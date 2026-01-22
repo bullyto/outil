@@ -293,6 +293,7 @@ async function refreshOnlinePublished(){
 async function main(){
   startClock();
 
+  // (Gardé tel quel) Champs de config affichés dans l'UI
   setVal("ghOwner", localStorage.getItem("gh_owner") || getVal("ghOwner","bullyto") || "bullyto");
   setVal("ghRepo", localStorage.getItem("gh_repo") || getVal("ghRepo","outil") || "outil");
   setVal("ghBranch", localStorage.getItem("gh_branch") || getVal("ghBranch","main") || "main");
@@ -326,11 +327,12 @@ async function main(){
   if($("schedDays")) $("schedDays").addEventListener("change", rerender);
 
   if ($("btnSaveToken")) $("btnSaveToken").addEventListener("click", ()=>{
-    const token = readTokenUnified();
+    const token = readTokenUnified(); // ici = PIN
     if(!token){ toast("Mot de passe vide."); return; }
     localStorage.setItem("admin_pin", token);
     toast("Mot de passe enregistré sur cet appareil.");
   });
+
   if ($("btnClearToken")) $("btnClearToken").addEventListener("click", ()=>{
     localStorage.removeItem("admin_pin");
     setVal("ghToken","");
@@ -349,7 +351,6 @@ async function main(){
     try{
       // Publication via Cloudflare Worker (token GitHub côté serveur)
       const pin = readTokenUnified();
-
       if(!pin){ toast("Entre le mot de passe (0000)."); return; }
 
       const updated = buildUpdatedStatus(current);
@@ -360,6 +361,7 @@ async function main(){
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pin, content: updated })
       });
+
       const txt = await r.text();
       let j = null;
       try{ j = JSON.parse(txt); }catch(e){}
@@ -383,4 +385,8 @@ async function main(){
     }
   });
 
-  refreshOnlinePubli
+  refreshOnlinePublished();
+  rerender();
+}
+
+main();
