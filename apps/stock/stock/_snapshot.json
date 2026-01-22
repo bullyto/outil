@@ -1,6 +1,10 @@
 {
-  "updated_at": "2026-01-22T22:15:31.046Z",
+  "updated_at": "2026-01-22T22:15:44.202Z",
   "items": [
+    {
+      "id": "absolut",
+      "qty": 14
+    },
     {
       "id": "poliakov",
       "qty": 0
