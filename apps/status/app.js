@@ -1,3 +1,4 @@
+// PATH: /apps/status/app.js
 const $ = (id) => document.getElementById(id);
 
 function getVal(id, fallback = ""){
@@ -35,23 +36,16 @@ async function loadStatus(){
   return await r.json();
 }
 
-function readTokenUnified(){
+// AVANT: token GitHub localStorage
+// MAINTENANT: PIN admin (0000) => le Worker utilise le secret GITHUB_TOKEN côté Cloudflare
+function readAdminPin(){
   const fromInput = getVal("ghToken","").trim();
   if(fromInput) return fromInput;
 
-  const legacy = (localStorage.getItem("gh_token") || "").trim();
-  if(legacy) return legacy;
+  const saved = (localStorage.getItem("admin_pin") || "").trim();
+  if(saved) return saved;
 
-  try{
-    const raw = localStorage.getItem("gh_token_v1");
-    if(!raw) return "";
-    const obj = JSON.parse(raw);
-    if(!obj || typeof obj.token !== "string" || typeof obj.exp !== "number") return "";
-    if(Date.now() > obj.exp) return "";
-    return obj.token.trim();
-  }catch(e){
-    return "";
-  }
+  return "";
 }
 
 function getCheckedDays(){
@@ -181,21 +175,17 @@ function renderLivePreview(data){
   safeText("liveMsg", cfg?.message, "—");
   safeImg("liveImg", cfg?.image, "images/panne.png");
 
-  // "Severity" = Mode chez toi → on affiche severity si existe sinon mode
   const sev = pickFirst(cfg, ["severity"]) || mode || "info";
   safeText("liveSev", sev);
 
-  // Chemin image toujours visible
   const imgPath = pickFirst(cfg, ["image","img","image_path","imagePath"]) || "images/panne.png";
   safeText("liveImagePath", imgPath);
 
-  // Création / Diffusion (grâce aux champs qu’on va écrire à chaque publish)
   const created = pickFirst(data, ["created_at","createdAt"]) ?? data.last_update ?? "";
   safeText("liveCreated", created);
 
   const starts = pickFirst(data, ["starts_at","startsAt"]) ?? pickFirst(data, ["published_at","publishedAt"]) ?? data.last_update ?? "";
   const ends = pickFirst(data, ["ends_at","endsAt"]) ?? "";
-
   safeText("liveStarts", starts);
   safeText("liveEnds", ends ? ends : "—");
 
@@ -270,6 +260,10 @@ function setFormFromStatus(data){
   setVal("schedEnd", sched.end || "06:00");
   setCheckedDays(sched.days || [1,2,3,4,5,6,0]);
 
+  // Remplir le PIN enregistré si vide
+  const savedPin = (localStorage.getItem("admin_pin") || "").trim();
+  if(savedPin && $("ghToken") && !getVal("ghToken","")) setVal("ghToken", savedPin);
+
   syncModePanels();
 
   renderPreview(buildUpdatedStatus(data));
@@ -292,12 +286,11 @@ function buildUpdatedStatus(current){
   data.mode = mode;
   data.last_update = nowIsoParisish();
 
-  // ✅ AJOUT: métadonnées pour "Création / Diffusion"
-  if(!data.created_at) data.created_at = data.last_update;   // une seule fois
-  data.published_at = data.last_update;                      // à chaque publication
+  if(!data.created_at) data.created_at = data.last_update;
+  data.published_at = data.last_update;
   if(active && mode !== "none"){
-    if(!data.starts_at) data.starts_at = data.last_update;   // diffusion “démarre maintenant”
-    if(data.ends_at === undefined) data.ends_at = "";        // vide = pas de fin fixe
+    if(!data.starts_at) data.starts_at = data.last_update;
+    if(data.ends_at === undefined) data.ends_at = "";
   } else {
     if(data.ends_at === undefined) data.ends_at = "";
   }
@@ -352,56 +345,6 @@ function buildUpdatedStatus(current){
   return data;
 }
 
-function b64encodeUtf8(str){
-  const bytes = new TextEncoder().encode(String(str));
-  let bin = "";
-  for (let i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
-  return btoa(bin);
-}
-
-async function githubGetFileMeta({owner, repo, path, branch, token}){
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
-  const r = await fetch(url, {
-    headers: {
-      "Accept": "application/vnd.github+json",
-      "Authorization": `Bearer ${token}`,
-      "X-GitHub-Api-Version": "2022-11-28"
-    }
-  });
-  if(!r.ok){
-    const t = await r.text();
-    throw new Error(`GitHub GET meta failed (${r.status}): ${t}`);
-  }
-  return await r.json();
-}
-
-async function githubPutFile({owner, repo, path, branch, token, contentText, sha}){
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-  const body = {
-    message: `Update ${path} via Status Admin`,
-    content: b64encodeUtf8(contentText),
-    branch
-  };
-  if(sha) body.sha = sha;
-
-  const r = await fetch(url, {
-    method: "PUT",
-    headers: {
-      "Accept": "application/vnd.github+json",
-      "Authorization": `Bearer ${token}`,
-      "X-GitHub-Api-Version": "2022-11-28",
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(body)
-  });
-
-  if(!r.ok){
-    const t = await r.text();
-    throw new Error(`GitHub PUT failed (${r.status}): ${t}`);
-  }
-  return await r.json();
-}
-
 function startClock(){
   const clock = $("clock");
   const today = $("today");
@@ -429,10 +372,11 @@ async function refreshOnlinePublished(){
 async function main(){
   startClock();
 
+  // On garde ces champs (UI) sans les casser, mais la publication n’en dépend plus.
   setVal("ghOwner", localStorage.getItem("gh_owner") || getVal("ghOwner","bullyto") || "bullyto");
-  setVal("ghRepo", localStorage.getItem("gh_repo") || getVal("ghRepo","status") || "status");
+  setVal("ghRepo", localStorage.getItem("gh_repo") || getVal("ghRepo","outil") || "outil");
   setVal("ghBranch", localStorage.getItem("gh_branch") || getVal("ghBranch","main") || "main");
-  setVal("ghPath", localStorage.getItem("gh_path") || getVal("ghPath","status.json") || "status.json");
+  setVal("ghPath", localStorage.getItem("gh_path") || getVal("ghPath","apps/status/status.json") || "apps/status/status.json");
 
   let currentRaw = await loadStatus();
   let current = normalizeStatus(currentRaw);
@@ -469,16 +413,17 @@ async function main(){
   });
   if($("schedDays")) $("schedDays").addEventListener("change", rerender);
 
+  // Boutons "token" => deviennent "PIN"
   if ($("btnSaveToken")) $("btnSaveToken").addEventListener("click", ()=>{
-    const token = readTokenUnified();
-    if(!token){ toast("Token vide."); return; }
-    localStorage.setItem("gh_token", token);
-    toast("Token enregistré sur ce téléphone.");
+    const pin = readAdminPin();
+    if(!pin){ toast("Mot de passe vide."); return; }
+    localStorage.setItem("admin_pin", pin);
+    toast("Mot de passe enregistré sur cet appareil.");
   });
   if ($("btnClearToken")) $("btnClearToken").addEventListener("click", ()=>{
-    localStorage.removeItem("gh_token");
+    localStorage.removeItem("admin_pin");
     setVal("ghToken","");
-    toast("Token supprimé.");
+    toast("Mot de passe supprimé.");
   });
 
   ["ghOwner","ghRepo","ghBranch","ghPath"].forEach(id => {
@@ -491,34 +436,37 @@ async function main(){
 
   if ($("btnPublish")) $("btnPublish").addEventListener("click", async ()=>{
     try{
-      const owner  = getVal("ghOwner", "bullyto");
-      const repo   = getVal("ghRepo", "status");
-      const branch = getVal("ghBranch", "main");
-      const path   = getVal("ghPath", "status.json");
-      const token  = readTokenUnified();
-
-      if(!owner || !repo || !path) { toast("Config manquante."); return; }
-      if(!token){ toast("Ajoute ton token GitHub."); return; }
-
-      toast("Lecture du fichier sur GitHub...");
-      const meta = await githubGetFileMeta({owner, repo, path, branch, token});
-      const sha = meta.sha;
+      const pin = readAdminPin();
+      if(!pin){ toast("Entre le mot de passe (0000)."); return; }
 
       const updated = buildUpdatedStatus(current);
-      const contentText = JSON.stringify(updated, null, 2);
 
-      toast("Publication sur GitHub...");
-      await githubPutFile({owner, repo, path, branch, token, contentText, sha});
+      toast("Publication via Cloudflare...");
+      const r = await fetch("https://quiet-sunset-9161.apero-nuit-du-66.workers.dev/api/status/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin, content: updated })
+      });
 
+      const txt = await r.text();
+      let j = null;
+      try{ j = JSON.parse(txt); }catch(e){}
+
+      if(!r.ok || !j || j.ok !== true){
+        const msg = (j && j.error) ? String(j.error) : `HTTP ${r.status}`;
+        throw new Error(msg);
+      }
+
+      localStorage.setItem("admin_pin", pin);
       current = updated;
 
       toast("Vérification en ligne...");
       await refreshOnlinePublished();
 
       toast("Publié ✅");
-    } catch(err){
+    }catch(err){
       console.error(err);
-      toast("Erreur GitHub : " + (err?.message || err));
+      toast("Erreur : " + (err?.message || err));
     }
   });
 
