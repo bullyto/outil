@@ -22,7 +22,7 @@
       --warn:#ffb020;        /* 1-2 */
       --ok:#31d158;          /* >=3 */
 
-      --name:#31d158;        /* ✅ nom produit (vert) */
+      --name:#31d158;        /* nom produit (vert) */
 
       --shadow:0 12px 40px rgba(0,0,0,.35);
       --r:18px;
@@ -168,20 +168,20 @@
 
     .list{ display:grid; grid-template-columns: 1fr; gap:10px; }
 
-    /* ✅ FIX: name missing because .content grid was centering. We align to TOP and reserve space for title */
+    /* ✅ LAYOUT FIX: no more overlap, name always visible, badge+price never under "-" */
     .item{
       display:grid;
-      grid-template-columns: 92px 1fr;
+      grid-template-columns: 110px 1fr;
       gap:14px;
       align-items:center;
       padding:14px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.12);
-      min-height: 156px;  /* ✅ taller */
+      min-height: 164px;
     }
     .thumb{
-      width:92px; height:92px;
+      width:110px; height:110px;
       border-radius:18px;
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
@@ -194,7 +194,7 @@
       width:100%;
       height:100%;
       object-fit:contain;
-      padding:6px;
+      padding:8px;
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.35));
     }
 
@@ -202,53 +202,29 @@
       min-width:0;
       display:grid;
       grid-template-columns: 1fr auto;
-      gap:12px;
-      align-items:start; /* ✅ IMPORTANT: don't vertically center -> name becomes visible */
+      grid-template-rows: auto auto auto;
+      column-gap:12px;
+      row-gap:10px;
+      align-items:center;
     }
 
-    .meta{
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      padding-top: 6px; /* ✅ pushes name into the green zone */
-    }
-
+    /* ✅ Name: one line, ALWAYS visible */
     .name{
+      grid-column: 1 / -1;
       margin:0;
       font-size:18px;
       font-weight:950;
-      line-height:1.15;
-      color: var(--name); /* ✅ green */
-      display:-webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
+      line-height:1.12;
+      color: var(--name);
+      white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      max-width: 100%;
-      min-height: 42px;   /* ✅ reserve space so it never collapses */
-    }
-
-    /* ✅ Move (red circle) slightly lower */
-    .subRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      min-width:0;
-      margin-top: 6px;    /* ✅ lower badge + price */
-    }
-
-    .price{
-      margin:0;
-      font-size:18px;
-      font-weight:950;
-      line-height:1;
-      flex:0 0 auto;
-      white-space:nowrap;
+      padding-top:2px;
     }
 
     .badge{
+      grid-row:2;
+      grid-column:1;
       font-size:11px;
       padding:7px 11px;
       border-radius:999px;
@@ -260,22 +236,40 @@
       align-items:center;
       gap:6px;
       width: fit-content;
+      max-width: 100%;
       white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .badge.ok{ border-color: rgba(49,209,88,.35); background: rgba(49,209,88,.10); color:#dfffe8; }
     .badge.warn{ border-color: rgba(255,176,32,.45); background: rgba(255,176,32,.12); color:#fff1d3; }
     .badge.danger{ border-color: rgba(255,59,59,.35); background: rgba(255,59,59,.10); color:#ffe3e3; }
 
+    /* ✅ Price: fixed column, never collides with buttons */
+    .price{
+      grid-row:2;
+      grid-column:2;
+      margin:0;
+      font-size:20px;
+      font-weight:950;   /* ✅ en gras */
+      line-height:1;
+      white-space:nowrap;
+      justify-self:end;
+      padding-left:8px;
+    }
+
+    /* ✅ Buttons always on their own row (no overlap) */
     .qtyBox{
+      grid-row:3;
+      grid-column:2;
       display:flex;
       align-items:center;
       gap:10px;
-      flex:0 0 auto;
-      padding-top: 36px; /* ✅ align controls with badge/price lower (prevents overlap) */
+      justify-self:end;
     }
     .qtyBtn{
-      width:48px;
-      height:48px;
+      width:52px;
+      height:52px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
@@ -289,13 +283,13 @@
     }
     .qtyBtn:active{ transform: translateY(1px); }
     .qtyVal{
-      min-width:62px;
-      padding:12px 10px;
+      min-width:66px;
+      padding:13px 10px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
       color:var(--text);
-      font-size:15px;
+      font-size:16px;
       text-align:center;
       user-select:none;
     }
@@ -409,10 +403,12 @@
     .tabTop:active{ transform: translateY(1px); }
 
     @media (max-width:420px){
-      .item{ grid-template-columns: 90px 1fr; min-height: 164px; }
+      .item{ grid-template-columns: 110px 1fr; min-height: 172px; }
+      .thumb{ width:110px; height:110px; }
       .name{ font-size:18px; }
-      .price{ font-size:18px; }
-      .qtyBox{ padding-top: 40px; }
+      .price{ font-size:20px; }
+      .qtyBtn{ width:54px; height:54px; }
+      .qtyVal{ min-width:68px; }
     }
   </style>
 </head>
@@ -740,14 +736,10 @@ function renderList(){
           </div>
 
           <div class="content">
-            <div class="meta">
-              <p class="name">${esc(p.name)}</p>
+            <p class="name">${esc(p.name)}</p>
 
-              <div class="subRow">
-                <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
-                <p class="price">${price ? esc(price) + "€" : "—"}</p>
-              </div>
-            </div>
+            <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
+            <p class="price">${price ? esc(price) + "€" : "—"}</p>
 
             <div class="qtyBox">
               <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
