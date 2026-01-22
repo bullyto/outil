@@ -390,35 +390,6 @@
       background: rgba(255,255,255,.03);
     }
 
-    .tabTop{
-      position:fixed;
-      right:12px;
-      top:92px;
-      z-index:12;
-      padding:9px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(10,14,24,.70);
-      backdrop-filter: blur(10px);
-      color:var(--text);
-      font-size:12px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      cursor:pointer;
-      user-select:none;
-    }
-    .tabTop:active{ transform: translateY(1px); }
-
-    @media (max-width:420px){
-      .item{ grid-template-columns: 96px 1fr; }
-      .thumb{ width:96px; height:96px; }
-      .name{ font-size:14px; }
-      .qtyBtn{ width:42px; height:42px; }
-      .qtyVal{ min-width:64px; }
-      .price{ font-size:18px; }
-    }
-
     /* =========================
        ✅ MENU "OUTILS" (comme TTC)
        ========================= */
@@ -565,15 +536,12 @@
         <div class="pill" id="syncPill" title="Dernière synchronisation">
           <span>Sync</span> <b id="syncText">—</b>
         </div>
-        <!-- ✅ ouvre le menu OUTILS (navigation) -->
+        <!-- ✅ SEUL bouton Outils (celui en vert sur ta capture) -->
         <button class="btnIcon" id="btnOpenToolsMenu" title="Outils">☰</button>
       </div>
     </div>
   </div>
 </header>
-
-<!-- ✅ même logique : "☰ Outils" ouvre le menu -->
-<div class="tabTop" id="tabTop">☰ Outils</div>
 
 <main>
   <div class="grid">
@@ -596,8 +564,7 @@
           <div class="actions">
             <button class="btn" id="btnReload" title="Recharger depuis GitHub (public)">⟲ Recharger</button>
             <button class="btn primary" id="btnSaveRepo" title="Publier via Cloudflare (PIN)">Publier</button>
-            <!-- ✅ le panneau Branch/Path/PIN reste accessible ici (pas via ☰ Outils) -->
-            <button class="btn" id="btnOpenStockSettings" title="Paramètres Stock">⚙️ Param</button>
+            <!-- ✅ SUPPRIMÉ: le bouton Param ici (tu l'as déjà dans le menu Outils) -->
             <button class="btn danger" id="btnReset" title="Annuler les modifications locales">Annuler</button>
           </div>
         </div>
@@ -651,12 +618,13 @@
 
     <div class="toolsFoot">
       <span>Accès rapide : navigation interne entre outils.</span>
+      <!-- ✅ Paramètres Stock UNIQUEMENT ici -->
       <button class="miniBtn" id="btnOpenStockSettingsFromMenu">⚙️ Paramètres Stock</button>
     </div>
   </div>
 </div>
 
-<!-- ✅ PARAMÈTRES STOCK (Branch/Path/PIN) — séparé du menu -->
+<!-- ✅ PARAMÈTRES STOCK (Branch/Path/PIN) -->
 <div class="sheet" id="sheet">
   <div class="backdrop" id="sheetBackdrop"></div>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
@@ -756,7 +724,6 @@ const toolsMenuSheet = $("#toolsMenuSheet");
 const toolsMenuBackdrop = $("#toolsMenuBackdrop");
 const toolsMenuClose = $("#toolsMenuClose");
 const btnOpenToolsMenu = $("#btnOpenToolsMenu");
-const tabTop = $("#tabTop");
 const toolsYear = $("#toolsYear");
 const btnOpenStockSettingsFromMenu = $("#btnOpenStockSettingsFromMenu");
 
@@ -764,7 +731,6 @@ const btnOpenStockSettingsFromMenu = $("#btnOpenStockSettingsFromMenu");
 const sheet = $("#sheet");
 const sheetBackdrop = $("#sheetBackdrop");
 const sheetClose = $("#sheetClose");
-const btnOpenStockSettings = $("#btnOpenStockSettings");
 const tokenInput = $("#tokenInput");
 const tokenState = $("#tokenState");
 const btnSaveToken = $("#btnSaveToken");
@@ -805,7 +771,6 @@ function snapshotPath(){
 
 /* ✅ MENU OUTILS */
 function openToolsMenu(){
-  // année auto si tu veux
   try{ toolsYear.textContent = String(new Date().getFullYear()); }catch(e){}
   toolsMenuSheet.classList.add("show");
 }
@@ -968,7 +933,6 @@ function renderList(){
   updateDirtyBadge();
 }
 
-/* ✅ BACK TO "AS BEFORE": soft-load snapshot, never throw, keep UI usable */
 async function pullFromRepo(){
   const s = getGH();
   toastMsg("Chargement dépôt…");
@@ -1069,8 +1033,6 @@ async function pushToRepo(){
 
 /* UI — MENU OUTILS */
 btnOpenToolsMenu.addEventListener("click", openToolsMenu);
-tabTop.addEventListener("click", openToolsMenu);
-
 toolsMenuBackdrop.addEventListener("click", closeToolsMenu);
 toolsMenuClose.addEventListener("click", closeToolsMenu);
 
@@ -1080,8 +1042,6 @@ btnOpenStockSettingsFromMenu.addEventListener("click", ()=>{
 });
 
 /* UI — PARAM STOCK */
-btnOpenStockSettings.addEventListener("click", openSettings);
-
 sheetBackdrop.addEventListener("click", closeSettings);
 sheetClose.addEventListener("click", closeSettings);
 
