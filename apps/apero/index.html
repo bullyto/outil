@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0b1220" />
+  <meta name="theme-color" content="#0b0f14" />
   <title>Calculateur TTC</title>
 
   <link rel="manifest" href="manifest.json" />
@@ -15,13 +15,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    /* Petit polish marketing (sans dépendances) */
+    /* ===== ADN66 – CHARTE OFFICIELLE OUTILS INTERNES (DARK PREMIUM) =====
+       Bleu = actions | Vert = OK | Jaune = warning | Rouge = danger
+       (pas de violet, pas de vert flashy en dehors de OK)
+    */
     .bg-neon {
       background:
         radial-gradient(900px 500px at 15% 10%, rgba(56,189,248,.22), transparent 60%),
-        radial-gradient(900px 500px at 85% 15%, rgba(34,197,94,.20), transparent 55%),
-        radial-gradient(900px 600px at 50% 95%, rgba(168,85,247,.14), transparent 55%),
-        linear-gradient(180deg, #050914 0%, #0b1220 40%, #0b1220 100%);
+        radial-gradient(900px 520px at 85% 18%, rgba(34,197,94,.12), transparent 58%),
+        linear-gradient(180deg, #050914 0%, #0b0f14 42%, #0b0f14 100%);
     }
     .glass {
       background: rgba(255,255,255,.06);
@@ -29,7 +31,7 @@
       backdrop-filter: blur(10px);
     }
     .ring-neon {
-      box-shadow: 0 0 0 1px rgba(56,189,248,.18), 0 0 40px rgba(56,189,248,.12);
+      box-shadow: 0 0 0 1px rgba(56,189,248,.18), 0 0 40px rgba(0,0,0,.60);
     }
     .btn {
       transition: transform .08s ease, box-shadow .12s ease, background .12s ease;
@@ -66,6 +68,7 @@
     /* ✅ MAJ: plus besoin du bouton "Démarrer caméra" */
     #scanStart { display:none !important; }
   </style>
+
   <link rel="stylesheet" href="../../shared/menu.css">
   <script src="../../shared/menu.js" defer></script>
 </head>
@@ -89,7 +92,8 @@
               <span class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide">
                 Apéro de Nuit 66 • PWA
               </span>
-              <span class="hidden sm:inline-flex items-center rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-semibold tracking-wide text-emerald-200">
+              <!-- ✅ Badge "info" : bleu (actions / info) -->
+              <span class="hidden sm:inline-flex items-center rounded-full bg-sky-400/15 px-3 py-1 text-xs font-semibold tracking-wide text-sky-200 border border-sky-300/20">
                 Calcul TTC + taxes
               </span>
             </div>
@@ -173,21 +177,26 @@
         </div>
 
         <div class="mt-5 flex flex-col sm:flex-row gap-3">
+          <!-- 🔵 Action -->
           <button id="addBtn"
             class="btn flex-1 rounded-2xl bg-sky-400/20 hover:bg-sky-400/30 border border-sky-300/30 px-4 py-3 font-bold">
             ➕ Ajouter
           </button>
+
           <button id="undoBtn"
             class="btn flex-1 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-3 font-semibold">
             ↩️ Annuler
           </button>
+
+          <!-- 🔴 Danger -->
           <button id="clearBtn"
-            class="btn flex-1 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/30 px-4 py-3 font-semibold">
+            class="btn flex-1 rounded-2xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 px-4 py-3 font-semibold">
             🗑️ Effacer tout
           </button>
 
+          <!-- 🔵 Action (scanner) -->
           <button id="scanBtn"
-            class="btn flex-1 rounded-2xl bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-300/25 px-4 py-3 font-semibold">
+            class="btn flex-1 rounded-2xl bg-sky-400/15 hover:bg-sky-400/25 border border-sky-300/25 px-4 py-3 font-semibold">
             📷 Scanner article
           </button>
         </div>
@@ -270,17 +279,19 @@
             <!-- ✅ MAJ: scanStart caché par CSS, mais on le garde pour compat/debug -->
             <button id="scanStart" class="btn rounded-2xl bg-sky-400/20 hover:bg-sky-400/30 border border-sky-300/30 px-4 py-2 font-bold text-sm">Démarrer caméra</button>
             <button id="scanStop" class="btn rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-2 font-semibold text-sm" disabled>Stop</button>
-            <button id="scanTorch" class="btn rounded-2xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-300/25 px-4 py-2 font-semibold text-sm" disabled>Flash</button>
+            <!-- 🔵 Flash = action (pas warning) -->
+            <button id="scanTorch" class="btn rounded-2xl bg-sky-400/15 hover:bg-sky-400/25 border border-sky-300/25 px-4 py-2 font-semibold text-sm" disabled>Flash</button>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="sm:col-span-2">
               <label for="scanManual" class="block text-xs font-semibold text-white/70">Code-barres (saisie manuelle)</label>
               <input id="scanManual" type="text" inputmode="numeric"
-                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-emerald-300/50 focus:ring-2 focus:ring-emerald-300/20"
+                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
                 placeholder="Ex: 2000000000007" />
             </div>
             <div class="sm:col-span-1 flex items-end">
+              <!-- 🟢 Valider = OK -->
               <button id="scanManualBtn"
                 class="btn w-full rounded-2xl bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-300/25 px-4 py-3 font-bold">
                 Valider
@@ -355,6 +366,7 @@
           </div>
 
           <div class="flex flex-col sm:flex-row gap-2">
+            <!-- 🟢 OK -->
             <button id="cartonValidate"
               class="btn flex-1 rounded-2xl bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-300/25 px-4 py-3 font-bold">
               ✅ Valider et ajouter
@@ -565,29 +577,27 @@
       // ✅ PACKS / SOFTS — codes RÉELS fournis en photo
       { barcode: "5000112639995", type: "soda", name: "Coca-Cola pack pro 12x1,25 L", priceHT: 1.50 },
       { barcode: "3760205930171", type: "soda", name: "Crazy Tiger pack 6x1 L PET",   priceHT: 5.00 },
-    
-// --- AJOUTS (scan cartons) ---
-{ barcode: "3012998538400", type: "alcohol", name: "Rhum blanc (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
-{ barcode: "3107870061876", type: "alcohol", name: "Scotch whisky (carton x12) - MBWS", bottles: 12, degree: 40, priceHT: null, volume: 0.70 },
-{ barcode: "3107872000507", type: "alcohol", name: "Scotch whisky (UVC) - MBWS", bottles: 12, degree: 40, priceHT: null, volume: 0.70 },
-{ barcode: "3147691285723", type: "alcohol", name: "Label 5 Classic Black (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
-{ barcode: "3147691285518", type: "alcohol", name: "William Peel (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
-{ barcode: "7312040017680", type: "alcohol", name: "Absolut Vodka (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
-{ barcode: "5010106013120", type: "alcohol", name: "Ballantine's (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
-{ barcode: "5099873105306", type: "alcohol", name: "Jack Daniel's Old No.7 (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
-{ barcode: "5099873128473", type: "alcohol", name: "Jack Daniel's Tennessee Honey (carton 6x70 cl)", bottles: 6, degree: 35, priceHT: null, volume: 0.70 },
-{ barcode: "7610113020227", type: "alcohol", name: "GET 27 (carton 6x70 cl)", bottles: 6, degree: 17.9, priceHT: null, volume: 0.70 },
-{ barcode: "3107870062804", type: "alcohol", name: "Tequila San José Silver (carton 6x70 cl)", bottles: 6, degree: 35, priceHT: null, volume: 0.70 },
-{ barcode: "3107872600394", type: "alcohol", name: "Tequila San José Silver (UVC)", bottles: 6, degree: 35, priceHT: null, volume: 0.70 },
-{ barcode: "3163937019709", type: "alcohol", name: "Ricard 1 L (carton 6x1 L)", bottles: 6, degree: 45, priceHT: null, volume: 1.00 },
-{ barcode: "3047100100213", type: "alcohol", name: "Pastis 51 1 L (carton 6x1 L)", bottles: 6, degree: 45, priceHT: null, volume: 1.00 },
 
-{ barcode: "5000289927000", type: "alcohol", name: "Gordon's Gin (carton 6x70 cl)", bottles: 6, degree: 37.5, priceHT: null, volume: 0.70 },
-
-{ barcode: "3124488196383", type: "soda",   name: "Schweppes Tonic pack 6x1.5 L", priceHT: 4.00 },
-{ barcode: "3124480196381", type: "soda",   name: "Schweppes Tonic pack (UC) 6x1.5 L", priceHT: 4.00 },
-{ barcode: "7613035833289", type: "soda",   name: "Perrier pack 6x1 L",          priceHT: 3.00 },
-];
+      // --- AJOUTS (scan cartons) ---
+      { barcode: "3012998538400", type: "alcohol", name: "Rhum blanc (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+      { barcode: "3107870061876", type: "alcohol", name: "Scotch whisky (carton x12) - MBWS", bottles: 12, degree: 40, priceHT: null, volume: 0.70 },
+      { barcode: "3107872000507", type: "alcohol", name: "Scotch whisky (UVC) - MBWS", bottles: 12, degree: 40, priceHT: null, volume: 0.70 },
+      { barcode: "3147691285723", type: "alcohol", name: "Label 5 Classic Black (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+      { barcode: "3147691285518", type: "alcohol", name: "William Peel (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+      { barcode: "7312040017680", type: "alcohol", name: "Absolut Vodka (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+      { barcode: "5010106013120", type: "alcohol", name: "Ballantine's (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+      { barcode: "5099873105306", type: "alcohol", name: "Jack Daniel's Old No.7 (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+      { barcode: "5099873128473", type: "alcohol", name: "Jack Daniel's Tennessee Honey (carton 6x70 cl)", bottles: 6, degree: 35, priceHT: null, volume: 0.70 },
+      { barcode: "7610113020227", type: "alcohol", name: "GET 27 (carton 6x70 cl)", bottles: 6, degree: 17.9, priceHT: null, volume: 0.70 },
+      { barcode: "3107870062804", type: "alcohol", name: "Tequila San José Silver (carton 6x70 cl)", bottles: 6, degree: 35, priceHT: null, volume: 0.70 },
+      { barcode: "3107872600394", type: "alcohol", name: "Tequila San José Silver (UVC)", bottles: 6, degree: 35, priceHT: null, volume: 0.70 },
+      { barcode: "3163937019709", type: "alcohol", name: "Ricard 1 L (carton 6x1 L)", bottles: 6, degree: 45, priceHT: null, volume: 1.00 },
+      { barcode: "3047100100213", type: "alcohol", name: "Pastis 51 1 L (carton 6x1 L)", bottles: 6, degree: 45, priceHT: null, volume: 1.00 },
+      { barcode: "5000289927000", type: "alcohol", name: "Gordon's Gin (carton 6x70 cl)", bottles: 6, degree: 37.5, priceHT: null, volume: 0.70 },
+      { barcode: "3124488196383", type: "soda",   name: "Schweppes Tonic pack 6x1.5 L", priceHT: 4.00 },
+      { barcode: "3124480196381", type: "soda",   name: "Schweppes Tonic pack (UC) 6x1.5 L", priceHT: 4.00 },
+      { barcode: "7613035833289", type: "soda",   name: "Perrier pack 6x1 L",          priceHT: 3.00 },
+    ];
 
     function beep(){
       try{
