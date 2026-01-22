@@ -1,4 +1,3 @@
-<!-- PATH: /apps/stock/index.html -->
 <!doctype html>
 <html lang="fr">
 <head>
@@ -419,6 +418,128 @@
       .qtyVal{ min-width:64px; }
       .price{ font-size:18px; }
     }
+
+    /* =========================
+       ✅ MENU "OUTILS" (comme TTC)
+       ========================= */
+    .toolsPanel{
+      width:min(560px, calc(100% - 22px));
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(14,18,28,.98), rgba(8,10,18,.98));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .toolsPanelHeader{
+      padding:16px 16px 14px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .toolsPanelHeader .left{
+      display:flex; align-items:center; gap:10px; min-width:0;
+    }
+    .toolsDot{
+      width:34px; height:34px; border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,213,74,.18), rgba(73,136,255,.10));
+      border:1px solid rgba(255,255,255,.12);
+      display:grid; place-items:center;
+      box-shadow: 0 10px 24px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .toolsTitle{
+      min-width:0;
+    }
+    .toolsTitle h3{
+      margin:0;
+      font-size:15px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .toolsTitle p{
+      margin:4px 0 0;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .toolsPanelHeader .year{
+      font-size:12px;
+      color:var(--muted);
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      user-select:none;
+    }
+
+    .toolsList{
+      padding:14px;
+      display:grid;
+      gap:10px;
+    }
+    .toolItem{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.10);
+    }
+    .toolItem .name{
+      margin:0;
+      font-size:16px;
+      font-weight:800;
+      color:var(--text);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 100%;
+    }
+    .toolTag{
+      font-size:12px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      user-select:none;
+      flex:0 0 auto;
+    }
+
+    .toolsFoot{
+      padding:14px 16px;
+      border-top:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+      background: rgba(255,255,255,.03);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .toolsFoot .miniBtn{
+      padding:9px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+      font-size:12px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .toolsFoot .miniBtn:active{ transform: translateY(1px); }
   </style>
 </head>
 
@@ -444,12 +565,14 @@
         <div class="pill" id="syncPill" title="Dernière synchronisation">
           <span>Sync</span> <b id="syncText">—</b>
         </div>
-        <button class="btnIcon" id="btnOpenSettings" title="Outils">☰</button>
+        <!-- ✅ ouvre le menu OUTILS (navigation) -->
+        <button class="btnIcon" id="btnOpenToolsMenu" title="Outils">☰</button>
       </div>
     </div>
   </div>
 </header>
 
+<!-- ✅ même logique : "☰ Outils" ouvre le menu -->
 <div class="tabTop" id="tabTop">☰ Outils</div>
 
 <main>
@@ -473,6 +596,8 @@
           <div class="actions">
             <button class="btn" id="btnReload" title="Recharger depuis GitHub (public)">⟲ Recharger</button>
             <button class="btn primary" id="btnSaveRepo" title="Publier via Cloudflare (PIN)">Publier</button>
+            <!-- ✅ le panneau Branch/Path/PIN reste accessible ici (pas via ☰ Outils) -->
+            <button class="btn" id="btnOpenStockSettings" title="Paramètres Stock">⚙️ Param</button>
             <button class="btn danger" id="btnReset" title="Annuler les modifications locales">Annuler</button>
           </div>
         </div>
@@ -485,11 +610,58 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ✅ MENU OUTILS (navigation) -->
+<div class="sheet" id="toolsMenuSheet" aria-hidden="true">
+  <div class="backdrop" id="toolsMenuBackdrop"></div>
+
+  <div class="panel toolsPanel" role="dialog" aria-modal="true" aria-labelledby="toolsMenuTitle">
+    <div class="toolsPanelHeader">
+      <div class="left">
+        <div class="toolsDot" aria-hidden="true">🚦</div>
+        <div class="toolsTitle">
+          <h3 id="toolsMenuTitle">ADN66 • Outils</h3>
+          <p>Menu interne — bascule rapide entre outils.</p>
+        </div>
+      </div>
+      <div class="year" id="toolsYear">2026</div>
+      <button id="toolsMenuClose" aria-label="Fermer">✕</button>
+    </div>
+
+    <div class="toolsList">
+      <div class="toolItem">
+        <p class="name">Stock</p>
+        <span class="toolTag">Outil</span>
+      </div>
+
+      <a class="toolItem" id="linkApero" href="../apero/" style="text-decoration:none;color:inherit;">
+        <p class="name">Apéro de Nuit 66</p>
+        <span class="toolTag">Outil</span>
+      </a>
+
+      <a class="toolItem" id="linkStatus" href="../status/" style="text-decoration:none;color:inherit;">
+        <p class="name">Status</p>
+        <span class="toolTag">Pilotage</span>
+      </a>
+
+      <a class="toolItem" id="linkGps" href="../gps/" style="text-decoration:none;color:inherit;">
+        <p class="name">GPS Apéro 66</p>
+        <span class="toolTag">Outil</span>
+      </a>
+    </div>
+
+    <div class="toolsFoot">
+      <span>Accès rapide : navigation interne entre outils.</span>
+      <button class="miniBtn" id="btnOpenStockSettingsFromMenu">⚙️ Paramètres Stock</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ PARAMÈTRES STOCK (Branch/Path/PIN) — séparé du menu -->
 <div class="sheet" id="sheet">
   <div class="backdrop" id="sheetBackdrop"></div>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
     <div class="panelHeader">
-      <h3 id="settingsTitle">Outils</h3>
+      <h3 id="settingsTitle">Paramètres Stock</h3>
       <button id="sheetClose" aria-label="Fermer">✕</button>
     </div>
 
@@ -579,11 +751,20 @@ const btnReset = $("#btnReset");
 const dirtyBadge = $("#dirtyBadge");
 const syncText = $("#syncText");
 
+/* ✅ Menu OUTILS (nav) */
+const toolsMenuSheet = $("#toolsMenuSheet");
+const toolsMenuBackdrop = $("#toolsMenuBackdrop");
+const toolsMenuClose = $("#toolsMenuClose");
+const btnOpenToolsMenu = $("#btnOpenToolsMenu");
+const tabTop = $("#tabTop");
+const toolsYear = $("#toolsYear");
+const btnOpenStockSettingsFromMenu = $("#btnOpenStockSettingsFromMenu");
+
+/* ✅ Paramètres Stock */
 const sheet = $("#sheet");
 const sheetBackdrop = $("#sheetBackdrop");
 const sheetClose = $("#sheetClose");
-const btnOpenSettings = $("#btnOpenSettings");
-const tabTop = $("#tabTop");
+const btnOpenStockSettings = $("#btnOpenStockSettings");
 const tokenInput = $("#tokenInput");
 const tokenState = $("#tokenState");
 const btnSaveToken = $("#btnSaveToken");
@@ -622,6 +803,17 @@ function snapshotPath(){
   return `${gh.stockPath}/_snapshot.json`;
 }
 
+/* ✅ MENU OUTILS */
+function openToolsMenu(){
+  // année auto si tu veux
+  try{ toolsYear.textContent = String(new Date().getFullYear()); }catch(e){}
+  toolsMenuSheet.classList.add("show");
+}
+function closeToolsMenu(){
+  toolsMenuSheet.classList.remove("show");
+}
+
+/* ✅ PARAM STOCK */
 function openSettings(){
   sheet.classList.add("show");
   tokenInput.value = state.pin || "";
@@ -875,9 +1067,20 @@ async function pushToRepo(){
   toastMsg("Publié ✅");
 }
 
-/* UI */
-btnOpenSettings.addEventListener("click", openSettings);
-tabTop.addEventListener("click", openSettings);
+/* UI — MENU OUTILS */
+btnOpenToolsMenu.addEventListener("click", openToolsMenu);
+tabTop.addEventListener("click", openToolsMenu);
+
+toolsMenuBackdrop.addEventListener("click", closeToolsMenu);
+toolsMenuClose.addEventListener("click", closeToolsMenu);
+
+btnOpenStockSettingsFromMenu.addEventListener("click", ()=>{
+  closeToolsMenu();
+  openSettings();
+});
+
+/* UI — PARAM STOCK */
+btnOpenStockSettings.addEventListener("click", openSettings);
 
 sheetBackdrop.addEventListener("click", closeSettings);
 sheetClose.addEventListener("click", closeSettings);
