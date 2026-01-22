@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Calculateur TTC</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="icon" href="icon-512.png" sizes="512x512" type="image/png" />
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* Petit polish marketing (sans dépendances) */
+    .bg-neon {
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(56,189,248,.22), transparent 60%),
+        radial-gradient(900px 500px at 85% 15%, rgba(34,197,94,.20), transparent 55%),
+        radial-gradient(900px 600px at 50% 95%, rgba(168,85,247,.14), transparent 55%),
+        linear-gradient(180deg, #050914 0%, #0b1220 40%, #0b1220 100%);
+    }
+    .glass {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+    }
+    .ring-neon {
+      box-shadow: 0 0 0 1px rgba(56,189,248,.18), 0 0 40px rgba(56,189,248,.12);
+    }
+    .btn {
+      transition: transform .08s ease, box-shadow .12s ease, background .12s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+    @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+  </style>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker enregistré', reg))
+          .catch(err => console.error('Erreur SW :', err));
+      });
+    }
+  </script>
+
+  <style>
+    /* UI épurée : masquage VISUEL uniquement (logique inchangée) */
+    .bg-white\/10.px-3.py-1.text-xs.font-semibold.tracking-wide { display:none !important; }
+    .mt-1.text-sm.text-white\/70 { display:none !important; }
+    .glass.rounded-2xl.px-4.py-3.text-sm { display:none !important; }
+    .mt-4.text-xs.text-white\/55 { display:none !important; }
+    footer.mt-8 { display:none !important; }
+  </style>
+
+  <style>
+    /* UI épurée : supprimer l'espace des cartes masquées (stockage/astuce) */
+    header .flex.flex-col.sm\:flex-row.gap-2.sm\:items-center { display:none !important; }
+  </style>
+
+  <style>
+    /* ✅ MAJ: plus besoin du bouton "Démarrer caméra" */
+    #scanStart { display:none !important; }
+  </style>
+  <link rel="stylesheet" href="../../shared/menu.css">
+  <script src="../../shared/menu.js" defer></script>
+</head>
+
+<body class="min-h-screen bg-neon text-white">
+  <div class="max-w-6xl mx-auto px-4 py-6">
+    <!-- Header -->
+    <header class="glass ring-neon rounded-3xl px-5 py-5 md:px-7 md:py-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="shrink-0">
+            <img
+              src="https://static.wixstatic.com/media/bc6106_2760d0ad9fe847418ba1d73666102706~mv2.png/v1/fill/w_560,h_320,al_c,lg_1,q_85,enc_avif,quality_auto/apero%20de%20nuit%20n.png"
+              alt="Apéro de Nuit 66"
+              class="h-14 w-auto drop-shadow"
+              onerror="this.onerror=null;this.src='icon-192.png';"
+            />
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide">
+                Apéro de Nuit 66 • PWA
+              </span>
+              <span class="hidden sm:inline-flex items-center rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-semibold tracking-wide text-emerald-200">
+                Calcul TTC + taxes
+              </span>
+            </div>
+            <h1 class="mt-2 text-xl md:text-2xl font-extrabold leading-tight">
+              Calculateur TTC
+            </h1>
+            <p class="mt-1 text-sm text-white/70">
+              Ajoute tes produits, vérifie TVA + CSS, et garde tout enregistré <span class="font-semibold text-white/80">en local</span> jusqu’à effacement.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+          <div class="glass rounded-2xl px-4 py-3 text-sm">
+            <div class="text-white/60">Stockage</div>
+            <div class="font-semibold">LocalStorage (persistant)</div>
+          </div>
+          <div class="glass rounded-2xl px-4 py-3 text-sm">
+            <div class="text-white/60">Astuce</div>
+            <div class="font-semibold">“Effacer tout” remet à zéro</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Form card -->
+      <section class="lg:col-span-5 glass ring-neon rounded-3xl p-5 md:p-6">
+        <div class="mt-3 flex gap-2">
+          <button id="modeAlcohol" type="button"
+            class="px-4 py-2 rounded-2xl bg-white/15 hover:bg-white/20 border border-white/15 text-sm font-semibold">
+            Alcool
+          </button>
+          <button id="modeSoda" type="button"
+            class="px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold text-white/80">
+            Soda
+          </button>
+        </div>
+
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label for="name" class="block text-xs font-semibold text-white/70">Nom du produit</label>
+            <input id="name" type="text"
+              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+              placeholder="Ex: Vodka 70 cl"
+            />
+          </div>
+
+          <div>
+            <label for="price" class="block text-xs font-semibold text-white/70">Prix unitaire HT (€)</label>
+            <input id="price" type="number" step="0.01" inputmode="decimal"
+              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+              placeholder="Ex: 12.90"
+            />
+          </div>
+
+          <div id="volumeField">
+            <label for="volume" class="block text-xs font-semibold text-white/70">Volume (L)</label>
+            <input id="volume" type="number" step="0.01" inputmode="decimal"
+              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+              placeholder="Ex: 0.70"
+            />
+          </div>
+
+          <div id="degreeField">
+            <label for="degree" class="block text-xs font-semibold text-white/70">Degré (%)</label>
+            <input id="degree" type="number" step="0.1" inputmode="decimal"
+              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+              placeholder="Ex: 40"
+            />
+          </div>
+
+          <div>
+            <label for="quantity" class="block text-xs font-semibold text-white/70">Quantité</label>
+            <input id="quantity" type="number" step="1" inputmode="numeric"
+              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+              placeholder="Ex: 6"
+            />
+          </div>
+        </div>
+
+        <div class="mt-5 flex flex-col sm:flex-row gap-3">
+          <button id="addBtn"
+            class="btn flex-1 rounded-2xl bg-sky-400/20 hover:bg-sky-400/30 border border-sky-300/30 px-4 py-3 font-bold">
+            ➕ Ajouter
+          </button>
+          <button id="undoBtn"
+            class="btn flex-1 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-3 font-semibold">
+            ↩️ Annuler
+          </button>
+          <button id="clearBtn"
+            class="btn flex-1 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/30 px-4 py-3 font-semibold">
+            🗑️ Effacer tout
+          </button>
+
+          <button id="scanBtn"
+            class="btn flex-1 rounded-2xl bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-300/25 px-4 py-3 font-semibold">
+            📷 Scanner article
+          </button>
+        </div>
+
+        <div class="mt-4 text-xs text-white/55">
+          Les données sont stockées <span class="font-semibold text-white/70">sur ton appareil</span> (LocalStorage). Rien n’est envoyé sur internet.
+        </div>
+      </section>
+
+      <!-- Table card -->
+      <section class="lg:col-span-7 glass ring-neon rounded-3xl p-5 md:p-6">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold tracking-wide text-white/90">Détail du calcul</h2>
+            <p class="mt-1 text-sm text-white/65">TVA HT, CSS, TVA CSS et total TTC.</p>
+          </div>
+
+          <div class="glass rounded-2xl px-4 py-3">
+            <div class="text-xs text-white/60">Total général TTC</div>
+            <div class="text-2xl font-extrabold tracking-tight">
+              <span id="grand-total">0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-5 overflow-x-auto rounded-2xl border border-white/10">
+          <table class="min-w-full text-sm">
+            <thead class="bg-white/5 text-white/80">
+              <tr>
+                <th class="px-4 py-3 text-left font-semibold">Produit</th>
+                <th class="px-4 py-3 text-right font-semibold">Total HT</th>
+                <th class="px-4 py-3 text-right font-semibold">TVA</th>
+                <th class="px-4 py-3 text-right font-semibold">CSS</th>
+                <th class="px-4 py-3 text-right font-semibold">TVA CSS</th>
+                <th class="px-4 py-3 text-right font-semibold">Total TTC</th>
+              </tr>
+            </thead>
+            <tbody id="product-table" class="divide-y divide-white/10 bg-black/10">
+              <!-- rows injected -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 text-xs text-white/55">
+          💡 Conseil : si tu veux “repartir à zéro”, utilise <span class="font-semibold text-white/75">Effacer tout</span> (ça supprime aussi la sauvegarde locale).
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-8 pb-6 text-center text-xs text-white/45">
+      © Apéro de Nuit 66
+    </footer>
+  </div>
+
+  <!-- Modal scanner -->
+  <div id="scanModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/70"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="glass ring-neon w-full max-w-lg rounded-3xl p-5 md:p-6 relative">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-extrabold">Scanner article</h3>
+            <p class="mt-1 text-sm text-white/70">Vise le code-barres (si compatible) ou saisis-le. Bip + vibration à la détection.</p>
+          </div>
+          <button id="scanClose" class="btn rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-3 py-2 text-sm font-semibold">✖</button>
+        </div>
+
+        <div class="mt-4 grid gap-3">
+          <div class="rounded-2xl overflow-hidden border border-white/10 bg-black/20">
+            <div class="relative">
+              <video id="scanVideo" class="w-full h-52 object-cover" autoplay playsinline muted></video>
+              <div class="pointer-events-none absolute inset-0 grid place-items-center">
+                <div class="w-[min(78vw,360px)] h-28 rounded-2xl border-2 border-white/70 shadow-[0_0_0_9999px_rgba(0,0,0,.35)]"></div>
+              </div>
+            </div>
+            <div class="px-4 py-3 text-sm text-white/75" id="scanStatus">Prêt.</div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <!-- ✅ MAJ: scanStart caché par CSS, mais on le garde pour compat/debug -->
+            <button id="scanStart" class="btn rounded-2xl bg-sky-400/20 hover:bg-sky-400/30 border border-sky-300/30 px-4 py-2 font-bold text-sm">Démarrer caméra</button>
+            <button id="scanStop" class="btn rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-2 font-semibold text-sm" disabled>Stop</button>
+            <button id="scanTorch" class="btn rounded-2xl bg-amber-400/15 hover:bg-amber-400/25 border border-amber-300/25 px-4 py-2 font-semibold text-sm" disabled>Flash</button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label for="scanManual" class="block text-xs font-semibold text-white/70">Code-barres (saisie manuelle)</label>
+              <input id="scanManual" type="text" inputmode="numeric"
+                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-emerald-300/50 focus:ring-2 focus:ring-emerald-300/20"
+                placeholder="Ex: 2000000000007" />
+            </div>
+            <div class="sm:col-span-1 flex items-end">
+              <button id="scanManualBtn"
+                class="btn w-full rounded-2xl bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-300/25 px-4 py-3 font-bold">
+                Valider
+              </button>
+            </div>
+          </div>
+
+          <div class="text-xs text-white/60">
+            ℹ️ Pour l’instant, ton “catalogue” de produits scannables est dans le code (jusqu’à 20 entrées). Les prix HT se mémorisent ensuite automatiquement via la pop-up.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal confirmation carton alcool -->
+  <div id="cartonModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/70"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="glass ring-neon w-full max-w-lg rounded-3xl p-5 md:p-6 relative">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-extrabold">Confirmer le carton</h3>
+            <p class="mt-1 text-sm text-white/70">Ajuste les infos (mémorisé en local), puis valide pour l’ajout au calcul.</p>
+          </div>
+          <button id="cartonClose"
+            class="btn rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-3 py-2 text-sm font-semibold">✖</button>
+        </div>
+
+        <div class="mt-4 grid gap-3">
+          <div class="glass rounded-2xl p-4 border border-white/10">
+            <div class="text-xs text-white/60">Produit</div>
+            <div id="cartonName" class="mt-1 font-bold text-white/90">—</div>
+            <div id="cartonBarcode" class="mt-1 text-xs text-white/55">—</div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-white/70">Prix HT du carton (€)</label>
+              <input id="cartonPriceHT" type="number" step="0.01" inputmode="decimal"
+                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+                placeholder="Ex: 45.84" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-white/70">Nombre de cartons</label>
+              <input id="cartonCartons" type="number" step="1" inputmode="numeric"
+                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+                value="1" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-white/70">Bouteilles / carton</label>
+              <input id="cartonBottles" type="number" step="1" inputmode="numeric"
+                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+                placeholder="Ex: 6" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-white/70">Volume / bouteille (L)</label>
+              <input id="cartonVolume" type="number" step="0.01" inputmode="decimal"
+                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+                value="0.70" />
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-white/70">Degré (%)</label>
+              <input id="cartonDegree" type="number" step="0.1" inputmode="decimal"
+                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
+                placeholder="Ex: 37.5" />
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button id="cartonValidate"
+              class="btn flex-1 rounded-2xl bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-300/25 px-4 py-3 font-bold">
+              ✅ Valider et ajouter
+            </button>
+            <button id="cartonCancel"
+              class="btn flex-1 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-3 font-semibold">
+              Annuler
+            </button>
+          </div>
+
+          <div class="text-xs text-white/60">
+            ℹ️ Les modifications (prix, colissage, degré, volume) sont enregistrées en local par code-barres.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Stockage local (persistant) — ne change PAS la logique de calcul ===
+    const STORAGE_KEY = "apero_de_nuit_66_calculateur_ttc_products_v1";
+    let products = [];
+
+    // Mode de saisie : alcool (calcul complet) ou soda (TVA réduite, pas de CSS)
+    let currentMode = "alcohol"; // "alcohol" | "soda"
+
+    function applyMode(mode){
+      currentMode = (mode === "soda") ? "soda" : "alcohol";
+      const vol = document.getElementById("volumeField");
+      const deg = document.getElementById("degreeField");
+      const bA = document.getElementById("modeAlcohol");
+      const bS = document.getElementById("modeSoda");
+
+      const activeCls = "px-4 py-2 rounded-2xl bg-white/15 hover:bg-white/20 border border-white/15 text-sm font-semibold";
+      const inactiveCls = "px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold text-white/80";
+
+      if(currentMode === "soda"){
+        if(vol) vol.style.display = "none";
+        if(deg) deg.style.display = "none";
+        if(bA) bA.className = inactiveCls;
+        if(bS) bS.className = activeCls;
+      } else {
+        if(vol) vol.style.display = "";
+        if(deg) deg.style.display = "";
+        const volInput = document.getElementById("volume");
+        if (volInput && (!volInput.value || Number(volInput.value) === 0)) volInput.value = "0.70";
+        if(bA) bA.className = activeCls;
+        if(bS) bS.className = inactiveCls;
+      }
+    }
+
+    function saveProducts() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(products)); }
+      catch (e) { console.warn("LocalStorage indisponible :", e); }
+    }
+
+    function loadProducts() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) products = parsed;
+        }
+      } catch (e) { products = []; }
+    }
+
+    // Format € (FR)
+    const _eur = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" });
+    function fmtEUR(v){
+      const n = Number(v);
+      return _eur.format(isFinite(n) ? n : 0);
+    }
+
+    // Rafraîchit le tableau + total général (TTC)
+    function renderTable(){
+      const tbody = document.getElementById("product-table");
+      const totalEl = document.getElementById("grand-total");
+      if(!tbody || !totalEl) return;
+
+      tbody.innerHTML = "";
+      let grand = 0;
+
+      for(const p of products){
+        grand += Number(p.totalTTC || 0);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="px-4 py-3 text-left text-white/90">${p.name ?? ""}</td>
+          <td class="px-4 py-3 text-right">${fmtEUR(p.priceHTTotal)}</td>
+          <td class="px-4 py-3 text-right">${fmtEUR(p.vatHT)}</td>
+          <td class="px-4 py-3 text-right">${fmtEUR(p.cssAmount)}</td>
+          <td class="px-4 py-3 text-right">${fmtEUR(p.vatCSS)}</td>
+          <td class="px-4 py-3 text-right font-semibold">${fmtEUR(p.totalTTC)}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      totalEl.textContent = fmtEUR(grand);
+    }
+
+    function addProduct() {
+      const name = document.getElementById("name").value?.trim();
+      const price = parseFloat(document.getElementById("price").value);
+      const quantity = parseInt(document.getElementById("quantity").value);
+
+      const volume = parseFloat(document.getElementById("volume").value);
+      const degree = parseFloat(document.getElementById("degree").value);
+
+      if (!name || isNaN(price) || isNaN(quantity)) {
+        alert("Veuillez remplir le nom, le prix HT et la quantité.");
+        return;
+      }
+
+      if (currentMode === "alcohol" && (isNaN(volume) || isNaN(degree))) {
+        alert("Mode alcool : merci de renseigner aussi le volume et le degré.");
+        return;
+      }
+
+      const priceHTTotal = price * quantity;
+
+      if (currentMode === "soda") {
+        const vatRate = 0.055;
+        const vatHT = priceHTTotal * vatRate;
+        const cssAmount = 0;
+        const vatCSS = 0;
+        const totalTTC = priceHTTotal + vatHT;
+        products.push({ type:"soda", name, priceHTTotal, vatHT, cssAmount, vatCSS, totalTTC, vatRate });
+      } else {
+        const vatHT = priceHTTotal * 0.20;
+        const volumeAlcoolPur = volume * (degree / 100);
+        const hlap = volumeAlcoolPur / 100;
+        const cssAmount = hlap * 609.80 * quantity;
+        const vatCSS = cssAmount * 0.20;
+        const totalTTC = priceHTTotal + vatHT + cssAmount + vatCSS;
+        products.push({ type:"alcohol", name, priceHTTotal, vatHT, cssAmount, vatCSS, totalTTC, vatRate:0.20 });
+      }
+
+      saveProducts();
+      renderTable();
+
+      document.getElementById("name").value = "";
+      document.getElementById("price").value = "";
+      if (currentMode === "alcohol") {
+        document.getElementById("volume").value = "0.70";
+        document.getElementById("degree").value = "";
+      }
+      document.getElementById("quantity").value = "";
+    }
+
+    function removeLast() {
+      if (products.length === 0) return;
+      products.pop();
+      saveProducts();
+      renderTable();
+    }
+
+    function clearAll() {
+      products = [];
+      try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+      renderTable();
+    }
+
+    document.getElementById("addBtn").addEventListener("click", addProduct);
+    document.getElementById("undoBtn").addEventListener("click", removeLast);
+    document.getElementById("clearBtn").addEventListener("click", clearAll);
+
+    // Chargement initial depuis LocalStorage
+    loadProducts();
+
+    // Initialisation des boutons de mode
+    const _bA = document.getElementById("modeAlcohol");
+    const _bS = document.getElementById("modeSoda");
+    if(_bA) _bA.addEventListener("click", () => applyMode("alcohol"));
+    if(_bS) _bS.addEventListener("click", () => applyMode("soda"));
+    applyMode("alcohol");
+
+    // === Catalogue codes-barres (20 cartons + packs) ===
+    // Tous en 70cl (volume: 0.70). priceHT est volontairement null -> tu règles une fois via la pop-up, c'est mémorisé.
+    const PRODUCT_CATALOG = [
+      // RHUM
+      { barcode: "2000000000001", type: "alcohol", name: "Captain Morgan (carton)",        bottles: 6, degree: 35,   priceHT: null, volume: 0.70 },
+      { barcode: "2000000000002", type: "alcohol", name: "Havana Club Especial (carton)",  bottles: 6, degree: 37.5, priceHT: null, volume: 0.70 },
+
+      // LIQUEURS
+      { barcode: "2000000000003", type: "alcohol", name: "Jägermeister (carton)",          bottles: 6, degree: 35,   priceHT: null, volume: 0.70 },
+      { barcode: "2000000000004", type: "alcohol", name: "Get 27 (carton)",                bottles: 6, degree: 21,   priceHT: null, volume: 0.70 },
+
+      // ANISÉS
+      { barcode: "2000000000005", type: "alcohol", name: "Ricard (carton)",                bottles: 6, degree: 45,   priceHT: null, volume: 0.70 },
+      { barcode: "2000000000006", type: "alcohol", name: "Pastis (carton)",                bottles: 6, degree: 45,   priceHT: null, volume: 0.70 },
+
+      // VODKAS
+      { barcode: "2000000000007", type: "alcohol", name: "Poliakov (carton)",              bottles: 6, degree: 37.5, priceHT: null, volume: 0.70 },
+      { barcode: "2000000000008", type: "alcohol", name: "Absolut (carton)",               bottles: 6, degree: 40,   priceHT: null, volume: 0.70 },
+      { barcode: "2000000000014", type: "alcohol", name: "Ciroc Redberry (carton)",        bottles: 6, degree: 37.5, priceHT: null, volume: 0.70 },
+      { barcode: "2000000000015", type: "alcohol", name: "Ciroc Apple (carton)",           bottles: 6, degree: 37.5, priceHT: null, volume: 0.70 },
+      { barcode: "2000000000016", type: "alcohol", name: "Ciroc Classic (carton)",         bottles: 6, degree: 40,   priceHT: null, volume: 0.70 },
+      { barcode: "2000000000017", type: "alcohol", name: "Gibson (carton)",                bottles: 6, degree: 37.5, priceHT: null, volume: 0.70 },
+      { barcode: "2000000000018", type: "alcohol", name: "Gordon's (carton)",              bottles: 6, degree: 37.5, priceHT: null, volume: 0.70 },
+
+      // WHISKYS
+      { barcode: "2000000000009", type: "alcohol", name: "William Peel (carton)",          bottles: 6, degree: 40,   priceHT: null, volume: 0.70 },
+      { barcode: "2000000000010", type: "alcohol", name: "Label 5 (carton)",               bottles: 6, degree: 40,   priceHT: null, volume: 0.70 },
+      { barcode: "2000000000011", type: "alcohol", name: "Ballantine's (carton)",          bottles: 6, degree: 40,   priceHT: null, volume: 0.70 },
+      { barcode: "2000000000012", type: "alcohol", name: "Jack Daniel's Tennessee (carton)",bottles: 6, degree: 40,  priceHT: null, volume: 0.70 },
+      { barcode: "2000000000013", type: "alcohol", name: "Jack Daniel's Honey (carton)",   bottles: 6, degree: 35,   priceHT: null, volume: 0.70 },
+
+      // ✅ PACKS / SOFTS — codes RÉELS fournis en photo
+      { barcode: "5000112639995", type: "soda", name: "Coca-Cola pack pro 12x1,25 L", priceHT: 1.50 },
+      { barcode: "3760205930171", type: "soda", name: "Crazy Tiger pack 6x1 L PET",   priceHT: 5.00 },
+    
+// --- AJOUTS (scan cartons) ---
+{ barcode: "3012998538400", type: "alcohol", name: "Rhum blanc (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+{ barcode: "3107870061876", type: "alcohol", name: "Scotch whisky (carton x12) - MBWS", bottles: 12, degree: 40, priceHT: null, volume: 0.70 },
+{ barcode: "3107872000507", type: "alcohol", name: "Scotch whisky (UVC) - MBWS", bottles: 12, degree: 40, priceHT: null, volume: 0.70 },
+{ barcode: "3147691285723", type: "alcohol", name: "Label 5 Classic Black (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+{ barcode: "3147691285518", type: "alcohol", name: "William Peel (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+{ barcode: "7312040017680", type: "alcohol", name: "Absolut Vodka (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+{ barcode: "5010106013120", type: "alcohol", name: "Ballantine's (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+{ barcode: "5099873105306", type: "alcohol", name: "Jack Daniel's Old No.7 (carton 6x70 cl)", bottles: 6, degree: 40, priceHT: null, volume: 0.70 },
+{ barcode: "5099873128473", type: "alcohol", name: "Jack Daniel's Tennessee Honey (carton 6x70 cl)", bottles: 6, degree: 35, priceHT: null, volume: 0.70 },
+{ barcode: "7610113020227", type: "alcohol", name: "GET 27 (carton 6x70 cl)", bottles: 6, degree: 17.9, priceHT: null, volume: 0.70 },
+{ barcode: "3107870062804", type: "alcohol", name: "Tequila San José Silver (carton 6x70 cl)", bottles: 6, degree: 35, priceHT: null, volume: 0.70 },
+{ barcode: "3107872600394", type: "alcohol", name: "Tequila San José Silver (UVC)", bottles: 6, degree: 35, priceHT: null, volume: 0.70 },
+{ barcode: "3163937019709", type: "alcohol", name: "Ricard 1 L (carton 6x1 L)", bottles: 6, degree: 45, priceHT: null, volume: 1.00 },
+{ barcode: "3047100100213", type: "alcohol", name: "Pastis 51 1 L (carton 6x1 L)", bottles: 6, degree: 45, priceHT: null, volume: 1.00 },
+
+{ barcode: "5000289927000", type: "alcohol", name: "Gordon's Gin (carton 6x70 cl)", bottles: 6, degree: 37.5, priceHT: null, volume: 0.70 },
+
+{ barcode: "3124488196383", type: "soda",   name: "Schweppes Tonic pack 6x1.5 L", priceHT: 4.00 },
+{ barcode: "3124480196381", type: "soda",   name: "Schweppes Tonic pack (UC) 6x1.5 L", priceHT: 4.00 },
+{ barcode: "7613035833289", type: "soda",   name: "Perrier pack 6x1 L",          priceHT: 3.00 },
+];
+
+    function beep(){
+      try{
+        const ctx = new (window.AudioContext||window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 880;
+        g.gain.value = 0.08;
+        o.start();
+        setTimeout(()=>{ o.stop(); ctx.close(); }, 120);
+      }catch(e){}
+    }
+
+    function haptic(){
+      try{ if(navigator.vibrate) navigator.vibrate(80); }catch(e){}
+    }
+
+    function findCatalogItem(barcode){
+      const b = String(barcode||"").trim();
+      return PRODUCT_CATALOG.find(x => x && x.barcode === b);
+    }
+
+    function pushLine(p){
+      products.push(p);
+      saveProducts();
+      renderTable();
+    }
+
+    function addFromCatalog(item){
+      if(!item) return;
+
+      if(item.type === "soda"){
+        const qty = 1;
+        const priceHTTotal = Number(item.priceHT) * qty;
+        const vatRate = 0.055;
+        const vatHT = priceHTTotal * vatRate;
+        const cssAmount = 0;
+        const vatCSS = 0;
+        const totalTTC = priceHTTotal + vatHT;
+        pushLine({ type:"soda", name: item.name, priceHTTotal, vatHT, cssAmount, vatCSS, totalTTC, vatRate });
+        return;
+      }
+
+      // Alcool direct (non utilisé si on passe par modal, mais on garde)
+      const cartons = 1;
+      const bottles = Number(item.bottles || 0);
+      const degree = Number(item.degree || 0);
+      const volume = Number(item.volume ?? 0.70);
+
+      if(!bottles || !degree){
+        alert("Entrée catalogue incomplète (bottles/degree).");
+        return;
+      }
+      const priceHTTotal = Number(item.priceHT || 0) * cartons;
+      const vatHT = priceHTTotal * 0.20;
+
+      const volumeAlcoolPurParBouteille = volume * (degree / 100);
+      const hlapParBouteille = volumeAlcoolPurParBouteille / 100;
+      const totalBottles = bottles * cartons;
+
+      const cssAmount = hlapParBouteille * 609.80 * totalBottles;
+      const vatCSS = cssAmount * 0.20;
+      const totalTTC = priceHTTotal + vatHT + cssAmount + vatCSS;
+
+      const name = `${item.name} • carton ${bottles}x${String(volume).replace(".", ",")}L • ${degree}%`;
+      pushLine({ type:"alcohol", name, priceHTTotal, vatHT, cssAmount, vatCSS, totalTTC, vatRate:0.20, bottles: totalBottles, degree, volume });
+    }
+
+    // === Overrides catalogue (LocalStorage) : mémoriser tes modifs par code-barres ===
+    const CATALOG_OVERRIDES_KEY = "apero_de_nuit_66_catalog_overrides_v1";
+
+    function loadCatalogOverrides(){
+      try{
+        const raw = localStorage.getItem(CATALOG_OVERRIDES_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return (parsed && typeof parsed === "object") ? parsed : {};
+      }catch(e){
+        return {};
+      }
+    }
+    function saveCatalogOverrides(obj){
+      try{ localStorage.setItem(CATALOG_OVERRIDES_KEY, JSON.stringify(obj || {})); }catch(e){}
+    }
+
+    function getCatalogItemWithOverride(barcode){
+      const base = findCatalogItem(barcode);
+      if(!base) return null;
+
+      const overrides = loadCatalogOverrides();
+      const o = overrides[String(barcode)] || null;
+
+      const merged = { ...base, volume: (base.volume ?? 0.70) };
+      if(!o) return merged;
+
+      return {
+        ...merged,
+        priceHT: (o.priceHT != null) ? o.priceHT : merged.priceHT,
+        bottles: (o.bottles != null) ? o.bottles : merged.bottles,
+        degree:  (o.degree  != null) ? o.degree  : merged.degree,
+        volume:  (o.volume  != null) ? o.volume  : merged.volume
+      };
+    }
+
+    // === Modal confirmation carton alcool ===
+    const cartonModal = document.getElementById("cartonModal");
+    const cartonClose = document.getElementById("cartonClose");
+    const cartonCancel = document.getElementById("cartonCancel");
+    const cartonValidate = document.getElementById("cartonValidate");
+
+    const cartonName = document.getElementById("cartonName");
+    const cartonBarcodeEl = document.getElementById("cartonBarcode");
+    const cartonPriceHT = document.getElementById("cartonPriceHT");
+    const cartonCartons = document.getElementById("cartonCartons");
+    const cartonBottles = document.getElementById("cartonBottles");
+    const cartonVolume = document.getElementById("cartonVolume");
+    const cartonDegree = document.getElementById("cartonDegree");
+
+    let pendingCarton = null;
+
+    function openCartonModal(item, barcode){
+      pendingCarton = { ...item, barcode: String(barcode) };
+
+      if(cartonName) cartonName.textContent = item.name || "—";
+      if(cartonBarcodeEl) cartonBarcodeEl.textContent = `Code-barres : ${barcode}`;
+
+      if(cartonPriceHT) cartonPriceHT.value = (item.priceHT ?? "");
+      if(cartonBottles) cartonBottles.value = (item.bottles ?? "");
+      if(cartonDegree)  cartonDegree.value  = (item.degree  ?? "");
+      if(cartonVolume)  cartonVolume.value  = (item.volume  ?? 0.70);
+      if(cartonCartons) cartonCartons.value = "1";
+
+      if(cartonModal) cartonModal.classList.remove("hidden");
+    }
+
+    function closeCartonModal(){
+      pendingCarton = null;
+      if(cartonModal) cartonModal.classList.add("hidden");
+    }
+
+    if(cartonClose) cartonClose.addEventListener("click", closeCartonModal);
+    if(cartonCancel) cartonCancel.addEventListener("click", closeCartonModal);
+    if(cartonModal){
+      cartonModal.addEventListener("click", (e)=>{
+        const overlay = cartonModal.firstElementChild;
+        if(e.target === overlay) closeCartonModal();
+      });
+    }
+
+    if(cartonValidate){
+      cartonValidate.addEventListener("click", ()=>{
+        if(!pendingCarton) return;
+
+        const barcode = pendingCarton.barcode;
+
+        const priceHT = Number(cartonPriceHT?.value);
+        const cartons = Math.max(1, parseInt(cartonCartons?.value || "1", 10));
+        const bottles = Math.max(1, parseInt(cartonBottles?.value || "0", 10));
+        const degree  = Number(cartonDegree?.value);
+        const volume  = Number(cartonVolume?.value);
+
+        if(!isFinite(priceHT) || priceHT <= 0){
+          alert("Prix HT du carton invalide.");
+          return;
+        }
+        if(!isFinite(degree) || degree <= 0){
+          alert("Degré invalide.");
+          return;
+        }
+        if(!isFinite(volume) || volume <= 0){
+          alert("Volume par bouteille invalide.");
+          return;
+        }
+
+        // 1) Sauver les overrides
+        const overrides = loadCatalogOverrides();
+        overrides[barcode] = { priceHT, bottles, degree, volume };
+        saveCatalogOverrides(overrides);
+
+        // 2) Ajouter au calcul
+        const totalBottles = bottles * cartons;
+
+        const priceHTTotal = priceHT * cartons;
+        const vatHT = priceHTTotal * 0.20;
+
+        const volumeAlcoolPurParBouteille = volume * (degree / 100);
+        const hlapParBouteille = volumeAlcoolPurParBouteille / 100;
+
+        const cssAmount = hlapParBouteille * 609.80 * totalBottles;
+        const vatCSS = cssAmount * 0.20;
+        const totalTTC = priceHTTotal + vatHT + cssAmount + vatCSS;
+
+        const name = `${pendingCarton.name} • carton ${bottles}x${String(volume).replace(".", ",")}L • ${degree}% • x${cartons}`;
+
+        pushLine({
+          type:"alcohol",
+          name,
+          priceHTTotal,
+          vatHT,
+          cssAmount,
+          vatCSS,
+          totalTTC,
+          vatRate:0.20,
+          bottles: totalBottles,
+          degree,
+          volume,
+          cartons,
+          barcode
+        });
+
+        closeCartonModal();
+      });
+    }
+
+    // === Scanner / BarcodeDetector ===
+    function handleBarcode(barcode){
+      const status = document.getElementById("scanStatus");
+      const code = String(barcode||"").trim();
+      if(!code) return;
+
+      const item = getCatalogItemWithOverride(code);
+
+      if(item){
+        status.textContent = `✅ Détecté : ${code} — trouvé (${item.name})`;
+        haptic(); beep();
+
+        if(item.type === "alcohol"){
+          openCartonModal(item, code); // pop-up avant ajout
+        } else {
+          addFromCatalog(item); // soda direct (pour l'instant)
+        }
+      }else{
+        status.textContent = `❌ Inconnu : ${code} (ajoute-le dans PRODUCT_CATALOG)`;
+        haptic(); beep();
+      }
+    }
+
+    // === Modal scanner ===
+    const scanBtn = document.getElementById("scanBtn");
+    const scanModal = document.getElementById("scanModal");
+    const scanClose = document.getElementById("scanClose");
+    const scanStart = document.getElementById("scanStart");
+    const scanStop  = document.getElementById("scanStop");
+    const scanTorch = document.getElementById("scanTorch");
+    const scanManual = document.getElementById("scanManual");
+    const scanManualBtn = document.getElementById("scanManualBtn");
+    const scanVideo = document.getElementById("scanVideo");
+    const scanStatus = document.getElementById("scanStatus");
+
+    let scanStream = null;
+    let scanRaf = null;
+    let scanDetector = null;
+    let lastScan = "";
+
+    // ✅ MAJ: ouverture du modal = démarrage caméra automatique
+    function openScanModal(){
+      if(scanModal) scanModal.classList.remove("hidden");
+      if(scanStatus) scanStatus.textContent = "Prêt.";
+      if(scanManual) scanManual.value = "";
+      startCameraScan();
+    }
+
+    function closeScanModal(){
+      stopCameraScan();
+      if(scanModal) scanModal.classList.add("hidden");
+    }
+
+    function canTorch(track){
+      try{
+        const caps = track.getCapabilities && track.getCapabilities();
+        return !!(caps && caps.torch);
+      }catch(e){ return false; }
+    }
+
+    async function toggleTorch(on){
+      if(!scanStream) return;
+      const track = scanStream.getVideoTracks()[0];
+      if(!track || !canTorch(track)) return;
+      try{ await track.applyConstraints({ advanced: [{ torch: !!on }] }); }catch(e){}
+    }
+
+    async function startCameraScan(){
+      if(!("mediaDevices" in navigator) || !navigator.mediaDevices.getUserMedia){
+        scanStatus.textContent = "Caméra indisponible sur ce navigateur.";
+        return;
+      }
+
+      if(!("BarcodeDetector" in window)){
+        scanStatus.textContent = "BarcodeDetector non supporté ici. Utilise la saisie manuelle.";
+        return;
+      }
+
+      scanDetector = new BarcodeDetector({ formats: ["ean_13","ean_8","code_128","qr_code"] });
+
+      try{
+        scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio:false });
+        scanVideo.srcObject = scanStream;
+        if(scanStart) scanStart.disabled = true; // même si caché
+        scanStop.disabled = false;
+
+        const track = scanStream.getVideoTracks()[0];
+        scanTorch.disabled = !canTorch(track);
+
+        scanStatus.textContent = "Scan en cours…";
+
+        const loop = async () => {
+          try{
+            const codes = await scanDetector.detect(scanVideo);
+            if(codes && codes.length){
+              const val = codes[0].rawValue;
+              if(val && val !== lastScan){
+                lastScan = val;
+                handleBarcode(val);
+                stopCameraScan(); // effet "douchette"
+                return;
+              }
+            }
+          }catch(e){}
+          scanRaf = requestAnimationFrame(loop);
+        };
+        scanRaf = requestAnimationFrame(loop);
+      }catch(e){
+        scanStatus.textContent = "Accès caméra refusé ou indisponible.";
+      }
+    }
+
+    function stopCameraScan(){
+      if(scanRaf){ cancelAnimationFrame(scanRaf); scanRaf = null; }
+      if(scanStream){
+        scanStream.getTracks().forEach(t => t.stop());
+        scanStream = null;
+      }
+      if(scanVideo) scanVideo.srcObject = null;
+      if(scanStart) scanStart.disabled = false;
+      if(scanStop) scanStop.disabled = true;
+      if(scanTorch){ scanTorch.disabled = true; scanTorch.dataset.on = "0"; scanTorch.textContent = "Flash"; }
+    }
+
+    if(scanBtn) scanBtn.addEventListener("click", openScanModal);
+    if(scanClose) scanClose.addEventListener("click", closeScanModal);
+
+    // (On garde l'event pour debug, même si bouton caché)
+    if(scanStart) scanStart.addEventListener("click", startCameraScan);
+    if(scanStop) scanStop.addEventListener("click", stopCameraScan);
+
+    if(scanTorch) scanTorch.addEventListener("click", async ()=>{
+      const isOn = scanTorch.dataset.on === "1";
+      await toggleTorch(!isOn);
+      scanTorch.dataset.on = isOn ? "0" : "1";
+      scanTorch.textContent = isOn ? "Flash" : "Flash ✅";
+    });
+
+    if(scanManualBtn) scanManualBtn.addEventListener("click", ()=>{
+      const code = (scanManual.value || "").trim();
+      handleBarcode(code);
+    });
+    if(scanManual) scanManual.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){
+        e.preventDefault();
+        const code = (scanManual.value || "").trim();
+        handleBarcode(code);
+      }
+    });
+
+    renderTable();
+  </script>
+</body>
+</html>

@@ -1,0 +1,647 @@
+ville,ordre,adresse,km_depuis_precedente,km_cumul
+Alénya,1,16 Avenue de Perpignan 66200 Alénya,0.149,0.149
+Alénya,2,3 Impasse des Cigalines 66200 Alénya,0.388,0.537
+Argelès-sur-Mer,1,28 Rue de la Paix 66700 Argelès-sur-Mer,0.306,0.306
+Argelès-sur-Mer,2,10 Rue de la Concorde 66700 Argelès-sur-Mer,0.102,0.408
+Argelès-sur-Mer,3,12 Rue Bel Air 66700 Argelès-sur-Mer,0.153,0.561
+Argelès-sur-Mer,4,10 Rue Jean Jacques Rousseau 66700 Argelès-sur-Mer,0.183,0.744
+Argelès-sur-Mer,5,10 Rue du Vercors 66700 Argelès-sur-Mer,0.742,1.486
+Argelès-sur-Mer,6,2 Rue Andre Malraux 66700 Argelès-sur-Mer,0.481,1.967
+Argelès-sur-Mer,7,14 Rue Paul Claudel 66700 Argelès-sur-Mer,0.067,2.034
+Argelès-sur-Mer,8,78bis Avenue du 8 Mai 1945 66700 Argelès-sur-Mer,0.625,2.659
+Argelès-sur-Mer,9,25 Avenue Moliere 66700 Argelès-sur-Mer,0.458,3.117
+Argelès-sur-Mer,10,5 Rue Simona Gay 66700 Argelès-sur-Mer,0.697,3.814
+Argelès-sur-Mer,11,5 Impasse Edmond Brazes 66700 Argelès-sur-Mer,0.168,3.981
+Argelès-sur-Mer,12,6 Rue Claude Salvy 66700 Argelès-sur-Mer,0.208,4.189
+Argelès-sur-Mer,13,Rue Frederic Mistral 66700 Argelès-sur-Mer,0.547,4.736
+Argelès-sur-Mer,14,5 Rue Frederic Mistral 66700 Argelès-sur-Mer,0.041,4.778
+Argelès-sur-Mer,15,9 Impasse des Huppes 66700 Argelès-sur-Mer,0.817,5.595
+Argelès-sur-Mer,16,9 Place Raimond de Tatzo 66700 Argelès-sur-Mer,2.036,7.631
+Argelès-sur-Mer,17,11 Rue Bernard Berenger 66700 Argelès-sur-Mer,0.021,7.652
+Argelès-sur-Mer,18,755 Avenue du Tech 66700 Argelès-sur-Mer,3.269,10.921
+Argelès-sur-Mer,19,5 Rue des Timoniers 66700 Argelès-sur-Mer,1.859,12.78
+Bages,1,2 Rue Andre Chenier 66670 Bages,0.307,0.307
+Bages,2,7 Rue Francois Arago 66670 Bages,0.103,0.41
+Baho,1,17 Rue du Pardal 66540 Baho,0.162,0.162
+Baho,2,16 Rue Neuve 66540 Baho,0.181,0.343
+Baho,3,Avenue des Pyrenees 66540 Baho,0.268,0.61
+Baho,4,17 Rue des Eaux Vives 66540 Baho,0.583,1.194
+Baixas,1,2 Impasse du Bail 66390 Baixas,0.131,0.131
+Baixas,2,47 Rue Dom Brial 66390 Baixas,0.137,0.268
+Banyuls-dels-Aspres,1,3 Rue du Canigou 66300 Banyuls-dels-Aspres,0.052,0.052
+Banyuls-dels-Aspres,2,4 Rue des Albères 66300 Banyuls-dels-Aspres,0.191,0.243
+Beauvais,1,19 Rue Claudie Haignere 60000 Beauvais,2.957,2.957
+Bompas,1,5 Rue Henri Salvador 66430 Bompas,0.262,0.262
+Bompas,2,13 Rue du Paradis 66430 Bompas,0.217,0.479
+Bompas,3,50 Avenue de la Salanque 66430 Bompas,0.039,0.519
+Bompas,4,18 Rue de Bretagne 66430 Bompas,0.802,1.32
+Bompas,5,10 Rue des Cigales 66430 Bompas,0.458,1.778
+Bompas,6,2 Rue Joliot Curie 66430 Bompas,0.213,1.992
+Bompas,7,27 Rue du Marechal Foch 66430 Bompas,0.68,2.672
+Bompas,8,2 Rue Saint Etienne 66430 Bompas,0.087,2.759
+Bompas,9,24 Avenue du Haut Vernet 66430 Bompas,0.202,2.961
+Bompas,10,4 Avenue des Oliviers 66430 Bompas,0.682,3.643
+Bompas,11,2 Rue des Grenadiers 66430 Bompas,0.106,3.748
+Bompas,12,8 Rue des Grenadiers 66430 Bompas,0.049,3.798
+Bompas,13,25 Avenue de la Tet 66430 Bompas,2.202,6.0
+Brouilla,1,4 Rue de la Tramontane 66620 Brouilla,0.268,0.268
+Brouilla,2,9 Avenue Jean Moulin 66620 Brouilla,0.163,0.432
+Cabestany,1,3 Rue Georges Clémenceau 66330 Cabestany,0.406,0.406
+Cabestany,2,27 Avenue de Provence 66330 Cabestany,0.426,0.831
+Cabestany,3,17 Rue du Muscat 66330 Cabestany,0.266,1.098
+Cabestany,4,14 Rue des Géraniums 66330 Cabestany,0.169,1.267
+Cabestany,5,15 Rue Fernand Grenier 66330 Cabestany,0.331,1.598
+Cabestany,6,38 Rue Fernand Grenier 66330 Cabestany,0.105,1.703
+Cabestany,7,9 Rue du 17e Regiment d’Infanterie 66330 Cabestany,0.754,2.458
+Cabestany,8,23 Rue Edouard Vaillant 66330 Cabestany,0.282,2.739
+Cabestany,9,Cour Raymond de Miraval 66330 Cabestany,0.308,3.047
+Cabestany,10,1 Allée du Comité de Baixas 66330 Cabestany,0.86,3.907
+Cabestany,11,17 Allée du Comité de Baixas 66330 Cabestany,0.266,4.173
+Canet-en-Roussillon,1,14 Rue du Pressoir 66140 Canet-en-Roussillon,0.26,0.26
+Canet-en-Roussillon,2,8 Avenue des Hauts de Canet 66140 Canet-en-Roussillon,0.132,0.392
+Canet-en-Roussillon,3,Avenue des Hauts de Canet 66140 Canet-en-Roussillon,0.023,0.414
+Canet-en-Roussillon,4,140 Avenue des Hauts de Canet 66140 Canet-en-Roussillon,0.416,0.831
+Canet-en-Roussillon,5,141 Avenue des Hauts de Canet 66140 Canet-en-Roussillon,0.143,0.973
+Canet-en-Roussillon,6,16 Avenue Guy Drut 66140 Canet-en-Roussillon,0.305,1.279
+Canet-en-Roussillon,7,Boulevard de Las Bigues 66140 Canet-en-Roussillon,0.352,1.631
+Canet-en-Roussillon,8,11 Impasse Hyacinthe Rigaud 66140 Canet-en-Roussillon,0.499,2.13
+Canet-en-Roussillon,9,18 Impasse du Lion 66140 Canet-en-Roussillon,0.243,2.373
+Canet-en-Roussillon,10,6 Rue du Paloméa 66140 Canet-en-Roussillon,0.125,2.499
+Canet-en-Roussillon,11,1 Rue de la Liberté 66140 Canet-en-Roussillon,0.249,2.748
+Canet-en-Roussillon,12,48 Avenue des Coteaux 66140 Canet-en-Roussillon,1.078,3.826
+Canet-en-Roussillon,13,72 Avenue des Coteaux 66140 Canet-en-Roussillon,0.341,4.167
+Canet-en-Roussillon,14,34bis Avenue des Floralies 66140 Canet-en-Roussillon,3.152,7.319
+Canet-en-Roussillon,15,15 Rue des Roses 66140 Canet-en-Roussillon,0.091,7.41
+Canet-en-Roussillon,16,6 Avenue Eugène Sauvy 66140 Canet-en-Roussillon,0.253,7.664
+Canet-en-Roussillon,17,1 Rue Alsace Lorraine 66140 Canet-en-Roussillon,0.31,7.974
+Canet-en-Roussillon,18,1 Rue du Danemark 66140 Canet-en-Roussillon,0.067,8.04
+Canet-en-Roussillon,19,3 Rue d'Italie 66140 Canet-en-Roussillon,0.042,8.082
+Canet-en-Roussillon,20,1 Rue Ile de France 66140 Canet-en-Roussillon,0.102,8.185
+Canet-en-Roussillon,21,34 Boulevard Hippolyte Tixador 66140 Canet-en-Roussillon,0.264,8.449
+Canet-en-Roussillon,22,104 Promenade de la Côte Vermeille 66140 Canet-en-Roussillon,0.538,8.986
+Canet-en-Roussillon,23,46 Rue de la Marinade 66140 Canet-en-Roussillon,0.311,9.297
+Canet-en-Roussillon,24,44 Rue Laurent Miailhes 66140 Canet-en-Roussillon,0.385,9.682
+Canet-en-Roussillon,25,31 Avenue de Capestang 66140 Canet-en-Roussillon,0.41,10.093
+Canet-en-Roussillon,26,3 Avenue de Toulouse 66140 Canet-en-Roussillon,0.317,10.41
+Canet-en-Roussillon,27,28 Avenue de Catalogne 66140 Canet-en-Roussillon,1.907,12.317
+Canet-en-Roussillon,28,41 Promenade de la Côte Vermeille 66140 Canet-en-Roussillon,0.225,12.542
+Canet-en-Roussillon,29,12 Rue Déodat de Séverac 66140 Canet-en-Roussillon,0.394,12.936
+Canet-en-Roussillon,30,Boulevard de la Jetée 66140 Canet-en-Roussillon,0.113,13.049
+Canohès,1,13 Rue Auguste Estrade 66680 Canohès,0.392,0.392
+Canohès,2,1 Rue Salvador Dali 66680 Canohès,0.399,0.791
+Canohès,3,1 Rue Eliane Thibaut Comelade 66680 Canohès,0.053,0.845
+Canohès,4,8 Avenue El Crusat 66680 Canohès,0.072,0.916
+Canohès,5,12 Rue Pompeu Fabra 66680 Canohès,0.154,1.07
+Canohès,6,8 Rue Edmond Brazes 66680 Canohès,0.154,1.224
+Canohès,7,2 Impasse Joseph Sebastia Pons 66680 Canohès,0.062,1.286
+Canohès,8,3 Rue des Mimosas 66680 Canohès,0.799,2.085
+Canohès,9,10 Rue du 11 Novembre 66680 Canohès,0.163,2.248
+Canohès,10,10 Rue de la Poste 66680 Canohès,0.074,2.322
+Canohès,11,Rue de la Pourtalade 66680 Canohès,0.148,2.47
+Canohès,12,2 Rue des Vignes 66680 Canohès,0.381,2.852
+Cases-de-Pène,1,6 Traverse de Baïxas 66600 Cases-de-Pène,0.229,0.229
+Claira,1,22 Rue de l'Anguille 66530 Claira,0.924,0.924
+Claira,2,8 Rue du Maréchal Joffre 66530 Claira,0.175,1.099
+Claira,3,14 Rue Charles Trenet 66530 Claira,0.276,1.374
+Claira,4,Chemin du Mas Bordas 66530 Claira,0.871,2.246
+Claira,5,14 Rue Saint Narcisse 66530 Claira,0.993,3.239
+Claira,6,21 rue hélène boucher 66530 Claira,1.858,5.097
+Claira,7,19 Rue Claudie Haigneré 66530 Claira,0.241,5.338
+Claira,8,9 Rue Saint Maurice 66530 Claira,0.162,5.5
+Collioure,1,2 Rue du Puits Saint Dominique 66190 Collioure,1.073,1.073
+Corneilla-del-Vercol,1,4 Rue Simone de Beauvoir 66200 Corneilla-del-Vercol,0.734,0.734
+Corneilla-del-Vercol,2,3 Rue des Lauriers 66200 Corneilla-del-Vercol,0.225,0.959
+Corneilla-del-Vercol,3,Allée du Canigou 66200 Corneilla-del-Vercol,0.188,1.147
+Corneilla-la-Rivière,1,113 Route Nationale 66550 Corneilla-la-Rivière,0.165,0.165
+Elne,1,28 Rue de la Gangue 66200 Elne,1.062,1.062
+Elne,2,6 Rue du Moulin 66200 Elne,0.284,1.346
+Elne,3,4 Rue du Conflent 66200 Elne,0.465,1.812
+Elne,4,23 Rue du Four a Chaux 66200 Elne,0.043,1.855
+Elne,5,16 Rue Joseph Planes 66200 Elne,0.02,1.875
+Elne,6,10 Rue de la Gendarmerie 66200 Elne,0.15,2.026
+Elne,7,10 Rue de la Chicane 66200 Elne,0.173,2.199
+Elne,8,16 Rue Georges Brassens 66200 Elne,0.579,2.778
+Elne,9,1 Rue Josep de la Trinxeria 66200 Elne,1.082,3.859
+Elne,10,35 Rue Rosa Parks 66200 Elne,0.43,4.289
+Espira-de-l'Agly,1,4 Rue Ull de la Mola 66600 Espira-de-l'Agly,0.444,0.444
+Espira-de-l'Agly,2,6 Rue du Dr Coste 66600 Espira-de-l'Agly,0.595,1.039
+Espira-de-l'Agly,3,11 Rue du Quatorze Juillet 66600 Espira-de-l'Agly,0.186,1.225
+Espira-de-l'Agly,4,Rue Jean Jacques Rousseau 66600 Espira-de-l'Agly,0.261,1.486
+Fourques,1,5 Carrer Gran 66300 Fourques,0.28,0.28
+Latour-Bas-Elne,1,6 Rue des Vendanges 66200 Latour-Bas-Elne,0.058,0.058
+Latour-Bas-Elne,2,10 Rue de la Poste 66200 Latour-Bas-Elne,0.209,0.267
+Latour-Bas-Elne,3,17 Rue Saint-Pierre 66200 Latour-Bas-Elne,0.184,0.451
+Latour-Bas-Elne,4,1 Rue de la Tramontane 66200 Latour-Bas-Elne,0.159,0.611
+Latour-Bas-Elne,5,30 Rue de la Tramontane 66200 Latour-Bas-Elne,0.253,0.864
+Latour-Bas-Elne,6,22 Avenue de Saint Cyprien 66200 Latour-Bas-Elne,0.605,1.469
+Latour-Bas-Elne,7,18 Rue du Grenache 66200 Latour-Bas-Elne,0.231,1.7
+Latour-Bas-Elne,8,1 Rue du Carignan 66200 Latour-Bas-Elne,0.36,2.06
+Le Barcarès,1,2 Impasse des Petits Loups 66420 Le Barcarès,0.303,0.303
+Le Barcarès,2,Quai des Pyrenees 66420 Le Barcarès,0.743,1.045
+Le Barcarès,3,3 Avenue du Racou 66420 Le Barcarès,0.099,1.144
+Le Barcarès,4,5 Avenue Dominica 66420 Le Barcarès,0.286,1.43
+Le Barcarès,5,10 Rue du Mas de la Grele 66420 Le Barcarès,2.037,3.467
+Le Barcarès,6,5 Avenue des Dosses 66420 Le Barcarès,1.31,4.777
+Le Barcarès,7,36 Rue des Lamparos 66420 Le Barcarès,4.666,9.443
+Le Barcarès,8,5 Rue des Lauriers Roses 66420 Le Barcarès,0.935,10.378
+Le Barcarès,9,111 Boulevard du 14 Juillet 66420 Le Barcarès,0.35,10.728
+Le Havre,1,85 Rue Maréchal Joffre 76600 Le Havre,0.936,0.936
+Le Mans,1,4 Rue de Perpignan 72100 Le Mans,3.839,3.839
+Le Soler,1,61 Avenue Jean Jaurès 66270 Le Soler,0.359,0.359
+Le Soler,2,15 Rue Léon Blum 66270 Le Soler,0.285,0.643
+Le Soler,3,13 Rue Marechal Joffre 66270 Le Soler,0.25,0.894
+Le Soler,4,8 Rue Albert Bausil 66270 Le Soler,0.56,1.453
+Le Soler,5,4 Rue Joan Cayrol 66270 Le Soler,0.209,1.662
+Le Soler,6,2 Rue des Genévriers 66270 Le Soler,0.376,2.039
+Le Soler,7,23 Rue des Ormes 66270 Le Soler,1.846,3.885
+Le Soler,8,35 Rue du Conflent 66270 Le Soler,1.368,5.253
+Leucate,1,5 Rue Zozime Ribes 11370 Leucate,0.768,0.768
+Leucate,2,2 Chemin du Haut de la Mer 11370 Leucate,1.367,2.135
+Leucate,3,20 Chemin du Haut de la Mer 11370 Leucate,0.218,2.353
+Leucate,4,Rue du Petit Corentin 11370 Leucate,0.519,2.872
+Llupia,1,4 Rue de la Tet 66300 Llupia,0.651,0.651
+Maisons-Alfort,1,30 Rue de Perpignan 94700 Maisons-Alfort,1.463,1.463
+Millas,1,64 Avenue Jean Jaurès 66170 Millas,0.127,0.127
+Millas,2,3 Rue Jean Bourrat 66170 Millas,0.237,0.364
+Millas,3,26 Carrer del Rech 66170 Millas,0.667,1.031
+Orléans,1,2 Rue du Colonel Arnaud Beltrame 45000 Orléans,4.837,4.837
+Perpignan,1,10 Rue Honoré de Balzac 66000 Perpignan,0.169,0.169
+Perpignan,2,5 Rue Michel de Montaigne 66000 Perpignan,0.024,0.193
+Perpignan,3,19 Rue Honoré de Balzac 66000 Perpignan,0.087,0.28
+Perpignan,4,7 Rue Charles de Montesquieu 66000 Perpignan,0.152,0.432
+Perpignan,5,6 Rue de la Corse 66000 Perpignan,0.207,0.639
+Perpignan,6,6 Avenue Rosette Blanc (RD 617) 66000 Perpignan,0.16,0.8
+Perpignan,7,58 Rue Maurice Barrès 66000 Perpignan,0.277,1.077
+Perpignan,8,19 Rue Aristide Maillol 66000 Perpignan,0.165,1.241
+Perpignan,9,9 Rue Jean-Baptiste Greuze 66000 Perpignan,0.28,1.521
+Perpignan,10,12 Rue Coypel 66000 Perpignan,0.079,1.6
+Perpignan,11,6 Rue Jean-Baptiste Chardin 66000 Perpignan,0.146,1.746
+Perpignan,12,12 Rue Madame de Staël 66000 Perpignan,0.304,2.05
+Perpignan,13,7 Rue Albertine Sarrazin 66000 Perpignan,0.178,2.228
+Perpignan,14,7 Rue Mercè Rodoreda 66000 Perpignan,0.093,2.321
+Perpignan,15,21 Rue des Jeunes-Années 66000 Perpignan,0.098,2.419
+Perpignan,16,4 Rue Gustave Eiffel 66100 Perpignan,0.091,2.51
+Perpignan,17,2 Rue des Terrasses 66100 Perpignan,0.072,2.581
+Perpignan,18,64 Avenue Georges Guynemer 66100 Perpignan,0.072,2.653
+Perpignan,19,5 Place Charles Hermite 66100 Perpignan,0.207,2.86
+Perpignan,20,17 Rue Henri de Turenne 66100 Perpignan,0.107,2.968
+Perpignan,21,21 Boulevard John-Fitzgerald Kennedy 66100 Perpignan,0.186,3.154
+Perpignan,22,32 Boulevard John-Fitzgerald Kennedy 66100 Perpignan,0.126,3.28
+Perpignan,23,41 Boulevard John-Fitzgerald Kennedy 66100 Perpignan,0.132,3.412
+Perpignan,24,170 Avenue Georges Guynemer 66100 Perpignan,0.144,3.556
+Perpignan,25,16 Rue Ernest Hemingway 66100 Perpignan,0.136,3.692
+Perpignan,26,5 Rue Paul Morand 66100 Perpignan,0.223,3.915
+Perpignan,27,Rue Paul Morand 66100 Perpignan,0.07,3.985
+Perpignan,28,10 Rue Paul Claudel 66100 Perpignan,0.119,4.104
+Perpignan,29,9 Rue Edouard Bourdet 66100 Perpignan,0.166,4.271
+Perpignan,30,64 Avenue Jean Giono 66100 Perpignan,0.05,4.321
+Perpignan,31,8 Rue Jules Romains 66100 Perpignan,0.108,4.429
+Perpignan,32,59 Rue Alexandre Ansaldi 66100 Perpignan,0.274,4.703
+Perpignan,33,69 Rue Alexandre Ansaldi 66100 Perpignan,0.088,4.791
+Perpignan,34,8 Avenue Jean Giraudoux 66100 Perpignan,0.469,5.26
+Perpignan,35,41 Rambla de l’Occitanie 66100 Perpignan,0.384,5.644
+Perpignan,36,3 Rue de Corneilla-del-Vercol 66100 Perpignan,0.178,5.822
+Perpignan,37,4 Rue de Latour-Bas-Elne 66100 Perpignan,0.053,5.874
+Perpignan,38,5 Rue Notre-Dame-du-Coral 66100 Perpignan,0.057,5.931
+Perpignan,39,6 Rue du Pas du Loup 66100 Perpignan,0.054,5.985
+Perpignan,40,4 Rue des Trabucayres 66100 Perpignan,0.134,6.119
+Perpignan,41,1 Avenue de Banyuls-sur-Mer 66100 Perpignan,0.056,6.175
+Perpignan,42,2 Avenue du Cap-Bear 66100 Perpignan,0.111,6.286
+Perpignan,43,3 Rond-Point du Parc-des-Sports 66100 Perpignan,0.242,6.528
+Perpignan,44,6 Avenue de la Côte-Radieuse 66100 Perpignan,0.301,6.829
+Perpignan,45,5 Rue Jeanne Jugan 66100 Perpignan,0.114,6.943
+Perpignan,46,23 Avenue Paul Alduy 66100 Perpignan,0.091,7.034
+Perpignan,47,29 Avenue Paul Alduy 66100 Perpignan,0.198,7.231
+Perpignan,48,41 Rue de Taulis 66100 Perpignan,0.959,8.191
+Perpignan,49,35 Rue de Taulis 66100 Perpignan,0.033,8.224
+Perpignan,50,25 Rue de Taulis 66100 Perpignan,0.047,8.271
+Perpignan,51,15 Rue de Taulis 66100 Perpignan,0.144,8.414
+Perpignan,52,Rue du Vilar 66100 Perpignan,0.11,8.524
+Perpignan,53,4 Avenue d'Amélie-les-Bains 66100 Perpignan,0.285,8.809
+Perpignan,54,1 Rue de la Preste 66100 Perpignan,0.074,8.883
+Perpignan,55,16 Avenue du Tech 66100 Perpignan,0.089,8.972
+Perpignan,56,14 Square Aristide Maillol 66100 Perpignan,0.116,9.088
+Perpignan,57,26 Rue du Béarn 66100 Perpignan,0.349,9.437
+Perpignan,58,4 Rue des Ardennes 66100 Perpignan,0.082,9.519
+Perpignan,59,43 Rue des Ménestrels 66100 Perpignan,0.132,9.651
+Perpignan,60,Avenue Jules de Carsalade-du-Pont 66100 Perpignan,0.091,9.742
+Perpignan,61,8 Avenue Pierre Cambres 66100 Perpignan,0.175,9.917
+Perpignan,62,4 Avenue Robert-Emmanuel Brousse 66100 Perpignan,0.096,10.013
+Perpignan,63,56 Boulevard Aristide Briand 66100 Perpignan,0.234,10.248
+Perpignan,64,52bis Boulevard Aristide Briand 66100 Perpignan,0.028,10.275
+Perpignan,65,30 Rue Jean Rière 66100 Perpignan,0.187,10.462
+Perpignan,66,8 Boulevard Henri Poincaré 66100 Perpignan,0.376,10.838
+Perpignan,67,1 Rue Henri Fantin-Latour 66000 Perpignan,0.07,10.908
+Perpignan,68,14 Rue Henri Fantin-Latour 66000 Perpignan,0.057,10.965
+Perpignan,69,14 Impasse Alphonse Daudet 66000 Perpignan,0.083,11.047
+Perpignan,70,11 Avenue Marcelin Albert 66000 Perpignan,0.111,11.158
+Perpignan,71,5 Rue des Tuileries 66000 Perpignan,0.05,11.208
+Perpignan,72,25 Rue Nicolas Poussin 66000 Perpignan,0.108,11.317
+Perpignan,73,14 Rue Georges Rives 66000 Perpignan,0.214,11.531
+Perpignan,74,25 Avenue Gilbert Brutus 66000 Perpignan,0.13,11.661
+Perpignan,75,Rue du Couvent-de-la-Merci 66000 Perpignan,0.083,11.744
+Perpignan,76,1 Rue des Commères 66000 Perpignan,0.121,11.865
+Perpignan,77,18 Rue Gande-la-Monnaie 66000 Perpignan,0.127,11.992
+Perpignan,78,29 Rue Gande-la-Monnaie 66000 Perpignan,0.012,12.004
+Perpignan,79,21 Rue Gande-la-Monnaie 66000 Perpignan,0.039,12.043
+Perpignan,80,8 Rue des Dragons 66000 Perpignan,0.062,12.105
+Perpignan,81,13 Rue Petite-la-Monnaie 66000 Perpignan,0.056,12.161
+Perpignan,82,10 Rue Grande-la-Réal 66000 Perpignan,0.081,12.242
+Perpignan,83,12 Rue Grande-la-Réal 66000 Perpignan,0.024,12.265
+Perpignan,84,35 Rue Grande-la-Réal 66000 Perpignan,0.057,12.322
+Perpignan,85,37 Rue Grande-la-Réal 66000 Perpignan,0.012,12.334
+Perpignan,86,7 Rue de l’Eglise-la-Réal 66000 Perpignan,0.079,12.413
+Perpignan,87,22 Rue Petite-la-Réal 66000 Perpignan,0.036,12.449
+Perpignan,88,16 Rue Hyacinthe Rigaud 66000 Perpignan,0.061,12.51
+Perpignan,89,32 Place Hyacinthe Rigaud 66000 Perpignan,0.06,12.57
+Perpignan,90,4 Rue Petite-la-Réal 66000 Perpignan,0.05,12.621
+Perpignan,91,6 Rue Petite-la-Réal 66000 Perpignan,0.004,12.625
+Perpignan,92,1 Impasse Pierre de Marivaux 66000 Perpignan,0.057,12.681
+Perpignan,93,2 Rue Général de la Bédoyère 66000 Perpignan,0.059,12.74
+Perpignan,94,21 Rue des Augustins 66000 Perpignan,0.146,12.886
+Perpignan,95,4 Rue Neuve 66000 Perpignan,0.045,12.931
+Perpignan,96,4 Rue Sainte-Magdeleine 66000 Perpignan,0.029,12.96
+Perpignan,97,3 Rue des Augustins 66000 Perpignan,0.038,12.998
+Perpignan,98,2bis Rue Porte-d'Assaut 66000 Perpignan,0.041,13.039
+Perpignan,99,2 Rue Porte-d'Assaut 66000 Perpignan,0.002,13.042
+Perpignan,100,25 Quai Sébastien Vauban 66000 Perpignan,0.153,13.194
+Perpignan,101,1bis Place Justin Bardou-Job 66000 Perpignan,0.093,13.287
+Perpignan,102,19 Rue Sébastien Vauban 66000 Perpignan,0.06,13.347
+Perpignan,103,57 Avenue du Général de Gaulle 66000 Perpignan,0.279,13.627
+Perpignan,104,24 Cours Lazare Escarguel 66000 Perpignan,0.031,13.658
+Perpignan,105,4 Rue de la Paix 66000 Perpignan,0.093,13.751
+Perpignan,106,25 Rue Alexandre-Joseph Oliva 66000 Perpignan,0.171,13.922
+Perpignan,107,29 Rue de Venise 66000 Perpignan,0.205,14.127
+Perpignan,108,25 Rue de Paris 66000 Perpignan,0.082,14.208
+Perpignan,109,10 Boulevard du Roussillon 66000 Perpignan,0.04,14.248
+Perpignan,110,6 Boulevard du Roussillon 66000 Perpignan,0.036,14.284
+Perpignan,111,2 Rue du Progrès 66000 Perpignan,0.043,14.327
+Perpignan,112,Rue Victor Hugo 66000 Perpignan,0.075,14.402
+Perpignan,113,1 Avenue du Général de Gaulle 66000 Perpignan,0.157,14.559
+Perpignan,114,2 Rue Pascal-Marie Agasse 66000 Perpignan,0.213,14.773
+Perpignan,115,2 Rue Jean de La Fontaine 66000 Perpignan,0.068,14.841
+Perpignan,116,6 Rue du Cygne 66000 Perpignan,0.041,14.882
+Perpignan,117,4 Rue Antoine de Condorcet 66000 Perpignan,0.026,14.907
+Perpignan,118,29 Rue Pascal-Marie Agasse 66000 Perpignan,0.079,14.986
+Perpignan,119,20 Rue Pascal-Marie Agasse 66000 Perpignan,0.049,15.035
+Perpignan,120,Rue Prairial 66000 Perpignan,0.042,15.077
+Perpignan,121,Rue des Frères Rosny 66000 Perpignan,0.083,15.16
+Perpignan,122,17 Rue Floréal 66000 Perpignan,0.173,15.333
+Perpignan,123,6 Avenue Docteur Jean-Louis Torreilles 66000 Perpignan,0.036,15.369
+Perpignan,124,7 Rue Raymond Pitet 66000 Perpignan,0.235,15.604
+Perpignan,125,21 Avenue de la Massane 66000 Perpignan,0.13,15.734
+Perpignan,126,19 Avenue de la Massane 66000 Perpignan,0.009,15.743
+Perpignan,127,64 Avenue de Prades 66000 Perpignan,0.147,15.889
+Perpignan,128,56 Avenue de Prades 66000 Perpignan,0.071,15.961
+Perpignan,129,36 Avenue de Prades 66000 Perpignan,0.146,16.107
+Perpignan,130,27 Avenue de Prades 66000 Perpignan,0.057,16.163
+Perpignan,131,18 Avenue de Prades 66000 Perpignan,0.059,16.223
+Perpignan,132,6 Rue Henri Stendhal 66000 Perpignan,0.064,16.286
+Perpignan,133,16 Rue Henri Stendhal 66000 Perpignan,0.028,16.314
+Perpignan,134,16 Rue Jean de La Fontaine 66000 Perpignan,0.106,16.42
+Perpignan,135,Rue Jean de La Fontaine 66000 Perpignan,0.048,16.468
+Perpignan,136,23 Rue Vicente Blasco Ibáñez 66000 Perpignan,0.125,16.593
+Perpignan,137,3 Rue Henri Fabre 66000 Perpignan,0.241,16.834
+Perpignan,138,Rue du Fer-à-Cheval 66000 Perpignan,0.456,17.29
+Perpignan,139,11 Avenue Henri Ribère 66000 Perpignan,0.075,17.365
+Perpignan,140,24 Rue de Cerdagne 66000 Perpignan,0.068,17.433
+Perpignan,141,7 Rue de Venise 66000 Perpignan,0.167,17.6
+Perpignan,142,18 Rue Léo Delibes 66000 Perpignan,0.427,18.026
+Perpignan,143,26 Rue Joseph Cabrit 66000 Perpignan,0.03,18.057
+Perpignan,144,61 Rue Jean-Baptiste Lulli 66000 Perpignan,0.04,18.097
+Perpignan,145,40 Rue Joseph Cabrit 66000 Perpignan,0.038,18.135
+Perpignan,146,20 Avenue de Grande-Bretagne 66000 Perpignan,0.033,18.168
+Perpignan,147,8 Avenue de Grande-Bretagne 66000 Perpignan,0.12,18.288
+Perpignan,148,11 Avenue de Grande-Bretagne 66000 Perpignan,0.042,18.33
+Perpignan,149,14 Rue Gabriel Fauré 66000 Perpignan,0.364,18.694
+Perpignan,150,13 Rue Paul Riquet 66000 Perpignan,0.095,18.789
+Perpignan,151,2 Cours Lazare Escarguel 66000 Perpignan,0.204,18.993
+Perpignan,152,15 Rue Général Legrand 66000 Perpignan,0.092,19.085
+Perpignan,153,34 Avenue Maréchal Leclerc 66000 Perpignan,0.242,19.327
+Perpignan,154,21 Espace Méditerranée 66000 Perpignan,0.039,19.367
+Perpignan,155,20 Espace Méditerranée 66000 Perpignan,0.08,19.447
+Perpignan,156,18 Boulevard Georges Clemenceau 66000 Perpignan,0.224,19.671
+Perpignan,157,2 Boulevard Georges Clemenceau 66000 Perpignan,0.117,19.788
+Perpignan,158,3 Rue Jean Payra 66000 Perpignan,0.067,19.855
+Perpignan,159,2 Rue du Marché-aux-Bestiaux 66000 Perpignan,0.059,19.914
+Perpignan,160,12 Rue Alphonse Simon 66000 Perpignan,0.022,19.936
+Perpignan,161,2 Cours François Palmarole 66000 Perpignan,0.121,20.057
+Perpignan,162,8 Rue Elie Delcros 66000 Perpignan,0.244,20.3
+Perpignan,163,9 Rue Jean Racine 66000 Perpignan,0.214,20.515
+Perpignan,164,8 Rue Saint-François-de-Paule 66000 Perpignan,0.202,20.717
+Perpignan,165,1bis Rue du Figuier 66000 Perpignan,0.118,20.834
+Perpignan,166,1 Rue du Figuier 66000 Perpignan,0.008,20.842
+Perpignan,167,5 Rue de la Révolution-Française 66000 Perpignan,0.035,20.877
+Perpignan,168,7 Rue de la Main-de-Fer 66000 Perpignan,0.051,20.929
+Perpignan,169,26 Rue des Trois-Journées 66000 Perpignan,0.068,20.996
+Perpignan,170,2 Rue des Fabriques-d'en-Nabot 66000 Perpignan,0.19,21.186
+Perpignan,171,8 Rue de la Cloche d'Or 66000 Perpignan,0.132,21.319
+Perpignan,172,3 Rue Luc Dagobert 66000 Perpignan,0.441,21.759
+Perpignan,173,63 Rue de la Lanterne 66000 Perpignan,0.041,21.8
+Perpignan,174,3 Avenue Gilbert Brutus 66000 Perpignan,0.261,22.061
+Perpignan,175,8 Rue du Chantier 66000 Perpignan,0.142,22.204
+Perpignan,176,16 Avenue Marcelin Albert 66000 Perpignan,0.047,22.25
+Perpignan,177,1 Rue Alain Lesage 66000 Perpignan,0.309,22.559
+Perpignan,178,47 Rue de l'Emporda 66000 Perpignan,0.093,22.652
+Perpignan,179,15 Allée de Bacchus 66000 Perpignan,0.288,22.94
+Perpignan,180,17 Rue Luc de Vauvenargues 66000 Perpignan,0.158,23.098
+Perpignan,181,24 Rue Valentin Magnan 66000 Perpignan,0.542,23.64
+Perpignan,182,63 Chemin de la Passio-Vella 66100 Perpignan,0.707,24.347
+Perpignan,183,151 Chemin de la Passio-Vella 66100 Perpignan,0.843,25.19
+Perpignan,184,2 Rue François Broussais 66100 Perpignan,0.795,25.984
+Perpignan,185,2 Rue Abbé Albert Cazes 66100 Perpignan,0.362,26.346
+Perpignan,186,10 Rue Gustave Roussy 66100 Perpignan,0.635,26.981
+Perpignan,187,20 Rue René Leriche 66100 Perpignan,0.241,27.222
+Perpignan,188,14 Rue du Docteur Koch 66100 Perpignan,0.143,27.365
+Perpignan,189,5 Rue de la Bisbal 66000 Perpignan,0.307,27.672
+Perpignan,190,4 Impasse de Setcases 66000 Perpignan,0.099,27.771
+Perpignan,191,13 Rue de Cadaqués 66000 Perpignan,0.614,28.385
+Perpignan,192,14 Rue de Valencia 66000 Perpignan,0.255,28.639
+Perpignan,193,308 Chemin du Mas-Bresson (VC 212) 66000 Perpignan,0.966,29.606
+Perpignan,194,300 Avenue Charles Deperet 66000 Perpignan,1.732,31.337
+Perpignan,195,Rue Louis de Bonnefoy 66000 Perpignan,0.392,31.729
+Perpignan,196,45 Rue Auguste Mariette 66000 Perpignan,0.179,31.908
+Perpignan,197,9 Rue Henry Aragon 66000 Perpignan,0.1,32.009
+Perpignan,198,3 Rue Anny de Pous 66000 Perpignan,0.098,32.106
+Perpignan,199,Rue des Grenadiers 66000 Perpignan,0.375,32.482
+Perpignan,200,955 Avenue Julien Panchot 66000 Perpignan,0.577,33.058
+Perpignan,201,Rue de la Vigneronne 66000 Perpignan,0.487,33.545
+Perpignan,202,34 Rue Maurice Garin 66000 Perpignan,0.392,33.937
+Perpignan,203,5 Place Alain Gerbault 66000 Perpignan,0.234,34.172
+Perpignan,204,5 Rue Alain Gerbault 66000 Perpignan,0.105,34.277
+Perpignan,205,91 Rue Pascal-Marie Agasse 66000 Perpignan,0.073,34.35
+Perpignan,206,15 Rue Jean Bouin 66000 Perpignan,0.2,34.55
+Perpignan,207,97 Avenue de Prades 66000 Perpignan,0.209,34.759
+Perpignan,208,Rue Frédéric Bartholdi 66000 Perpignan,0.974,35.732
+Perpignan,209,11 Rue Jules Dalou 66000 Perpignan,0.252,35.985
+Perpignan,210,1 Rue Claude Clodion 66000 Perpignan,0.184,36.168
+Perpignan,211,92 Avenue Commandant Soubielle 66000 Perpignan,0.3,36.469
+Perpignan,212,1 Rue des Vignes 66000 Perpignan,0.094,36.563
+Perpignan,213,4 Rue des Vignes 66000 Perpignan,0.023,36.586
+Perpignan,214,61 Avenue Commandant Soubielle 66000 Perpignan,0.096,36.682
+Perpignan,215,23 Rue des Vignes 66000 Perpignan,0.16,36.842
+Perpignan,216,8 Rue de Nohèdes 66000 Perpignan,0.303,37.145
+Perpignan,217,6 Rue de Nohèdes 66000 Perpignan,0.019,37.164
+Perpignan,218,Rue de la Carança 66000 Perpignan,0.156,37.32
+Perpignan,219,6 Rue de Puyvalador 66000 Perpignan,0.323,37.643
+Perpignan,220,1 Allée José-Maria de Heredia 66000 Perpignan,0.814,38.457
+Perpignan,221,137 Avenue Maréchal Joffre 66000 Perpignan,0.414,38.871
+Perpignan,222,141bis Avenue Maréchal Joffre 66000 Perpignan,0.033,38.904
+Perpignan,223,146 Avenue Maréchal Joffre 66000 Perpignan,0.069,38.973
+Perpignan,224,2 Rue Jules Dumont-d'Urville 66000 Perpignan,0.152,39.125
+Perpignan,225,13 Rue des Villas 66000 Perpignan,0.25,39.374
+Perpignan,226,183 Avenue Maréchal Joffre 66000 Perpignan,0.187,39.562
+Perpignan,227,8 Rue des Rouges-Gorges 66000 Perpignan,0.165,39.727
+Perpignan,228,14 Chemin du Sacré-Coeur 66000 Perpignan,0.25,39.977
+Perpignan,229,1 Rue François Delcos 66000 Perpignan,0.499,40.476
+Perpignan,230,73 Avenue Docteur Albert Schweitzer 66000 Perpignan,0.092,40.567
+Perpignan,231,1 Rue Simone Gay 66000 Perpignan,0.062,40.629
+Perpignan,232,71 Rue Joan Maragall 66000 Perpignan,0.35,40.979
+Perpignan,233,3 Rue Bonaventura-Carlos Aribau 66000 Perpignan,0.034,41.013
+Perpignan,234,8 Rue Santiago Russinol 66000 Perpignan,0.067,41.08
+Perpignan,235,38 Rue Jean Alcover 66000 Perpignan,0.135,41.215
+Perpignan,236,38bis Rue Jean Alcover 66000 Perpignan,0.006,41.221
+Perpignan,237,26 Rue de la Tour-de-la-Massane 66000 Perpignan,0.218,41.439
+Perpignan,238,11 Rue de la Tour-de-la-Massane 66000 Perpignan,0.112,41.551
+Perpignan,239,99 Avenue Docteur Albert Schweitzer 66000 Perpignan,0.679,42.23
+Perpignan,240,2 Rue Zénobe Gramme 66000 Perpignan,1.277,43.508
+Perpignan,241,4 Rue Robert Planquette 66000 Perpignan,0.551,44.059
+Perpignan,242,3 Impasse Adolphe Adam 66000 Perpignan,0.459,44.518
+Perpignan,243,Rue Alfred Bachelet 66000 Perpignan,0.217,44.735
+Perpignan,244,817 Boulevard Marius Berliet 66000 Perpignan,0.487,45.222
+Perpignan,245,221 Rue Chenard et Walker 66000 Perpignan,0.299,45.521
+Perpignan,246,Rue Eugène Flachat 66000 Perpignan,0.733,46.254
+Perpignan,247,12 Rue Adolphe Monticelli 66000 Perpignan,0.656,46.91
+Perpignan,248,Chemin de la Poudrière 66000 Perpignan,1.906,48.816
+Perpignan,249,Rue des Carignans 66000 Perpignan,0.723,49.539
+Perpignan,250,Rue de la Tramontane 66000 Perpignan,0.091,49.63
+Perpignan,251,1 Rue des Vendanges 66000 Perpignan,0.172,49.802
+Perpignan,252,3 Rue Jean-Philippe Rameau 66000 Perpignan,0.076,49.877
+Perpignan,253,Rue des Oeillets 66000 Perpignan,0.153,50.031
+Perpignan,254,51 Avenue du Palais-des-Expositions 66000 Perpignan,0.094,50.125
+Perpignan,255,140 Avenue du Palais-des-Expositions 66000 Perpignan,0.188,50.313
+Perpignan,256,6 Impasse Ducup de Saint-Paul 66000 Perpignan,0.247,50.56
+Perpignan,257,12 Rue Claude Bernard 66000 Perpignan,0.121,50.681
+Perpignan,258,2 Rue Lieutenant Farriol 66000 Perpignan,0.212,50.893
+Perpignan,259,1 Rue des Glaïeuls 66000 Perpignan,0.391,51.284
+Perpignan,260,24 Avenue Emile Roudayre 66000 Perpignan,0.802,52.085
+Perpignan,261,25 Avenue du Palais-des-Expositions 66000 Perpignan,0.519,52.605
+Perpignan,262,44 Avenue du Palais-des-Expositions 66000 Perpignan,0.022,52.627
+Perpignan,263,5 Avenue du Palais-des-Expositions 66000 Perpignan,0.12,52.747
+Perpignan,264,21 Avenue Maréchal Joffre 66000 Perpignan,0.196,52.943
+Perpignan,265,40 Avenue des Eaux-Vives 66000 Perpignan,0.064,53.007
+Perpignan,266,9 Avenue Commandant Soubielle 66000 Perpignan,0.18,53.187
+Perpignan,267,27 Rue Georges Bizet 66000 Perpignan,0.063,53.25
+Perpignan,268,47 Rue René-Antoine de Réaumur 66000 Perpignan,0.402,53.652
+Perpignan,269,33 Rue des Amandiers 66000 Perpignan,1.495,55.148
+Perpignan,270,28 Boulevard Aristide Briand 66100 Perpignan,0.297,55.444
+Perpignan,271,15 Rue Jacques Mach 66000 Perpignan,0.264,55.709
+Perpignan,272,24 Rue Théodore Chasseriau 66000 Perpignan,0.237,55.946
+Perpignan,273,5 Rue des Sérénades 66100 Perpignan,0.702,56.648
+Perpignan,274,24 Chemin de Saint-Roch 66100 Perpignan,0.171,56.819
+Perpignan,275,Rue André Chouraqui 66100 Perpignan,0.505,57.323
+Perpignan,276,16 Rambla de l’Occitanie 66100 Perpignan,0.189,57.512
+Perpignan,277,10 Rambla de l’Occitanie 66100 Perpignan,0.049,57.561
+Perpignan,278,30 Rue Salomon de Brosse 66000 Perpignan,1.665,59.225
+Perpignan,279,6 Rue Pierre de Montreuil 66000 Perpignan,0.095,59.321
+Perpignan,280,21 Rue Robert de Cotte 66000 Perpignan,0.107,59.427
+Perpignan,281,4 Rue Paul Séjourné 66000 Perpignan,0.184,59.611
+Perpignan,282,2 Rue Louis Le Vau 66000 Perpignan,0.076,59.687
+Perpignan,283,23 Rue Jean-Michel Chevotet 66000 Perpignan,0.353,60.04
+Perpignan,284,3 Impasse de la Houle 66000 Perpignan,0.358,60.398
+Perpignan,285,17 Rue Marc Seguin 66000 Perpignan,0.851,61.25
+Perpignan,286,28 Rue des Métézeau 66000 Perpignan,0.227,61.477
+Perpignan,287,109 Rue Jean Bullant 66000 Perpignan,0.73,62.207
+Perpignan,288,8 Rue Joe Rosenthal 66000 Perpignan,0.833,63.04
+Perpignan,289,163 Rue du Clos Banet 66000 Perpignan,0.516,63.555
+Perpignan,290,3 Rue Jordi Carbonell i Tries 66000 Perpignan,0.479,64.034
+Perpignan,291,14 Chemin des Yeuses 66000 Perpignan,0.55,64.585
+Perpignan,292,Chemin Guillem de Cabestany 66000 Perpignan,0.13,64.714
+Perpignan,293,Chemin de Château-Roussillon (VC 210) 66000 Perpignan,0.251,64.965
+Perpignan,294,61 Rue Jean Vigo 66000 Perpignan,1.589,66.554
+Perpignan,295,4 Rue Yves Allégret 66000 Perpignan,0.26,66.814
+Perpignan,296,1 Rue Henri Verneuil 66000 Perpignan,0.171,66.985
+Perpignan,297,10 Rue Louis Malle 66000 Perpignan,0.382,67.367
+Perpignan,298,1 Rue des Abricotiers 66000 Perpignan,2.185,69.552
+Perpignan,299,Chemin du Soleil Roy (CR 8) 66000 Perpignan,0.946,70.497
+Perpignan,300,41 Rue Han Coll 66000 Perpignan,7.598,78.095
+Perpignan,301,16 Rue Benoit Fourneyron 66000 Perpignan,1.791,79.886
+Perpignan,302,330 Impasse d’Oslo 66000 Perpignan,1.278,81.164
+Perpignan,303,280 Chemin du Mas-Ducup (VC 20) 66000 Perpignan,0.499,81.663
+Perpignan,304,358 Chemin du Mas-Ducup (VC 20) 66000 Perpignan,0.093,81.756
+Perpignan,305,7 Rue de Vienne 66000 Perpignan,0.086,81.842
+Perpignan,306,67 Allée des Cyprès 66000 Perpignan,0.571,82.413
+Perpignan,307,36 Rue Charles Gerhardt 66000 Perpignan,1.492,83.905
+Perpignan,308,9 Rue Charles Gerhardt 66000 Perpignan,0.069,83.974
+Perpignan,309,32 Rue Jacques Trefouël 66000 Perpignan,0.614,84.588
+Perpignan,310,Allée des Justes de France 66000 Perpignan,0.63,85.218
+Peyrestortes,1,3 Place de la Republique 66600 Peyrestortes,0.181,0.181
+Pia,1,10 Rue du Lavoir 66380 Pia,0.292,0.292
+Pia,2,3 Rue des Orangers 66380 Pia,0.207,0.499
+Pia,3,2 Rue Joseph Sebastien Pons 66380 Pia,0.279,0.778
+Pia,4,2 Rue des Colverts 66380 Pia,0.283,1.06
+Pia,5,7 Rue des Cormorans 66380 Pia,0.092,1.153
+Pia,6,6 Rue Costabonne 66380 Pia,0.643,1.795
+Pia,7,1 Rue des Iris 66380 Pia,0.056,1.851
+Pia,8,Rue des Gentianes 66380 Pia,0.252,2.103
+Pia,9,2 Rue des Pins 66380 Pia,0.461,2.564
+Pia,10,8 Rue des Citronniers 66380 Pia,0.176,2.74
+Pia,11,32 Route de Perpignan 66380 Pia,0.42,3.16
+Pia,12,20 Chemin des Charrettes 66380 Pia,0.153,3.313
+Pia,13,42 Chemin de l’Etang Long 66380 Pia,0.373,3.686
+Pia,14,16 Rue du Serpolet 66380 Pia,0.207,3.893
+Pia,15,Chemin des Vignes 66380 Pia,0.122,4.014
+Pia,16,42 Chemin des Vignes 66380 Pia,0.476,4.49
+Pia,17,1bis Chemin des Vignes 66380 Pia,0.278,4.768
+Pia,18,30 Avenue du Stade 66380 Pia,0.701,5.469
+Pia,19,1 Impasse des Capucines 66380 Pia,0.036,5.505
+Pia,20,20 Rue de la Llabanere 66380 Pia,0.814,6.319
+Pia,21,4 Rue Louise Michel 66380 Pia,1.18,7.5
+Pia,22,25 Rue du Clos des Palmiers 66380 Pia,2.427,9.927
+Pia,23,61 Rue du Clos des Palmiers 66380 Pia,0.127,10.054
+Pia,24,25 Rue du Chenin Blanc 66380 Pia,0.089,10.142
+Pollestres,1,4 Place de l'Eglise 66450 Pollestres,0.376,0.376
+Pollestres,2,16 Avenue de Canohès 66450 Pollestres,0.088,0.464
+Pollestres,3,16 Rue Cité le Moulin 66450 Pollestres,0.282,0.746
+Pollestres,4,8 Rue Laura Flessel 66450 Pollestres,0.71,1.456
+Pollestres,5,1 Rue Prairial 66450 Pollestres,0.103,1.559
+Pollestres,6,2 Avenue Laure Manaudou 66450 Pollestres,0.103,1.662
+Pollestres,7,7 Allée Félicia Ballanger 66450 Pollestres,0.453,2.115
+Ponteilla,1,2 Rue des Fauvettes 66300 Ponteilla,2.337,2.337
+Port-Vendres,1,5 Boulevard du 8 Mai 1945 66660 Port-Vendres,1.344,1.344
+Pézilla-la-Rivière,1,4 Rue du 11 Novembre 66370 Pézilla-la-Rivière,0.369,0.369
+Pézilla-la-Rivière,2,17 Rue Paul Astor 66370 Pézilla-la-Rivière,0.182,0.551
+Pézilla-la-Rivière,3,26 Rue des Aires 66370 Pézilla-la-Rivière,0.169,0.72
+Pézilla-la-Rivière,4,15 Rue du Portal d’Amont 66370 Pézilla-la-Rivière,0.146,0.866
+Pézilla-la-Rivière,5,11 Rue du Portal d’Amont 66370 Pézilla-la-Rivière,0.01,0.876
+Pézilla-la-Rivière,6,25 Rue de l’Egalité 66370 Pézilla-la-Rivière,0.648,1.524
+Pézilla-la-Rivière,7,5 Rond Point des Kiwis 66370 Pézilla-la-Rivière,0.315,1.839
+Rivesaltes,1,21 Rue du Romani 66600 Rivesaltes,0.027,0.027
+Rivesaltes,2,7 Impasse de Bruxelles 66600 Rivesaltes,1.06,1.087
+Rivesaltes,3,18 Impasse de Bruxelles 66600 Rivesaltes,0.063,1.15
+Rivesaltes,4,27 Avenue Louis Blanc 66600 Rivesaltes,0.977,2.127
+Rivesaltes,5,19 Avenue Louis Blanc 66600 Rivesaltes,0.046,2.173
+Rivesaltes,6,10 Rue Danton 66600 Rivesaltes,0.038,2.211
+Rivesaltes,7,9 Avenue Louis Blanc 66600 Rivesaltes,0.073,2.285
+Rivesaltes,8,42 Rue de la République 66600 Rivesaltes,0.203,2.487
+Rivesaltes,9,2 Rue de l'Orphéon 66600 Rivesaltes,0.03,2.518
+Rivesaltes,10,4 Rue Edgar Quinet 66600 Rivesaltes,0.098,2.615
+Rivesaltes,11,2 Rue de la République 66600 Rivesaltes,0.077,2.692
+Rivesaltes,12,27 Rue Jean Jaurès 66600 Rivesaltes,0.049,2.742
+Rivesaltes,13,9 Rue du 4 Septembre 66600 Rivesaltes,0.104,2.846
+Rivesaltes,14,41 Rue du 4 Septembre 66600 Rivesaltes,0.093,2.939
+Rivesaltes,15,19 Avenue de la Mourére 66600 Rivesaltes,0.52,3.459
+Rivesaltes,16,24 Rue Michel Boher 66600 Rivesaltes,0.379,3.837
+Rivesaltes,17,3 Rue Ambroise Pare 66600 Rivesaltes,0.049,3.886
+Rivesaltes,18,13 Avenue Gambetta 66600 Rivesaltes,0.213,4.099
+Rivesaltes,19,42 Rue Van Gogh 66600 Rivesaltes,0.623,4.722
+Rivesaltes,20,7 Avenue Alfred Sauvy 66600 Rivesaltes,3.22,7.942
+Saint-André,1,7 Rue du Conflent 66690 Saint-André,0.262,0.262
+Saint-Cyprien,1,10 Rue Guillaume Apollinaire 66750 Saint-Cyprien,0.675,0.675
+Saint-Cyprien,2,30 Place Henri Bergson 66750 Saint-Cyprien,0.217,0.892
+Saint-Cyprien,3,2 Impasse Paul Pégar 66750 Saint-Cyprien,0.585,1.477
+Saint-Cyprien,4,7 Impasse Jean Bordes 66750 Saint-Cyprien,0.608,2.085
+Saint-Cyprien,5,12 Rue Sainte Beuve 66750 Saint-Cyprien,2.636,4.721
+Saint-Cyprien,6,22 Rue Lautréamont 66750 Saint-Cyprien,0.261,4.982
+Saint-Cyprien,7,15 Rue du Docteur Schweitzer 66750 Saint-Cyprien,0.303,5.285
+Saint-Cyprien,8,39 Rue du Docteur Schweitzer 66750 Saint-Cyprien,0.149,5.434
+Saint-Cyprien,9,15 Boulevard François Desnoyer 66750 Saint-Cyprien,0.246,5.68
+Saint-Cyprien,10,10 Rue Condorcet 66750 Saint-Cyprien,0.288,5.968
+Saint-Cyprien,11,8 Rue Condorcet 66750 Saint-Cyprien,0.056,6.024
+Saint-Cyprien,12,Quai Arthur Rimbaud 66750 Saint-Cyprien,0.158,6.182
+Saint-Cyprien,13,2 Rue Jean Sebastien Bach 66750 Saint-Cyprien,0.809,6.992
+Saint-Cyprien,14,1 Rue Pierre Mac Orlan 66750 Saint-Cyprien,0.39,7.382
+Saint-Cyprien,15,4 Rue Gaston Chérau 66750 Saint-Cyprien,0.487,7.868
+Saint-Cyprien,16,28 Avenue Armand Lanoux 66750 Saint-Cyprien,1.082,8.95
+Saint-Cyprien,17,Rue de Suede 66750 Saint-Cyprien,0.644,9.594
+Saint-Cyprien,18,Boulevard François Desnoyer 66750 Saint-Cyprien,3.061,12.655
+Saint-Cyprien,19,5 Rue Eugène Delacroix 66750 Saint-Cyprien,0.213,12.868
+Saint-Cyprien,20,15 Rue Vaugelas 66750 Saint-Cyprien,0.23,13.099
+Saint-Cyprien,21,13 Rue Henry Bordeaux 66750 Saint-Cyprien,0.809,13.908
+Saint-Estève,1,3 Place Pierre de Coubertin 66240 Saint-Estève,0.43,0.43
+Saint-Estève,2,20 Rue de Sydney 66240 Saint-Estève,0.038,0.468
+Saint-Estève,3,15 Rue Olympe de Gouges 66240 Saint-Estève,0.279,0.747
+Saint-Estève,4,31 Rue Francois Mitterrand 66240 Saint-Estève,0.351,1.098
+Saint-Estève,5,14 Route de Perpignan 66240 Saint-Estève,0.168,1.267
+Saint-Estève,6,38 Avenue Gilbert Brutus 66240 Saint-Estève,0.693,1.96
+Saint-Estève,7,28bis Avenue du General de Gaulle 66240 Saint-Estève,0.611,2.571
+Saint-Estève,8,10 Rue de Champagne 66240 Saint-Estève,0.512,3.082
+Saint-Estève,9,42 Rue du Fournas 66240 Saint-Estève,1.005,4.088
+Saint-Estève,10,Rue du Pla Guillem 66240 Saint-Estève,0.192,4.28
+Saint-Estève,11,55 Boulevard du Canigou 66240 Saint-Estève,0.294,4.573
+Saint-Estève,12,1 Rue de la Sardane 66240 Saint-Estève,0.51,5.083
+Saint-Estève,13,4 Rue Louis Piquemal 66240 Saint-Estève,0.546,5.629
+Saint-Estève,14,42 Mas Cot 66240 Saint-Estève,1.596,7.224
+Saint-Estève,15,108 Rue du Fournas 66240 Saint-Estève,2.403,9.627
+Saint-Féliu-d'Avall,1,7bis Impasse de la Côte 66170 Saint-Féliu-d'Avall,0.887,0.887
+Saint-Féliu-d'Avall,2,7 Rue de la Côte 66170 Saint-Féliu-d'Avall,0.006,0.893
+Saint-Féliu-d'Avall,3,11 Rue du Presbytere 66170 Saint-Féliu-d'Avall,0.216,1.11
+Saint-Féliu-d'Avall,4,Rue de l'Agly 66170 Saint-Féliu-d'Avall,2.171,3.28
+Saint-Hippolyte,1,3 Avenue Jeanne d’Arc 66510 Saint-Hippolyte,0.596,0.596
+Saint-Hippolyte,2,12 Rue du 14 Juillet 66510 Saint-Hippolyte,0.092,0.688
+Saint-Laurent-de-la-Salanque,1,8 Avenue de la Côte Vermeille 66250 Saint-Laurent-de-la-Salanque,0.348,0.348
+Saint-Laurent-de-la-Salanque,2,7 Rue Danton 66250 Saint-Laurent-de-la-Salanque,0.099,0.447
+Saint-Laurent-de-la-Salanque,3,34 Rue Diderot 66250 Saint-Laurent-de-la-Salanque,0.018,0.464
+Saint-Laurent-de-la-Salanque,4,11bis Rue de Malakoff 66250 Saint-Laurent-de-la-Salanque,0.102,0.566
+Saint-Laurent-de-la-Salanque,5,5 Rue de la Fontaine 66250 Saint-Laurent-de-la-Salanque,0.053,0.62
+Saint-Laurent-de-la-Salanque,6,21 Rue Offenbach 66250 Saint-Laurent-de-la-Salanque,0.066,0.686
+Saint-Laurent-de-la-Salanque,7,3 Rue Docteur Amedee Cadene 66250 Saint-Laurent-de-la-Salanque,0.085,0.771
+Saint-Laurent-de-la-Salanque,8,5 Impasse Jules Michelet 66250 Saint-Laurent-de-la-Salanque,0.047,0.818
+Saint-Laurent-de-la-Salanque,9,5 Rue la Tour d’Auvergne 66250 Saint-Laurent-de-la-Salanque,0.091,0.909
+Saint-Laurent-de-la-Salanque,10,18 Rue Duquesne 66250 Saint-Laurent-de-la-Salanque,0.125,1.034
+Saint-Laurent-de-la-Salanque,11,5 Rue de Rivoli 66250 Saint-Laurent-de-la-Salanque,0.18,1.214
+Saint-Laurent-de-la-Salanque,12,3 Rue Arnau de Vilanova 66250 Saint-Laurent-de-la-Salanque,0.391,1.605
+Saint-Laurent-de-la-Salanque,13,26 Rue Louis David 66250 Saint-Laurent-de-la-Salanque,0.893,2.498
+Saint-Laurent-de-la-Salanque,14,3 Rue Maurice Ravel 66250 Saint-Laurent-de-la-Salanque,0.352,2.85
+Saint-Laurent-de-la-Salanque,15,3 Impasse Jean Philippe Rameau 66250 Saint-Laurent-de-la-Salanque,0.116,2.966
+Saint-Laurent-de-la-Salanque,16,20 Rue Jean Mermoz 66250 Saint-Laurent-de-la-Salanque,0.258,3.225
+Saint-Nazaire,1,12 Rue de l'Alicante 66570 Saint-Nazaire,0.204,0.204
+Saint-Nazaire,2,1 Rue du Littoral 66570 Saint-Nazaire,0.718,0.923
+Saint-Sulpice-la-Pointe,1,Rue Villelongue 81370 Saint-Sulpice-la-Pointe,1.259,1.259
+Sainte-Marie-la-Mer,1,21 Rue des Bougainvilliers 66470 Sainte-Marie-la-Mer,0.672,0.672
+Sainte-Marie-la-Mer,2,Résidence les Sablettes 66470 Sainte-Marie-la-Mer,0.327,0.999
+Sainte-Marie-la-Mer,3,Résidence les Ondines 66470 Sainte-Marie-la-Mer,0.153,1.152
+Sainte-Marie-la-Mer,4,19 Rue des Pins 66470 Sainte-Marie-la-Mer,1.514,2.667
+Sainte-Marie-la-Mer,5,17 Rue des Chênes 66470 Sainte-Marie-la-Mer,1.471,4.137
+Sainte-Marie-la-Mer,6,3bis Rue Derrière la Muraille 66470 Sainte-Marie-la-Mer,0.444,4.581
+Sainte-Marie-la-Mer,7,1 Rue Pasteur 66470 Sainte-Marie-la-Mer,0.168,4.749
+Sainte-Marie-la-Mer,8,1 Rue des Corbières 66470 Sainte-Marie-la-Mer,0.202,4.951
+Saleilles,1,6 Avenue Gino Massarotto 66280 Saleilles,0.292,0.292
+Saleilles,2,2 Avenue Arthur Conte 66280 Saleilles,0.739,1.031
+Saleilles,3,3 Rue de la Cerdagne 66280 Saleilles,1.921,2.952
+Tarbes,1,40 Place Marcadieu 65000 Tarbes,1.933,1.933
+Thuir,1,7 Avenue des Sports 66300 Thuir,0.555,0.555
+Thuir,2,6 Rue de la Cellera 66300 Thuir,0.3,0.855
+Thuir,3,7 Rue Dagobert 66300 Thuir,0.123,0.978
+Thuir,4,4 Impasse Anatole France 66300 Thuir,0.056,1.033
+Thuir,5,11 Rue Albert Bausil 66300 Thuir,0.263,1.297
+Thuir,6,36 Rue Marcel Pagnol 66300 Thuir,0.194,1.491
+Thuir,7,3 Rue du Bélier 66300 Thuir,1.165,2.656
+Théza,1,1 Boulevard de l’Oratori 66200 Théza,0.183,0.183
+Théza,2,11 Rue des Ormes 66200 Théza,0.274,0.457
+Théza,3,7 Rue des Palmiers 66200 Théza,0.116,0.573
+Torreilles,1,3bis Rue George Sand 66440 Torreilles,0.749,0.749
+Torreilles,2,1bis Avenue des Pyrenees 66440 Torreilles,0.262,1.01
+Torreilles,3,2 Avenue du Languedoc 66440 Torreilles,0.192,1.202
+Torreilles,4,12 Rue du Canigou 66440 Torreilles,0.05,1.252
+Torreilles,5,9 Avenue de Perpignan 66440 Torreilles,0.088,1.341
+Torreilles,6,12 Lotissement les Patios de Torreilles 66440 Torreilles,3.192,4.532
+Toulouges,1,1 Place de la République 66350 Toulouges,0.198,0.198
+Toulouges,2,8 Rue du Beffroi 66350 Toulouges,0.041,0.239
+Toulouges,3,3 Rue du Beffroi 66350 Toulouges,0.003,0.242
+Toulouges,4,6 Rue Mere Teresa 66350 Toulouges,0.519,0.761
+Tresserre,1,7 Rue du Canigou 66300 Tresserre,0.758,0.758
+Trouillas,1,15 Rue du Jasmin 66300 Trouillas,1.702,1.702
+Trouillas,2,19 Rue d'Alger 66300 Trouillas,0.608,2.31
+Trouillas,3,2 Rue du Pou de la Pigne 66300 Trouillas,0.177,2.487
+Villelongue-de-la-Salanque,1,14 Avenue de Perpignan 66410 Villelongue-de-la-Salanque,0.177,0.177
+Villelongue-de-la-Salanque,2,4 Avenue du Littoral 66410 Villelongue-de-la-Salanque,0.065,0.241
+Villelongue-de-la-Salanque,3,18 Rue Sainte Lucie 66410 Villelongue-de-la-Salanque,0.038,0.279
+Villelongue-de-la-Salanque,4,12 Rue du Fer a Cheval 66410 Villelongue-de-la-Salanque,0.122,0.402
+Villelongue-de-la-Salanque,5,58 Avenue du Littoral 66410 Villelongue-de-la-Salanque,0.283,0.685
+Villelongue-de-la-Salanque,6,15 Rue des Chardonnerets 66410 Villelongue-de-la-Salanque,0.594,1.279
+Villeneuve-de-la-Raho,1,8 Avenue Salvador Dali 66180 Villeneuve-de-la-Raho,0.899,0.899
+Villeneuve-de-la-Raho,2,5 Rue des Mimosas 66180 Villeneuve-de-la-Raho,0.305,1.204
+Villeneuve-de-la-Raho,3,3 Place de la Couloumine 66180 Villeneuve-de-la-Raho,0.338,1.542
+Villeneuve-la-Rivière,1,4 Rue Neuve 66610 Villeneuve-la-Rivière,0.116,0.116
+Vingrau,1,20 Rue Rameau 66600 Vingrau,1.512,1.512
