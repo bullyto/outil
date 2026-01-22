@@ -22,6 +22,8 @@
       --warn:#ffb020;        /* 1-2 */
       --ok:#31d158;          /* >=3 */
 
+      --name:#31d158;        /* ✅ nom produit (vert) */
+
       --shadow:0 12px 40px rgba(0,0,0,.35);
       --r:18px;
       --btn:rgba(255,255,255,.07);
@@ -166,20 +168,20 @@
 
     .list{ display:grid; grid-template-columns: 1fr; gap:10px; }
 
-    /* ✅ FIX: make cards taller + force name visible (2 lines max, no overlap) */
+    /* ✅ FIX: name missing because .content grid was centering. We align to TOP and reserve space for title */
     .item{
       display:grid;
-      grid-template-columns: 92px 1fr; /* image + content */
+      grid-template-columns: 92px 1fr;
       gap:14px;
       align-items:center;
       padding:14px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.12);
-      min-height: 142px;            /* ✅ taller so name is visible */
+      min-height: 156px;  /* ✅ taller */
     }
     .thumb{
-      width:92px; height:92px;      /* ✅ bigger bottle */
+      width:92px; height:92px;
       border-radius:18px;
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
@@ -199,42 +201,47 @@
     .content{
       min-width:0;
       display:grid;
-      grid-template-columns: 1fr auto; /* left meta + right controls */
+      grid-template-columns: 1fr auto;
       gap:12px;
-      align-items:center;
+      align-items:start; /* ✅ IMPORTANT: don't vertically center -> name becomes visible */
     }
 
     .meta{
       min-width:0;
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap:12px;
+      padding-top: 6px; /* ✅ pushes name into the green zone */
     }
 
     .name{
       margin:0;
-      font-size:18px;               /* ✅ bigger */
+      font-size:18px;
       font-weight:950;
       line-height:1.15;
-      display:-webkit-box;          /* ✅ allow 2 lines max */
+      color: var(--name); /* ✅ green */
+      display:-webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       overflow:hidden;
       text-overflow:ellipsis;
       max-width: 100%;
+      min-height: 42px;   /* ✅ reserve space so it never collapses */
     }
 
+    /* ✅ Move (red circle) slightly lower */
     .subRow{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
       min-width:0;
+      margin-top: 6px;    /* ✅ lower badge + price */
     }
 
     .price{
       margin:0;
-      font-size:18px;               /* ✅ bigger + bold */
+      font-size:18px;
       font-weight:950;
       line-height:1;
       flex:0 0 auto;
@@ -264,9 +271,10 @@
       align-items:center;
       gap:10px;
       flex:0 0 auto;
+      padding-top: 36px; /* ✅ align controls with badge/price lower (prevents overlap) */
     }
     .qtyBtn{
-      width:48px;                   /* ✅ bigger */
+      width:48px;
       height:48px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.12);
@@ -281,7 +289,7 @@
     }
     .qtyBtn:active{ transform: translateY(1px); }
     .qtyVal{
-      min-width:62px;               /* ✅ bigger */
+      min-width:62px;
       padding:12px 10px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.12);
@@ -400,11 +408,11 @@
     }
     .tabTop:active{ transform: translateY(1px); }
 
-    /* small screens: keep readability */
     @media (max-width:420px){
-      .item{ grid-template-columns: 90px 1fr; min-height: 150px; }
+      .item{ grid-template-columns: 90px 1fr; min-height: 164px; }
       .name{ font-size:18px; }
       .price{ font-size:18px; }
+      .qtyBox{ padding-top: 40px; }
     }
   </style>
 </head>
@@ -510,18 +518,9 @@
 </div>
 
 <script>
-/* =========================
-   CONFIG
-   ========================= */
-
 const IMG_DIR = "./stock/";
 const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
-
 const OK_THRESHOLD = 3;
-
-/* =========================
-   PRODUITS (base)
-   ========================= */
 
 const BASE_PRODUCTS = [
   { id:"poliakov", name:"Poliakov Vodka", price:29, img:"poliakov.png" },
@@ -564,10 +563,6 @@ const BASE_PRODUCTS = [
 
 let PRODUCTS = [...BASE_PRODUCTS];
 
-/* =========================
-   HELPERS
-   ========================= */
-
 function $(sel){ return document.querySelector(sel); }
 function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
 
@@ -579,7 +574,6 @@ const btnReset = $("#btnReset");
 const dirtyBadge = $("#dirtyBadge");
 const syncText = $("#syncText");
 
-// sheet
 const sheet = $("#sheet");
 const sheetBackdrop = $("#sheetBackdrop");
 const sheetClose = $("#sheetClose");
@@ -834,6 +828,7 @@ async function pushToRepo(){
     return;
   }
   if(pin !== "0000"){
+    toastMsg("Code invalide.");
     toastMsg("Code invalide.");
     return;
   }
