@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>ADN66 • Outils internes (suite)</title>
+  <meta name="description" content="Suite d’outils internes ADN66 : Stock, Apéro de Nuit 66, Status, GPS." />
+  <link rel="icon" href="./apps/apero/icon-192.png" />
+  <style>
+    :root{
+      --bg:#0b1220; --panel:rgba(255,255,255,.06); --border:rgba(255,255,255,.12);
+      --text:#e8eefc; --muted:#a9b7d6; --shadow:0 14px 46px rgba(0,0,0,.45);
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; min-height:100vh;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 650px at 15% 10%, rgba(255,210,0,.10), transparent 55%),
+        radial-gradient(800px 600px at 85% 10%, rgba(255,59,59,.10), transparent 55%),
+        radial-gradient(1000px 800px at 50% 110%, rgba(80,120,255,.10), transparent 60%),
+        var(--bg);
+      padding: 14px;
+    }
+    .wrap{ max-width: 980px; margin: 0 auto; padding: 14px 0 26px; }
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding: 14px 14px;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .brand{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .logo{
+      width:44px; height:44px; border-radius:16px;
+      border:1px solid var(--border);
+      background:
+        radial-gradient(14px 14px at 30% 30%, rgba(255,210,0,.95), rgba(255,210,0,0) 60%),
+        radial-gradient(18px 18px at 70% 75%, rgba(255,59,59,.85), rgba(255,59,59,0) 60%),
+        linear-gradient(160deg, rgba(255,255,255,.12), rgba(255,255,255,.02));
+    }
+    .titles{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .t1{ font-weight:900; letter-spacing:.2px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .t2{ font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .grid{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .card{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 14px;
+      box-shadow: 0 12px 34px rgba(0,0,0,.28);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .card h2{ margin:0 0 6px; font-size: 15px; letter-spacing:.2px; }
+    .card p{ margin:0 0 12px; color:var(--muted); font-size: 12px; line-height:1.35; }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; }
+    a.btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      text-decoration:none;
+      font-weight: 900;
+      font-size: 12px;
+      user-select:none;
+    }
+    a.btn:active{ transform: scale(.98); }
+    footer{
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 11px;
+      opacity:.9;
+      line-height:1.35;
+      text-align:center;
+    }
+    @media (max-width: 720px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="titles">
+          <div class="t1">ADN66 • Suite d’outils internes</div>
+          <div class="t2">Un seul repo • Menu global sur chaque outil</div>
+        </div>
+      </div>
+      <div class="row">
+        <a class="btn" href="./apps/stock/index.html">Ouvrir Stock</a>
+        <a class="btn" href="./apps/gps/index.html">Ouvrir GPS</a>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Stock</h2>
+        <p>Outil stock interne (images + snapshot). Le menu en haut à droite permet de basculer vers les autres outils.</p>
+        <div class="row">
+          <a class="btn" href="./apps/stock/index.html">Accéder</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Apéro de Nuit 66</h2>
+        <p>PWA principale (landing / commande). Conserve ses fichiers d’origine dans <code>/apps/apero/</code>.</p>
+        <div class="row">
+          <a class="btn" href="./apps/apero/index.html">Accéder</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Status</h2>
+        <p>Centre de pilotage (status.json + client). Utile pour les messages et blocages.</p>
+        <div class="row">
+          <a class="btn" href="./apps/status/index.html">Accéder</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>GPS Apéro 66</h2>
+        <p>Outil GPS / logistique. Les données restent dans son dossier d’origine.</p>
+        <div class="row">
+          <a class="btn" href="./apps/gps/index.html">Accéder</a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Interne • Non indexé (noindex).<br/>
+      Astuce : sur chaque outil, clique “☰ Outils” (en haut à droite) pour basculer.
+    </footer>
+  </div>
+
+  <link rel="stylesheet" href="./shared/menu.css">
+  <script src="./shared/menu.js" defer></script>
+</body>
+</html>
