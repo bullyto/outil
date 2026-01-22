@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-01-22T21:02:25.693Z",
+  "updated_at": "2026-01-22T21:04:48.367Z",
   "items": [
     {
       "id": "absolut",
-      "qty": 49
+      "qty": 0
     },
     {
       "id": "ballantines",
@@ -79,7 +79,7 @@
     },
     {
       "id": "poliakov",
-      "qty": 2
+      "qty": 0
     },
     {
       "id": "ricard",
