@@ -1,817 +1,572 @@
+<!-- PATH: /apps/stock/index.html -->
 <!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Stock Véhicule</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0f1a" />
+  <title>Stock véhicule — Apéro de Nuit 66</title>
 
-  <link rel="manifest" href="./manifest.webmanifest">
-  <meta name="theme-color" content="#05070b" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./icon-192.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icon-192.svg" />
 
   <style>
     :root{
-      --bg0:#020308; --bg1:#05070b; --bg2:#070a10;
-      --txt:#ecf3ff; --mut:#9fb0c8;
-      --accent:#39d98a; --accent2:#47c9ff; --warn:#ffb020; --bad:#ff4d6d;
-      --shadow: 0 26px 80px rgba(0,0,0,.72);
-      --shadow2: 0 14px 40px rgba(0,0,0,.58);
+      --bg:#060a12;
+      --card:#0b1220;
+      --card2:#0f1a2d;
+      --text:#e8f0ff;
+      --muted:#9fb3d1;
+      --line:rgba(255,255,255,.08);
+      --accent:#ffd54a;
+      --danger:#ff3b3b;
+      --ok:#31d158;
+      --shadow:0 12px 40px rgba(0,0,0,.35);
+      --r:18px;
+      --btn:rgba(255,255,255,.07);
+      --btn2:rgba(255,255,255,.10);
     }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    *{ box-sizing:border-box; }
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--txt);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      color:var(--text);
       background:
-        radial-gradient(1100px 780px at 16% 10%, rgba(71,201,255,.10), transparent 60%),
-        radial-gradient(980px 760px at 84% 14%, rgba(57,217,138,.09), transparent 60%),
-        radial-gradient(1300px 950px at 50% 120%, rgba(57,217,138,.06), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1) 42%, var(--bg2));
-      overflow-x:hidden;
+        radial-gradient(900px 600px at 50% -120px, rgba(255,213,74,.16), transparent 60%),
+        radial-gradient(900px 700px at 50% 110%, rgba(73,136,255,.12), transparent 60%),
+        var(--bg);
     }
-
-    .wrap{max-width:1100px;margin:0 auto;padding:10px 14px 0}
-    .header{
-      position: sticky; top: 0; z-index: 60;
-      padding-top: env(safe-area-inset-top);
-      background: linear-gradient(180deg, rgba(2,3,8,.97), rgba(2,3,8,.84) 65%, rgba(2,3,8,0));
-      backdrop-filter: blur(12px);
+    header{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(to bottom, rgba(6,10,18,.92), rgba(6,10,18,.62));
+      border-bottom:1px solid var(--line);
     }
-    .headerInner{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; padding: 10px 0 12px;}
-    .brand{display:flex; gap:12px; align-items:center;}
-    .logo{
-      width:44px;height:44px;border-radius:14px;
-      background:
-        radial-gradient(18px 18px at 30% 30%, rgba(71,201,255,.28), transparent 55%),
-        radial-gradient(18px 18px at 70% 70%, rgba(57,217,138,.26), transparent 55%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: var(--shadow2);
-      position:relative; overflow:hidden;
-    }
-    .logo:after{
-      content:"";
-      position:absolute; inset:-40%;
-      background: conic-gradient(from 0deg, rgba(71,201,255,0), rgba(71,201,255,.35), rgba(57,217,138,.35), rgba(71,201,255,0));
-      animation: spin 7s linear infinite;
-      filter: blur(12px);
-      opacity:.65;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    .titleBox{line-height:1.12}
-    .title{font-size:16px;font-weight:950;letter-spacing:.3px}
-    .subtitle{margin-top:4px;font-size:12px;color:var(--mut);letter-spacing:.2px}
-    .subtitle strong{color:rgba(236,243,255,.88); font-weight:900}
-
-    .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 9px 10px; border-radius: 999px;
-      background: rgba(255,255,255,.045);
-      border:1px solid rgba(255,255,255,.08);
-      color: var(--mut); font-size:12px; white-space:nowrap;
-    }
-    .dot{width:8px;height:8px;border-radius:50%; background: var(--accent); box-shadow: 0 0 0 6px rgba(57,217,138,.09);}
-    .dot.off{background: rgba(255,255,255,.38); box-shadow: 0 0 0 6px rgba(255,255,255,.06);}
-    .btn{
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      color:var(--txt);
-      padding: 10px 12px;
-      border-radius: 14px;
-      font-weight: 900;
-      font-size: 13px;
-      display:inline-flex; align-items:center; gap:10px;
-      cursor:pointer; box-shadow: 0 10px 26px rgba(0,0,0,.40);
-      user-select:none; transition: transform .08s ease, filter .15s ease, opacity .15s ease;
-    }
-    .btn:hover{filter:brightness(1.07)}
-    .btn:active{transform:translateY(1px)}
-    .btn[disabled]{opacity:.55; cursor:not-allowed; filter:none}
-    .btn.primary{
-      border-color: rgba(57,217,138,.22);
-      background: linear-gradient(180deg, rgba(57,217,138,.16), rgba(255,255,255,.05));
-    }
-    .icon{width:18px;height:18px;display:inline-block}
-
-    .toolbar{margin-top: 10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-    .search{
-      flex: 1 1 220px;
+    .wrap{ max-width:980px; margin:0 auto; padding:14px 14px 10px; }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .brand{
       display:flex; align-items:center; gap:10px;
-      padding: 12px 12px; border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.045);
-      box-shadow: var(--shadow2);
+      min-width: 0;
     }
-    .search input{
-      flex:1; background: transparent; border:0; outline:none;
-      color: var(--txt); font-size: 14px; font-weight: 850;
+    .logo{
+      width:44px; height:44px; border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,213,74,.30), rgba(255,213,74,.06));
+      border:1px solid rgba(255,213,74,.24);
+      display:grid; place-items:center;
+      box-shadow: var(--shadow);
+      flex:0 0 auto;
     }
-    .search input::placeholder{color: rgba(159,176,200,.65); font-weight:800}
-
-    .seg{
-      display:flex; gap:8px; align-items:center;
-      padding: 6px; border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.045);
-      box-shadow: var(--shadow2);
+    .logo svg{ opacity:.95 }
+    .title{
+      min-width:0;
     }
-    .seg button{
-      border:0; background: transparent; color: var(--mut);
-      padding: 10px 12px; border-radius: 12px;
-      font-weight: 950; font-size: 13px; cursor:pointer;
+    .title h1{
+      margin:0;
+      font-size:15px;
+      letter-spacing:.2px;
+      line-height:1.15;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
-    .seg button.active{
-      background: rgba(255,255,255,.08);
-      color: var(--txt);
-      border: 1px solid rgba(255,255,255,.10);
+    .title p{
+      margin:3px 0 0;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
-
-    .grid{margin-top: 14px; display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-bottom: 96px;}
-        @media (max-width: 520px){ .grid{grid-template-columns: repeat(2, 1fr);} }
-
-    .card{
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.03));
-      box-shadow: var(--shadow2);
-      overflow:hidden; position:relative; cursor:pointer;
-      transition: transform .12s ease, filter .2s ease;
+    .topRight{
+      display:flex; align-items:center; gap:10px;
+    }
+    .pill{
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      display:flex; align-items:center; gap:8px;
       user-select:none;
     }
-    .card:hover{filter:brightness(1.06)}
-    .card:active{transform:translateY(1px)}
-    .cardTop{
-      padding: 14px 14px 10px;
-      min-height: 140px;
-      display:flex; align-items:center; justify-content:center;
-      background:
-        radial-gradient(220px 140px at 50% 50%, rgba(71,201,255,.085), transparent 60%),
-        radial-gradient(220px 140px at 70% 30%, rgba(57,217,138,.08), transparent 60%);
-      position:relative;
+    .pill b{ color:var(--text); font-weight:700; }
+    .btnIcon{
+      width:40px; height:40px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      display:grid; place-items:center;
+      cursor:pointer;
+    }
+    .btnIcon:active{ transform: translateY(1px); }
+
+    main{ padding:14px 14px 26px; }
+    .grid{
+      max-width:980px; margin:0 auto;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHeader{
+      padding:14px 14px 12px;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), transparent);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .cardHeader h2{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .cardHeader p{
+      margin:4px 0 0;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .cardBody{ padding:12px 14px 14px; }
+
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .search{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex: 1 1 320px;
+      min-width:240px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+    }
+    .search input{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:14px;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .btn{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: var(--btn);
+      color:var(--text);
+      cursor:pointer;
+      font-size:13px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn:hover{ background: var(--btn2); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      border-color: rgba(255,213,74,.34);
+      background: rgba(255,213,74,.10);
+    }
+    .btn.danger{
+      border-color: rgba(255,59,59,.35);
+      background: rgba(255,59,59,.10);
+      color: #ffecec;
+    }
+    .btn:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+      transform:none;
     }
 
-    .bottle{
-      width: 104px;
-      height: 128px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
-      box-shadow: 0 18px 55px rgba(0,0,0,.50);
-      display:flex; align-items:center; justify-content:center;
-      position:relative; overflow:hidden;
+    .list{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
     }
-    .bottle img{width:100%;height:100%;object-fit:contain;display:block}
-    .bottle .fallback{
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      font-weight: 1100; letter-spacing: .6px;
-      color: rgba(236,243,255,.70);
-      font-size: 12px;
+    .item{
+      display:grid;
+      grid-template-columns: 66px 1fr auto;
+      gap:12px;
+      align-items:center;
+      padding:10px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
     }
-    .bottle.hasimg .fallback{display:none}
+    .thumb{
+      width:66px; height:66px;
+      border-radius:16px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      padding:6px;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.35));
+    }
+    .meta{
+      min-width:0;
+    }
+    .meta .name{
+      font-size:14px;
+      font-weight:700;
+      margin:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .meta .desc{
+      margin:4px 0 0;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .qtyBox{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .qty{
+      width:70px;
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      font-size:14px;
+      text-align:center;
+      outline:none;
+    }
+    .badge{
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      user-select:none;
+    }
+    .badge.ok{ border-color: rgba(49,209,88,.35); background: rgba(49,209,88,.10); color:#dfffe8; }
+    .badge.warn{ border-color: rgba(255,213,74,.35); background: rgba(255,213,74,.10); color:#fff4cf; }
+    .badge.danger{ border-color: rgba(255,59,59,.35); background: rgba(255,59,59,.10); color:#ffe3e3; }
 
-    .badgeQty{
-      position:absolute; top: 10px; right: 10px;
-      padding: 8px 10px; border-radius: 999px;
-      font-weight: 1000; font-size: 12px;
-      color: #06110c;
-      background: linear-gradient(180deg, rgba(57,217,138,.95), rgba(57,217,138,.65));
-      box-shadow: 0 16px 45px rgba(57,217,138,.18);
-      border: 1px solid rgba(255,255,255,.18);
-      min-width: 44px; text-align:center;
+    .toast{
+      position:fixed;
+      bottom:16px;
+      left:50%;
+      transform: translateX(-50%);
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,14,24,.92);
+      color:var(--text);
+      box-shadow: var(--shadow);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index:99;
+      max-width: calc(100% - 18px);
+      text-align:center;
+      font-size:13px;
     }
-    .badgeLow{background: linear-gradient(180deg, rgba(255,176,32,.95), rgba(255,176,32,.65)); box-shadow: 0 16px 45px rgba(255,176,32,.18);}
-    .badgeZero{background: linear-gradient(180deg, rgba(255,77,109,.95), rgba(255,77,109,.60)); box-shadow: 0 16px 45px rgba(255,77,109,.18); color:#12030a;}
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-2px);
+    }
 
-    .cardBody{padding: 12px 14px 14px}
-    .name{font-weight: 1000; font-size: 13px; line-height: 1.2; letter-spacing: .2px; margin: 0 0 8px;}
-    .metaRow{display:flex; align-items:center; justify-content:space-between; gap:10px; color: var(--mut); font-size: 12px; font-weight: 850;}
-    .tag{padding: 7px 9px; border-radius: 999px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.045); color: rgba(159,176,200,.9); font-size: 11px; font-weight: 950; white-space:nowrap;}
-
-    .sheetBackdrop{position:fixed; inset:0; background: rgba(0,0,0,.68); backdrop-filter: blur(10px); opacity:0; pointer-events:none; transition: opacity .18s ease; z-index: 90;}
-    .sheetBackdrop.show{opacity:1; pointer-events:auto;}
-    .sheet{position:fixed; left:0; right:0; bottom: -430px; transition: transform .22s ease; z-index: 95; padding: 0 12px calc(env(safe-area-inset-bottom) + 12px);}
-    .sheet.show{transform: translateY(-430px);}
-    .sheetInner{max-width: 720px; margin: 0 auto; border-radius: 26px; border:1px solid rgba(255,255,255,.12); background: linear-gradient(180deg, rgba(9,12,18,.94), rgba(6,8,12,.94)); box-shadow: var(--shadow); overflow:hidden;}
-    .sheetHandle{width: 60px; height: 5px; border-radius:999px; background: rgba(255,255,255,.18); margin: 10px auto 8px;}
-    .sheetContent{padding: 10px 14px 14px}
-    .sheetTitleRow{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding: 4px 2px 10px;}
-    .sheetTitle{font-weight:1000;font-size:16px;letter-spacing:.2px;margin:0}
-    .sheetSub{margin-top:6px;color:var(--mut);font-size:12px;font-weight:850}
-    .qtyBig{font-size: 28px; font-weight: 1100; letter-spacing:.5px; padding: 10px 14px; border-radius: 18px; border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); min-width: 88px; text-align:center;}
-    .controls{display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;}
-    .ctl{padding: 14px 14px; border-radius: 18px; border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); display:flex; align-items:center; justify-content:center; gap:10px; font-weight: 1000; cursor:pointer; user-select:none;}
-    .ctl.plus{border-color: rgba(57,217,138,.22); background: linear-gradient(180deg, rgba(57,217,138,.18), rgba(255,255,255,.05));}
-    .ctl.minus{border-color: rgba(255,77,109,.18); background: linear-gradient(180deg, rgba(255,77,109,.14), rgba(255,255,255,.05));}
-    .ctl:active{transform:translateY(1px)}
-    .rowChips{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap}
-
-    .fab{position: fixed; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 16px); z-index: 80;
-      width: 62px; height: 62px; border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.16);
-      background:
-        radial-gradient(30px 30px at 30% 30%, rgba(71,201,255,.36), transparent 60%),
-        radial-gradient(30px 30px at 70% 70%, rgba(57,217,138,.36), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.06));
-      box-shadow: 0 22px 70px rgba(0,0,0,.62);
-      display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none; overflow:hidden;
-      opacity: .96;
+    .sheet{
+      position:fixed;
+      inset:0;
+      display:none;
+      z-index:50;
     }
-    .fab:after{content:""; position:absolute; inset:-60%;
-      background: conic-gradient(from 0deg, rgba(71,201,255,0), rgba(71,201,255,.44), rgba(57,217,138,.44), rgba(71,201,255,0));
-      filter: blur(14px); opacity:.52; animation: spin 7s linear infinite;
+    .sheet.show{ display:block; }
+    .sheet .backdrop{
+      position:absolute;
+      inset:0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
     }
-    .fab svg{position:relative}
-
-    .modal{position:fixed; inset:0; background: rgba(0,0,0,.72); backdrop-filter: blur(10px); z-index: 110;
-      opacity:0; pointer-events:none; transition: opacity .18s ease;
-      display:flex; align-items:flex-end; padding: 12px; padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+    .sheet .panel{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform: translate(-50%,-50%);
+      width:min(520px, calc(100% - 22px));
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(12,18,32,.98), rgba(8,12,22,.98));
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
-    .modal.show{opacity:1; pointer-events:auto;}
-    .modalCard{width:100%; max-width: 720px; margin: 0 auto; border-radius: 26px; border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(9,12,18,.95), rgba(6,8,12,.95)); box-shadow: var(--shadow); overflow:hidden;
+    .sheet .panelHeader{
+      padding:14px 14px 12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
     }
-    .modalTop{padding: 12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom: 1px solid rgba(255,255,255,.10);}
-    .modalTop b{font-weight:1000; letter-spacing:.2px}
-    .modalTop .right{display:flex; gap:10px; align-items:center}
-    .miniBtn{border:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); color: var(--txt);
-      padding: 10px 12px; border-radius: 14px; font-weight: 950; font-size: 13px; cursor:pointer; user-select:none;
+    .sheet .panelHeader h3{
+      margin:0;
+      font-size:14px;
+      letter-spacing:.2px;
     }
-    .miniBtn:active{transform:translateY(1px)}
-    .miniBtn.primary{border-color: rgba(71,201,255,.22); background: linear-gradient(180deg, rgba(71,201,255,.16), rgba(255,255,255,.05));}
-    .videoBox{position:relative; background: #000; aspect-ratio: 16 / 9; width: 100%; overflow:hidden;}
-    video{width:100%; height:100%; object-fit:cover; display:block}
-    .scanOverlay{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;}
-    .scanFrame{width: 70%; max-width: 420px; aspect-ratio: 1.9 / 1; border-radius: 20px; border: 2px solid rgba(71,201,255,.55);
-      box-shadow: 0 0 0 10px rgba(71,201,255,.10), 0 0 40px rgba(71,201,255,.20); position:relative;
+    .sheet .panelHeader button{
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      font-size:18px;
+      cursor:pointer;
     }
-    .scanFrame:after{content:""; position:absolute; left:10px; right:10px; top:50%; height:2px;
-      background: rgba(57,217,138,.75); box-shadow: 0 0 18px rgba(57,217,138,.35);
-      transform: translateY(-50%); opacity:.9;
+    .sheet .panelBody{
+      padding:14px;
+      display:grid;
+      gap:12px;
     }
-    .modalBody{padding: 12px 14px}
-    .scanResult{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-      padding: 12px; border-radius: 18px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.04);
+    .field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
     }
-    .scanResult .left{display:flex; flex-direction:column; gap:6px}
-    .scanResult .small{color:var(--mut); font-size:12px; font-weight:850}
-    .scanResult .big{font-weight:1000}
-    .confirmRow{margin-top: 10px; display:grid; grid-template-columns: 1fr 1fr; gap: 10px;}
-    .confirmRow button{width:100%; padding: 14px 14px; border-radius: 18px; border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.05); color:var(--txt); font-weight:1000; cursor:pointer; user-select:none;
-    }
-    .confirmRow button.ok{border-color: rgba(57,217,138,.22); background: linear-gradient(180deg, rgba(57,217,138,.18), rgba(255,255,255,.05));}
-    .confirmRow button.no{border-color: rgba(255,77,109,.18); background: linear-gradient(180deg, rgba(255,77,109,.14), rgba(255,255,255,.05));}
-    .confirmRow button:active{transform:translateY(1px)}
-    .confirmRow button:disabled{opacity:.55; cursor:not-allowed}
-
-    /* Settings (token only) */
-    .settings{position:fixed; inset:0; z-index: 130;
-      background: rgba(0,0,0,.72); backdrop-filter: blur(12px);
-      opacity:0; pointer-events:none; transition: opacity .18s ease;
-      display:flex; align-items:flex-end; padding: 12px; padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
-    }
-    .settings.show{opacity:1; pointer-events:auto;}
-    .settingsCard{width:100%; max-width: 720px; margin: 0 auto; border-radius: 26px; border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(9,12,18,.96), rgba(6,8,12,.96)); box-shadow: var(--shadow); overflow:hidden;
-    }
-    .settingsTop{padding: 12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom: 1px solid rgba(255,255,255,.10);}
-    .settingsTop b{font-weight:1000; letter-spacing:.2px}
-    .settingsBody{padding: 12px 14px}
-    .field{display:flex; flex-direction:column; gap:6px}
-    .field label{font-size:12px; color: rgba(159,176,200,.86); font-weight:900}
     .field input{
-      padding: 12px 12px; border-radius: 16px;
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.05);
-      color: var(--txt);
+      color:var(--text);
       outline:none;
-      font-weight: 900;
+      font-size:14px;
     }
-    .help{margin-top:10px; color: rgba(159,176,200,.82); font-size:12px; font-weight:850; line-height:1.35}
-    .help code{background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 8px; border:1px solid rgba(255,255,255,.10)}
-    .settingsActions{margin-top:12px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
-    .settingsActions .btn{width:100%; justify-content:center}
-    .settingsActions .btn.primary{justify-content:center}
-
-    .toast{position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 92px);
-      transform: translateX(-50%);
-      padding: 10px 12px; border-radius: 999px; border:1px solid rgba(255,255,255,.12);
-      background: rgba(6,8,12,.84); box-shadow: var(--shadow2);
-      color: var(--mut); font-size: 12px; font-weight: 900;
-      opacity: 0; pointer-events:none; transition: opacity .18s ease, transform .18s ease;
-      z-index: 140; backdrop-filter: blur(10px); white-space:nowrap;
+    .hint{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
     }
-    .toast.show{opacity:1; transform: translateX(-50%) translateY(-4px);}
+    .panelActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      padding:14px;
+      border-top:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
   </style>
-  <link rel="stylesheet" href="../../shared/menu.css">
-  <script src="../../shared/menu.js" defer></script>
 </head>
 
 <body>
-  <div class="header">
-    <div class="wrap">
-      <div class="headerInner">
-        <div class="brand">
-          <div class="logo" aria-hidden="true"></div>
-          <div class="titleBox">
-            <div class="title">Stock Véhicule</div>
-            <div class="subtitle" id="subtitleLine">
-              Temps réel
-              <br><strong id="miniStats">—</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <div class="chip"><span class="dot off" id="dotNet"></span><span id="chipStatus">Offline</span></div>
-
-          <button class="btn" type="button" id="btnSettings" title="Token GitHub">
-            <svg class="icon" viewBox="0 0 24 24" fill="none">
-              <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="2"/>
-              <path d="M19.4 15a7.8 7.8 0 0 0 .1-1l2-1.2-2-3.5-2.3.7a7.8 7.8 0 0 0-1.7-1L15 4h-6l-.5 2.9a7.8 7.8 0 0 0-1.7 1L4.5 7.2l-2 3.5 2 1.2a7.8 7.8 0 0 0 0 2l-2 1.2 2 3.5 2.3-.7a7.8 7.8 0 0 0 1.7 1L9 20h6l.5-2.9a7.8 7.8 0 0 0 1.7-1l2.3.7 2-3.5-2-1.2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-            Token
-          </button>
-
-          <button class="btn primary" type="button" id="btnSaveRepo" title="Enregistrer le stock en dépôt (GitHub)">
-            <svg class="icon" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              <path d="M8 9l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M5 14v5h14v-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            Enregistrer dépôt
-          </button>
-        </div>
-      </div>
-
-      <div class="toolbar">
-        <div class="search">
-          <svg class="icon" viewBox="0 0 24 24" fill="none">
-            <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
-            <path d="M16.3 16.3 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          <input id="q" type="text" placeholder="Rechercher une bouteille…" />
-        </div>
-
-        <div class="seg" role="tablist" aria-label="Filtres">
-          <button id="fAll" class="active" type="button">Tout</button>
-          <button id="fLow" type="button">Faible</button>
-          <button id="fZero" type="button">Rupture</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
+<header>
   <div class="wrap">
-    <div class="grid" id="grid"></div>
-  </div>
+    <div class="row">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2c5.3 0 9.6 4.3 9.6 9.6S17.3 21.2 12 21.2 2.4 16.9 2.4 11.6 6.7 2 12 2Z" stroke="rgba(255,213,74,.9)" stroke-width="1.4"/>
+            <path d="M7.2 12.4c1.4 2.2 3 3.2 4.8 3.2s3.4-1 4.8-3.2" stroke="rgba(255,213,74,.9)" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M9.1 9.7h.01M14.9 9.7h.01" stroke="rgba(255,213,74,.9)" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="title">
+          <h1>Stock véhicule</h1>
+          <p>Synchronisé avec l’outil interne — Apéro de Nuit 66</p>
+        </div>
+      </div>
 
-  <div class="fab" id="fabScan" title="Scanner EAN">
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-      <path d="M7 7h3M7 7V4h3M17 7h-3M17 7V4h-3M7 17h3M7 17v3h3M17 17h-3M17 17v3h-3" stroke="white" stroke-width="2" stroke-linecap="round"/>
-      <path d="M8 12h8" stroke="white" stroke-width="2" stroke-linecap="round"/>
-    </svg>
+      <div class="topRight">
+        <div class="pill" id="syncPill" title="Dernière synchronisation">
+          <span>Sync</span> <b id="syncText">—</b>
+        </div>
+        <button class="btnIcon" id="btnOpenSettings" title="Outils">☰</button>
+      </div>
+    </div>
   </div>
+</header>
 
-  <div class="sheetBackdrop" id="backdrop"></div>
-  <div class="sheet" id="sheet">
-    <div class="sheetInner">
-      <div class="sheetHandle"></div>
-      <div class="sheetContent">
-        <div class="sheetTitleRow">
-          <div>
-            <h3 class="sheetTitle" id="sheetName">—</h3>
-            <div class="sheetSub">Ajuster le stock</div>
+<main>
+  <div class="grid">
+    <section class="card">
+      <div class="cardHeader">
+        <div>
+          <h2>Stock en direct : synchronisé avec le véhicule</h2>
+          <p>Affichage indicatif (mise à jour ~3 minutes). Un produit peut être temporairement indisponible.</p>
+        </div>
+        <span class="badge" id="dirtyBadge">OK</span>
+      </div>
+
+      <div class="cardBody">
+        <div class="toolbar">
+          <div class="search">
+            <span style="opacity:.7">🔎</span>
+            <input id="q" type="search" placeholder="Rechercher un produit…" autocomplete="off" />
           </div>
-          <div class="qtyBig" id="sheetQty">0</div>
-        </div>
 
-        <div class="controls">
-          <div class="ctl minus" id="btnMinus">— 1</div>
-          <div class="ctl plus" id="btnPlus">+ 1</div>
-        </div>
-
-        <div class="rowChips">
-          <div class="chip"><span class="dot" style="background:var(--accent2)"></span><span>Tap carte = ouvrir</span></div>
-          <div class="chip"><span class="dot" style="background:var(--warn)"></span><span>Faible ≤ 2</span></div>
-          <div class="chip"><span class="dot" style="background:var(--bad)"></span><span>Rupture = 0</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="scanModal" aria-hidden="true">
-    <div class="modalCard">
-      <div class="modalTop">
-        <b>Scanner une bouteille</b>
-        <div class="right">
-          <button class="miniBtn" id="btnTorch" type="button">Flash</button>
-          <button class="miniBtn primary" id="btnCloseScan" type="button">Fermer</button>
-        </div>
-      </div>
-
-      <div class="videoBox">
-        <video id="video" playsinline></video>
-        <div class="scanOverlay"><div class="scanFrame"></div></div>
-      </div>
-
-      <div class="modalBody">
-        <div class="scanResult">
-          <div class="left">
-            <div class="small">EAN détecté</div>
-            <div class="big" id="eanText">—</div>
-            <div class="small" id="matchText">Présente la bouteille dans le cadre</div>
+          <div class="actions">
+            <button class="btn" id="btnReload" title="Recharger depuis GitHub (public)">⟲ Recharger</button>
+            <button class="btn primary" id="btnSaveRepo" title="Publier via Cloudflare (PIN)">Publier</button>
+            <button class="btn danger" id="btnReset" title="Annuler les modifications locales">Annuler</button>
           </div>
-          <div class="badgeQty" id="scanBadge">x0</div>
         </div>
 
-        <div class="confirmRow">
-          <button class="no" id="btnCancelDeduct" type="button">Annuler</button>
-          <button class="ok" id="btnConfirmDeduct" type="button">Confirmer : -1</button>
-        </div>
+        <div class="list" id="list"></div>
       </div>
+    </section>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<!-- SETTINGS SHEET -->
+<div class="sheet" id="sheet">
+  <div class="backdrop" id="sheetBackdrop"></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="panelHeader">
+      <h3 id="settingsTitle">Outils</h3>
+      <button id="sheetClose" aria-label="Fermer">✕</button>
+    </div>
+
+    <div class="panelBody">
+      <div class="field">
+        <label>Branch</label>
+        <input id="ghBranch" value="main" readonly />
+      </div>
+
+      <div class="field">
+        <label>Chemin du fichier</label>
+        <input id="ghPath" value="apps/stock/stock/_snapshot.json" readonly />
+      </div>
+
+      <div class="field">
+        <label>Code admin (PIN)</label>
+        <input id="tokenInput" type="password" placeholder="0000" inputmode="numeric" />
+      </div>
+
+      <p class="hint" id="tokenHint">
+        Stocké en local sur ce téléphone (6 mois).
+        <span id="tokenState"></span>
+      </p>
+    </div>
+
+    <div class="panelActions">
+      <button class="btn" id="btnSaveToken">Enregistrer le code</button>
+      <button class="btn danger" id="btnClearToken">Supprimer le code</button>
     </div>
   </div>
-
-  <!-- Settings (Token only) -->
-  <div class="settings" id="settings" aria-hidden="true">
-    <div class="settingsCard">
-      <div class="settingsTop">
-        <b>Token GitHub (PAT)</b>
-        <div class="right">
-          <button class="miniBtn primary" id="btnCloseSettings" type="button">Fermer</button>
-        </div>
-      </div>
-
-      <div class="settingsBody">
-        <div class="field">
-          <label>Token GitHub (PAT)</label>
-          <input id="ghToken" placeholder="ghp_… / github_pat_…" autocomplete="off" />
-        </div>
-
-        <div class="help">
-          • Dépôt utilisé par défaut : <code>bullyto/stock</code> (branch <code>main</code>)<br>
-          • Stock = <strong>1 fichier par bouteille</strong> : <code>stock/&lt;id-bouteille&gt;.json</code> + un <code>stock/_snapshot.json</code><br>
-          • Le token est stocké <strong>uniquement en local</strong> (LocalStorage).<br>
-          • Sans token : tu peux lire (repo public). Avec token : tu peux <strong>écrire</strong> (enregistrer dépôt).
-        </div>
-
-        <div class="settingsActions">
-          <button class="btn" id="btnPullRepo" type="button">Charger depuis dépôt</button>
-          <button class="btn primary" id="btnSaveToken" type="button">Enregistrer token</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast">—</div>
+</div>
 
 <script>
-"use strict";
+/* =========================
+   CONFIG
+   ========================= */
 
-/* ========= PWA / Service Worker (update sans galère) ========= */
-const chipStatus = document.getElementById("chipStatus");
-const dotNet = document.getElementById("dotNet");
+// IMPORTANT: les images produits ne sont plus dans /img/,
+// elles sont maintenant dans /apps/stock/stock/*.png
+const IMG_DIR = "./stock/";
 
-async function registerSW(){
-  if (!("serviceWorker" in navigator)) return;
-  try{
-    const reg = await navigator.serviceWorker.register("./sw.js");
-    reg.update?.();
-
-    if (reg.waiting) reg.waiting.postMessage({ type:"SKIP_WAITING" });
-
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (window.__reloadedOnce) return;
-      window.__reloadedOnce = true;
-      location.reload();
-    });
-
-    reg.addEventListener("updatefound", () => {
-      const nw = reg.installing;
-      if(!nw) return;
-      nw.addEventListener("statechange", () => {
-        if (nw.state === "installed" && navigator.serviceWorker.controller) {
-          reg.waiting?.postMessage({ type:"SKIP_WAITING" });
-        }
-      });
-    });
-  }catch{}
-}
-
-function updateOnlineUI(){
-  const online = navigator.onLine;
-  chipStatus.textContent = online ? "Online" : "Offline";
-  dotNet.classList.toggle("off", !online);
-}
-window.addEventListener("online", updateOnlineUI);
-window.addEventListener("offline", updateOnlineUI);
-window.addEventListener("load", () => { updateOnlineUI(); registerSW(); });
-
-/* ========= Data ========= */
-const LOW_THRESHOLD = 2;
-const LS_KEY = "stock_vehicle_v3";
-const SETTINGS_KEY = "stock_vehicle_settings_v2";
-const IMG_DIR = "./img/";
-
-/* >>> DEFAULTS EN DUR (tu ne touches plus à rien) <<< */
 const DEFAULT_GH = {
   owner: "bullyto",
-  repo: "stock",
+  repo: "outil",
   branch: "main",
-  stockPath: "stock",
+  stockPath: "apps/stock/stock",
   ext: ".json"
 };
 
+// Cloudflare Worker (même Worker que stats)
+const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
+
+/* =========================
+   DATA (produits)
+   ========================= */
+
 const PRODUCTS = [
-  { id:"poliakov", name:"Poliakov Vodka", barcode:"", price:29 },
-  { id:"absolut", name:"Absolut Vodka", barcode:"", price:34 },
-  { id:"ciroc_pomme", name:"Cîroc Pomme", barcode:"", price:49 },
-  { id:"ciroc_classic", name:"Cîroc Classic", barcode:"", price:49 },
-  { id:"ciroc_redberry", name:"Cîroc Red Berry", barcode:"", price:49 },
-
-  { id:"william_peel", name:"William Peel", barcode:"", price:29 },
-  { id:"label_5", name:"Label 5 Classic Black", barcode:"", price:32 },
-  { id:"ballantines", name:"Ballantine’s Finest", barcode:"", price:36 },
-  { id:"jack_old7", name:"Jack Daniel’s Old No.7", barcode:"", price:40 },
-  { id:"jack_honey", name:"Jack Daniel’s Tennessee Honey", barcode:"", price:42 },
-
-  { id:"old_nick_darkwood", name:"Old Nick Dark Wood", barcode:"", price:29 },
-  { id:"captain_morgan", name:"Captain Morgan Spiced Gold", barcode:"", price:34 },
-  { id:"havana_especial", name:"Havana Club Especial", barcode:"", price:38 },
-
-  { id:"old_nick_blanc", name:"Old Nick Rhum Blanc", barcode:"", price:27 },
-  { id:"saint_james_blanc", name:"Saint James Rhum Blanc", barcode:"", price:32 },
-  { id:"trois_rivieres", name:"Trois Rivières Rhum Blanc", barcode:"", price:33 },
-  { id:"havana_3ans", name:"Havana Club 3 ans", barcode:"", price:37 },
-
-  { id:"gibsons_gin", name:"Gibson’s Gin", barcode:"", price:34 },
-  { id:"gordons_gin", name:"Gordon’s Gin", barcode:"", price:34 },
-
-  { id:"ricard", name:"Ricard", barcode:"", price:35 },
-  { id:"pastis_51", name:"Pastis 51", barcode:"", price:35 },
-
-  { id:"get_27", name:"GET 27", barcode:"", price:32 },
-  { id:"jagermeister", name:"Jägermeister", barcode:"", price:35 },
-  { id:"tequila_sanjose", name:"Tequila San José", barcode:"", price:28 },
-
-  { id:"xv_catalan_rose", name:"XV Catalan rose", barcode:"", price:19 },
-  { id:"xv_catalan_blanc", name:"XV Catalan blanc", barcode:"", price:19 },
-  { id:"xv_catalan_rouge", name:"XV Catalan rouge", barcode:"", price:19 },
-  { id:"muscat", name:"Muscat", barcode:"", price:25 }
+  { id:"absolut", name:"Absolut", desc:"Vodka", img:"absolut.png" },
+  { id:"ballantines", name:"Ballantine's", desc:"Whisky", img:"ballantines.png" },
+  { id:"captain_morgan", name:"Captain Morgan", desc:"Rhum", img:"captain_morgan.png" },
+  { id:"cacahuette", name:"Cacahuètes", desc:"Snacking", img:"cacahuette.png" },
+  { id:"bretzel", name:"Bretzels", desc:"Snacking", img:"bretzel.png" },
+  { id:"TROIS_RIVIERES", name:"Trois Rivières", desc:"Rhum", img:"TROIS_RIVIERES.png" },
 ];
 
-const SEED_STOCK = {
-  // produits (seed)
-  tequila_sanjose:1,
-  gibsons_gin:1,
-  jagermeister:1,
-  pastis_51:3,
-  ricard:3,
-  havana_3ans:0,
-  get_27:3,
-  gordons_gin:0,
-  jack_old7:3,
-  jack_honey:3,
-  old_nick_darkwood:0,
-  captain_morgan:3,
-  saint_james_blanc:0,
-  trois_rivieres:0,
-  havana_especial:0,
-  old_nick_blanc:0,
-  ballantines:3,
-  poliakov:3,
-  absolut:3,
-  ciroc_pomme:0,
-  ciroc_classic:0,
-  ciroc_redberry:0,
-  william_peel:3,
-  label_5:3,
-  xv_catalan_rouge:3,
-  xv_catalan_blanc:3,
-  xv_catalan_rose:3,
-  muscat:1,
+// alias (au cas où)
+const ID_ALIASES = {
+  "trois_rivieres": "TROIS_RIVIERES",
+  "TROIS_RIVIERES": "TROIS_RIVIERES"
 };
+
+function $(sel){ return document.querySelector(sel); }
+function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+
+const listEl = $("#list");
+const qEl = $("#q");
+const btnReload = $("#btnReload");
+const btnSaveRepo = $("#btnSaveRepo");
+const btnReset = $("#btnReset");
+const dirtyBadge = $("#dirtyBadge");
+const syncText = $("#syncText");
+
+// sheet
+const sheet = $("#sheet");
+const sheetBackdrop = $("#sheetBackdrop");
+const sheetClose = $("#sheetClose");
+const btnOpenSettings = $("#btnOpenSettings");
+const tokenInput = $("#tokenInput");
+const tokenState = $("#tokenState");
+const tokenHint = $("#tokenHint");
+const btnSaveToken = $("#btnSaveToken");
+const btnClearToken = $("#btnClearToken");
+
+// local storage
+const SETTINGS_KEY = "adn66_stock_settings_v2";
 
 const state = {
-  filter: "all",
-  q: "",
-  selectedId: null,
-  stock: {},
-  dirty: {},     // {id:true} => modifié localement non poussé
-  token: "",     // le seul “paramètre”
-  lastScan: { ean:"", matchId:null }
+  pin: "",
+  // (legacy) token: "",
+  stock: {},           // id -> qty
+  dirty: new Set(),    // ids modified
+  lastSync: null
 };
 
-const ID_ALIASES = {
-  vin_rose: "xv_catalan_rose",
-  vin_blanc: "xv_catalan_blanc",
-  vin_rouge: "xv_catalan_rouge"
-};
-
-
-function seededStock(){
-  const s = {};
-  for(const p of PRODUCTS) s[p.id] = Number(SEED_STOCK[p.id] ?? 0);
-  return s;
+function toastMsg(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window.__toast);
+  window.__toast = setTimeout(()=> t.classList.remove("show"), 2200);
 }
-
-function load(){
-  try{
-    const raw = localStorage.getItem(LS_KEY);
-    if(!raw) throw new Error("no");
-    const data = JSON.parse(raw);
-    if(!data || typeof data.stock !== "object") throw new Error("bad");
-    state.stock = data.stock || {};
-    state.dirty = data.dirty || {};
-
-    // Migration IDs (anciens vins -> nouveaux IDs XV Catalan)
-    for(const [oldId,newId] of Object.entries(ID_ALIASES)){
-      if(state.stock[oldId] != null && state.stock[newId] == null){
-        state.stock[newId] = Number(state.stock[oldId] ?? 0);
-      }
-      // nettoie l'ancien id pour éviter double comptage
-      if(state.stock[oldId] != null){
-        delete state.stock[oldId];
-      }
-      if(state.dirty && state.dirty[oldId]){
-        state.dirty[newId] = true;
-        delete state.dirty[oldId];
-      }
-    }
-  }catch{
-    state.stock = seededStock();
-    state.dirty = {};
-    save();
-  }
-
-  try{
-    const rawS = localStorage.getItem(SETTINGS_KEY);
-    const s = rawS ? JSON.parse(rawS) : null;
-    state.token = (s && s.token) ? String(s.token) : "";
-  }catch{
-    state.token = "";
-  }
-}
-function save(){
-  localStorage.setItem(LS_KEY, JSON.stringify({ v: 3, savedAt: Date.now(), stock: state.stock, dirty: state.dirty }));
-}
-function saveToken(token){
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 2, token: String(token||"") }));
-  state.token = String(token||"");
-}
-
-/* ========= UI ========= */
-const grid = document.getElementById("grid");
-const q = document.getElementById("q");
-const fAll = document.getElementById("fAll");
-const fLow = document.getElementById("fLow");
-const fZero = document.getElementById("fZero");
-const miniStats = document.getElementById("miniStats");
-
-const backdrop = document.getElementById("backdrop");
-const sheet = document.getElementById("sheet");
-const sheetName = document.getElementById("sheetName");
-const sheetQty = document.getElementById("sheetQty");
-const btnMinus = document.getElementById("btnMinus");
-const btnPlus = document.getElementById("btnPlus");
-
-const toast = document.getElementById("toast");
-function toastMsg(text){
-  toast.textContent = text;
-  toast.classList.add("show");
-  clearTimeout(toast._t);
-  toast._t = setTimeout(()=>toast.classList.remove("show"), 1500);
-}
-
-function normalizeName(s){ return (s||"").toLowerCase().trim(); }
-function qtyClass(qty){
-  if(qty <= 0) return "badgeZero";
-  if(qty <= LOW_THRESHOLD) return "badgeLow";
-  return "";
-}
-function bottleMonogram(name){
-  const parts = name.replace("’","'").split(" ").filter(Boolean);
-  const a = parts[0]?.[0] || "A";
-  const b = parts[1]?.[0] || parts[0]?.[1] || "N";
-  return (a + b).toUpperCase();
-}
-
-function computeStats(){
-  const total = PRODUCTS.length;
-  let units = 0;
-  let lowOrZero = 0;
-  let dirtyCount = 0;
-
-  for(const p of PRODUCTS){
-    const v = Number(state.stock[p.id] ?? 0);
-    units += v;
-    if(v === 0 || v <= LOW_THRESHOLD) lowOrZero++;
-    if(state.dirty[p.id]) dirtyCount++;
-  }
-
-  miniStats.textContent = `${total} produits • ${units} unités • ${lowOrZero} faible/rupture` + (dirtyCount ? ` • ${dirtyCount} à enregistrer` : "");
-}
-
-function filteredProducts(){
-  const qq = normalizeName(state.q);
-  return PRODUCTS.filter(p => {
-    const v = Number(state.stock[p.id] ?? 0);
-    if(state.filter === "low" && !(v > 0 && v <= LOW_THRESHOLD)) return false;
-    if(state.filter === "zero" && v !== 0) return false;
-    if(qq && !normalizeName(p.name).includes(qq)) return false;
-    return true;
-  });
-}
-
-function render(){
-  computeStats();
-  const list = filteredProducts();
-
-  grid.innerHTML = list.map(p => {
-    const qty = Number(state.stock[p.id] ?? 0);
-    const cls = qtyClass(qty);
-    const tag = qty === 0 ? "Rupture" : (qty <= LOW_THRESHOLD ? "Faible" : "OK");
-    const price = Number(p.price ?? 0);
-    const imgSrc = IMG_DIR + p.id + ".png";
-    const mono = bottleMonogram(p.name);
-
-    return `
-      <div class="card" data-id="${p.id}" role="button" aria-label="${p.name}">
-        <div class="cardTop">
-          <div class="badgeQty ${cls}">x${qty}</div>
-          <div class="bottle">
-            <img src="${imgSrc}" alt="${p.name}" loading="lazy"
-              onload="this.parentElement.classList.add('hasimg')"
-              onerror="this.remove();"
-            />
-            <div class="fallback"><span>${mono}</span></div>
-          </div>
-        </div>
-        <div class="cardBody">
-          <div class="name">${p.name}</div>
-          <div class="metaRow">
-            <span>${tag}</span>
-            <span class="tag">${price}€</span>
-          </div>
-        </div>
-      </div>`;
-  }).join("");
-
-  grid.querySelectorAll(".card").forEach(el => {
-    el.addEventListener("click", () => openSheet(el.dataset.id));
-  });
-
-  updateSaveButtonsState();
-}
-
-function openSheet(id){
-  state.selectedId = id;
-  const p = PRODUCTS.find(x=>x.id===id);
-  if(!p) return;
-
-  const qty = Number(state.stock[id] ?? 0);
-  sheetName.textContent = p.name;
-  sheetQty.textContent = qty;
-
-  backdrop.classList.add("show");
-  sheet.classList.add("show");
-}
-function closeSheet(){
-  backdrop.classList.remove("show");
-  sheet.classList.remove("show");
-  state.selectedId = null;
-}
-function adjust(delta){
-  if(!state.selectedId) return;
-  const id = state.selectedId;
-  const v = Number(state.stock[id] ?? 0);
-  const nv = Math.max(0, v + delta);
-  state.stock[id] = nv;
-  state.dirty[id] = true;
-  sheetQty.textContent = nv;
-  save();
-  render();
-  toastMsg(delta>0 ? "+1 ajouté" : "-1 retiré");
-}
-
-function setFilter(f){
-  state.filter = f;
-  fAll.classList.toggle("active", f==="all");
-  fLow.classList.toggle("active", f==="low");
-  fZero.classList.toggle("active", f==="zero");
-  render();
-}
-
-/* ========= GitHub dépôt : 1 fichier par bouteille ========= */
-const btnSaveRepo = document.getElementById("btnSaveRepo");
-const btnSettings = document.getElementById("btnSettings");
 
 function getGH(){
   return {
@@ -820,125 +575,142 @@ function getGH(){
     branch: DEFAULT_GH.branch,
     stockPath: DEFAULT_GH.stockPath,
     ext: DEFAULT_GH.ext,
-    token: String(state.token||"").trim()
+    pin: String(state.pin||"").trim()
   };
+}
+
+function fileForId(id){
+  const gh = getGH();
+  return `${gh.stockPath}/${id}${gh.ext}`;
+}
+function snapshotPath(){
+  const gh = getGH();
+  return `${gh.stockPath}/_snapshot.json`;
+}
+
+function openSettings(){
+  sheet.classList.add("show");
+  tokenInput.value = state.pin || "";
+  updateTokenHint();
+}
+function closeSettings(){
+  sheet.classList.remove("show");
+}
+
+function updateTokenHint(){
+  if(state.pin){
+    tokenState.textContent = "Code enregistré ✅";
+  }else{
+    tokenState.textContent = "";
+  }
+}
+
+function saveToken(pin){
+  // On garde le nom historique "saveToken" pour ne rien casser,
+  // mais on enregistre maintenant un PIN (ex: 0000) au lieu d'un token GitHub.
+  const exp = Date.now() + (1000 * 60 * 60 * 24 * 30 * 6); // ~6 mois
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 3, pin: String(pin||"").trim(), exp }));
+  state.pin = String(pin||"").trim();
+  updateSaveButtonsState();
+}
+
+function clearToken(){
+  localStorage.removeItem(SETTINGS_KEY);
+  state.pin = "";
+  updateSaveButtonsState();
+}
+
+function loadSettings(){
+  const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+  if (raw.exp && Date.now() > raw.exp) {
+    localStorage.removeItem(SETTINGS_KEY);
+  }
+  // AVANT: token GitHub (PAT) ; MAINTENANT: PIN admin (ex: 0000)
+  state.pin = String(raw.pin ?? raw.token ?? "").trim();
 }
 
 function updateSaveButtonsState(){
   const s = getGH();
-  const hasToken = !!s.token;
-  // Mode forcé : on autorise l'enregistrement même s'il n'y a aucune modif locale (dirty=0)
-  btnSaveRepo.disabled = !hasToken;
+  const hasPin = !!String(s.pin||"").trim();
+  // on autorise la publication uniquement si un PIN est présent
+  btnSaveRepo.disabled = !hasPin;
 }
 
-function b64encodeUnicode(str){
-  return btoa(unescape(encodeURIComponent(str)));
-}
-
-async function ghApi(path, options={}){
-  const s = getGH();
-  const headers = options.headers || {};
-  headers["Accept"] = "application/vnd.github+json";
-  if(s.token) headers["Authorization"] = "Bearer " + s.token; // PAT classique & fine-grained
-  if(options.json) headers["Content-Type"] = "application/json";
-  const res = await fetch("https://api.github.com" + path, { ...options, headers });
-  return res;
-}
-
-async function ghGetSha(owner, repo, filePath, branch){
-  const res = await ghApi(`/repos/${owner}/${repo}/contents/${encodeURIComponent(filePath).replace(/%2F/g,"/")}?ref=${encodeURIComponent(branch)}`);
-  if(res.status === 404) return null;
-  if(!res.ok) throw new Error("GET sha failed");
-  const data = await res.json();
-  return data.sha || null;
-}
-
-async function ghPutFile(owner, repo, filePath, branch, message, contentStr){
-  const sha = await ghGetSha(owner, repo, filePath, branch);
-  const body = { message, content: b64encodeUnicode(contentStr), branch };
-  if(sha) body.sha = sha;
-
-  const res = await ghApi(`/repos/${owner}/${repo}/contents/${encodeURIComponent(filePath).replace(/%2F/g,"/")}`, {
-    method:"PUT",
-    json:true,
-    body: JSON.stringify(body)
-  });
-  if(!res.ok){
-    const t = await res.text().catch(()=> "");
-    throw new Error("PUT failed: " + res.status + " " + t.slice(0,160));
+function updateDirtyBadge(){
+  const n = state.dirty.size;
+  if(n === 0){
+    dirtyBadge.textContent = "OK";
+    dirtyBadge.className = "badge ok";
+  }else{
+    dirtyBadge.textContent = `${n} modif.`;
+    dirtyBadge.className = "badge warn";
   }
-  return true;
 }
 
-function fileForId(id){
-  const s = getGH();
-  const ext = s.ext.startsWith(".") ? s.ext : ("." + s.ext);
-  return `${s.stockPath}/${id}${ext}`;
-}
-function snapshotPath(){
-  const s = getGH();
-  return `${s.stockPath}/_snapshot.json`;
+function setSync(ts){
+  state.lastSync = ts;
+  syncText.textContent = ts ? new Date(ts).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "—";
 }
 
-async function pushToRepo(){
-  const s = getGH();
-  if(!s.token){
-    toastMsg("Ajoute ton token pour écrire");
-    openSettings();
-    return;
-  }
+function clampQty(v){
+  const n = Number(v);
+  if(!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(999, Math.round(n)));
+}
 
-  // Mode forcé :
-  // - s'il y a des modifs locales (dirty), on pousse uniquement ces fichiers
-  // - sinon, on réécrit AU MINIMUM le _snapshot.json (commit garanti) + (option) tous les fichiers
-  const dirtyIds = Object.keys(state.dirty || {});
-  const forceAllFiles = false; // mets true si tu veux réécrire *tous* les stock/<id>.json à chaque sauvegarde
-  const idsToPush = dirtyIds.length ? dirtyIds : (forceAllFiles ? PRODUCTS.map(p=>p.id) : []);
+function renderList(){
+  const q = (qEl.value || "").trim().toLowerCase();
 
-  btnSaveRepo.disabled = true;
-  toastMsg(dirtyIds.length ? "Enregistrement…" : "Enregistrement (forcé)…");
-
-  const now = new Date().toISOString();
-  const msgBase = `stock: update ${now}`;
-
-  try{
-    // 1) Fichiers par produit (si nécessaire)
-    for(const id of idsToPush){
+  const rows = PRODUCTS
+    .filter(p => !q || p.name.toLowerCase().includes(q) || (p.desc||"").toLowerCase().includes(q))
+    .map(p => {
+      const id = ID_ALIASES[p.id] || p.id;
       const qty = Number(state.stock[id] ?? 0);
-      const payload = { id, qty, updatedAt: now };
-      await ghPutFile(
-        s.owner, s.repo, fileForId(id), s.branch,
-        msgBase + ` (${id})`,
-        JSON.stringify(payload, null, 2)
-      );
-    }
+      const isDirty = state.dirty.has(id);
+      const badgeCls = qty > 0 ? "ok" : "danger";
+      const badgeTxt = qty > 0 ? "Dispo" : "Rupture";
+      return `
+        <div class="item" data-id="${esc(id)}">
+          <div class="thumb"><img src="${esc(IMG_DIR + p.img)}" alt="${esc(p.name)}" loading="lazy" /></div>
+          <div class="meta">
+            <p class="name">${esc(p.name)}</p>
+            <p class="desc">${esc(p.desc||"")}</p>
+            <span class="badge ${badgeCls}">${badgeTxt}${isDirty ? " • modifié" : ""}</span>
+          </div>
+          <div class="qtyBox">
+            <input class="qty" type="number" inputmode="numeric" min="0" max="999" value="${esc(qty)}" />
+          </div>
+        </div>
+      `;
+    })
+    .join("");
 
-    // 2) Snapshot : TOUJOURS réécrit (c'est lui qui sert au "Charger depuis dépôt")
-    const snapshot = {
-      v: 1,
-      updatedAt: now,
-      items: PRODUCTS.map(p => ({ id: p.id, qty: Number(state.stock[p.id] ?? 0) }))
-    };
-    await ghPutFile(
-      s.owner, s.repo, snapshotPath(), s.branch,
-      msgBase + " (_snapshot)",
-      JSON.stringify(snapshot, null, 2)
-    );
+  listEl.innerHTML = rows || `<div class="badge" style="padding:12px 14px;border-radius:16px;">Aucun résultat</div>`;
 
-    // OK : on peut vider dirty
-    state.dirty = {};
-    save();
-    render();
-    toastMsg("Dépôt mis à jour ✅");
-  }catch(err){
-    console.error(err);
-    // IMPORTANT : on ne vide PAS dirty en cas d'erreur
-    toastMsg("Erreur GitHub ❌ (vérifie droits du token)");
-  }finally{
-    // On réactive le bouton selon l'état (token)
-    updateSaveButtonsState();
-  }
+  // bind inputs
+  listEl.querySelectorAll(".item").forEach(el => {
+    const id = el.getAttribute("data-id");
+    const input = el.querySelector(".qty");
+    input.addEventListener("change", ()=>{
+      const v = clampQty(input.value);
+      input.value = v;
+      state.stock[id] = v;
+      state.dirty.add(id);
+      updateDirtyBadge();
+    });
+  });
+
+  updateDirtyBadge();
 }
+
+function updateStockUI(){
+  renderList();
+  updateSaveButtonsState();
+}
+
+/* =========================
+   LOAD FROM REPO (public raw)
+   ========================= */
 
 async function pullFromRepo(){
   const s = getGH();
@@ -948,237 +720,148 @@ async function pullFromRepo(){
   let snap = null;
 
   try{
-    if(s.token){
-      const res = await ghApi(`/repos/${s.owner}/${s.repo}/contents/${encodeURIComponent(snapFile).replace(/%2F/g,"/")}?ref=${encodeURIComponent(s.branch)}`);
-      if(res.ok){
-        const data = await res.json();
-        const content = data.content ? atob(data.content.replace(/\n/g,"")) : "";
-        snap = JSON.parse(content);
-      }
-    }else{
-      const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
-      const res = await fetch(rawUrl, { cache:"no-store" });
-      if(res.ok) snap = await res.json();
-    }
-  }catch{}
+    const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
+    const res = await fetch(rawUrl, { cache:"no-store" });
+    if(res.ok) snap = await res.json();
+  }catch(e){
+    console.warn("pullFromRepo snapshot failed", e);
+  }
 
   if(snap && Array.isArray(snap.items)){
     for(const it of snap.items){
       if(!it || !it.id) continue;
       const id = ID_ALIASES[it.id] || it.id;
-      const v = Number(it.qty);
-      if(Number.isFinite(v) && v >= 0) state.stock[id] = Math.floor(v);
+      if(typeof it.qty === "number") state.stock[id] = it.qty;
     }
-    state.dirty = {};
-    save();
-    render();
-    toastMsg("Stock chargé ✅");
+  }
+
+  updateStockUI();
+  toastMsg("Chargé ✅");
+}
+
+/* =========================
+   PUBLISH VIA WORKER (PIN)
+   ========================= */
+
+async function pushToRepo(){
+  const s = getGH();
+  const pin = String(s.pin||"").trim();
+
+  if(!pin){
+    toastMsg("Entre le code admin (0000).");
+    openSettings();
     return;
   }
 
-  toastMsg("Snapshot absent : charge impossible");
+  // on garde un contrôle côté client (le serveur re-valide)
+  if(pin !== "0000"){
+    toastMsg("Code invalide.");
+    return;
+  }
+
+  toastMsg("Publication via Cloudflare…");
+
+  // Préparer payload (même logique qu’avant, mais l’écriture GitHub se fait côté Worker)
+  const idsToPush = Object.keys(state.stock).filter(id => state.dirty.has(id));
+  const payload = {
+    pin,
+    owner: s.owner,
+    repo: s.repo,
+    branch: s.branch,
+    stockPath: s.stockPath,
+    ext: s.ext,
+    ids: idsToPush,
+    stock: state.stock,
+    updated_at: new Date().toISOString()
+  };
+
+  const r = await fetch(`${WORKER_BASE}/api/stock/publish`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const txt = await r.text();
+  let j = null;
+  try{ j = JSON.parse(txt); }catch(e){ j = null; }
+
+  if(!r.ok || !j || j.ok !== true){
+    const msg = (j && j.error) ? String(j.error) : `HTTP ${r.status}`;
+    throw new Error(msg);
+  }
+
+  // Success
+  idsToPush.forEach(id => state.dirty.delete(id));
+  updateStockUI();
+
+  toastMsg("Publié ✅");
 }
 
-/* ========= Settings modal (token only) ========= */
-const settingsEl = document.getElementById("settings");
-const btnCloseSettings = document.getElementById("btnCloseSettings");
-const btnSaveToken = document.getElementById("btnSaveToken");
-const btnPullRepo = document.getElementById("btnPullRepo");
-const ghToken = document.getElementById("ghToken");
+/* =========================
+   UI EVENTS
+   ========================= */
 
-function openSettings(){
-  ghToken.value = String(state.token||"");
-  settingsEl.classList.add("show");
-  settingsEl.setAttribute("aria-hidden","false");
-}
-function closeSettings(){
-  settingsEl.classList.remove("show");
-  settingsEl.setAttribute("aria-hidden","true");
-}
-
-btnSettings.addEventListener("click", openSettings);
-btnCloseSettings.addEventListener("click", closeSettings);
-settingsEl.addEventListener("click", (e)=>{ if(e.target === settingsEl) closeSettings(); });
+btnOpenSettings.addEventListener("click", openSettings);
+sheetBackdrop.addEventListener("click", closeSettings);
+sheetClose.addEventListener("click", closeSettings);
 
 btnSaveToken.addEventListener("click", ()=>{
-  const t = (ghToken.value||"").trim();
-  saveToken(t);
-  render();
-  toastMsg(t ? "Token enregistré ✅" : "Token supprimé ✅");
-  closeSettings();
+  const pin = String(tokenInput.value||"").trim();
+  if(!pin){ toastMsg("Code vide."); return; }
+  saveToken(pin);
+  updateTokenHint();
+  toastMsg("Code enregistré ✅");
 });
 
-btnPullRepo.addEventListener("click", async ()=>{
+btnClearToken.addEventListener("click", ()=>{
+  clearToken();
+  tokenInput.value = "";
+  updateTokenHint();
+  toastMsg("Code supprimé.");
+});
+
+btnReload.addEventListener("click", async ()=>{
+  try{
+    await pullFromRepo();
+    setSync(Date.now());
+  }catch(e){
+    console.error(e);
+    toastMsg("Erreur rechargement.");
+  }
+});
+
+btnSaveRepo.addEventListener("click", async ()=>{
+  try{
+    await pushToRepo();
+    setSync(Date.now());
+  }catch(e){
+    console.error(e);
+    toastMsg("Erreur : " + (e?.message || e));
+  }
+});
+
+btnReset.addEventListener("click", ()=>{
+  // annule les modifications locales (recharge)
+  state.dirty.clear();
+  pullFromRepo().then(()=>toastMsg("Annulé ✅")).catch(()=>toastMsg("Erreur annulation."));
+});
+
+qEl.addEventListener("input", renderList);
+
+/* =========================
+   INIT
+   ========================= */
+
+(async function init(){
+  loadSettings();
+  updateTokenHint();
+  updateSaveButtonsState();
   await pullFromRepo();
-});
+  setSync(Date.now());
 
-btnSaveRepo.addEventListener("click", pushToRepo);
-
-/* ========= Bind UI ========= */
-backdrop.addEventListener("click", closeSheet);
-btnMinus.addEventListener("click", ()=>adjust(-1));
-btnPlus.addEventListener("click", ()=>adjust(+1));
-fAll.addEventListener("click", ()=>setFilter("all"));
-fLow.addEventListener("click", ()=>setFilter("low"));
-fZero.addEventListener("click", ()=>setFilter("zero"));
-q.addEventListener("input", ()=>{ state.q = q.value || ""; render(); });
-
-/* ========= Scanner EAN (BarcodeDetector) ========= */
-const fabScan = document.getElementById("fabScan");
-const scanModal = document.getElementById("scanModal");
-const btnCloseScan = document.getElementById("btnCloseScan");
-const btnTorch = document.getElementById("btnTorch");
-const btnCancelDeduct = document.getElementById("btnCancelDeduct");
-const btnConfirmDeduct = document.getElementById("btnConfirmDeduct");
-const eanText = document.getElementById("eanText");
-const matchText = document.getElementById("matchText");
-const scanBadge = document.getElementById("scanBadge");
-const video = document.getElementById("video");
-
-let stream = null;
-let detector = null;
-let scanTimer = null;
-let torchOn = false;
-let trackForTorch = null;
-
-function findProductByEAN(ean){
-  ean = String(ean||"").trim();
-  if(!ean) return null;
-  return PRODUCTS.find(p => p.barcode && String(p.barcode).trim() === ean) || null;
-}
-
-async function openScanner(){
-  scanModal.classList.add("show");
-  scanModal.setAttribute("aria-hidden","false");
-  eanText.textContent = "—";
-  matchText.textContent = "Présente la bouteille dans le cadre";
-  scanBadge.textContent = "x0";
-  state.lastScan = { ean:"", matchId:null };
-  btnConfirmDeduct.disabled = true;
-
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
-    video.srcObject = stream;
-    await video.play();
-
-    trackForTorch = stream.getVideoTracks()[0] || null;
-
-    if ("BarcodeDetector" in window) {
-      detector = new BarcodeDetector({ formats: ["ean_13","ean_8","upc_a","upc_e","code_128","code_39","qr_code"] });
-      startScanLoop();
-      toastMsg("Scanner prêt ✅");
-    } else {
-      matchText.textContent = "BarcodeDetector non supporté (Chrome Android conseillé)";
-      toastMsg("Scanner non supporté ❌");
-    }
-  }catch{
-    matchText.textContent = "Accès caméra refusé ou indisponible";
-    toastMsg("Caméra impossible ❌");
-  }
-}
-
-function closeScanner(){
-  scanModal.classList.remove("show");
-  scanModal.setAttribute("aria-hidden","true");
-  stopScanLoop();
-  stopCamera();
-}
-function stopCamera(){
-  try{ if(stream){ stream.getTracks().forEach(t=>t.stop()); } }catch{}
-  stream = null;
-  detector = null;
-  trackForTorch = null;
-  torchOn = false;
-}
-function startScanLoop(){
-  stopScanLoop();
-  scanTimer = setInterval(scanOnce, 250);
-}
-function stopScanLoop(){
-  if(scanTimer) clearInterval(scanTimer);
-  scanTimer = null;
-}
-async function scanOnce(){
-  if(!detector) return;
-  if(video.readyState < 2) return;
-
-  try{
-    const barcodes = await detector.detect(video);
-    if(!barcodes || !barcodes.length) return;
-
-    const raw = barcodes[0].rawValue || "";
-    if(!raw) return;
-    if(state.lastScan.ean === raw) return;
-
-    state.lastScan.ean = raw;
-    eanText.textContent = raw;
-
-    const prod = findProductByEAN(raw);
-    if(prod){
-      state.lastScan.matchId = prod.id;
-      const qty = Number(state.stock[prod.id] ?? 0);
-      matchText.textContent = `Trouvé : ${prod.name}`;
-      scanBadge.textContent = `x${qty}`;
-      btnConfirmDeduct.disabled = false;
-    }else{
-      state.lastScan.matchId = null;
-      matchText.textContent = "EAN inconnu (ajoute le code-barres plus tard)";
-      scanBadge.textContent = "x?";
-      btnConfirmDeduct.disabled = true;
-    }
-  }catch{}
-}
-async function toggleTorch(){
-  if(!trackForTorch) return toastMsg("Flash non dispo");
-  const caps = trackForTorch.getCapabilities ? trackForTorch.getCapabilities() : {};
-  if(!caps.torch){ toastMsg("Flash non dispo"); return; }
-  torchOn = !torchOn;
-  try{
-    await trackForTorch.applyConstraints({ advanced: [{ torch: torchOn }] });
-    toastMsg(torchOn ? "Flash ON" : "Flash OFF");
-  }catch{
-    toastMsg("Flash impossible");
-  }
-}
-function deductOneFromMatched(){
-  const id = state.lastScan.matchId;
-  if(!id) return;
-  const v = Number(state.stock[id] ?? 0);
-  if(v <= 0){ toastMsg("Déjà à 0"); return; }
-  state.stock[id] = v - 1;
-  state.dirty[id] = true;
-  save();
-  render();
-  const p = PRODUCTS.find(x=>x.id===id);
-  toastMsg(`-1 ${p ? p.name : ""}`);
-  scanBadge.textContent = `x${state.stock[id]}`;
-}
-
-fabScan.addEventListener("click", openScanner);
-btnCloseScan.addEventListener("click", closeScanner);
-scanModal.addEventListener("click", (e)=>{ if(e.target === scanModal) closeScanner(); });
-btnTorch.addEventListener("click", toggleTorch);
-btnCancelDeduct.addEventListener("click", ()=>{
-  state.lastScan = { ean:"", matchId:null };
-  eanText.textContent = "—";
-  matchText.textContent = "Présente la bouteille dans le cadre";
-  scanBadge.textContent = "x0";
-  btnConfirmDeduct.disabled = true;
-});
-btnConfirmDeduct.addEventListener("click", ()=>{
-  if(!state.lastScan.matchId) return;
-  if(!confirm("Confirmer la déduction de 1 unité ?")) return;
-  deductOneFromMatched();
-});
-
-/* ========= Boot ========= */
-load();
-render();
-
-// Auto-charger depuis dépôt au démarrage (si online et pas de modifs locales)
-(async ()=>{
-  if(navigator.onLine && !Object.keys(state.dirty||{}).length){
-    await pullFromRepo().catch(()=>{});
+  // SW
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
 })();
 </script>
