@@ -776,6 +776,7 @@ function renderList(){
   updateDirtyBadge();
 }
 
+/* ✅ BACK TO "AS BEFORE": soft-load snapshot, never throw, keep UI usable */
 async function pullFromRepo(){
   const s = getGH();
   toastMsg("Chargement dépôt…");
@@ -785,20 +786,10 @@ async function pullFromRepo(){
 
   try{
     const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
-    const res = await fetch(rawUrl, {
-      cache:"no-store",
-      headers: { "Cache-Control":"no-cache", "Pragma":"no-cache" }
-    });
-    if(!res.ok){
-      throw new Error(`Snapshot HTTP ${res.status}`);
-    }
-    snap = await res.json();
+    const res = await fetch(rawUrl, { cache:"no-store" });
+    if(res.ok) snap = await res.json();
   }catch(e){
     console.warn("pullFromRepo snapshot failed", e);
-    toastMsg("Erreur chargement stock (snapshot).");
-    // IMPORTANT: keep UI (quantities will stay as current local state)
-    updateStockUI();
-    return;
   }
 
   const snapshotIds = new Set();
@@ -809,7 +800,6 @@ async function pullFromRepo(){
       const id = String(it.id);
       snapshotIds.add(id);
 
-      // ✅ accept number OR numeric string
       const q = Number(it.qty);
       if(Number.isFinite(q)) state.stock[id] = clampQty(q);
     }
@@ -826,8 +816,6 @@ async function pullFromRepo(){
 
   PRODUCTS = [...BASE_PRODUCTS, ...extra];
 
-  // after a successful pull, local modifications are still local;
-  // we do NOT wipe state.dirty automatically.
   updateStockUI();
   toastMsg("Chargé ✅");
 }
@@ -885,12 +873,6 @@ async function pushToRepo(){
   idsToPush.forEach(id => state.dirty.delete(id));
   updateStockUI();
   toastMsg("Publié ✅");
-
-  // ✅ force refresh from repo (so you see what was really written)
-  try{
-    await pullFromRepo();
-    setSync(Date.now());
-  }catch(_){}
 }
 
 /* UI */
