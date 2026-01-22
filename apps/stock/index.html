@@ -15,13 +15,16 @@
     :root{
       --bg:#060a12;
       --card:#0b1220;
-      --card2:#0f1a2d;
       --text:#e8f0ff;
       --muted:#9fb3d1;
       --line:rgba(255,255,255,.08);
       --accent:#ffd54a;
-      --danger:#ff3b3b;
-      --ok:#31d158;
+
+      /* badges */
+      --danger:#ff3b3b;      /* 0 */
+      --warn:#ffb020;        /* 1-2 */
+      --ok:#31d158;          /* >=3 */
+
       --shadow:0 12px 40px rgba(0,0,0,.35);
       --r:18px;
       --btn:rgba(255,255,255,.07);
@@ -187,19 +190,22 @@
       grid-template-columns: 1fr;
       gap:10px;
     }
+
+    /* ✅ FIX chevauchement + image plus grande */
     .item{
       display:grid;
-      grid-template-columns: 66px 1fr auto;
+      grid-template-columns: 82px 1fr auto; /* image + grande */
       gap:12px;
       align-items:center;
-      padding:10px;
-      border-radius:16px;
+      padding:12px;
+      border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.12);
+      min-height: 108px;
     }
     .thumb{
-      width:66px; height:66px;
-      border-radius:16px;
+      width:82px; height:82px;            /* image + grande */
+      border-radius:18px;
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
       overflow:hidden;
@@ -214,32 +220,29 @@
       padding:6px;
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.35));
     }
-    .meta{ min-width:0; }
-    /* ✅ FIX: le nom doit être lisible (pas tronqué à "Bal..." etc.) */
+
+    /* ✅ FIX: zone texte en colonne (nom/tarif/badge) pour éviter chevauchement */
+    .meta{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
     .meta .name{
-      font-size:14px;
-      font-weight:800;
+      font-size:15px;
+      font-weight:900;
       margin:0;
       white-space:normal;
       overflow:visible;
-      text-overflow:unset;
       display:-webkit-box;
       -webkit-line-clamp:2;
       -webkit-box-orient:vertical;
       line-height:1.15;
     }
-    .meta .desc{
-      margin:6px 0 0;
-      font-size:12px;
-      color:var(--muted);
-      white-space:normal;
-      overflow:visible;
-    }
-    /* ✅ FIX: tarif en gras */
-    .meta .desc b{
-      color:var(--text);
-      font-weight:900;
-      font-size:13px;
+    .meta .price{
+      margin:0;
+      font-size:14px;
+      font-weight:900; /* ✅ tarif en gras */
       letter-spacing:.2px;
     }
 
@@ -248,11 +251,12 @@
       display:flex;
       align-items:center;
       gap:8px;
+      flex:0 0 auto;
     }
     .qtyBtn{
-      width:42px;
-      height:42px;
-      border-radius:14px;
+      width:44px;
+      height:44px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
       color:var(--text);
@@ -265,9 +269,9 @@
     }
     .qtyBtn:active{ transform: translateY(1px); }
     .qtyVal{
-      min-width:54px;
+      min-width:56px;
       padding:10px 10px;
-      border-radius:14px;
+      border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
       color:var(--text);
@@ -278,7 +282,7 @@
 
     .badge{
       font-size:11px;
-      padding:6px 10px;
+      padding:7px 11px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
@@ -287,10 +291,10 @@
       display:inline-flex;
       align-items:center;
       gap:6px;
-      margin-top:8px;
+      width: fit-content;
     }
     .badge.ok{ border-color: rgba(49,209,88,.35); background: rgba(49,209,88,.10); color:#dfffe8; }
-    .badge.warn{ border-color: rgba(255,213,74,.35); background: rgba(255,213,74,.10); color:#fff4cf; }
+    .badge.warn{ border-color: rgba(255,176,32,.45); background: rgba(255,176,32,.12); color:#fff1d3; }
     .badge.danger{ border-color: rgba(255,59,59,.35); background: rgba(255,59,59,.10); color:#ffe3e3; }
 
     .toast{
@@ -398,6 +402,27 @@
       border-top:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.03);
     }
+
+    /* ✅ "onglet" en haut à droite (comme avant) */
+    .tabTop{
+      position:fixed;
+      right:12px;
+      top:78px; /* sous le header */
+      z-index:12;
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,14,24,.70);
+      backdrop-filter: blur(10px);
+      color:var(--text);
+      font-size:12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .tabTop:active{ transform: translateY(1px); }
   </style>
 </head>
 
@@ -428,6 +453,9 @@
     </div>
   </div>
 </header>
+
+<!-- ✅ Onglet flottant (haut droite) -->
+<div class="tabTop" id="tabTop">☰ Outils</div>
 
 <main>
   <div class="grid">
@@ -511,13 +539,17 @@ const IMG_DIR = "./stock/";
 // Cloudflare Worker (même Worker que stats)
 const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
 
-// Seuil "faible"
-const LOW_THRESHOLD = 3;
+/* ✅ Règle couleur stock demandée :
+   - 0 => rouge
+   - 1 à 2 => orange/jaune
+   - 3 et + => vert
+*/
+const OK_THRESHOLD = 3;     // >=3 => OK (vert)
+const WARN_MIN = 1;         // 1-2 => WARN
+const WARN_MAX = 2;
 
 /* =========================
    PRODUITS (base)
-   - ✅ FIX: certains fichiers image ont des noms exacts (poliakov.png, ricard.png, saint_james_blanc.png…)
-   - ✅ FIX: les 3 vins doivent être: xv_catalan_blanc.png / xv_catalan_rose.png / xv_catalan_rouge.png
    ========================= */
 
 const BASE_PRODUCTS = [
@@ -582,6 +614,7 @@ const sheet = $("#sheet");
 const sheetBackdrop = $("#sheetBackdrop");
 const sheetClose = $("#sheetClose");
 const btnOpenSettings = $("#btnOpenSettings");
+const tabTop = $("#tabTop");
 const tokenInput = $("#tokenInput");
 const tokenState = $("#tokenState");
 const btnSaveToken = $("#btnSaveToken");
@@ -690,16 +723,14 @@ function fmtNameFromId(id){
 }
 
 function qtyTag(qty){
-  if(qty === 0) return { cls:"danger", txt:"Rupture" };
-  if(qty <= LOW_THRESHOLD) return { cls:"warn", txt:"Faible" };
-  return { cls:"ok", txt:"OK" };
+  if(qty <= 0) return { cls:"danger", txt:"Rupture" };
+  if(qty >= OK_THRESHOLD) return { cls:"ok", txt:"OK" };
+  // 1-2
+  return { cls:"warn", txt:"Faible" };
 }
 
 function getImgForProduct(p){
-  // Si p.img est défini -> nom exact fourni
   if(p && p.img) return IMG_DIR + String(p.img);
-
-  // fallback classique id.png
   const id = p?.id ? String(p.id) : "";
   return IMG_DIR + id + ".png";
 }
@@ -722,8 +753,6 @@ function adjustQty(id, delta){
       badge.innerHTML = `${t.txt}${state.dirty.has(id) ? " • modifié" : ""}`;
     }
   }
-
-  toastMsg(delta > 0 ? "+1 ajouté" : "-1 retiré");
 }
 
 function renderList(){
@@ -747,13 +776,16 @@ function renderList(){
       return `
         <div class="item" data-id="${esc(id)}">
           <div class="thumb">
-            <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';" />
+            <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy"
+                 onerror="this.style.display='none';" />
           </div>
+
           <div class="meta">
             <p class="name">${esc(p.name)}</p>
-            <p class="desc">${price ? `<b>${esc(price)}€</b>` : "—"}</p>
+            <p class="price">${price ? esc(price) + "€" : "—"}</p>
             <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
           </div>
+
           <div class="qtyBox">
             <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
             <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
@@ -816,7 +848,6 @@ async function pullFromRepo(){
     }
   });
 
-  // base d'abord, extras ensuite
   PRODUCTS = [...BASE_PRODUCTS, ...extra];
 
   updateStockUI();
@@ -841,7 +872,6 @@ async function pushToRepo(){
     openSettings();
     return;
   }
-
   if(pin !== "0000"){
     toastMsg("Code invalide.");
     return;
@@ -880,7 +910,6 @@ async function pushToRepo(){
 
   idsToPush.forEach(id => state.dirty.delete(id));
   updateStockUI();
-
   toastMsg("Publié ✅");
 }
 
@@ -889,6 +918,8 @@ async function pushToRepo(){
    ========================= */
 
 btnOpenSettings.addEventListener("click", openSettings);
+tabTop.addEventListener("click", openSettings);
+
 sheetBackdrop.addEventListener("click", closeSettings);
 sheetClose.addEventListener("click", closeSettings);
 
