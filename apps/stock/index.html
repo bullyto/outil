@@ -166,20 +166,20 @@
 
     .list{ display:grid; grid-template-columns: 1fr; gap:10px; }
 
-    /* ✅ NEW layout: name ONE LINE + price moved to right (no overlap) */
+    /* ✅ FIX: make cards taller + force name visible (2 lines max, no overlap) */
     .item{
       display:grid;
-      grid-template-columns: 82px 1fr; /* image + content */
-      gap:12px;
+      grid-template-columns: 92px 1fr; /* image + content */
+      gap:14px;
       align-items:center;
-      padding:12px;
+      padding:14px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.12);
-      min-height: 112px;
+      min-height: 142px;            /* ✅ taller so name is visible */
     }
     .thumb{
-      width:82px; height:82px;
+      width:92px; height:92px;      /* ✅ bigger bottle */
       border-radius:18px;
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
@@ -208,33 +208,37 @@
       min-width:0;
       display:flex;
       flex-direction:column;
-      gap:8px;
+      gap:10px;
     }
-    .nameRow{
+
+    .name{
+      margin:0;
+      font-size:18px;               /* ✅ bigger */
+      font-weight:950;
+      line-height:1.15;
+      display:-webkit-box;          /* ✅ allow 2 lines max */
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 100%;
+    }
+
+    .subRow{
       display:flex;
-      align-items:baseline;
+      align-items:center;
       justify-content:space-between;
       gap:10px;
       min-width:0;
     }
-    .name{
-      margin:0;
-      font-size:16px;
-      font-weight:900;
-      line-height:1.1;
-      white-space:nowrap;          /* ✅ one line only */
-      overflow:hidden;             /* ✅ no wrap */
-      text-overflow:ellipsis;      /* ✅ ... */
-      min-width:0;
-      flex:1 1 auto;
-    }
+
     .price{
       margin:0;
-      font-size:16px;
-      font-weight:950;             /* ✅ strong */
+      font-size:18px;               /* ✅ bigger + bold */
+      font-weight:950;
       line-height:1;
       flex:0 0 auto;
-      padding-left:6px;
+      white-space:nowrap;
     }
 
     .badge{
@@ -249,6 +253,7 @@
       align-items:center;
       gap:6px;
       width: fit-content;
+      white-space:nowrap;
     }
     .badge.ok{ border-color: rgba(49,209,88,.35); background: rgba(49,209,88,.10); color:#dfffe8; }
     .badge.warn{ border-color: rgba(255,176,32,.45); background: rgba(255,176,32,.12); color:#fff1d3; }
@@ -257,32 +262,32 @@
     .qtyBox{
       display:flex;
       align-items:center;
-      gap:8px;
+      gap:10px;
       flex:0 0 auto;
     }
     .qtyBtn{
-      width:44px;
-      height:44px;
-      border-radius:16px;
+      width:48px;                   /* ✅ bigger */
+      height:48px;
+      border-radius:18px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
       color:var(--text);
       cursor:pointer;
       display:grid;
       place-items:center;
-      font-size:18px;
+      font-size:20px;
       line-height:1;
       user-select:none;
     }
     .qtyBtn:active{ transform: translateY(1px); }
     .qtyVal{
-      min-width:56px;
-      padding:10px 10px;
-      border-radius:16px;
+      min-width:62px;               /* ✅ bigger */
+      padding:12px 10px;
+      border-radius:18px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
       color:var(--text);
-      font-size:14px;
+      font-size:15px;
       text-align:center;
       user-select:none;
     }
@@ -394,6 +399,13 @@
       user-select:none;
     }
     .tabTop:active{ transform: translateY(1px); }
+
+    /* small screens: keep readability */
+    @media (max-width:420px){
+      .item{ grid-template-columns: 90px 1fr; min-height: 150px; }
+      .name{ font-size:18px; }
+      .price{ font-size:18px; }
+    }
   </style>
 </head>
 
@@ -505,10 +517,7 @@
 const IMG_DIR = "./stock/";
 const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
 
-/* stock colors rules */
 const OK_THRESHOLD = 3;
-const WARN_MIN = 1;
-const WARN_MAX = 2;
 
 /* =========================
    PRODUITS (base)
@@ -738,11 +747,12 @@ function renderList(){
 
           <div class="content">
             <div class="meta">
-              <div class="nameRow">
-                <p class="name">${esc(p.name)}</p>
+              <p class="name">${esc(p.name)}</p>
+
+              <div class="subRow">
+                <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
                 <p class="price">${price ? esc(price) + "€" : "—"}</p>
               </div>
-              <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
             </div>
 
             <div class="qtyBox">
