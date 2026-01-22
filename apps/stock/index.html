@@ -14,13 +14,10 @@
   <style>
     :root{
       --bg:#060a12;
-      --card:#0b1220;
       --text:#e8f0ff;
       --muted:#9fb3d1;
       --line:rgba(255,255,255,.08);
-      --accent:#ffd54a;
 
-      /* badges */
       --danger:#ff3b3b;      /* 0 */
       --warn:#ffb020;        /* 1-2 */
       --ok:#31d158;          /* >=3 */
@@ -100,12 +97,7 @@
     .btnIcon:active{ transform: translateY(1px); }
 
     main{ padding:14px 14px 26px; }
-    .grid{
-      max-width:980px; margin:0 auto;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:14px;
-    }
+    .grid{ max-width:980px; margin:0 auto; display:grid; grid-template-columns: 1fr; gap:14px; }
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
       border:1px solid var(--line);
@@ -153,13 +145,7 @@
       color:var(--text);
       font-size:14px;
     }
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-      align-items:center;
-    }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
     .btn{
       padding:10px 12px;
       border-radius:14px;
@@ -174,37 +160,26 @@
     }
     .btn:hover{ background: var(--btn2); }
     .btn:active{ transform: translateY(1px); }
-    .btn.primary{
-      border-color: rgba(255,213,74,.34);
-      background: rgba(255,213,74,.10);
-    }
-    .btn.danger{
-      border-color: rgba(255,59,59,.35);
-      background: rgba(255,59,59,.10);
-      color: #ffecec;
-    }
+    .btn.primary{ border-color: rgba(255,213,74,.34); background: rgba(255,213,74,.10); }
+    .btn.danger{ border-color: rgba(255,59,59,.35); background: rgba(255,59,59,.10); color:#ffecec; }
     .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
 
-    .list{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-    }
+    .list{ display:grid; grid-template-columns: 1fr; gap:10px; }
 
-    /* ✅ FIX chevauchement + image plus grande */
+    /* ✅ NEW layout: name ONE LINE + price moved to right (no overlap) */
     .item{
       display:grid;
-      grid-template-columns: 82px 1fr auto; /* image + grande */
+      grid-template-columns: 82px 1fr; /* image + content */
       gap:12px;
       align-items:center;
       padding:12px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.12);
-      min-height: 108px;
+      min-height: 112px;
     }
     .thumb{
-      width:82px; height:82px;            /* image + grande */
+      width:82px; height:82px;
       border-radius:18px;
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
@@ -221,32 +196,64 @@
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.35));
     }
 
-    /* ✅ FIX: zone texte en colonne (nom/tarif/badge) pour éviter chevauchement */
+    .content{
+      min-width:0;
+      display:grid;
+      grid-template-columns: 1fr auto; /* left meta + right controls */
+      gap:12px;
+      align-items:center;
+    }
+
     .meta{
       min-width:0;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:8px;
     }
-    .meta .name{
-      font-size:15px;
+    .nameRow{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      min-width:0;
+    }
+    .name{
+      margin:0;
+      font-size:16px;
       font-weight:900;
-      margin:0;
-      white-space:normal;
-      overflow:visible;
-      display:-webkit-box;
-      -webkit-line-clamp:2;
-      -webkit-box-orient:vertical;
-      line-height:1.15;
+      line-height:1.1;
+      white-space:nowrap;          /* ✅ one line only */
+      overflow:hidden;             /* ✅ no wrap */
+      text-overflow:ellipsis;      /* ✅ ... */
+      min-width:0;
+      flex:1 1 auto;
     }
-    .meta .price{
+    .price{
       margin:0;
-      font-size:14px;
-      font-weight:900; /* ✅ tarif en gras */
-      letter-spacing:.2px;
+      font-size:16px;
+      font-weight:950;             /* ✅ strong */
+      line-height:1;
+      flex:0 0 auto;
+      padding-left:6px;
     }
 
-    /* + / - controls */
+    .badge{
+      font-size:11px;
+      padding:7px 11px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      width: fit-content;
+    }
+    .badge.ok{ border-color: rgba(49,209,88,.35); background: rgba(49,209,88,.10); color:#dfffe8; }
+    .badge.warn{ border-color: rgba(255,176,32,.45); background: rgba(255,176,32,.12); color:#fff1d3; }
+    .badge.danger{ border-color: rgba(255,59,59,.35); background: rgba(255,59,59,.10); color:#ffe3e3; }
+
     .qtyBox{
       display:flex;
       align-items:center;
@@ -279,23 +286,6 @@
       text-align:center;
       user-select:none;
     }
-
-    .badge{
-      font-size:11px;
-      padding:7px 11px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color:var(--muted);
-      user-select:none;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      width: fit-content;
-    }
-    .badge.ok{ border-color: rgba(49,209,88,.35); background: rgba(49,209,88,.10); color:#dfffe8; }
-    .badge.warn{ border-color: rgba(255,176,32,.45); background: rgba(255,176,32,.12); color:#fff1d3; }
-    .badge.danger{ border-color: rgba(255,59,59,.35); background: rgba(255,59,59,.10); color:#ffe3e3; }
 
     .toast{
       position:fixed;
@@ -354,11 +344,7 @@
       justify-content:space-between;
       gap:10px;
     }
-    .sheet .panelHeader h3{
-      margin:0;
-      font-size:14px;
-      letter-spacing:.2px;
-    }
+    .sheet .panelHeader h3{ margin:0; font-size:14px; letter-spacing:.2px; }
     .sheet .panelHeader button{
       border:none;
       background:transparent;
@@ -366,17 +352,8 @@
       font-size:18px;
       cursor:pointer;
     }
-    .sheet .panelBody{
-      padding:14px;
-      display:grid;
-      gap:12px;
-    }
-    .field label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
+    .sheet .panelBody{ padding:14px; display:grid; gap:12px; }
+    .field label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
     .field input{
       width:100%;
       padding:12px 12px;
@@ -387,12 +364,7 @@
       outline:none;
       font-size:14px;
     }
-    .hint{
-      margin:0;
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.35;
-    }
+    .hint{ margin:0; font-size:12px; color:var(--muted); line-height:1.35; }
     .panelActions{
       display:flex;
       gap:10px;
@@ -403,11 +375,10 @@
       background: rgba(255,255,255,.03);
     }
 
-    /* ✅ "onglet" en haut à droite (comme avant) */
     .tabTop{
       position:fixed;
       right:12px;
-      top:78px; /* sous le header */
+      top:78px;
       z-index:12;
       padding:9px 12px;
       border-radius:999px;
@@ -454,7 +425,6 @@
   </div>
 </header>
 
-<!-- ✅ Onglet flottant (haut droite) -->
 <div class="tabTop" id="tabTop">☰ Outils</div>
 
 <main>
@@ -490,7 +460,6 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- SETTINGS SHEET -->
 <div class="sheet" id="sheet">
   <div class="backdrop" id="sheetBackdrop"></div>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
@@ -533,19 +502,12 @@
    CONFIG
    ========================= */
 
-// IMPORTANT: images produits = ./stock/<fichier>.png  (repo: /apps/stock/stock/<fichier>.png)
 const IMG_DIR = "./stock/";
-
-// Cloudflare Worker (même Worker que stats)
 const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
 
-/* ✅ Règle couleur stock demandée :
-   - 0 => rouge
-   - 1 à 2 => orange/jaune
-   - 3 et + => vert
-*/
-const OK_THRESHOLD = 3;     // >=3 => OK (vert)
-const WARN_MIN = 1;         // 1-2 => WARN
+/* stock colors rules */
+const OK_THRESHOLD = 3;
+const WARN_MIN = 1;
 const WARN_MAX = 2;
 
 /* =========================
@@ -591,7 +553,6 @@ const BASE_PRODUCTS = [
   { id:"muscat", name:"Muscat", price:25, img:"muscat.png" }
 ];
 
-// Liste finale affichée (base + tous les IDs du snapshot)
 let PRODUCTS = [...BASE_PRODUCTS];
 
 /* =========================
@@ -620,13 +581,12 @@ const tokenState = $("#tokenState");
 const btnSaveToken = $("#btnSaveToken");
 const btnClearToken = $("#btnClearToken");
 
-// local storage
 const SETTINGS_KEY = "adn66_stock_settings_v3";
 
 const state = {
   pin: "",
-  stock: {},           // id -> qty
-  dirty: new Set(),    // ids modified
+  stock: {},
+  dirty: new Set(),
   lastSync: null
 };
 
@@ -668,7 +628,7 @@ function updateTokenHint(){
 }
 
 function saveToken(pin){
-  const exp = Date.now() + (1000 * 60 * 60 * 24 * 30 * 6); // ~6 mois
+  const exp = Date.now() + (1000 * 60 * 60 * 24 * 30 * 6);
   localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 3, pin: String(pin||"").trim(), exp }));
   state.pin = String(pin||"").trim();
   updateSaveButtonsState();
@@ -682,9 +642,7 @@ function clearToken(){
 
 function loadSettings(){
   const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
-  if (raw.exp && Date.now() > raw.exp) {
-    localStorage.removeItem(SETTINGS_KEY);
-  }
+  if (raw.exp && Date.now() > raw.exp) localStorage.removeItem(SETTINGS_KEY);
   state.pin = String(raw.pin ?? "").trim();
 }
 
@@ -725,7 +683,6 @@ function fmtNameFromId(id){
 function qtyTag(qty){
   if(qty <= 0) return { cls:"danger", txt:"Rupture" };
   if(qty >= OK_THRESHOLD) return { cls:"ok", txt:"OK" };
-  // 1-2
   return { cls:"warn", txt:"Faible" };
 }
 
@@ -750,7 +707,7 @@ function adjustQty(id, delta){
     if(badge){
       const t = qtyTag(nv);
       badge.className = `badge ${t.cls}`;
-      badge.innerHTML = `${t.txt}${state.dirty.has(id) ? " • modifié" : ""}`;
+      badge.textContent = `${t.txt}${state.dirty.has(id) ? " • modifié" : ""}`;
     }
   }
 }
@@ -776,20 +733,23 @@ function renderList(){
       return `
         <div class="item" data-id="${esc(id)}">
           <div class="thumb">
-            <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy"
-                 onerror="this.style.display='none';" />
+            <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';" />
           </div>
 
-          <div class="meta">
-            <p class="name">${esc(p.name)}</p>
-            <p class="price">${price ? esc(price) + "€" : "—"}</p>
-            <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
-          </div>
+          <div class="content">
+            <div class="meta">
+              <div class="nameRow">
+                <p class="name">${esc(p.name)}</p>
+                <p class="price">${price ? esc(price) + "€" : "—"}</p>
+              </div>
+              <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
+            </div>
 
-          <div class="qtyBox">
-            <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
-            <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
-            <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
+            <div class="qtyBox">
+              <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
+              <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
+              <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
+            </div>
           </div>
         </div>
       `;
@@ -808,10 +768,6 @@ function renderList(){
 
   updateDirtyBadge();
 }
-
-/* =========================
-   LOAD FROM REPO (public raw)
-   ========================= */
 
 async function pullFromRepo(){
   const s = getGH();
@@ -838,7 +794,6 @@ async function pullFromRepo(){
     }
   }
 
-  // Ajouter au catalogue tous les ids présents dans le snapshot (si pas déjà dans BASE_PRODUCTS)
   const known = new Set(PRODUCTS.map(p=>p.id));
   const extra = [];
   snapshotIds.forEach(id => {
@@ -858,10 +813,6 @@ function updateStockUI(){
   renderList();
   updateSaveButtonsState();
 }
-
-/* =========================
-   PUBLISH VIA WORKER (PIN)
-   ========================= */
 
 async function pushToRepo(){
   const s = getGH();
@@ -913,10 +864,7 @@ async function pushToRepo(){
   toastMsg("Publié ✅");
 }
 
-/* =========================
-   UI EVENTS
-   ========================= */
-
+/* UI */
 btnOpenSettings.addEventListener("click", openSettings);
 tabTop.addEventListener("click", openSettings);
 
@@ -964,10 +912,6 @@ btnReset.addEventListener("click", ()=>{
 });
 
 qEl.addEventListener("input", renderList);
-
-/* =========================
-   INIT
-   ========================= */
 
 (async function init(){
   loadSettings();
