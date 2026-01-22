@@ -28,6 +28,7 @@
       --btn2:rgba(255,255,255,.10);
     }
     *{ box-sizing:border-box; }
+
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
@@ -37,12 +38,14 @@
         radial-gradient(900px 700px at 50% 110%, rgba(73,136,255,.12), transparent 60%),
         var(--bg);
     }
+
     header{
       position:sticky; top:0; z-index:10;
       backdrop-filter: blur(14px);
       background: linear-gradient(to bottom, rgba(6,10,18,.92), rgba(6,10,18,.62));
       border-bottom:1px solid var(--line);
     }
+
     .wrap{ max-width:980px; margin:0 auto; padding:14px 14px 10px; }
     .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
     .brand{ display:flex; align-items:center; gap:10px; min-width: 0; }
@@ -73,6 +76,7 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
+
     .topRight{ display:flex; align-items:center; gap:10px; }
     .pill{
       font-size:12px;
@@ -126,6 +130,7 @@
       justify-content:space-between;
       margin-bottom:12px;
     }
+
     .search{
       display:flex;
       align-items:center;
@@ -145,7 +150,9 @@
       color:var(--text);
       font-size:14px;
     }
+
     .actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center; }
+
     .btn{
       padding:10px 12px;
       border-radius:14px;
@@ -166,11 +173,11 @@
 
     .list{ display:grid; grid-template-columns: 1fr; gap:10px; }
 
-    /* ✅ ITEM: tout visible, aucun chevauchement */
+    /* ✅ ITEM LAYOUT: 3 LINES (no overlap possible) */
     .item{
       display:grid;
-      grid-template-columns: 108px 1fr auto; /* image | infos | contrôles */
-      gap:14px;
+      grid-template-columns: 98px 1fr;
+      gap:12px;
       align-items:center;
       padding:14px;
       border-radius:18px;
@@ -180,7 +187,7 @@
     }
 
     .thumb{
-      width:108px; height:108px;
+      width:98px; height:98px;
       border-radius:18px;
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
@@ -197,27 +204,66 @@
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.35));
     }
 
-    .meta{
+    .content{
       min-width:0;
-      display:flex;
-      flex-direction:column;
+      display:grid;
+      grid-template-rows: auto auto auto; /* 3 lines */
       gap:10px;
+      align-items:center;
     }
 
-    /* ✅ Nom: TOUJOURS visible (une ligne, blanc, taille raisonnable) */
+    /* Line 1: Name (always visible, single line) */
     .name{
       margin:0;
-      font-size:16px;
+      font-size:14px;
       font-weight:900;
       line-height:1.15;
-      color: var(--text);
+      color:var(--text);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    /* ✅ Ligne statut + prix (toujours visible) */
-    .infoRow{
+    /* Line 2: Controls centered */
+    .qtyLine{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      width:100%;
+    }
+    .qtyBtn{
+      width:44px;
+      height:44px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      font-size:22px;
+      line-height:1;
+      user-select:none;
+      flex:0 0 auto;
+    }
+    .qtyBtn:active{ transform: translateY(1px); }
+    .qtyVal{
+      min-width:68px;
+      padding:10px 10px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      font-size:16px;
+      font-weight:800;
+      text-align:center;
+      user-select:none;
+      flex:0 0 auto;
+    }
+
+    /* Line 3: Status + Price (no overlap, auto truncation) */
+    .bottomLine{
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -237,10 +283,12 @@
       align-items:center;
       gap:6px;
       width: fit-content;
-      max-width: 68%;
+      max-width: 100%;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+      min-width: 0;
+      flex:1 1 auto;
     }
     .badge.ok{ border-color: rgba(49,209,88,.35); background: rgba(49,209,88,.10); color:#dfffe8; }
     .badge.warn{ border-color: rgba(255,176,32,.45); background: rgba(255,176,32,.12); color:#fff1d3; }
@@ -249,45 +297,10 @@
     .price{
       margin:0;
       font-size:18px;
-      font-weight:950; /* ✅ gras */
+      font-weight:950;
       line-height:1;
       white-space:nowrap;
       flex:0 0 auto;
-    }
-
-    /* ✅ Contrôles à droite: taille normale, jamais au-dessus du prix/statut */
-    .qtyBox{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      justify-content:flex-end;
-      flex:0 0 auto;
-    }
-    .qtyBtn{
-      width:42px;
-      height:42px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      color:var(--text);
-      cursor:pointer;
-      display:grid;
-      place-items:center;
-      font-size:20px;
-      line-height:1;
-      user-select:none;
-    }
-    .qtyBtn:active{ transform: translateY(1px); }
-    .qtyVal{
-      min-width:56px;
-      padding:10px 8px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color:var(--text);
-      font-size:15px;
-      text-align:center;
-      user-select:none;
     }
 
     .toast{
@@ -381,7 +394,7 @@
     .tabTop{
       position:fixed;
       right:12px;
-      top:78px;
+      top:92px;
       z-index:12;
       padding:9px 12px;
       border-radius:999px;
@@ -399,17 +412,12 @@
     .tabTop:active{ transform: translateY(1px); }
 
     @media (max-width:420px){
-      .item{
-        grid-template-columns: 98px 1fr auto;
-        gap:12px;
-        padding:12px;
-      }
-      .thumb{ width:98px; height:98px; }
-      .name{ font-size:15px; }
+      .item{ grid-template-columns: 96px 1fr; }
+      .thumb{ width:96px; height:96px; }
+      .name{ font-size:14px; }
+      .qtyBtn{ width:42px; height:42px; }
+      .qtyVal{ min-width:64px; }
       .price{ font-size:18px; }
-      .qtyBtn{ width:40px; height:40px; }
-      .qtyVal{ min-width:52px; }
-      .badge{ max-width:62%; }
     }
   </style>
 </head>
@@ -736,18 +744,19 @@ function renderList(){
             <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';" />
           </div>
 
-          <div class="meta">
+          <div class="content">
             <p class="name">${esc(p.name)}</p>
-            <div class="infoRow">
+
+            <div class="qtyLine">
+              <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
+              <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
+              <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
+            </div>
+
+            <div class="bottomLine">
               <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
               <p class="price">${price ? esc(price) + "€" : "—"}</p>
             </div>
-          </div>
-
-          <div class="qtyBox">
-            <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
-            <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
-            <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
           </div>
         </div>
       `;
@@ -776,19 +785,33 @@ async function pullFromRepo(){
 
   try{
     const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
-    const res = await fetch(rawUrl, { cache:"no-store" });
-    if(res.ok) snap = await res.json();
+    const res = await fetch(rawUrl, {
+      cache:"no-store",
+      headers: { "Cache-Control":"no-cache", "Pragma":"no-cache" }
+    });
+    if(!res.ok){
+      throw new Error(`Snapshot HTTP ${res.status}`);
+    }
+    snap = await res.json();
   }catch(e){
     console.warn("pullFromRepo snapshot failed", e);
+    toastMsg("Erreur chargement stock (snapshot).");
+    // IMPORTANT: keep UI (quantities will stay as current local state)
+    updateStockUI();
+    return;
   }
 
   const snapshotIds = new Set();
+
   if(snap && Array.isArray(snap.items)){
     for(const it of snap.items){
       if(!it || !it.id) continue;
       const id = String(it.id);
       snapshotIds.add(id);
-      if(typeof it.qty === "number") state.stock[id] = clampQty(it.qty);
+
+      // ✅ accept number OR numeric string
+      const q = Number(it.qty);
+      if(Number.isFinite(q)) state.stock[id] = clampQty(q);
     }
   }
 
@@ -803,6 +826,8 @@ async function pullFromRepo(){
 
   PRODUCTS = [...BASE_PRODUCTS, ...extra];
 
+  // after a successful pull, local modifications are still local;
+  // we do NOT wipe state.dirty automatically.
   updateStockUI();
   toastMsg("Chargé ✅");
 }
@@ -822,7 +847,6 @@ async function pushToRepo(){
     return;
   }
   if(pin !== "0000"){
-    toastMsg("Code invalide.");
     toastMsg("Code invalide.");
     return;
   }
@@ -861,6 +885,12 @@ async function pushToRepo(){
   idsToPush.forEach(id => state.dirty.delete(id));
   updateStockUI();
   toastMsg("Publié ✅");
+
+  // ✅ force refresh from repo (so you see what was really written)
+  try{
+    await pullFromRepo();
+    setSync(Date.now());
+  }catch(_){}
 }
 
 /* UI */
