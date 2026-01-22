@@ -45,10 +45,7 @@
     }
     .wrap{ max-width:980px; margin:0 auto; padding:14px 14px 10px; }
     .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      min-width: 0;
-    }
+    .brand{ display:flex; align-items:center; gap:10px; min-width: 0; }
     .logo{
       width:44px; height:44px; border-radius:14px;
       background: radial-gradient(circle at 30% 30%, rgba(255,213,74,.30), rgba(255,213,74,.06));
@@ -58,9 +55,7 @@
       flex:0 0 auto;
     }
     .logo svg{ opacity:.95 }
-    .title{
-      min-width:0;
-    }
+    .title{ min-width:0; }
     .title h1{
       margin:0;
       font-size:15px;
@@ -78,9 +73,7 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
-    .topRight{
-      display:flex; align-items:center; gap:10px;
-    }
+    .topRight{ display:flex; align-items:center; gap:10px; }
     .pill{
       font-size:12px;
       padding:8px 10px;
@@ -126,16 +119,8 @@
       justify-content:space-between;
       gap:12px;
     }
-    .cardHeader h2{
-      margin:0;
-      font-size:14px;
-      letter-spacing:.2px;
-    }
-    .cardHeader p{
-      margin:4px 0 0;
-      font-size:12px;
-      color:var(--muted);
-    }
+    .cardHeader h2{ margin:0; font-size:14px; letter-spacing:.2px; }
+    .cardHeader p{ margin:4px 0 0; font-size:12px; color:var(--muted); }
     .cardBody{ padding:12px 14px 14px; }
 
     .toolbar{
@@ -195,11 +180,7 @@
       background: rgba(255,59,59,.10);
       color: #ffecec;
     }
-    .btn:disabled{
-      opacity:.5;
-      cursor:not-allowed;
-      transform:none;
-    }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
 
     .list{
       display:grid;
@@ -233,9 +214,7 @@
       padding:6px;
       filter: drop-shadow(0 10px 16px rgba(0,0,0,.35));
     }
-    .meta{
-      min-width:0;
-    }
+    .meta{ min-width:0; }
     .meta .name{
       font-size:14px;
       font-weight:700;
@@ -252,13 +231,30 @@
       overflow:hidden;
       text-overflow:ellipsis;
     }
+
+    /* + / - controls */
     .qtyBox{
       display:flex;
       align-items:center;
       gap:8px;
     }
-    .qty{
-      width:70px;
+    .qtyBtn{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      font-size:18px;
+      line-height:1;
+      user-select:none;
+    }
+    .qtyBtn:active{ transform: translateY(1px); }
+    .qtyVal{
+      min-width:54px;
       padding:10px 10px;
       border-radius:14px;
       border:1px solid rgba(255,255,255,.12);
@@ -266,8 +262,9 @@
       color:var(--text);
       font-size:14px;
       text-align:center;
-      outline:none;
+      user-select:none;
     }
+
     .badge{
       font-size:11px;
       padding:6px 10px;
@@ -276,6 +273,10 @@
       background: rgba(255,255,255,.04);
       color:var(--muted);
       user-select:none;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:6px;
     }
     .badge.ok{ border-color: rgba(49,209,88,.35); background: rgba(49,209,88,.10); color:#dfffe8; }
     .badge.warn{ border-color: rgba(255,213,74,.35); background: rgba(255,213,74,.10); color:#fff4cf; }
@@ -425,7 +426,7 @@
           <h2>Stock en direct : synchronisé avec le véhicule</h2>
           <p>Affichage indicatif (mise à jour ~3 minutes). Un produit peut être temporairement indisponible.</p>
         </div>
-        <span class="badge" id="dirtyBadge">OK</span>
+        <span class="badge ok" id="dirtyBadge">OK</span>
       </div>
 
       <div class="cardBody">
@@ -493,10 +494,10 @@
    CONFIG
    ========================= */
 
-// IMPORTANT: les images produits ne sont plus dans /img/,
-// elles sont maintenant dans /apps/stock/stock/*.png
+// IMPORTANT: images produits = ./stock/<id>.png  (car repo: /apps/stock/stock/<id>.png)
 const IMG_DIR = "./stock/";
 
+// Repo cible (info)
 const DEFAULT_GH = {
   owner: "bullyto",
   repo: "outil",
@@ -508,24 +509,60 @@ const DEFAULT_GH = {
 // Cloudflare Worker (même Worker que stats)
 const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
 
+// Seuil "faible"
+const LOW_THRESHOLD = 3;
+
 /* =========================
-   DATA (produits)
+   PRODUITS (liste de base)
+   - On remet TOUTES tes bouteilles de l'ancien index
+   - Et en plus: si le snapshot contient d'autres IDs, on les affiche aussi automatiquement.
    ========================= */
 
-const PRODUCTS = [
-  { id:"absolut", name:"Absolut", desc:"Vodka", img:"absolut.png" },
-  { id:"ballantines", name:"Ballantine's", desc:"Whisky", img:"ballantines.png" },
-  { id:"captain_morgan", name:"Captain Morgan", desc:"Rhum", img:"captain_morgan.png" },
-  { id:"cacahuette", name:"Cacahuètes", desc:"Snacking", img:"cacahuette.png" },
-  { id:"bretzel", name:"Bretzels", desc:"Snacking", img:"bretzel.png" },
-  { id:"TROIS_RIVIERES", name:"Trois Rivières", desc:"Rhum", img:"TROIS_RIVIERES.png" },
+const BASE_PRODUCTS = [
+  { id:"poliakov", name:"Poliakov Vodka", price:29 },
+  { id:"absolut", name:"Absolut Vodka", price:34 },
+  { id:"ciroc_pomme", name:"Cîroc Pomme", price:49 },
+  { id:"ciroc_classic", name:"Cîroc Classic", price:49 },
+  { id:"ciroc_redberry", name:"Cîroc Red Berry", price:49 },
+
+  { id:"william_peel", name:"William Peel", price:29 },
+  { id:"label_5", name:"Label 5 Classic Black", price:32 },
+  { id:"ballantines", name:"Ballantine’s Finest", price:36 },
+  { id:"jack_old7", name:"Jack Daniel’s Old No.7", price:40 },
+  { id:"jack_honey", name:"Jack Daniel’s Tennessee Honey", price:42 },
+
+  { id:"old_nick_darkwood", name:"Old Nick Dark Wood", price:29 },
+  { id:"captain_morgan", name:"Captain Morgan Spiced Gold", price:34 },
+  { id:"havana_especial", name:"Havana Club Especial", price:38 },
+
+  { id:"old_nick_blanc", name:"Old Nick Rhum Blanc", price:27 },
+  { id:"saint_james_blanc", name:"Saint James Rhum Blanc", price:32 },
+  { id:"trois_rivieres", name:"Trois Rivières Rhum Blanc", price:33 },
+  { id:"havana_3ans", name:"Havana Club 3 ans", price:37 },
+
+  { id:"gibsons_gin", name:"Gibson’s Gin", price:34 },
+  { id:"gordons_gin", name:"Gordon’s Gin", price:34 },
+
+  { id:"ricard", name:"Ricard", price:35 },
+  { id:"pastis_51", name:"Pastis 51", price:35 },
+
+  { id:"get_27", name:"GET 27", price:32 },
+  { id:"jagermeister", name:"Jägermeister", price:35 },
+  { id:"tequila_sanjose", name:"Tequila San José", price:28 },
+
+  { id:"xv_catalan_rose", name:"XV Catalan rose", price:19 },
+  { id:"xv_catalan_blanc", name:"XV Catalan blanc", price:19 },
+  { id:"xv_catalan_rouge", name:"XV Catalan rouge", price:19 },
+
+  { id:"muscat", name:"Muscat", price:25 }
 ];
 
-// alias (au cas où)
-const ID_ALIASES = {
-  "trois_rivieres": "TROIS_RIVIERES",
-  "TROIS_RIVIERES": "TROIS_RIVIERES"
-};
+// Liste finale affichée (base + tout ce que le snapshot contient en plus)
+let PRODUCTS = [...BASE_PRODUCTS];
+
+/* =========================
+   HELPERS
+   ========================= */
 
 function $(sel){ return document.querySelector(sel); }
 function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
@@ -545,16 +582,14 @@ const sheetClose = $("#sheetClose");
 const btnOpenSettings = $("#btnOpenSettings");
 const tokenInput = $("#tokenInput");
 const tokenState = $("#tokenState");
-const tokenHint = $("#tokenHint");
 const btnSaveToken = $("#btnSaveToken");
 const btnClearToken = $("#btnClearToken");
 
 // local storage
-const SETTINGS_KEY = "adn66_stock_settings_v2";
+const SETTINGS_KEY = "adn66_stock_settings_v3";
 
 const state = {
   pin: "",
-  // (legacy) token: "",
   stock: {},           // id -> qty
   dirty: new Set(),    // ids modified
   lastSync: null
@@ -579,10 +614,6 @@ function getGH(){
   };
 }
 
-function fileForId(id){
-  const gh = getGH();
-  return `${gh.stockPath}/${id}${gh.ext}`;
-}
 function snapshotPath(){
   const gh = getGH();
   return `${gh.stockPath}/_snapshot.json`;
@@ -598,16 +629,10 @@ function closeSettings(){
 }
 
 function updateTokenHint(){
-  if(state.pin){
-    tokenState.textContent = "Code enregistré ✅";
-  }else{
-    tokenState.textContent = "";
-  }
+  tokenState.textContent = state.pin ? "Code enregistré ✅" : "";
 }
 
 function saveToken(pin){
-  // On garde le nom historique "saveToken" pour ne rien casser,
-  // mais on enregistre maintenant un PIN (ex: 0000) au lieu d'un token GitHub.
   const exp = Date.now() + (1000 * 60 * 60 * 24 * 30 * 6); // ~6 mois
   localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 3, pin: String(pin||"").trim(), exp }));
   state.pin = String(pin||"").trim();
@@ -625,14 +650,11 @@ function loadSettings(){
   if (raw.exp && Date.now() > raw.exp) {
     localStorage.removeItem(SETTINGS_KEY);
   }
-  // AVANT: token GitHub (PAT) ; MAINTENANT: PIN admin (ex: 0000)
-  state.pin = String(raw.pin ?? raw.token ?? "").trim();
+  state.pin = String(raw.pin ?? "").trim();
 }
 
 function updateSaveButtonsState(){
-  const s = getGH();
-  const hasPin = !!String(s.pin||"").trim();
-  // on autorise la publication uniquement si un PIN est présent
+  const hasPin = !!String(getGH().pin||"").trim();
   btnSaveRepo.disabled = !hasPin;
 }
 
@@ -658,27 +680,75 @@ function clampQty(v){
   return Math.max(0, Math.min(999, Math.round(n)));
 }
 
+function fmtNameFromId(id){
+  // fallback propre si le snapshot contient un id pas dans BASE_PRODUCTS
+  return String(id||"")
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function qtyTag(qty){
+  if(qty === 0) return { cls:"danger", txt:"Rupture" };
+  if(qty <= LOW_THRESHOLD) return { cls:"warn", txt:"Faible" };
+  return { cls:"ok", txt:"OK" };
+}
+
+function adjustQty(id, delta){
+  const cur = Number(state.stock[id] ?? 0);
+  const nv = clampQty(cur + delta);
+  state.stock[id] = nv;
+  state.dirty.add(id);
+  updateDirtyBadge();
+
+  // update quick UI without full rerender (but keep safe)
+  const row = listEl.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
+  if(row){
+    const vEl = row.querySelector(".qtyVal");
+    if(vEl) vEl.textContent = String(nv);
+    const badge = row.querySelector(".badge");
+    if(badge){
+      const t = qtyTag(nv);
+      badge.className = `badge ${t.cls}`;
+      badge.innerHTML = `${t.txt}${state.dirty.has(id) ? " • modifié" : ""}`;
+    }
+  }
+
+  toastMsg(delta > 0 ? "+1 ajouté" : "-1 retiré");
+}
+
 function renderList(){
   const q = (qEl.value || "").trim().toLowerCase();
 
   const rows = PRODUCTS
-    .filter(p => !q || p.name.toLowerCase().includes(q) || (p.desc||"").toLowerCase().includes(q))
+    .filter(p => {
+      if(!q) return true;
+      const name = (p.name||"").toLowerCase();
+      const id = (p.id||"").toLowerCase();
+      return name.includes(q) || id.includes(q);
+    })
     .map(p => {
-      const id = ID_ALIASES[p.id] || p.id;
+      const id = p.id;
       const qty = Number(state.stock[id] ?? 0);
       const isDirty = state.dirty.has(id);
-      const badgeCls = qty > 0 ? "ok" : "danger";
-      const badgeTxt = qty > 0 ? "Dispo" : "Rupture";
+      const t = qtyTag(qty);
+      const price = Number(p.price ?? 0);
+      const imgSrc = IMG_DIR + id + ".png";
+
       return `
         <div class="item" data-id="${esc(id)}">
-          <div class="thumb"><img src="${esc(IMG_DIR + p.img)}" alt="${esc(p.name)}" loading="lazy" /></div>
+          <div class="thumb">
+            <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';" />
+          </div>
           <div class="meta">
             <p class="name">${esc(p.name)}</p>
-            <p class="desc">${esc(p.desc||"")}</p>
-            <span class="badge ${badgeCls}">${badgeTxt}${isDirty ? " • modifié" : ""}</span>
+            <p class="desc">${price ? (esc(price) + "€") : "—"}</p>
+            <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
           </div>
           <div class="qtyBox">
-            <input class="qty" type="number" inputmode="numeric" min="0" max="999" value="${esc(qty)}" />
+            <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
+            <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
+            <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
           </div>
         </div>
       `;
@@ -687,29 +757,24 @@ function renderList(){
 
   listEl.innerHTML = rows || `<div class="badge" style="padding:12px 14px;border-radius:16px;">Aucun résultat</div>`;
 
-  // bind inputs
+  // bind +/-
   listEl.querySelectorAll(".item").forEach(el => {
     const id = el.getAttribute("data-id");
-    const input = el.querySelector(".qty");
-    input.addEventListener("change", ()=>{
-      const v = clampQty(input.value);
-      input.value = v;
-      state.stock[id] = v;
-      state.dirty.add(id);
-      updateDirtyBadge();
-    });
+    const btnMinus = el.querySelector(".qtyBtn.minus");
+    const btnPlus = el.querySelector(".qtyBtn.plus");
+    if(btnMinus) btnMinus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, -1); });
+    if(btnPlus) btnPlus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, +1); });
   });
 
   updateDirtyBadge();
 }
 
-function updateStockUI(){
-  renderList();
-  updateSaveButtonsState();
-}
-
 /* =========================
    LOAD FROM REPO (public raw)
+   - Charge le snapshot et:
+     1) met à jour state.stock
+     2) ajoute automatiquement au catalogue tous les IDs présents dans le snapshot
+        (comme ça tu as bien "tous les produits" même si la liste hardcodée est incomplète)
    ========================= */
 
 async function pullFromRepo(){
@@ -727,16 +792,37 @@ async function pullFromRepo(){
     console.warn("pullFromRepo snapshot failed", e);
   }
 
+  // snapshot attendu: { items:[ {id, qty, ...} ] }
+  const snapshotIds = new Set();
   if(snap && Array.isArray(snap.items)){
     for(const it of snap.items){
       if(!it || !it.id) continue;
-      const id = ID_ALIASES[it.id] || it.id;
-      if(typeof it.qty === "number") state.stock[id] = it.qty;
+      const id = String(it.id);
+      snapshotIds.add(id);
+      if(typeof it.qty === "number") state.stock[id] = clampQty(it.qty);
     }
   }
 
+  // Ajouter au catalogue tous les ids présents dans le snapshot (si pas déjà dans BASE_PRODUCTS)
+  const known = new Set(PRODUCTS.map(p=>p.id));
+  const extra = [];
+  snapshotIds.forEach(id => {
+    if(!known.has(id)){
+      extra.push({ id, name: fmtNameFromId(id), price: 0 });
+      known.add(id);
+    }
+  });
+
+  // Rebuild PRODUCTS (base d'abord, extras ensuite)
+  PRODUCTS = [...BASE_PRODUCTS, ...extra];
+
   updateStockUI();
   toastMsg("Chargé ✅");
+}
+
+function updateStockUI(){
+  renderList();
+  updateSaveButtonsState();
 }
 
 /* =========================
@@ -753,7 +839,6 @@ async function pushToRepo(){
     return;
   }
 
-  // on garde un contrôle côté client (le serveur re-valide)
   if(pin !== "0000"){
     toastMsg("Code invalide.");
     return;
@@ -761,8 +846,8 @@ async function pushToRepo(){
 
   toastMsg("Publication via Cloudflare…");
 
-  // Préparer payload (même logique qu’avant, mais l’écriture GitHub se fait côté Worker)
   const idsToPush = Object.keys(state.stock).filter(id => state.dirty.has(id));
+
   const payload = {
     pin,
     owner: s.owner,
@@ -790,7 +875,6 @@ async function pushToRepo(){
     throw new Error(msg);
   }
 
-  // Success
   idsToPush.forEach(id => state.dirty.delete(id));
   updateStockUI();
 
@@ -841,7 +925,6 @@ btnSaveRepo.addEventListener("click", async ()=>{
 });
 
 btnReset.addEventListener("click", ()=>{
-  // annule les modifications locales (recharge)
   state.dirty.clear();
   pullFromRepo().then(()=>toastMsg("Annulé ✅")).catch(()=>toastMsg("Erreur annulation."));
 });
