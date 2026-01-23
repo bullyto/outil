@@ -501,7 +501,7 @@
     }
     .toolsFoot .miniBtn:active{ transform: translateY(1px); }
 
-    /* ✅ Fake loader (2.5s) */
+    /* ✅ Fake loader (1s) */
     .loader{
       position:fixed;
       inset:0;
@@ -587,7 +587,7 @@
 </head>
 
 <body>
-  <!-- ✅ Fake loading screen (2.5s) -->
+  <!-- ✅ Fake loading screen (1s) -->
   <div class="loader" id="fakeLoader" aria-hidden="true">
     <div class="loaderCard" role="status" aria-live="polite">
       <div class="loaderLogo">
@@ -749,461 +749,478 @@
 </div>
 
 <script>
-const IMG_DIR = "./stock/";
-const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
-const OK_THRESHOLD = 3;
-
-const BASE_PRODUCTS = [
-  { id:"poliakov", name:"Poliakov Vodka", price:29, img:"poliakov.png" },
-  { id:"absolut", name:"Absolut Vodka", price:34, img:"absolut.png" },
-  { id:"ciroc_pomme", name:"Cîroc Pomme", price:49, img:"ciroc_pomme.png" },
-  { id:"ciroc_classic", name:"Cîroc Classic", price:49, img:"ciroc_classic.png" },
-  { id:"ciroc_redberry", name:"Cîroc Red Berry", price:49, img:"ciroc_redberry.png" },
-
-  { id:"william_peel", name:"William Peel", price:29, img:"william_peel.png" },
-  { id:"label_5", name:"Label 5 Classic Black", price:32, img:"label_5.png" },
-  { id:"ballantines", name:"Ballantine’s Finest", price:36, img:"ballantines.png" },
-  { id:"jack_old7", name:"Jack Daniel’s Old No.7", price:40, img:"jack_old7.png" },
-  { id:"jack_honey", name:"Jack Daniel’s Tennessee Honey", price:42, img:"jack_honey.png" },
-
-  { id:"old_nick_darkwood", name:"Old Nick Dark Wood", price:29, img:"old_nick_darkwood.png" },
-  { id:"captain_morgan", name:"Captain Morgan Spiced Gold", price:34, img:"captain_morgan.png" },
-  { id:"havana_especial", name:"Havana Club Especial", price:38, img:"havana_especial.png" },
-
-  { id:"old_nick_blanc", name:"Old Nick Rhum Blanc", price:27, img:"old_nick_blanc.png" },
-  { id:"saint_james_blanc", name:"Saint James Rhum Blanc", price:32, img:"saint_james_blanc.png" },
-  { id:"trois_rivieres", name:"Trois Rivières Rhum Blanc", price:33, img:"trois_rivieres.png" },
-  { id:"havana_3ans", name:"Havana Club 3 ans", price:37, img:"havana_3ans.png" },
-
-  { id:"gibsons_gin", name:"Gibson’s Gin", price:34, img:"gibsons_gin.png" },
-  { id:"gordons_gin", name:"Gordon’s Gin", price:34, img:"gordons_gin.png" },
-
-  { id:"ricard", name:"Ricard", price:35, img:"ricard.png" },
-  { id:"pastis_51", name:"Pastis 51", price:35, img:"pastis_51.png" },
-
-  { id:"get_27", name:"GET 27", price:32, img:"get_27.png" },
-  { id:"jagermeister", name:"Jägermeister", price:35, img:"jagermeister.png" },
-  { id:"tequila_sanjose", name:"Tequila San José", price:28, img:"tequila_sanjose.png" },
-
-  { id:"xv_catalan_rose", name:"XV Catalan Rosé", price:19, img:"xv_catalan_rose.png" },
-  { id:"xv_catalan_blanc", name:"XV Catalan Blanc", price:19, img:"xv_catalan_blanc.png" },
-  { id:"xv_catalan_rouge", name:"XV Catalan Rouge", price:19, img:"xv_catalan_rouge.png" },
-
-  { id:"muscat", name:"Muscat", price:25, img:"muscat.png" }
-];
-
-let PRODUCTS = [...BASE_PRODUCTS];
-
-function $(sel){ return document.querySelector(sel); }
-function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
-
-const listEl = $("#list");
-const qEl = $("#q");
-const btnReload = $("#btnReload");
-const btnSaveRepo = $("#btnSaveRepo");
-const btnReset = $("#btnReset");
-const dirtyBadge = $("#dirtyBadge");
-const syncText = $("#syncText");
-
-/* Menu OUTILS */
-const toolsMenuSheet = $("#toolsMenuSheet");
-const toolsMenuBackdrop = $("#toolsMenuBackdrop");
-const toolsMenuClose = $("#toolsMenuClose");
-const btnOpenToolsMenu = $("#btnOpenToolsMenu");
-const toolsYear = $("#toolsYear");
-const btnOpenStockSettingsFromMenu = $("#btnOpenStockSettingsFromMenu");
-
-/* Paramètres Stock */
-const sheet = $("#sheet");
-const sheetBackdrop = $("#sheetBackdrop");
-const sheetClose = $("#sheetClose");
-const tokenInput = $("#tokenInput");
-const tokenState = $("#tokenState");
-const btnSaveToken = $("#btnSaveToken");
-const btnClearToken = $("#btnClearToken");
-
-const SETTINGS_KEY = "adn66_stock_settings_v3";
-
-const state = {
-  pin: "",
-  stock: {},
-  dirty: new Set(),
-  lastSync: null
-};
-
-function toastMsg(msg){
-  const t = $("#toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(window.__toast);
-  window.__toast = setTimeout(()=> t.classList.remove("show"), 2200);
-}
-
-function getGH(){
-  return {
-    owner: "bullyto",
-    repo: "outil",
-    branch: "main",
-    stockPath: "apps/stock/stock",
-    ext: ".json",
-    pin: String(state.pin||"").trim()
-  };
-}
-
-function snapshotPath(){
-  const gh = getGH();
-  return `${gh.stockPath}/_snapshot.json`;
-}
-
-/* Menu OUTILS */
-function openToolsMenu(){
-  try{ toolsYear.textContent = String(new Date().getFullYear()); }catch(e){}
-  toolsMenuSheet.classList.add("show");
-}
-function closeToolsMenu(){
-  toolsMenuSheet.classList.remove("show");
-}
-
-/* Param Stock */
-function openSettings(){
-  sheet.classList.add("show");
-  tokenInput.value = state.pin || "";
-  updateTokenHint();
-}
-function closeSettings(){
-  sheet.classList.remove("show");
-}
-
-function updateTokenHint(){
-  tokenState.textContent = state.pin ? "Code enregistré ✅" : "";
-}
-
-function saveToken(pin){
-  const exp = Date.now() + (1000 * 60 * 60 * 24 * 30 * 6);
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 3, pin: String(pin||"").trim(), exp }));
-  state.pin = String(pin||"").trim();
-  updateSaveButtonsState();
-}
-
-function clearToken(){
-  localStorage.removeItem(SETTINGS_KEY);
-  state.pin = "";
-  updateSaveButtonsState();
-}
-
-function loadSettings(){
-  const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
-  if (raw.exp && Date.now() > raw.exp) localStorage.removeItem(SETTINGS_KEY);
-  state.pin = String(raw.pin ?? "").trim();
-}
-
-function updateSaveButtonsState(){
-  const hasPin = !!String(getGH().pin||"").trim();
-  btnSaveRepo.disabled = !hasPin;
-}
-
-function updateDirtyBadge(){
-  const n = state.dirty.size;
-  if(n === 0){
-    dirtyBadge.textContent = "OK";
-    dirtyBadge.className = "badge ok";
-  }else{
-    dirtyBadge.textContent = `${n} modif.`;
-    dirtyBadge.className = "badge warn";
-  }
-}
-
-function setSync(ts){
-  state.lastSync = ts;
-  syncText.textContent = ts ? new Date(ts).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "—";
-}
-
-function clampQty(v){
-  const n = Number(v);
-  if(!Number.isFinite(n)) return 0;
-  return Math.max(0, Math.min(999, Math.round(n)));
-}
-
-function fmtNameFromId(id){
-  return String(id||"")
-    .replace(/[_-]+/g, " ")
-    .trim()
-    .replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function qtyTag(qty){
-  if(qty <= 0) return { cls:"danger", txt:"Rupture" };
-  if(qty >= OK_THRESHOLD) return { cls:"ok", txt:"OK" };
-  return { cls:"warn", txt:"Faible" };
-}
-
-function getImgForProduct(p){
-  if(p && p.img) return IMG_DIR + String(p.img);
-  const id = p?.id ? String(p.id) : "";
-  return IMG_DIR + id + ".png";
-}
-
-function adjustQty(id, delta){
-  const cur = Number(state.stock[id] ?? 0);
-  const nv = clampQty(cur + delta);
-  state.stock[id] = nv;
-  state.dirty.add(id);
-  updateDirtyBadge();
-
-  const row = listEl.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
-  if(row){
-    const vEl = row.querySelector(".qtyVal");
-    if(vEl) vEl.textContent = String(nv);
-    const badge = row.querySelector(".badge");
-    if(badge){
-      const t = qtyTag(nv);
-      badge.className = `badge ${t.cls}`;
-      badge.textContent = `${t.txt}${state.dirty.has(id) ? " • modifié" : ""}`;
-    }
-  }
-}
-
-function renderList(){
-  const q = (qEl.value || "").trim().toLowerCase();
-
-  const rows = PRODUCTS
-    .filter(p => {
-      if(!q) return true;
-      const name = (p.name||"").toLowerCase();
-      const id = (p.id||"").toLowerCase();
-      return name.includes(q) || id.includes(q);
-    })
-    .map(p => {
-      const id = p.id;
-      const qty = Number(state.stock[id] ?? 0);
-      const isDirty = state.dirty.has(id);
-      const t = qtyTag(qty);
-      const price = Number(p.price ?? 0);
-      const imgSrc = getImgForProduct(p);
-
-      return `
-        <div class="item" data-id="${esc(id)}">
-          <div class="thumb">
-            <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';" />
-          </div>
-
-          <div class="content">
-            <p class="name">${esc(p.name)}</p>
-
-            <div class="qtyLine">
-              <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
-              <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
-              <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
-            </div>
-
-            <div class="bottomLine">
-              <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
-              <p class="price">${price ? esc(price) + "€" : "—"}</p>
-            </div>
-          </div>
-        </div>
-      `;
-    })
-    .join("");
-
-  listEl.innerHTML = rows || `<div class="badge" style="padding:12px 14px;border-radius:16px;">Aucun résultat</div>`;
-
-  listEl.querySelectorAll(".item").forEach(el => {
-    const id = el.getAttribute("data-id");
-    const btnMinus = el.querySelector(".qtyBtn.minus");
-    const btnPlus = el.querySelector(".qtyBtn.plus");
-    if(btnMinus) btnMinus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, -1); });
-    if(btnPlus) btnPlus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, +1); });
-  });
-
-  updateDirtyBadge();
-}
-
-async function pullFromRepo(){
-  const s = getGH();
-  toastMsg("Chargement dépôt…");
-
-  const snapFile = snapshotPath();
-  let snap = null;
-
-  try{
-    const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
-    const res = await fetch(rawUrl, { cache:"no-store" });
-    if(res.ok) snap = await res.json();
-  }catch(e){
-    console.warn("pullFromRepo snapshot failed", e);
-  }
-
-  const snapshotIds = new Set();
-
-  if(snap && Array.isArray(snap.items)){
-    for(const it of snap.items){
-      if(!it || !it.id) continue;
-      const id = String(it.id);
-      snapshotIds.add(id);
-
-      const q = Number(it.qty);
-      if(Number.isFinite(q)) state.stock[id] = clampQty(q);
-    }
-  }
-
-  const known = new Set(PRODUCTS.map(p=>p.id));
-  const extra = [];
-  snapshotIds.forEach(id => {
-    if(!known.has(id)){
-      extra.push({ id, name: fmtNameFromId(id), price: 0, img: null });
-      known.add(id);
-    }
-  });
-
-  PRODUCTS = [...BASE_PRODUCTS, ...extra];
-
-  updateStockUI();
-  toastMsg("Chargé ✅");
-}
-
-function updateStockUI(){
-  renderList();
-  updateSaveButtonsState();
-}
-
-async function pushToRepo(){
-  const s = getGH();
-  const pin = String(s.pin||"").trim();
-
-  if(!pin){
-    toastMsg("Entre le code admin (0000).");
-    openSettings();
-    return;
-  }
-  if(pin !== "0000"){
-    toastMsg("Code invalide.");
-    return;
-  }
-
-  toastMsg("Publication via Cloudflare…");
-
-  const idsToPush = Object.keys(state.stock).filter(id => state.dirty.has(id));
-
-  const payload = {
-    pin,
-    owner: s.owner,
-    repo: s.repo,
-    branch: s.branch,
-    stockPath: s.stockPath,
-    ext: s.ext,
-    ids: idsToPush,
-    stock: state.stock,
-    updated_at: new Date().toISOString()
-  };
-
-  const r = await fetch(`${WORKER_BASE}/api/stock/publish`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-
-  const txt = await r.text();
-  let j = null;
-  try{ j = JSON.parse(txt); }catch(e){ j = null; }
-
-  if(!r.ok || !j || j.ok !== true){
-    const msg = (j && j.error) ? String(j.error) : `HTTP ${r.status}`;
-    throw new Error(msg);
-  }
-
-  idsToPush.forEach(id => state.dirty.delete(id));
-  updateStockUI();
-  toastMsg("Publié ✅");
-}
-
-/* UI — MENU OUTILS */
-btnOpenToolsMenu.addEventListener("click", openToolsMenu);
-toolsMenuBackdrop.addEventListener("click", closeToolsMenu);
-toolsMenuClose.addEventListener("click", closeToolsMenu);
-
-btnOpenStockSettingsFromMenu.addEventListener("click", ()=>{
-  closeToolsMenu();
-  openSettings();
-});
-
-/* UI — PARAM STOCK */
-sheetBackdrop.addEventListener("click", closeSettings);
-sheetClose.addEventListener("click", closeSettings);
-
-btnSaveToken.addEventListener("click", ()=>{
-  const pin = String(tokenInput.value||"").trim();
-  if(!pin){ toastMsg("Code vide."); return; }
-  saveToken(pin);
-  updateTokenHint();
-  toastMsg("Code enregistré ✅");
-});
-
-btnClearToken.addEventListener("click", ()=>{
-  clearToken();
-  tokenInput.value = "";
-  updateTokenHint();
-  toastMsg("Code supprimé.");
-});
-
-btnReload.addEventListener("click", async ()=>{
-  try{
-    await pullFromRepo();
-    setSync(Date.now());
-  }catch(e){
-    console.error(e);
-    toastMsg("Erreur rechargement.");
-  }
-});
-
-btnSaveRepo.addEventListener("click", async ()=>{
-  try{
-    await pushToRepo();
-    setSync(Date.now());
-  }catch(e){
-    console.error(e);
-    toastMsg("Erreur : " + (e?.message || e));
-  }
-});
-
-btnReset.addEventListener("click", ()=>{
-  state.dirty.clear();
-  pullFromRepo().then(()=>toastMsg("Annulé ✅")).catch(()=>toastMsg("Erreur annulation."));
-});
-
-qEl.addEventListener("input", renderList);
-
-(function fakeLoaderAndPreload(){
+(function bootADN66(){
   const loader = document.getElementById("fakeLoader");
   const start = performance.now();
 
-  // Warm important routes (best effort)
-  const warm = ["../apero/","../status/","../gps/"];
-  Promise.resolve().then(async () => {
-    for (const url of warm) { try { await fetch(url, { cache:"no-cache" }); } catch(e){} }
-  });
+  const MIN_MS = 1000;   // ⬅️ 1 seconde (comme demandé)
+  const MAX_MS = 8000;   // sécurité anti-blocage
 
-  const minMs = 2500; // ⬅️ augmente ici si tu veux plus long
-  const done = () => {
+  let hidden = false;
+
+  function hideLoader(force=false){
+    if (!loader || hidden) return;
     const elapsed = performance.now() - start;
-    const wait = Math.max(0, minMs - elapsed);
-    setTimeout(() => loader.classList.add("hide"), wait);
+    const wait = force ? 0 : Math.max(0, MIN_MS - elapsed);
+    setTimeout(() => {
+      if (hidden) return;
+      hidden = true;
+      loader.classList.add("hide");
+    }, wait);
+  }
+
+  // Sécurité absolue : même si tout plante, on masque au bout de MAX_MS
+  setTimeout(() => hideLoader(true), MAX_MS);
+
+  // Préchargement best-effort (ne doit JAMAIS bloquer)
+  (async () => {
+    const warm = ["../apero/","../status/","../gps/"];
+    for (const url of warm) {
+      try { await fetch(url, { cache:"no-cache" }); } catch(e){}
+    }
+  })();
+
+  const IMG_DIR = "./stock/";
+  const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
+  const OK_THRESHOLD = 3;
+
+  const BASE_PRODUCTS = [
+    { id:"poliakov", name:"Poliakov Vodka", price:29, img:"poliakov.png" },
+    { id:"absolut", name:"Absolut Vodka", price:34, img:"absolut.png" },
+    { id:"ciroc_pomme", name:"Cîroc Pomme", price:49, img:"ciroc_pomme.png" },
+    { id:"ciroc_classic", name:"Cîroc Classic", price:49, img:"ciroc_classic.png" },
+    { id:"ciroc_redberry", name:"Cîroc Red Berry", price:49, img:"ciroc_redberry.png" },
+
+    { id:"william_peel", name:"William Peel", price:29, img:"william_peel.png" },
+    { id:"label_5", name:"Label 5 Classic Black", price:32, img:"label_5.png" },
+    { id:"ballantines", name:"Ballantine’s Finest", price:36, img:"ballantines.png" },
+    { id:"jack_old7", name:"Jack Daniel’s Old No.7", price:40, img:"jack_old7.png" },
+    { id:"jack_honey", name:"Jack Daniel’s Tennessee Honey", price:42, img:"jack_honey.png" },
+
+    { id:"old_nick_darkwood", name:"Old Nick Dark Wood", price:29, img:"old_nick_darkwood.png" },
+    { id:"captain_morgan", name:"Captain Morgan Spiced Gold", price:34, img:"captain_morgan.png" },
+    { id:"havana_especial", name:"Havana Club Especial", price:38, img:"havana_especial.png" },
+
+    { id:"old_nick_blanc", name:"Old Nick Rhum Blanc", price:27, img:"old_nick_blanc.png" },
+    { id:"saint_james_blanc", name:"Saint James Rhum Blanc", price:32, img:"saint_james_blanc.png" },
+    { id:"trois_rivieres", name:"Trois Rivières Rhum Blanc", price:33, img:"trois_rivieres.png" },
+    { id:"havana_3ans", name:"Havana Club 3 ans", price:37, img:"havana_3ans.png" },
+
+    { id:"gibsons_gin", name:"Gibson’s Gin", price:34, img:"gibsons_gin.png" },
+    { id:"gordons_gin", name:"Gordon’s Gin", price:34, img:"gordons_gin.png" },
+
+    { id:"ricard", name:"Ricard", price:35, img:"ricard.png" },
+    { id:"pastis_51", name:"Pastis 51", price:35, img:"pastis_51.png" },
+
+    { id:"get_27", name:"GET 27", price:32, img:"get_27.png" },
+    { id:"jagermeister", name:"Jägermeister", price:35, img:"jagermeister.png" },
+    { id:"tequila_sanjose", name:"Tequila San José", price:28, img:"tequila_sanjose.png" },
+
+    { id:"xv_catalan_rose", name:"XV Catalan Rosé", price:19, img:"xv_catalan_rose.png" },
+    { id:"xv_catalan_blanc", name:"XV Catalan Blanc", price:19, img:"xv_catalan_blanc.png" },
+    { id:"xv_catalan_rouge", name:"XV Catalan Rouge", price:19, img:"xv_catalan_rouge.png" },
+
+    { id:"muscat", name:"Muscat", price:25, img:"muscat.png" }
+  ];
+
+  let PRODUCTS = [...BASE_PRODUCTS];
+
+  function $(sel){ return document.querySelector(sel); }
+  function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+
+  const listEl = $("#list");
+  const qEl = $("#q");
+  const btnReload = $("#btnReload");
+  const btnSaveRepo = $("#btnSaveRepo");
+  const btnReset = $("#btnReset");
+  const dirtyBadge = $("#dirtyBadge");
+  const syncText = $("#syncText");
+
+  /* Menu OUTILS */
+  const toolsMenuSheet = $("#toolsMenuSheet");
+  const toolsMenuBackdrop = $("#toolsMenuBackdrop");
+  const toolsMenuClose = $("#toolsMenuClose");
+  const btnOpenToolsMenu = $("#btnOpenToolsMenu");
+  const toolsYear = $("#toolsYear");
+  const btnOpenStockSettingsFromMenu = $("#btnOpenStockSettingsFromMenu");
+
+  /* Paramètres Stock */
+  const sheet = $("#sheet");
+  const sheetBackdrop = $("#sheetBackdrop");
+  const sheetClose = $("#sheetClose");
+  const tokenInput = $("#tokenInput");
+  const tokenState = $("#tokenState");
+  const btnSaveToken = $("#btnSaveToken");
+  const btnClearToken = $("#btnClearToken");
+
+  const SETTINGS_KEY = "adn66_stock_settings_v3";
+
+  const state = {
+    pin: "",
+    stock: {},
+    dirty: new Set(),
+    lastSync: null
   };
 
-  if (document.readyState === "complete") done();
-  else window.addEventListener("load", done, { once:true });
-})();
-
-(async function init(){
-  loadSettings();
-  updateTokenHint();
-  updateSaveButtonsState();
-  await pullFromRepo();
-  setSync(Date.now());
-
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  function toastMsg(msg){
+    const t = $("#toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(window.__toast);
+    window.__toast = setTimeout(()=> t.classList.remove("show"), 2200);
   }
+
+  function getGH(){
+    return {
+      owner: "bullyto",
+      repo: "outil",
+      branch: "main",
+      stockPath: "apps/stock/stock",
+      ext: ".json",
+      pin: String(state.pin||"").trim()
+    };
+  }
+
+  function snapshotPath(){
+    const gh = getGH();
+    return `${gh.stockPath}/_snapshot.json`;
+  }
+
+  function openToolsMenu(){
+    try{ toolsYear.textContent = String(new Date().getFullYear()); }catch(e){}
+    toolsMenuSheet.classList.add("show");
+  }
+  function closeToolsMenu(){
+    toolsMenuSheet.classList.remove("show");
+  }
+
+  function openSettings(){
+    sheet.classList.add("show");
+    tokenInput.value = state.pin || "";
+    updateTokenHint();
+  }
+  function closeSettings(){
+    sheet.classList.remove("show");
+  }
+
+  function updateTokenHint(){
+    tokenState.textContent = state.pin ? "Code enregistré ✅" : "";
+  }
+
+  function saveToken(pin){
+    const exp = Date.now() + (1000 * 60 * 60 * 24 * 30 * 6);
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 3, pin: String(pin||"").trim(), exp }));
+    state.pin = String(pin||"").trim();
+    updateSaveButtonsState();
+  }
+
+  function clearToken(){
+    localStorage.removeItem(SETTINGS_KEY);
+    state.pin = "";
+    updateSaveButtonsState();
+  }
+
+  function loadSettings(){
+    const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+    if (raw.exp && Date.now() > raw.exp) localStorage.removeItem(SETTINGS_KEY);
+    state.pin = String(raw.pin ?? "").trim();
+  }
+
+  function updateSaveButtonsState(){
+    const hasPin = !!String(getGH().pin||"").trim();
+    btnSaveRepo.disabled = !hasPin;
+  }
+
+  function updateDirtyBadge(){
+    const n = state.dirty.size;
+    if(n === 0){
+      dirtyBadge.textContent = "OK";
+      dirtyBadge.className = "badge ok";
+    }else{
+      dirtyBadge.textContent = `${n} modif.`;
+      dirtyBadge.className = "badge warn";
+    }
+  }
+
+  function setSync(ts){
+    state.lastSync = ts;
+    syncText.textContent = ts ? new Date(ts).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "—";
+  }
+
+  function clampQty(v){
+    const n = Number(v);
+    if(!Number.isFinite(n)) return 0;
+    return Math.max(0, Math.min(999, Math.round(n)));
+  }
+
+  function fmtNameFromId(id){
+    return String(id||"")
+      .replace(/[_-]+/g, " ")
+      .trim()
+      .replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function qtyTag(qty){
+    if(qty <= 0) return { cls:"danger", txt:"Rupture" };
+    if(qty >= OK_THRESHOLD) return { cls:"ok", txt:"OK" };
+    return { cls:"warn", txt:"Faible" };
+  }
+
+  function getImgForProduct(p){
+    if(p && p.img) return IMG_DIR + String(p.img);
+    const id = p?.id ? String(p.id) : "";
+    return IMG_DIR + id + ".png";
+  }
+
+  function adjustQty(id, delta){
+    const cur = Number(state.stock[id] ?? 0);
+    const nv = clampQty(cur + delta);
+    state.stock[id] = nv;
+    state.dirty.add(id);
+    updateDirtyBadge();
+
+    const row = listEl.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
+    if(row){
+      const vEl = row.querySelector(".qtyVal");
+      if(vEl) vEl.textContent = String(nv);
+      const badge = row.querySelector(".badge");
+      if(badge){
+        const t = qtyTag(nv);
+        badge.className = `badge ${t.cls}`;
+        badge.textContent = `${t.txt}${state.dirty.has(id) ? " • modifié" : ""}`;
+      }
+    }
+  }
+
+  function renderList(){
+    const q = (qEl.value || "").trim().toLowerCase();
+
+    const rows = PRODUCTS
+      .filter(p => {
+        if(!q) return true;
+        const name = (p.name||"").toLowerCase();
+        const id = (p.id||"").toLowerCase();
+        return name.includes(q) || id.includes(q);
+      })
+      .map(p => {
+        const id = p.id;
+        const qty = Number(state.stock[id] ?? 0);
+        const isDirty = state.dirty.has(id);
+        const t = qtyTag(qty);
+        const price = Number(p.price ?? 0);
+        const imgSrc = getImgForProduct(p);
+
+        return `
+          <div class="item" data-id="${esc(id)}">
+            <div class="thumb">
+              <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';" />
+            </div>
+
+            <div class="content">
+              <p class="name">${esc(p.name)}</p>
+
+              <div class="qtyLine">
+                <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
+                <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
+                <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
+              </div>
+
+              <div class="bottomLine">
+                <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
+                <p class="price">${price ? esc(price) + "€" : "—"}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join("");
+
+    listEl.innerHTML = rows || `<div class="badge" style="padding:12px 14px;border-radius:16px;">Aucun résultat</div>`;
+
+    listEl.querySelectorAll(".item").forEach(el => {
+      const id = el.getAttribute("data-id");
+      const btnMinus = el.querySelector(".qtyBtn.minus");
+      const btnPlus = el.querySelector(".qtyBtn.plus");
+      if(btnMinus) btnMinus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, -1); });
+      if(btnPlus) btnPlus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, +1); });
+    });
+
+    updateDirtyBadge();
+  }
+
+  async function pullFromRepo(){
+    const s = getGH();
+    toastMsg("Chargement dépôt…");
+
+    const snapFile = snapshotPath();
+    let snap = null;
+
+    try{
+      const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
+      const res = await fetch(rawUrl, { cache:"no-store" });
+      if(res.ok) snap = await res.json();
+    }catch(e){
+      console.warn("pullFromRepo snapshot failed", e);
+    }
+
+    const snapshotIds = new Set();
+
+    if(snap && Array.isArray(snap.items)){
+      for(const it of snap.items){
+        if(!it || !it.id) continue;
+        const id = String(it.id);
+        snapshotIds.add(id);
+
+        const q = Number(it.qty);
+        if(Number.isFinite(q)) state.stock[id] = clampQty(q);
+      }
+    }
+
+    const known = new Set(PRODUCTS.map(p=>p.id));
+    const extra = [];
+    snapshotIds.forEach(id => {
+      if(!known.has(id)){
+        extra.push({ id, name: fmtNameFromId(id), price: 0, img: null });
+        known.add(id);
+      }
+    });
+
+    PRODUCTS = [...BASE_PRODUCTS, ...extra];
+
+    updateStockUI();
+    toastMsg("Chargé ✅");
+  }
+
+  function updateStockUI(){
+    renderList();
+    updateSaveButtonsState();
+  }
+
+  async function pushToRepo(){
+    const s = getGH();
+    const pin = String(s.pin||"").trim();
+
+    if(!pin){
+      toastMsg("Entre le code admin (0000).");
+      openSettings();
+      return;
+    }
+    if(pin !== "0000"){
+      toastMsg("Code invalide.");
+      return;
+    }
+
+    toastMsg("Publication via Cloudflare…");
+
+    const idsToPush = Object.keys(state.stock).filter(id => state.dirty.has(id));
+
+    const payload = {
+      pin,
+      owner: s.owner,
+      repo: s.repo,
+      branch: s.branch,
+      stockPath: s.stockPath,
+      ext: s.ext,
+      ids: idsToPush,
+      stock: state.stock,
+      updated_at: new Date().toISOString()
+    };
+
+    const r = await fetch(`${WORKER_BASE}/api/stock/publish`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const txt = await r.text();
+    let j = null;
+    try{ j = JSON.parse(txt); }catch(e){ j = null; }
+
+    if(!r.ok || !j || j.ok !== true){
+      const msg = (j && j.error) ? String(j.error) : `HTTP ${r.status}`;
+      throw new Error(msg);
+    }
+
+    idsToPush.forEach(id => state.dirty.delete(id));
+    updateStockUI();
+    toastMsg("Publié ✅");
+  }
+
+  // UI events
+  btnOpenToolsMenu.addEventListener("click", openToolsMenu);
+  toolsMenuBackdrop.addEventListener("click", closeToolsMenu);
+  toolsMenuClose.addEventListener("click", closeToolsMenu);
+
+  btnOpenStockSettingsFromMenu.addEventListener("click", ()=>{
+    closeToolsMenu();
+    openSettings();
+  });
+
+  sheetBackdrop.addEventListener("click", closeSettings);
+  sheetClose.addEventListener("click", closeSettings);
+
+  btnSaveToken.addEventListener("click", ()=>{
+    const pin = String(tokenInput.value||"").trim();
+    if(!pin){ toastMsg("Code vide."); return; }
+    saveToken(pin);
+    updateTokenHint();
+    toastMsg("Code enregistré ✅");
+  });
+
+  btnClearToken.addEventListener("click", ()=>{
+    clearToken();
+    tokenInput.value = "";
+    updateTokenHint();
+    toastMsg("Code supprimé.");
+  });
+
+  btnReload.addEventListener("click", async ()=>{
+    try{
+      await pullFromRepo();
+      setSync(Date.now());
+    }catch(e){
+      console.error(e);
+      toastMsg("Erreur rechargement.");
+    }
+  });
+
+  btnSaveRepo.addEventListener("click", async ()=>{
+    try{
+      await pushToRepo();
+      setSync(Date.now());
+    }catch(e){
+      console.error(e);
+      toastMsg("Erreur : " + (e?.message || e));
+    }
+  });
+
+  btnReset.addEventListener("click", ()=>{
+    state.dirty.clear();
+    pullFromRepo().then(()=>toastMsg("Annulé ✅")).catch(()=>toastMsg("Erreur annulation."));
+  });
+
+  qEl.addEventListener("input", renderList);
+
+  // Init protégée : si ça plante -> on cache quand même le loader
+  (async function init(){
+    try{
+      loadSettings();
+      updateTokenHint();
+      updateSaveButtonsState();
+      await pullFromRepo();
+      setSync(Date.now());
+
+      if("serviceWorker" in navigator){
+        navigator.serviceWorker.register("./sw.js").catch(()=>{});
+      }
+
+      hideLoader(false);
+    }catch(e){
+      console.error(e);
+      hideLoader(true);
+      toastMsg("Erreur chargement (mode dégradé).");
+    }
+  })();
 })();
 </script>
 </body>
