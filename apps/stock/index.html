@@ -1,90 +1,62 @@
 <!doctype html>
-<html lang="fr" dir="ltr">
+<html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0f1a" />
+  <title>Stock véhicule — Apéro de Nuit 66</title>
 
-  <!-- ✅ NOINDEX -->
-  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-
-  <!-- ✅ THEME ADN66 OUTIL -->
-  <meta name="theme-color" content="#050b12" />
-
-  <title>Stock véhicule &amp; tarif — Outil ADN66</title>
-
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="../../icons/icon-192.png" type="image/png" />
-  <link rel="apple-touch-icon" href="../../icons/icon-192.png" />
+  <link rel="icon" href="./icon-192.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./icon-192.svg" />
 
   <style>
     :root{
-      /* ADN66 — TOKENS */
-      --bg0:#050b12;
-      --bg1:#070f19;
-      --card:#0b1420;
-      --card2:#0e1826;
+      --bg:#060a12;
+      --text:#e8f0ff;
+      --muted:#9fb3d1;
+      --line:rgba(255,255,255,.08);
 
-      --txt:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.68);
-      --muted2:rgba(255,255,255,.56);
+      --danger:#ff3b3b;      /* 0 */
+      --warn:#ffb020;        /* 1-2 */
+      --ok:#31d158;          /* >=3 */
 
-      --stroke:rgba(255,255,255,.08);
-      --stroke2:rgba(255,255,255,.12);
-
-      --glow:rgba(84,180,255,.35);
-      --glow2:rgba(80,255,170,.22);
-
-      --ok:#21d07a;
-      --warn:#ffcc33;
-      --danger:#ff4d4d;
-
-      --shadow:0 16px 52px rgba(0,0,0,.45);
-      --r:22px;
-
-      --btn:rgba(255,255,255,.06);
+      --shadow:0 12px 40px rgba(0,0,0,.35);
+      --r:18px;
+      --btn:rgba(255,255,255,.07);
       --btn2:rgba(255,255,255,.10);
     }
     *{ box-sizing:border-box; }
 
-    html,body{ height:100%; }
-
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      color:var(--txt);
+      color:var(--text);
       background:
-        radial-gradient(1200px 700px at 20% -10%, rgba(84,180,255,.20), transparent 60%),
-        radial-gradient(900px 600px at 85% 10%, rgba(80,255,170,.10), transparent 60%),
-        radial-gradient(1200px 900px at 50% 120%, rgba(255,255,255,.06), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1));
-      overflow-x:hidden;
+        radial-gradient(900px 600px at 50% -120px, rgba(255,213,74,.16), transparent 60%),
+        radial-gradient(900px 700px at 50% 110%, rgba(73,136,255,.12), transparent 60%),
+        var(--bg);
     }
 
     header{
       position:sticky; top:0; z-index:10;
       backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      background: linear-gradient(to bottom, rgba(5,11,18,.92), rgba(7,15,25,.62));
-      border-bottom:1px solid var(--stroke);
+      background: linear-gradient(to bottom, rgba(6,10,18,.92), rgba(6,10,18,.62));
+      border-bottom:1px solid var(--line);
     }
 
     .wrap{ max-width:980px; margin:0 auto; padding:14px 14px 10px; }
     .row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-
     .brand{ display:flex; align-items:center; gap:10px; min-width: 0; }
     .logo{
-      width:44px; height:44px; border-radius:16px;
-      background: rgba(255,255,255,.06);
-      border:1px solid var(--stroke2);
+      width:44px; height:44px; border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,213,74,.30), rgba(255,213,74,.06));
+      border:1px solid rgba(255,213,74,.24);
       display:grid; place-items:center;
-      box-shadow: var(--shadow), 0 0 18px var(--glow);
+      box-shadow: var(--shadow);
       flex:0 0 auto;
-      overflow:hidden;
     }
-    .logo img{ width:100%; height:100%; object-fit:cover; display:block; }
-
+    .logo svg{ opacity:.95 }
     .title{ min-width:0; }
     .title h1{
       margin:0;
@@ -94,7 +66,6 @@
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      font-weight:900;
     }
     .title p{
       margin:3px 0 0;
@@ -110,48 +81,43 @@
       font-size:12px;
       padding:8px 10px;
       border-radius:999px;
-      border:1px solid var(--stroke);
+      border:1px solid var(--line);
       background:rgba(255,255,255,.04);
       color:var(--muted);
       display:flex; align-items:center; gap:8px;
       user-select:none;
     }
-    .pill b{ color:var(--txt); font-weight:800; }
-
+    .pill b{ color:var(--text); font-weight:700; }
     .btnIcon{
       width:40px; height:40px;
-      border-radius:16px;
-      border:1px solid var(--stroke);
+      border-radius:14px;
+      border:1px solid var(--line);
       background:rgba(255,255,255,.06);
-      color:var(--txt);
+      color:var(--text);
       display:grid; place-items:center;
       cursor:pointer;
-      box-shadow: 0 14px 34px rgba(0,0,0,.25);
     }
     .btnIcon:active{ transform: translateY(1px); }
 
     main{ padding:14px 14px 26px; }
     .grid{ max-width:980px; margin:0 auto; display:grid; grid-template-columns: 1fr; gap:14px; }
-
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
-      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid var(--line);
       border-radius: var(--r);
-      box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,.03) inset;
+      box-shadow: var(--shadow);
       overflow:hidden;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
     .cardHeader{
       padding:14px 14px 12px;
-      border-bottom:1px solid var(--stroke);
+      border-bottom:1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.05), transparent);
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap:12px;
     }
-    .cardHeader h2{ margin:0; font-size:14px; letter-spacing:.2px; font-weight:900; }
+    .cardHeader h2{ margin:0; font-size:14px; letter-spacing:.2px; }
     .cardHeader p{ margin:4px 0 0; font-size:12px; color:var(--muted); }
     .cardBody{ padding:12px 14px 14px; }
 
@@ -171,8 +137,8 @@
       flex: 1 1 320px;
       min-width:240px;
       padding:10px 12px;
-      border-radius:16px;
-      border:1px solid var(--stroke);
+      border-radius:14px;
+      border:1px solid var(--line);
       background:rgba(255,255,255,.04);
     }
     .search input{
@@ -180,7 +146,7 @@
       border:none;
       outline:none;
       background:transparent;
-      color:var(--txt);
+      color:var(--text);
       font-size:14px;
     }
 
@@ -188,10 +154,10 @@
 
     .btn{
       padding:10px 12px;
-      border-radius:16px;
-      border:1px solid var(--stroke);
+      border-radius:14px;
+      border:1px solid var(--line);
       background: var(--btn);
-      color:var(--txt);
+      color:var(--text);
       cursor:pointer;
       font-size:13px;
       display:inline-flex;
@@ -200,19 +166,20 @@
     }
     .btn:hover{ background: var(--btn2); }
     .btn:active{ transform: translateY(1px); }
-    .btn.primary{ border-color: rgba(84,180,255,.32); background: rgba(84,180,255,.10); }
-    .btn.danger{ border-color: rgba(255,77,77,.35); background: rgba(255,77,77,.10); color:#ffecec; }
+    .btn.primary{ border-color: rgba(255,213,74,.34); background: rgba(255,213,74,.10); }
+    .btn.danger{ border-color: rgba(255,59,59,.35); background: rgba(255,59,59,.10); color:#ffecec; }
     .btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
 
     .list{ display:grid; grid-template-columns: 1fr; gap:10px; }
 
+    /* ✅ ITEM LAYOUT: 3 LINES (no overlap possible) */
     .item{
       display:grid;
       grid-template-columns: 98px 1fr;
       gap:12px;
       align-items:center;
       padding:14px;
-      border-radius:22px;
+      border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.12);
       overflow:hidden;
@@ -220,7 +187,7 @@
 
     .thumb{
       width:98px; height:98px;
-      border-radius:22px;
+      border-radius:18px;
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.10);
       overflow:hidden;
@@ -239,22 +206,24 @@
     .content{
       min-width:0;
       display:grid;
-      grid-template-rows: auto auto auto;
+      grid-template-rows: auto auto auto; /* 3 lines */
       gap:10px;
       align-items:center;
     }
 
+    /* Line 1: Name (always visible, single line) */
     .name{
       margin:0;
       font-size:14px;
-      font-weight:950;
+      font-weight:900;
       line-height:1.15;
-      color:var(--txt);
+      color:var(--text);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
+    /* Line 2: Controls centered */
     .qtyLine{
       display:flex;
       align-items:center;
@@ -268,7 +237,7 @@
       border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
-      color:var(--txt);
+      color:var(--text);
       cursor:pointer;
       display:grid;
       place-items:center;
@@ -284,14 +253,15 @@
       border-radius:16px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
-      color:var(--txt);
+      color:var(--text);
       font-size:16px;
-      font-weight:900;
+      font-weight:800;
       text-align:center;
       user-select:none;
       flex:0 0 auto;
     }
 
+    /* Line 3: Status + Price (no overlap, auto truncation) */
     .bottomLine{
       display:flex;
       align-items:center;
@@ -319,9 +289,9 @@
       min-width: 0;
       flex:1 1 auto;
     }
-    .badge.ok{ border-color: rgba(33,208,122,.35); background: rgba(33,208,122,.10); color:#dfffe8; }
-    .badge.warn{ border-color: rgba(255,204,51,.45); background: rgba(255,204,51,.12); color:#fff1d3; }
-    .badge.danger{ border-color: rgba(255,77,77,.35); background: rgba(255,77,77,.10); color:#ffe3e3; }
+    .badge.ok{ border-color: rgba(49,209,88,.35); background: rgba(49,209,88,.10); color:#dfffe8; }
+    .badge.warn{ border-color: rgba(255,176,32,.45); background: rgba(255,176,32,.12); color:#fff1d3; }
+    .badge.danger{ border-color: rgba(255,59,59,.35); background: rgba(255,59,59,.10); color:#ffe3e3; }
 
     .price{
       margin:0;
@@ -338,10 +308,10 @@
       left:50%;
       transform: translateX(-50%);
       padding:10px 12px;
-      border-radius:16px;
+      border-radius:14px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(10,14,24,.92);
-      color:var(--txt);
+      color:var(--text);
       box-shadow: var(--shadow);
       opacity:0;
       pointer-events:none;
@@ -368,13 +338,62 @@
       inset:0;
       background: rgba(0,0,0,.55);
       backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
     }
     .sheet .panel{
       position:absolute;
       left:50%;
       top:50%;
       transform: translate(-50%,-50%);
+      width:min(520px, calc(100% - 22px));
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(12,18,32,.98), rgba(8,12,22,.98));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .sheet .panelHeader{
+      padding:14px 14px 12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .sheet .panelHeader h3{ margin:0; font-size:14px; letter-spacing:.2px; }
+    .sheet .panelHeader button{
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      font-size:18px;
+      cursor:pointer;
+    }
+    .sheet .panelBody{ padding:14px; display:grid; gap:12px; }
+    .field label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    .field input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+    }
+    .hint{ margin:0; font-size:12px; color:var(--muted); line-height:1.35; }
+    .panelActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      padding:14px;
+      border-top:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+
+    /* =========================
+       ✅ MENU "OUTILS" (comme TTC)
+       ========================= */
+    .toolsPanel{
       width:min(560px, calc(100% - 22px));
       border-radius:24px;
       border:1px solid rgba(255,255,255,.12);
@@ -382,8 +401,6 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-
-    /* ✅ MENU OUTILS — CARTE CLIQUABLE */
     .toolsPanelHeader{
       padding:16px 16px 14px;
       border-bottom:1px solid rgba(255,255,255,.10);
@@ -396,16 +413,16 @@
       display:flex; align-items:center; gap:10px; min-width:0;
     }
     .toolsDot{
-      width:34px; height:34px; border-radius:16px;
-      background: radial-gradient(circle at 30% 30%, rgba(84,180,255,.18), rgba(80,255,170,.10));
+      width:34px; height:34px; border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,213,74,.18), rgba(73,136,255,.10));
       border:1px solid rgba(255,255,255,.12);
       display:grid; place-items:center;
       box-shadow: 0 10px 24px rgba(0,0,0,.35);
       overflow:hidden;
     }
-    .toolsDot img{ width:100%; height:100%; object-fit:cover; display:block; }
-
-    .toolsTitle{ min-width:0; }
+    .toolsTitle{
+      min-width:0;
+    }
     .toolsTitle h3{
       margin:0;
       font-size:15px;
@@ -413,7 +430,6 @@
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      font-weight:900;
     }
     .toolsTitle p{
       margin:4px 0 0;
@@ -432,32 +448,27 @@
       background: rgba(255,255,255,.04);
       user-select:none;
     }
+
     .toolsList{
       padding:14px;
       display:grid;
       gap:10px;
     }
-
-    .toolLink{
-      text-decoration:none;
-      color:inherit;
+    .toolItem{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
       padding:14px 14px;
-      border-radius:22px;
+      border-radius:18px;
       border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.10);
-      box-shadow: 0 10px 22px rgba(0,0,0,.18);
     }
-    .toolLink:active{ transform: translateY(1px); }
-
-    .toolLink .name{
+    .toolItem .name{
       margin:0;
       font-size:16px;
-      font-weight:900;
-      color:var(--txt);
+      font-weight:800;
+      color:var(--text);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -489,10 +500,10 @@
     }
     .toolsFoot .miniBtn{
       padding:9px 12px;
-      border-radius:16px;
+      border-radius:14px;
       border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
-      color:var(--txt);
+      color:var(--text);
       cursor:pointer;
       font-size:12px;
       display:inline-flex;
@@ -500,114 +511,23 @@
       gap:8px;
     }
     .toolsFoot .miniBtn:active{ transform: translateY(1px); }
-
-    /* ✅ Fake loader (1s) */
-    .loader{
-      position:fixed;
-      inset:0;
-      z-index:9999;
-      display:grid;
-      place-items:center;
-      background:
-        radial-gradient(900px 600px at 50% 35%, rgba(84,180,255,.16), transparent 60%),
-        radial-gradient(700px 520px at 60% 70%, rgba(80,255,170,.10), transparent 60%),
-        linear-gradient(180deg, #050b12, #070f19);
-      transition: opacity .25s ease, visibility .25s ease;
-    }
-    .loader.hide{
-      opacity:0;
-      visibility:hidden;
-      pointer-events:none;
-    }
-    .loaderCard{
-      width:min(420px, calc(100vw - 32px));
-      border-radius: 28px;
-      padding: 22px 18px 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow:
-        0 26px 70px rgba(0,0,0,.55),
-        0 0 0 1px rgba(84,180,255,.10) inset;
-      text-align:center;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    .loaderLogo{
-      width: 96px;
-      height: 96px;
-      margin: 2px auto 12px;
-      border-radius: 28px;
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: 0 18px 48px rgba(0,0,0,.45), 0 0 22px var(--glow);
-      background: rgba(255,255,255,.06);
-      transform: translateZ(0);
-      animation: pop 900ms ease-in-out infinite alternate;
-    }
-    .loaderLogo img{width:100%;height:100%;object-fit:cover;display:block}
-    @keyframes pop{
-      from{ transform: scale(.98); filter: saturate(1.05); }
-      to{ transform: scale(1.02); filter: saturate(1.15); }
-    }
-    .loaderTitle{
-      margin:0 0 6px 0;
-      font-weight: 950;
-      letter-spacing:.2px;
-      font-size: 16px;
-    }
-    .loaderSub{
-      margin:0 0 12px 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-    }
-    .bar{
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.10);
-      overflow:hidden;
-      position:relative;
-      box-shadow: 0 10px 25px rgba(0,0,0,.25) inset;
-    }
-    .bar::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      width: 45%;
-      background: linear-gradient(90deg, rgba(84,180,255,.0), rgba(84,180,255,.55), rgba(80,255,170,.55), rgba(84,180,255,.0));
-      animation: sweep 900ms ease-in-out infinite;
-      filter: blur(.2px);
-    }
-    @keyframes sweep{
-      from{ transform: translateX(-60%); }
-      to{ transform: translateX(220%); }
-    }
   </style>
 </head>
 
 <body>
-  <!-- ✅ Fake loading screen (1s) -->
-  <div class="loader" id="fakeLoader" aria-hidden="true">
-    <div class="loaderCard" role="status" aria-live="polite">
-      <div class="loaderLogo">
-        <img src="../../icons/icon-512.png" alt="Outil ADN66" />
-      </div>
-      <h1 class="loaderTitle">Stock véhicule &amp; tarif</h1>
-      <p class="loaderSub">Synchronisation et préparation…</p>
-      <div class="bar"></div>
-    </div>
-  </div>
-
 <header>
   <div class="wrap">
     <div class="row">
       <div class="brand">
         <div class="logo" aria-hidden="true">
-          <img src="../../icons/icon-192.png" alt="" />
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2c5.3 0 9.6 4.3 9.6 9.6S17.3 21.2 12 21.2 2.4 16.9 2.4 11.6 6.7 2 12 2Z" stroke="rgba(255,213,74,.9)" stroke-width="1.4"/>
+            <path d="M7.2 12.4c1.4 2.2 3 3.2 4.8 3.2s3.4-1 4.8-3.2" stroke="rgba(255,213,74,.9)" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M9.1 9.7h.01M14.9 9.7h.01" stroke="rgba(255,213,74,.9)" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
         </div>
         <div class="title">
-          <h1>Stock véhicule &amp; tarif</h1>
+          <h1>Stock véhicule</h1>
           <p>Synchronisé avec l’outil interne — Apéro de Nuit 66</p>
         </div>
       </div>
@@ -616,6 +536,7 @@
         <div class="pill" id="syncPill" title="Dernière synchronisation">
           <span>Sync</span> <b id="syncText">—</b>
         </div>
+        <!-- ✅ SEUL bouton Outils (celui en vert sur ta capture) -->
         <button class="btnIcon" id="btnOpenToolsMenu" title="Outils">☰</button>
       </div>
     </div>
@@ -643,6 +564,7 @@
           <div class="actions">
             <button class="btn" id="btnReload" title="Recharger depuis GitHub (public)">⟲ Recharger</button>
             <button class="btn primary" id="btnSaveRepo" title="Publier via Cloudflare (PIN)">Publier</button>
+            <!-- ✅ SUPPRIMÉ: le bouton Param ici (tu l'as déjà dans le menu Outils) -->
             <button class="btn danger" id="btnReset" title="Annuler les modifications locales">Annuler</button>
           </div>
         </div>
@@ -659,12 +581,10 @@
 <div class="sheet" id="toolsMenuSheet" aria-hidden="true">
   <div class="backdrop" id="toolsMenuBackdrop"></div>
 
-  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="toolsMenuTitle">
+  <div class="panel toolsPanel" role="dialog" aria-modal="true" aria-labelledby="toolsMenuTitle">
     <div class="toolsPanelHeader">
       <div class="left">
-        <div class="toolsDot" aria-hidden="true">
-          <img src="../../icons/icon-192.png" alt="" />
-        </div>
+        <div class="toolsDot" aria-hidden="true">🚦</div>
         <div class="toolsTitle">
           <h3 id="toolsMenuTitle">ADN66 • Outils</h3>
           <p>Menu interne — bascule rapide entre outils.</p>
@@ -675,29 +595,30 @@
     </div>
 
     <div class="toolsList">
-      <a class="toolLink" href="./" aria-current="page">
-        <p class="name">Stock véhicule &amp; tarif</p>
+      <div class="toolItem">
+        <p class="name">Stock</p>
+        <span class="toolTag">Outil</span>
+      </div>
+
+      <a class="toolItem" id="linkApero" href="../apero/" style="text-decoration:none;color:inherit;">
+        <p class="name">Apéro de Nuit 66</p>
         <span class="toolTag">Outil</span>
       </a>
 
-      <a class="toolLink" id="linkApero" href="../apero/">
-        <p class="name">Calculateur TTC</p>
-        <span class="toolTag">Outil</span>
-      </a>
-
-      <a class="toolLink" id="linkStatus" href="../status/">
-        <p class="name">Pop-up Status sites</p>
+      <a class="toolItem" id="linkStatus" href="../status/" style="text-decoration:none;color:inherit;">
+        <p class="name">Status</p>
         <span class="toolTag">Pilotage</span>
       </a>
 
-      <a class="toolLink" id="linkGps" href="../gps/">
-        <p class="name">Optimiseur de tournée prospection</p>
+      <a class="toolItem" id="linkGps" href="../gps/" style="text-decoration:none;color:inherit;">
+        <p class="name">GPS Apéro 66</p>
         <span class="toolTag">Outil</span>
       </a>
     </div>
 
     <div class="toolsFoot">
       <span>Accès rapide : navigation interne entre outils.</span>
+      <!-- ✅ Paramètres Stock UNIQUEMENT ici -->
       <button class="miniBtn" id="btnOpenStockSettingsFromMenu">⚙️ Paramètres Stock</button>
     </div>
   </div>
@@ -707,520 +628,475 @@
 <div class="sheet" id="sheet">
   <div class="backdrop" id="sheetBackdrop"></div>
   <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-    <div class="toolsPanelHeader" style="border-bottom:1px solid rgba(255,255,255,.10);">
-      <div class="left">
-        <div class="toolsDot" aria-hidden="true" style="width:34px;height:34px;border-radius:16px;">
-          ⚙️
-        </div>
-        <div class="toolsTitle">
-          <h3 id="settingsTitle">Paramètres Stock</h3>
-          <p>Code admin (PIN) stocké en local (6 mois).</p>
-        </div>
-      </div>
+    <div class="panelHeader">
+      <h3 id="settingsTitle">Paramètres Stock</h3>
       <button id="sheetClose" aria-label="Fermer">✕</button>
     </div>
 
-    <div style="padding:14px; display:grid; gap:12px;">
+    <div class="panelBody">
       <div class="field">
-        <label style="display:block; font-size:12px; color:var(--muted); margin-bottom:6px;">Branch</label>
-        <input id="ghBranch" value="main" readonly style="width:100%;padding:12px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--txt);outline:none;font-size:14px;" />
+        <label>Branch</label>
+        <input id="ghBranch" value="main" readonly />
       </div>
 
       <div class="field">
-        <label style="display:block; font-size:12px; color:var(--muted); margin-bottom:6px;">Chemin du fichier</label>
-        <input id="ghPath" value="apps/stock/stock/_snapshot.json" readonly style="width:100%;padding:12px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--txt);outline:none;font-size:14px;" />
+        <label>Chemin du fichier</label>
+        <input id="ghPath" value="apps/stock/stock/_snapshot.json" readonly />
       </div>
 
       <div class="field">
-        <label style="display:block; font-size:12px; color:var(--muted); margin-bottom:6px;">Code admin (PIN)</label>
-        <input id="tokenInput" type="password" placeholder="0000" inputmode="numeric" style="width:100%;padding:12px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--txt);outline:none;font-size:14px;" />
+        <label>Code admin (PIN)</label>
+        <input id="tokenInput" type="password" placeholder="0000" inputmode="numeric" />
       </div>
 
-      <p class="hint" id="tokenHint" style="margin:0;font-size:12px;color:var(--muted);line-height:1.35;">
+      <p class="hint" id="tokenHint">
+        Stocké en local sur ce téléphone (6 mois).
         <span id="tokenState"></span>
       </p>
     </div>
 
-    <div class="toolsFoot" style="justify-content:flex-end;">
-      <button class="miniBtn" id="btnSaveToken">Enregistrer le code</button>
-      <button class="miniBtn" id="btnClearToken" style="border-color: rgba(255,77,77,.35); background: rgba(255,77,77,.10);">Supprimer le code</button>
+    <div class="panelActions">
+      <button class="btn" id="btnSaveToken">Enregistrer le code</button>
+      <button class="btn danger" id="btnClearToken">Supprimer le code</button>
     </div>
   </div>
 </div>
 
 <script>
-(function bootADN66(){
-  const loader = document.getElementById("fakeLoader");
-  const start = performance.now();
+const IMG_DIR = "./stock/";
+const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
+const OK_THRESHOLD = 3;
 
-  const MIN_MS = 1000;   // ⬅️ 1 seconde (comme demandé)
-  const MAX_MS = 8000;   // sécurité anti-blocage
+const BASE_PRODUCTS = [
+  { id:"poliakov", name:"Poliakov Vodka", price:29, img:"poliakov.png" },
+  { id:"absolut", name:"Absolut Vodka", price:34, img:"absolut.png" },
+  { id:"ciroc_pomme", name:"Cîroc Pomme", price:49, img:"ciroc_pomme.png" },
+  { id:"ciroc_classic", name:"Cîroc Classic", price:49, img:"ciroc_classic.png" },
+  { id:"ciroc_redberry", name:"Cîroc Red Berry", price:49, img:"ciroc_redberry.png" },
 
-  let hidden = false;
+  { id:"william_peel", name:"William Peel", price:29, img:"william_peel.png" },
+  { id:"label_5", name:"Label 5 Classic Black", price:32, img:"label_5.png" },
+  { id:"ballantines", name:"Ballantine’s Finest", price:36, img:"ballantines.png" },
+  { id:"jack_old7", name:"Jack Daniel’s Old No.7", price:40, img:"jack_old7.png" },
+  { id:"jack_honey", name:"Jack Daniel’s Tennessee Honey", price:42, img:"jack_honey.png" },
 
-  function hideLoader(force=false){
-    if (!loader || hidden) return;
-    const elapsed = performance.now() - start;
-    const wait = force ? 0 : Math.max(0, MIN_MS - elapsed);
-    setTimeout(() => {
-      if (hidden) return;
-      hidden = true;
-      loader.classList.add("hide");
-    }, wait);
-  }
+  { id:"old_nick_darkwood", name:"Old Nick Dark Wood", price:29, img:"old_nick_darkwood.png" },
+  { id:"captain_morgan", name:"Captain Morgan Spiced Gold", price:34, img:"captain_morgan.png" },
+  { id:"havana_especial", name:"Havana Club Especial", price:38, img:"havana_especial.png" },
 
-  // Sécurité absolue : même si tout plante, on masque au bout de MAX_MS
-  setTimeout(() => hideLoader(true), MAX_MS);
+  { id:"old_nick_blanc", name:"Old Nick Rhum Blanc", price:27, img:"old_nick_blanc.png" },
+  { id:"saint_james_blanc", name:"Saint James Rhum Blanc", price:32, img:"saint_james_blanc.png" },
+  { id:"trois_rivieres", name:"Trois Rivières Rhum Blanc", price:33, img:"trois_rivieres.png" },
+  { id:"havana_3ans", name:"Havana Club 3 ans", price:37, img:"havana_3ans.png" },
 
-  // Préchargement best-effort (ne doit JAMAIS bloquer)
-  (async () => {
-    const warm = ["../apero/","../status/","../gps/"];
-    for (const url of warm) {
-      try { await fetch(url, { cache:"no-cache" }); } catch(e){}
-    }
-  })();
+  { id:"gibsons_gin", name:"Gibson’s Gin", price:34, img:"gibsons_gin.png" },
+  { id:"gordons_gin", name:"Gordon’s Gin", price:34, img:"gordons_gin.png" },
 
-  const IMG_DIR = "./stock/";
-  const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
-  const OK_THRESHOLD = 3;
+  { id:"ricard", name:"Ricard", price:35, img:"ricard.png" },
+  { id:"pastis_51", name:"Pastis 51", price:35, img:"pastis_51.png" },
 
-  const BASE_PRODUCTS = [
-    { id:"poliakov", name:"Poliakov Vodka", price:29, img:"poliakov.png" },
-    { id:"absolut", name:"Absolut Vodka", price:34, img:"absolut.png" },
-    { id:"ciroc_pomme", name:"Cîroc Pomme", price:49, img:"ciroc_pomme.png" },
-    { id:"ciroc_classic", name:"Cîroc Classic", price:49, img:"ciroc_classic.png" },
-    { id:"ciroc_redberry", name:"Cîroc Red Berry", price:49, img:"ciroc_redberry.png" },
+  { id:"get_27", name:"GET 27", price:32, img:"get_27.png" },
+  { id:"jagermeister", name:"Jägermeister", price:35, img:"jagermeister.png" },
+  { id:"tequila_sanjose", name:"Tequila San José", price:28, img:"tequila_sanjose.png" },
 
-    { id:"william_peel", name:"William Peel", price:29, img:"william_peel.png" },
-    { id:"label_5", name:"Label 5 Classic Black", price:32, img:"label_5.png" },
-    { id:"ballantines", name:"Ballantine’s Finest", price:36, img:"ballantines.png" },
-    { id:"jack_old7", name:"Jack Daniel’s Old No.7", price:40, img:"jack_old7.png" },
-    { id:"jack_honey", name:"Jack Daniel’s Tennessee Honey", price:42, img:"jack_honey.png" },
+  { id:"xv_catalan_rose", name:"XV Catalan Rosé", price:19, img:"xv_catalan_rose.png" },
+  { id:"xv_catalan_blanc", name:"XV Catalan Blanc", price:19, img:"xv_catalan_blanc.png" },
+  { id:"xv_catalan_rouge", name:"XV Catalan Rouge", price:19, img:"xv_catalan_rouge.png" },
 
-    { id:"old_nick_darkwood", name:"Old Nick Dark Wood", price:29, img:"old_nick_darkwood.png" },
-    { id:"captain_morgan", name:"Captain Morgan Spiced Gold", price:34, img:"captain_morgan.png" },
-    { id:"havana_especial", name:"Havana Club Especial", price:38, img:"havana_especial.png" },
+  { id:"muscat", name:"Muscat", price:25, img:"muscat.png" }
+];
 
-    { id:"old_nick_blanc", name:"Old Nick Rhum Blanc", price:27, img:"old_nick_blanc.png" },
-    { id:"saint_james_blanc", name:"Saint James Rhum Blanc", price:32, img:"saint_james_blanc.png" },
-    { id:"trois_rivieres", name:"Trois Rivières Rhum Blanc", price:33, img:"trois_rivieres.png" },
-    { id:"havana_3ans", name:"Havana Club 3 ans", price:37, img:"havana_3ans.png" },
+let PRODUCTS = [...BASE_PRODUCTS];
 
-    { id:"gibsons_gin", name:"Gibson’s Gin", price:34, img:"gibsons_gin.png" },
-    { id:"gordons_gin", name:"Gordon’s Gin", price:34, img:"gordons_gin.png" },
+function $(sel){ return document.querySelector(sel); }
+function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
 
-    { id:"ricard", name:"Ricard", price:35, img:"ricard.png" },
-    { id:"pastis_51", name:"Pastis 51", price:35, img:"pastis_51.png" },
+const listEl = $("#list");
+const qEl = $("#q");
+const btnReload = $("#btnReload");
+const btnSaveRepo = $("#btnSaveRepo");
+const btnReset = $("#btnReset");
+const dirtyBadge = $("#dirtyBadge");
+const syncText = $("#syncText");
 
-    { id:"get_27", name:"GET 27", price:32, img:"get_27.png" },
-    { id:"jagermeister", name:"Jägermeister", price:35, img:"jagermeister.png" },
-    { id:"tequila_sanjose", name:"Tequila San José", price:28, img:"tequila_sanjose.png" },
+/* ✅ Menu OUTILS (nav) */
+const toolsMenuSheet = $("#toolsMenuSheet");
+const toolsMenuBackdrop = $("#toolsMenuBackdrop");
+const toolsMenuClose = $("#toolsMenuClose");
+const btnOpenToolsMenu = $("#btnOpenToolsMenu");
+const toolsYear = $("#toolsYear");
+const btnOpenStockSettingsFromMenu = $("#btnOpenStockSettingsFromMenu");
 
-    { id:"xv_catalan_rose", name:"XV Catalan Rosé", price:19, img:"xv_catalan_rose.png" },
-    { id:"xv_catalan_blanc", name:"XV Catalan Blanc", price:19, img:"xv_catalan_blanc.png" },
-    { id:"xv_catalan_rouge", name:"XV Catalan Rouge", price:19, img:"xv_catalan_rouge.png" },
+/* ✅ Paramètres Stock */
+const sheet = $("#sheet");
+const sheetBackdrop = $("#sheetBackdrop");
+const sheetClose = $("#sheetClose");
+const tokenInput = $("#tokenInput");
+const tokenState = $("#tokenState");
+const btnSaveToken = $("#btnSaveToken");
+const btnClearToken = $("#btnClearToken");
 
-    { id:"muscat", name:"Muscat", price:25, img:"muscat.png" }
-  ];
+const SETTINGS_KEY = "adn66_stock_settings_v3";
 
-  let PRODUCTS = [...BASE_PRODUCTS];
+const state = {
+  pin: "",
+  stock: {},
+  dirty: new Set(),
+  lastSync: null
+};
 
-  function $(sel){ return document.querySelector(sel); }
-  function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+function toastMsg(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window.__toast);
+  window.__toast = setTimeout(()=> t.classList.remove("show"), 2200);
+}
 
-  const listEl = $("#list");
-  const qEl = $("#q");
-  const btnReload = $("#btnReload");
-  const btnSaveRepo = $("#btnSaveRepo");
-  const btnReset = $("#btnReset");
-  const dirtyBadge = $("#dirtyBadge");
-  const syncText = $("#syncText");
-
-  /* Menu OUTILS */
-  const toolsMenuSheet = $("#toolsMenuSheet");
-  const toolsMenuBackdrop = $("#toolsMenuBackdrop");
-  const toolsMenuClose = $("#toolsMenuClose");
-  const btnOpenToolsMenu = $("#btnOpenToolsMenu");
-  const toolsYear = $("#toolsYear");
-  const btnOpenStockSettingsFromMenu = $("#btnOpenStockSettingsFromMenu");
-
-  /* Paramètres Stock */
-  const sheet = $("#sheet");
-  const sheetBackdrop = $("#sheetBackdrop");
-  const sheetClose = $("#sheetClose");
-  const tokenInput = $("#tokenInput");
-  const tokenState = $("#tokenState");
-  const btnSaveToken = $("#btnSaveToken");
-  const btnClearToken = $("#btnClearToken");
-
-  const SETTINGS_KEY = "adn66_stock_settings_v3";
-
-  const state = {
-    pin: "",
-    stock: {},
-    dirty: new Set(),
-    lastSync: null
+function getGH(){
+  return {
+    owner: "bullyto",
+    repo: "outil",
+    branch: "main",
+    stockPath: "apps/stock/stock",
+    ext: ".json",
+    pin: String(state.pin||"").trim()
   };
+}
 
-  function toastMsg(msg){
-    const t = $("#toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    clearTimeout(window.__toast);
-    window.__toast = setTimeout(()=> t.classList.remove("show"), 2200);
-  }
+function snapshotPath(){
+  const gh = getGH();
+  return `${gh.stockPath}/_snapshot.json`;
+}
 
-  function getGH(){
-    return {
-      owner: "bullyto",
-      repo: "outil",
-      branch: "main",
-      stockPath: "apps/stock/stock",
-      ext: ".json",
-      pin: String(state.pin||"").trim()
-    };
-  }
+/* ✅ MENU OUTILS */
+function openToolsMenu(){
+  try{ toolsYear.textContent = String(new Date().getFullYear()); }catch(e){}
+  toolsMenuSheet.classList.add("show");
+}
+function closeToolsMenu(){
+  toolsMenuSheet.classList.remove("show");
+}
 
-  function snapshotPath(){
-    const gh = getGH();
-    return `${gh.stockPath}/_snapshot.json`;
-  }
+/* ✅ PARAM STOCK */
+function openSettings(){
+  sheet.classList.add("show");
+  tokenInput.value = state.pin || "";
+  updateTokenHint();
+}
+function closeSettings(){
+  sheet.classList.remove("show");
+}
 
-  function openToolsMenu(){
-    try{ toolsYear.textContent = String(new Date().getFullYear()); }catch(e){}
-    toolsMenuSheet.classList.add("show");
-  }
-  function closeToolsMenu(){
-    toolsMenuSheet.classList.remove("show");
-  }
+function updateTokenHint(){
+  tokenState.textContent = state.pin ? "Code enregistré ✅" : "";
+}
 
-  function openSettings(){
-    sheet.classList.add("show");
-    tokenInput.value = state.pin || "";
-    updateTokenHint();
-  }
-  function closeSettings(){
-    sheet.classList.remove("show");
-  }
+function saveToken(pin){
+  const exp = Date.now() + (1000 * 60 * 60 * 24 * 30 * 6);
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 3, pin: String(pin||"").trim(), exp }));
+  state.pin = String(pin||"").trim();
+  updateSaveButtonsState();
+}
 
-  function updateTokenHint(){
-    tokenState.textContent = state.pin ? "Code enregistré ✅" : "";
-  }
+function clearToken(){
+  localStorage.removeItem(SETTINGS_KEY);
+  state.pin = "";
+  updateSaveButtonsState();
+}
 
-  function saveToken(pin){
-    const exp = Date.now() + (1000 * 60 * 60 * 24 * 30 * 6);
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 3, pin: String(pin||"").trim(), exp }));
-    state.pin = String(pin||"").trim();
-    updateSaveButtonsState();
-  }
+function loadSettings(){
+  const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+  if (raw.exp && Date.now() > raw.exp) localStorage.removeItem(SETTINGS_KEY);
+  state.pin = String(raw.pin ?? "").trim();
+}
 
-  function clearToken(){
-    localStorage.removeItem(SETTINGS_KEY);
-    state.pin = "";
-    updateSaveButtonsState();
-  }
+function updateSaveButtonsState(){
+  const hasPin = !!String(getGH().pin||"").trim();
+  btnSaveRepo.disabled = !hasPin;
+}
 
-  function loadSettings(){
-    const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
-    if (raw.exp && Date.now() > raw.exp) localStorage.removeItem(SETTINGS_KEY);
-    state.pin = String(raw.pin ?? "").trim();
+function updateDirtyBadge(){
+  const n = state.dirty.size;
+  if(n === 0){
+    dirtyBadge.textContent = "OK";
+    dirtyBadge.className = "badge ok";
+  }else{
+    dirtyBadge.textContent = `${n} modif.`;
+    dirtyBadge.className = "badge warn";
   }
+}
 
-  function updateSaveButtonsState(){
-    const hasPin = !!String(getGH().pin||"").trim();
-    btnSaveRepo.disabled = !hasPin;
-  }
+function setSync(ts){
+  state.lastSync = ts;
+  syncText.textContent = ts ? new Date(ts).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "—";
+}
 
-  function updateDirtyBadge(){
-    const n = state.dirty.size;
-    if(n === 0){
-      dirtyBadge.textContent = "OK";
-      dirtyBadge.className = "badge ok";
-    }else{
-      dirtyBadge.textContent = `${n} modif.`;
-      dirtyBadge.className = "badge warn";
+function clampQty(v){
+  const n = Number(v);
+  if(!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(999, Math.round(n)));
+}
+
+function fmtNameFromId(id){
+  return String(id||"")
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function qtyTag(qty){
+  if(qty <= 0) return { cls:"danger", txt:"Rupture" };
+  if(qty >= OK_THRESHOLD) return { cls:"ok", txt:"OK" };
+  return { cls:"warn", txt:"Faible" };
+}
+
+function getImgForProduct(p){
+  if(p && p.img) return IMG_DIR + String(p.img);
+  const id = p?.id ? String(p.id) : "";
+  return IMG_DIR + id + ".png";
+}
+
+function adjustQty(id, delta){
+  const cur = Number(state.stock[id] ?? 0);
+  const nv = clampQty(cur + delta);
+  state.stock[id] = nv;
+  state.dirty.add(id);
+  updateDirtyBadge();
+
+  const row = listEl.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
+  if(row){
+    const vEl = row.querySelector(".qtyVal");
+    if(vEl) vEl.textContent = String(nv);
+    const badge = row.querySelector(".badge");
+    if(badge){
+      const t = qtyTag(nv);
+      badge.className = `badge ${t.cls}`;
+      badge.textContent = `${t.txt}${state.dirty.has(id) ? " • modifié" : ""}`;
     }
   }
+}
 
-  function setSync(ts){
-    state.lastSync = ts;
-    syncText.textContent = ts ? new Date(ts).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "—";
-  }
+function renderList(){
+  const q = (qEl.value || "").trim().toLowerCase();
 
-  function clampQty(v){
-    const n = Number(v);
-    if(!Number.isFinite(n)) return 0;
-    return Math.max(0, Math.min(999, Math.round(n)));
-  }
+  const rows = PRODUCTS
+    .filter(p => {
+      if(!q) return true;
+      const name = (p.name||"").toLowerCase();
+      const id = (p.id||"").toLowerCase();
+      return name.includes(q) || id.includes(q);
+    })
+    .map(p => {
+      const id = p.id;
+      const qty = Number(state.stock[id] ?? 0);
+      const isDirty = state.dirty.has(id);
+      const t = qtyTag(qty);
+      const price = Number(p.price ?? 0);
+      const imgSrc = getImgForProduct(p);
 
-  function fmtNameFromId(id){
-    return String(id||"")
-      .replace(/[_-]+/g, " ")
-      .trim()
-      .replace(/\b\w/g, c => c.toUpperCase());
-  }
+      return `
+        <div class="item" data-id="${esc(id)}">
+          <div class="thumb">
+            <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';" />
+          </div>
 
-  function qtyTag(qty){
-    if(qty <= 0) return { cls:"danger", txt:"Rupture" };
-    if(qty >= OK_THRESHOLD) return { cls:"ok", txt:"OK" };
-    return { cls:"warn", txt:"Faible" };
-  }
+          <div class="content">
+            <p class="name">${esc(p.name)}</p>
 
-  function getImgForProduct(p){
-    if(p && p.img) return IMG_DIR + String(p.img);
-    const id = p?.id ? String(p.id) : "";
-    return IMG_DIR + id + ".png";
-  }
-
-  function adjustQty(id, delta){
-    const cur = Number(state.stock[id] ?? 0);
-    const nv = clampQty(cur + delta);
-    state.stock[id] = nv;
-    state.dirty.add(id);
-    updateDirtyBadge();
-
-    const row = listEl.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
-    if(row){
-      const vEl = row.querySelector(".qtyVal");
-      if(vEl) vEl.textContent = String(nv);
-      const badge = row.querySelector(".badge");
-      if(badge){
-        const t = qtyTag(nv);
-        badge.className = `badge ${t.cls}`;
-        badge.textContent = `${t.txt}${state.dirty.has(id) ? " • modifié" : ""}`;
-      }
-    }
-  }
-
-  function renderList(){
-    const q = (qEl.value || "").trim().toLowerCase();
-
-    const rows = PRODUCTS
-      .filter(p => {
-        if(!q) return true;
-        const name = (p.name||"").toLowerCase();
-        const id = (p.id||"").toLowerCase();
-        return name.includes(q) || id.includes(q);
-      })
-      .map(p => {
-        const id = p.id;
-        const qty = Number(state.stock[id] ?? 0);
-        const isDirty = state.dirty.has(id);
-        const t = qtyTag(qty);
-        const price = Number(p.price ?? 0);
-        const imgSrc = getImgForProduct(p);
-
-        return `
-          <div class="item" data-id="${esc(id)}">
-            <div class="thumb">
-              <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';" />
+            <div class="qtyLine">
+              <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
+              <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
+              <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
             </div>
 
-            <div class="content">
-              <p class="name">${esc(p.name)}</p>
-
-              <div class="qtyLine">
-                <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
-                <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
-                <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
-              </div>
-
-              <div class="bottomLine">
-                <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
-                <p class="price">${price ? esc(price) + "€" : "—"}</p>
-              </div>
+            <div class="bottomLine">
+              <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
+              <p class="price">${price ? esc(price) + "€" : "—"}</p>
             </div>
           </div>
-        `;
-      })
-      .join("");
+        </div>
+      `;
+    })
+    .join("");
 
-    listEl.innerHTML = rows || `<div class="badge" style="padding:12px 14px;border-radius:16px;">Aucun résultat</div>`;
+  listEl.innerHTML = rows || `<div class="badge" style="padding:12px 14px;border-radius:16px;">Aucun résultat</div>`;
 
-    listEl.querySelectorAll(".item").forEach(el => {
-      const id = el.getAttribute("data-id");
-      const btnMinus = el.querySelector(".qtyBtn.minus");
-      const btnPlus = el.querySelector(".qtyBtn.plus");
-      if(btnMinus) btnMinus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, -1); });
-      if(btnPlus) btnPlus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, +1); });
-    });
+  listEl.querySelectorAll(".item").forEach(el => {
+    const id = el.getAttribute("data-id");
+    const btnMinus = el.querySelector(".qtyBtn.minus");
+    const btnPlus = el.querySelector(".qtyBtn.plus");
+    if(btnMinus) btnMinus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, -1); });
+    if(btnPlus) btnPlus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, +1); });
+  });
 
-    updateDirtyBadge();
+  updateDirtyBadge();
+}
+
+async function pullFromRepo(){
+  const s = getGH();
+  toastMsg("Chargement dépôt…");
+
+  const snapFile = snapshotPath();
+  let snap = null;
+
+  try{
+    const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
+    const res = await fetch(rawUrl, { cache:"no-store" });
+    if(res.ok) snap = await res.json();
+  }catch(e){
+    console.warn("pullFromRepo snapshot failed", e);
   }
 
-  async function pullFromRepo(){
-    const s = getGH();
-    toastMsg("Chargement dépôt…");
+  const snapshotIds = new Set();
 
-    const snapFile = snapshotPath();
-    let snap = null;
+  if(snap && Array.isArray(snap.items)){
+    for(const it of snap.items){
+      if(!it || !it.id) continue;
+      const id = String(it.id);
+      snapshotIds.add(id);
 
-    try{
-      const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
-      const res = await fetch(rawUrl, { cache:"no-store" });
-      if(res.ok) snap = await res.json();
-    }catch(e){
-      console.warn("pullFromRepo snapshot failed", e);
+      const q = Number(it.qty);
+      if(Number.isFinite(q)) state.stock[id] = clampQty(q);
     }
-
-    const snapshotIds = new Set();
-
-    if(snap && Array.isArray(snap.items)){
-      for(const it of snap.items){
-        if(!it || !it.id) continue;
-        const id = String(it.id);
-        snapshotIds.add(id);
-
-        const q = Number(it.qty);
-        if(Number.isFinite(q)) state.stock[id] = clampQty(q);
-      }
-    }
-
-    const known = new Set(PRODUCTS.map(p=>p.id));
-    const extra = [];
-    snapshotIds.forEach(id => {
-      if(!known.has(id)){
-        extra.push({ id, name: fmtNameFromId(id), price: 0, img: null });
-        known.add(id);
-      }
-    });
-
-    PRODUCTS = [...BASE_PRODUCTS, ...extra];
-
-    updateStockUI();
-    toastMsg("Chargé ✅");
   }
 
-  function updateStockUI(){
-    renderList();
-    updateSaveButtonsState();
-  }
-
-  async function pushToRepo(){
-    const s = getGH();
-    const pin = String(s.pin||"").trim();
-
-    if(!pin){
-      toastMsg("Entre le code admin (0000).");
-      openSettings();
-      return;
+  const known = new Set(PRODUCTS.map(p=>p.id));
+  const extra = [];
+  snapshotIds.forEach(id => {
+    if(!known.has(id)){
+      extra.push({ id, name: fmtNameFromId(id), price: 0, img: null });
+      known.add(id);
     }
-    if(pin !== "0000"){
-      toastMsg("Code invalide.");
-      return;
-    }
+  });
 
-    toastMsg("Publication via Cloudflare…");
+  PRODUCTS = [...BASE_PRODUCTS, ...extra];
 
-    const idsToPush = Object.keys(state.stock).filter(id => state.dirty.has(id));
+  updateStockUI();
+  toastMsg("Chargé ✅");
+}
 
-    const payload = {
-      pin,
-      owner: s.owner,
-      repo: s.repo,
-      branch: s.branch,
-      stockPath: s.stockPath,
-      ext: s.ext,
-      ids: idsToPush,
-      stock: state.stock,
-      updated_at: new Date().toISOString()
-    };
+function updateStockUI(){
+  renderList();
+  updateSaveButtonsState();
+}
 
-    const r = await fetch(`${WORKER_BASE}/api/stock/publish`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+async function pushToRepo(){
+  const s = getGH();
+  const pin = String(s.pin||"").trim();
 
-    const txt = await r.text();
-    let j = null;
-    try{ j = JSON.parse(txt); }catch(e){ j = null; }
-
-    if(!r.ok || !j || j.ok !== true){
-      const msg = (j && j.error) ? String(j.error) : `HTTP ${r.status}`;
-      throw new Error(msg);
-    }
-
-    idsToPush.forEach(id => state.dirty.delete(id));
-    updateStockUI();
-    toastMsg("Publié ✅");
-  }
-
-  // UI events
-  btnOpenToolsMenu.addEventListener("click", openToolsMenu);
-  toolsMenuBackdrop.addEventListener("click", closeToolsMenu);
-  toolsMenuClose.addEventListener("click", closeToolsMenu);
-
-  btnOpenStockSettingsFromMenu.addEventListener("click", ()=>{
-    closeToolsMenu();
+  if(!pin){
+    toastMsg("Entre le code admin (0000).");
     openSettings();
+    return;
+  }
+  if(pin !== "0000"){
+    toastMsg("Code invalide.");
+    return;
+  }
+
+  toastMsg("Publication via Cloudflare…");
+
+  const idsToPush = Object.keys(state.stock).filter(id => state.dirty.has(id));
+
+  const payload = {
+    pin,
+    owner: s.owner,
+    repo: s.repo,
+    branch: s.branch,
+    stockPath: s.stockPath,
+    ext: s.ext,
+    ids: idsToPush,
+    stock: state.stock,
+    updated_at: new Date().toISOString()
+  };
+
+  const r = await fetch(`${WORKER_BASE}/api/stock/publish`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
   });
 
-  sheetBackdrop.addEventListener("click", closeSettings);
-  sheetClose.addEventListener("click", closeSettings);
+  const txt = await r.text();
+  let j = null;
+  try{ j = JSON.parse(txt); }catch(e){ j = null; }
 
-  btnSaveToken.addEventListener("click", ()=>{
-    const pin = String(tokenInput.value||"").trim();
-    if(!pin){ toastMsg("Code vide."); return; }
-    saveToken(pin);
-    updateTokenHint();
-    toastMsg("Code enregistré ✅");
-  });
+  if(!r.ok || !j || j.ok !== true){
+    const msg = (j && j.error) ? String(j.error) : `HTTP ${r.status}`;
+    throw new Error(msg);
+  }
 
-  btnClearToken.addEventListener("click", ()=>{
-    clearToken();
-    tokenInput.value = "";
-    updateTokenHint();
-    toastMsg("Code supprimé.");
-  });
+  idsToPush.forEach(id => state.dirty.delete(id));
+  updateStockUI();
+  toastMsg("Publié ✅");
+}
 
-  btnReload.addEventListener("click", async ()=>{
-    try{
-      await pullFromRepo();
-      setSync(Date.now());
-    }catch(e){
-      console.error(e);
-      toastMsg("Erreur rechargement.");
-    }
-  });
+/* UI — MENU OUTILS */
+btnOpenToolsMenu.addEventListener("click", openToolsMenu);
+toolsMenuBackdrop.addEventListener("click", closeToolsMenu);
+toolsMenuClose.addEventListener("click", closeToolsMenu);
 
-  btnSaveRepo.addEventListener("click", async ()=>{
-    try{
-      await pushToRepo();
-      setSync(Date.now());
-    }catch(e){
-      console.error(e);
-      toastMsg("Erreur : " + (e?.message || e));
-    }
-  });
+btnOpenStockSettingsFromMenu.addEventListener("click", ()=>{
+  closeToolsMenu();
+  openSettings();
+});
 
-  btnReset.addEventListener("click", ()=>{
-    state.dirty.clear();
-    pullFromRepo().then(()=>toastMsg("Annulé ✅")).catch(()=>toastMsg("Erreur annulation."));
-  });
+/* UI — PARAM STOCK */
+sheetBackdrop.addEventListener("click", closeSettings);
+sheetClose.addEventListener("click", closeSettings);
 
-  qEl.addEventListener("input", renderList);
+btnSaveToken.addEventListener("click", ()=>{
+  const pin = String(tokenInput.value||"").trim();
+  if(!pin){ toastMsg("Code vide."); return; }
+  saveToken(pin);
+  updateTokenHint();
+  toastMsg("Code enregistré ✅");
+});
 
-  // Init protégée : si ça plante -> on cache quand même le loader
-  (async function init(){
-    try{
-      loadSettings();
-      updateTokenHint();
-      updateSaveButtonsState();
-      await pullFromRepo();
-      setSync(Date.now());
+btnClearToken.addEventListener("click", ()=>{
+  clearToken();
+  tokenInput.value = "";
+  updateTokenHint();
+  toastMsg("Code supprimé.");
+});
 
-      if("serviceWorker" in navigator){
-        navigator.serviceWorker.register("./sw.js").catch(()=>{});
-      }
+btnReload.addEventListener("click", async ()=>{
+  try{
+    await pullFromRepo();
+    setSync(Date.now());
+  }catch(e){
+    console.error(e);
+    toastMsg("Erreur rechargement.");
+  }
+});
 
-      hideLoader(false);
-    }catch(e){
-      console.error(e);
-      hideLoader(true);
-      toastMsg("Erreur chargement (mode dégradé).");
-    }
-  })();
+btnSaveRepo.addEventListener("click", async ()=>{
+  try{
+    await pushToRepo();
+    setSync(Date.now());
+  }catch(e){
+    console.error(e);
+    toastMsg("Erreur : " + (e?.message || e));
+  }
+});
+
+btnReset.addEventListener("click", ()=>{
+  state.dirty.clear();
+  pullFromRepo().then(()=>toastMsg("Annulé ✅")).catch(()=>toastMsg("Erreur annulation."));
+});
+
+qEl.addEventListener("input", renderList);
+
+(async function init(){
+  loadSettings();
+  updateTokenHint();
+  updateSaveButtonsState();
+  await pullFromRepo();
+  setSync(Date.now());
+
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
 })();
 </script>
 </body>
