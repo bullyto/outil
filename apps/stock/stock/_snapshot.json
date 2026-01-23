@@ -1,13 +1,17 @@
 {
-  "updated_at": "2026-01-22T22:40:22.794Z",
+  "updated_at": "2026-01-23T00:15:05.722Z",
   "items": [
     {
       "id": "absolut",
-      "qty": 13
+      "qty": 2
+    },
+    {
+      "id": "ciroc_pomme",
+      "qty": 2
     },
     {
       "id": "poliakov",
-      "qty": 21
+      "qty": 0
     }
   ]
 }
