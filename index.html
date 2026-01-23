@@ -1,173 +1,475 @@
-<!-- Chemin : /index.html -->
 <!doctype html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-  <!-- NO INDEX (Google & autres) -->
+  <title>Outils internet à l'entreprise Apéro de Nuit 66</title>
+
+  <!-- No index -->
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
   <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
 
   <!-- PWA -->
-  <meta name="theme-color" content="#050b12" />
   <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#050b12" />
   <link rel="icon" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
 
-  <title>Outil - ADN66 • outils internet à l'entreprise apéro de nuit 66</title>
-  <meta name="description" content="outiles internet à l'entreprise apéro de nuit 66." />
-
   <style>
     :root{
-      --bg:#0b1220; --panel:rgba(255,255,255,.06); --border:rgba(255,255,255,.12);
-      --text:#e8eefc; --muted:#a9b7d6; --shadow:0 14px 46px rgba(0,0,0,.45);
-      --radius:18px;
+      --bg0:#050b12;
+      --bg1:#070f19;
+      --card:#0b1420;
+      --card2:#0e1826;
+      --stroke:rgba(255,255,255,.08);
+      --stroke2:rgba(255,255,255,.12);
+      --txt:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --muted2:rgba(255,255,255,.56);
+      --glow:rgba(84, 180, 255, .35);
+      --glow2:rgba(80, 255, 170, .22);
+      --ok:#21d07a;
+      --warn:#ffcc33;
+      --danger:#ff4d4d;
+      --radius:22px;
     }
-    *{ box-sizing:border-box; }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; min-height:100vh;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-      color:var(--text);
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--txt);
       background:
-        radial-gradient(900px 650px at 15% 10%, rgba(255,210,0,.10), transparent 55%),
-        radial-gradient(800px 600px at 85% 10%, rgba(255,59,59,.10), transparent 55%),
-        radial-gradient(1000px 800px at 50% 110%, rgba(80,120,255,.10), transparent 60%),
-        var(--bg);
-      padding: 14px;
+        radial-gradient(1200px 700px at 20% -10%, rgba(84,180,255,.20), transparent 60%),
+        radial-gradient(900px 600px at 85% 10%, rgba(80,255,170,.10), transparent 60%),
+        radial-gradient(1200px 900px at 50% 120%, rgba(255,255,255,.06), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
     }
-    .wrap{ max-width: 980px; margin: 0 auto; padding: 14px 0 26px; }
-    header{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding: 14px 14px;
-      border:1px solid var(--border);
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px 16px 28px;
+    }
+
+    .hero{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      padding:18px 18px;
       border-radius: var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--stroke);
+      box-shadow:
+        0 18px 45px rgba(0,0,0,.35),
+        0 0 0 1px rgba(84,180,255,.10) inset;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      position:relative;
+      overflow:hidden;
     }
-    .brand{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(300px 180px at 18% 25%, rgba(84,180,255,.22), transparent 60%),
+        radial-gradient(320px 200px at 90% 15%, rgba(80,255,170,.10), transparent 60%);
+      pointer-events:none;
+      filter: blur(0px);
+    }
+
     .logo{
-      width:44px; height:44px; border-radius:16px;
-      border:1px solid var(--border);
-      background:
-        url("./icons/icon-192.png") center / cover no-repeat;
-      box-shadow: 0 10px 26px rgba(0,0,0,.35);
-    }
-    .titles{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-    .t1{ font-weight:900; letter-spacing:.2px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .t2{ font-size:12px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .grid{
-      margin-top: 12px;
+      width:58px;
+      height:58px;
+      border-radius: 16px;
+      flex: 0 0 auto;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--stroke2);
       display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      place-items:center;
+      box-shadow: 0 10px 26px rgba(0,0,0,.35), 0 0 18px var(--glow);
+      overflow:hidden;
+      position:relative;
+      z-index:1;
     }
-    .card{
-      border:1px solid var(--border);
+    .logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .heroTxt{position:relative; z-index:1; min-width:0;}
+    .heroTitle{
+      font-weight: 800;
+      letter-spacing: .2px;
+      font-size: 18px;
+      line-height: 1.2;
+      margin:0 0 4px 0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .heroSub{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.25;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .cardLink{
+      text-decoration:none;
+      color:inherit;
+      display:block;
       border-radius: var(--radius);
-      background: var(--panel);
-      padding: 14px;
-      box-shadow: 0 12px 34px rgba(0,0,0,.28);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+      border: 1px solid var(--stroke);
+      box-shadow:
+        0 14px 36px rgba(0,0,0,.32),
+        0 0 0 1px rgba(255,255,255,.03) inset;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      position:relative;
+      overflow:hidden;
+      transform: translateZ(0);
     }
-    .card h2{ margin:0 0 6px; font-size: 15px; letter-spacing:.2px; }
-    .card p{ margin:0 0 12px; color:var(--muted); font-size: 12px; line-height:1.35; }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; }
-    a.btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 10px 12px;
-      border-radius: 999px;
-      border:1px solid var(--border);
-      background: rgba(0,0,0,.25);
-      color: var(--text);
-      text-decoration:none;
-      font-weight: 900;
-      font-size: 12px;
-      user-select:none;
+
+    .cardLink::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: radial-gradient(420px 220px at 20% 20%, rgba(84,180,255,.12), transparent 60%);
+      opacity:.65;
+      pointer-events:none;
+      transition: opacity .18s ease;
     }
-    a.btn:active{ transform: scale(.98); }
-    footer{
-      margin-top: 12px;
+
+    .cardLink:active{ transform: scale(.992); }
+    .cardLink:hover::after{ opacity:.95; }
+
+    .cardInner{
+      padding: 16px 16px 15px;
+      display:flex;
+      gap: 14px;
+      align-items:flex-start;
+      position:relative;
+      z-index:1;
+    }
+
+    .badge{
+      width:46px; height:46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--stroke2);
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+      box-shadow: 0 12px 26px rgba(0,0,0,.28);
+      overflow:hidden;
+    }
+    .badge svg{ width:22px; height:22px; opacity:.9; }
+
+    .cardTxt{min-width:0; flex:1}
+    .cardTitle{
+      margin:0 0 6px 0;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing:.2px;
+      line-height:1.15;
+    }
+    .cardDesc{
+      margin:0;
       color: var(--muted);
-      font-size: 11px;
-      opacity:.9;
-      line-height:1.35;
+      font-size: 13.5px;
+      line-height: 1.35;
+    }
+
+    .chev{
+      flex:0 0 auto;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      margin-top: 2px;
+    }
+    .chev svg{width:16px;height:16px; opacity:.9}
+
+    footer{
+      margin-top: 18px;
+      padding: 10px 6px 4px;
+      color: var(--muted2);
+      font-size: 12.5px;
       text-align:center;
     }
-    @media (max-width: 720px){
-      .grid{ grid-template-columns: 1fr; }
+
+    /* Fake loader (2.5s) */
+    .loader{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:grid;
+      place-items:center;
+      background:
+        radial-gradient(900px 600px at 50% 35%, rgba(84,180,255,.16), transparent 60%),
+        radial-gradient(700px 520px at 60% 70%, rgba(80,255,170,.10), transparent 60%),
+        linear-gradient(180deg, #050b12, #070f19);
+      transition: opacity .25s ease, visibility .25s ease;
+    }
+    .loader.hide{
+      opacity:0;
+      visibility:hidden;
+      pointer-events:none;
+    }
+    .loaderCard{
+      width:min(420px, calc(100vw - 32px));
+      border-radius: 28px;
+      padding: 22px 18px 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow:
+        0 26px 70px rgba(0,0,0,.55),
+        0 0 0 1px rgba(84,180,255,.10) inset;
+      text-align:center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .loaderLogo{
+      width: 96px;
+      height: 96px;
+      margin: 2px auto 12px;
+      border-radius: 28px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 48px rgba(0,0,0,.45), 0 0 22px var(--glow);
+      background: rgba(255,255,255,.06);
+      transform: translateZ(0);
+      animation: pop 900ms ease-in-out infinite alternate;
+    }
+    .loaderLogo img{width:100%;height:100%;object-fit:cover;display:block}
+    @keyframes pop{
+      from{ transform: scale(.98); filter: saturate(1.05); }
+      to{ transform: scale(1.02); filter: saturate(1.15); }
+    }
+    .loaderTitle{
+      margin:0 0 6px 0;
+      font-weight: 900;
+      letter-spacing:.2px;
+      font-size: 16px;
+    }
+    .loaderSub{
+      margin:0 0 12px 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+      position:relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,.25) inset;
+    }
+    .bar::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      width: 45%;
+      background: linear-gradient(90deg, rgba(84,180,255,.0), rgba(84,180,255,.55), rgba(80,255,170,.55), rgba(84,180,255,.0));
+      animation: sweep 900ms ease-in-out infinite;
+      filter: blur(.2px);
+    }
+    @keyframes sweep{
+      from{ transform: translateX(-60%); }
+      to{ transform: translateX(220%); }
+    }
+
+    @media (min-width: 720px){
+      .grid{ grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <div class="titles">
-          <div class="t1">Outil - ADN66 • Suite d’outils internes</div>
-          <div class="t2">Un seul repo • Menu global sur chaque outil</div>
-        </div>
+  <!-- Fake loading screen (2.5s) -->
+  <div class="loader" id="fakeLoader" aria-hidden="true">
+    <div class="loaderCard" role="status" aria-live="polite">
+      <div class="loaderLogo">
+        <img src="./icons/icon-512.png" alt="Outil ADN66" />
       </div>
-      <div class="row">
-        <a class="btn" href="./apps/stock/index.html">Ouvrir Stock</a>
-        <a class="btn" href="./apps/gps/index.html">Ouvrir GPS</a>
+      <h1 class="loaderTitle">Outil - ADN66</h1>
+      <p class="loaderSub">Chargement des outils internes…</p>
+      <div class="bar"></div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <header class="hero">
+      <div class="logo">
+        <img src="./icons/icon-512.png" alt="Outil ADN66" />
+      </div>
+      <div class="heroTxt">
+        <h2 class="heroTitle">Outil - ADN66 • Suite d’outils</h2>
+        <p class="heroSub">Un seul repo • Menu global • Accès rapide à tous les modules</p>
       </div>
     </header>
 
-    <div class="grid">
-      <div class="card">
-        <h2>Stock</h2>
-        <p>Outil stock interne (images + snapshot). Le menu en haut à droite permet de basculer vers les autres outils.</p>
-        <div class="row">
-          <a class="btn" href="./apps/stock/index.html">Accéder</a>
+    <section class="grid" aria-label="Outils">
+      <!-- Stock -->
+      <a class="cardLink" href="./apps/stock/" data-preload="./apps/stock/">
+        <div class="cardInner">
+          <div class="badge" aria-hidden="true">
+            <!-- boxes icon -->
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 7.5 12 3l8 4.5-8 4.5L4 7.5Z" stroke="white" opacity=".85" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M4 7.5V16.5L12 21l8-4.5V7.5" stroke="white" opacity=".85" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M12 12v9" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="cardTxt">
+            <h3 class="cardTitle">Stock véhicule &amp; tarif</h3>
+            <p class="cardDesc">Catalogue interne + images + snapshot. Gestion stock/produits et tarifs.</p>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
-      </div>
+      </a>
 
-      <div class="card">
-        <h2>Apéro de Nuit 66</h2>
-        <p>PWA principale (landing / commande). Conserve ses fichiers d’origine dans <code>/apps/apero/</code>.</p>
-        <div class="row">
-          <a class="btn" href="./apps/apero/index.html">Accéder</a>
+      <!-- Calculateur TTC (Apéro) -->
+      <a class="cardLink" href="./apps/apero/" data-preload="./apps/apero/">
+        <div class="cardInner">
+          <div class="badge" aria-hidden="true">
+            <!-- calculator icon -->
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" stroke="white" opacity=".85" stroke-width="1.8"/>
+              <path d="M8 7h8" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M8 11h2M12 11h2M16 11h0" stroke="white" opacity=".85" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M8 15h2M12 15h2M16 15h0" stroke="white" opacity=".85" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="cardTxt">
+            <h3 class="cardTitle">Calculateur TTC</h3>
+            <p class="cardDesc">Outil rapide pour calculs TTC / marges / conversions, usage interne.</p>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
-      </div>
+      </a>
 
-      <div class="card">
-        <h2>Status</h2>
-        <p>Centre de pilotage (status.json + client). Utile pour les messages et blocages.</p>
-        <div class="row">
-          <a class="btn" href="./apps/status/index.html">Accéder</a>
+      <!-- Status -->
+      <a class="cardLink" href="./apps/status/" data-preload="./apps/status/">
+        <div class="cardInner">
+          <div class="badge" aria-hidden="true">
+            <!-- window icon -->
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z" stroke="white" opacity=".85" stroke-width="1.8"/>
+              <path d="M4 8h16" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M7 6.5h.01M9.5 6.5h.01M12 6.5h.01" stroke="white" opacity=".85" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="cardTxt">
+            <h3 class="cardTitle">Pop-up Status sites</h3>
+            <p class="cardDesc">Fenêtres de statut (messages, blocages, horaires) pilotées via status.json.</p>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
-      </div>
+      </a>
 
-      <div class="card">
-        <h2>GPS Apéro 66</h2>
-        <p>Outil GPS / logistique. Les données restent dans son dossier d’origine.</p>
-        <div class="row">
-          <a class="btn" href="./apps/gps/index.html">Accéder</a>
+      <!-- GPS -->
+      <a class="cardLink" href="./apps/gps/" data-preload="./apps/gps/">
+        <div class="cardInner">
+          <div class="badge" aria-hidden="true">
+            <!-- route icon -->
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 3v4a3 3 0 0 0 3 3h4a3 3 0 0 1 3 3v8" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M7 21v-4a3 3 0 0 1 3-3h4a3 3 0 0 0 3-3V3" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M7 7h0M17 17h0" stroke="white" opacity=".85" stroke-width="3.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="cardTxt">
+            <h3 class="cardTitle">Optimiseur de tournée prospection</h3>
+            <p class="cardDesc">Optimisation d’adresses et tournées commerciales (logistique terrain).</p>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
-      </div>
-    </div>
+      </a>
+    </section>
 
     <footer>
-      Interne • Non indexé (noindex).<br/>
-      Astuce : sur chaque outil, clique “☰ Outils” (en haut à droite) pour basculer.
+      Outils internes. L’entreprise Apéro de Nuit 66<span aria-hidden="true">®</span>
     </footer>
-  </div>
-
-  <link rel="stylesheet" href="./shared/menu.css">
-  <script src="./shared/menu.js" defer></script>
+  </main>
 
   <script>
-    // PWA SW
+    // Register SW
     if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js").catch(() => {});
-      });
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
     }
+
+    // Fake loader: keep visible ~2.5s, preload in background
+    (function () {
+      const loader = document.getElementById("fakeLoader");
+      const start = performance.now();
+
+      // Background preloading (best effort)
+      const links = Array.from(document.querySelectorAll("[data-preload]"))
+        .map(a => a.getAttribute("data-preload"))
+        .filter(Boolean);
+
+      // Preload with fetch (won't break if blocked)
+      Promise.resolve().then(async () => {
+        for (const url of links) {
+          try {
+            // Warm navigation + possible SW cache
+            await fetch(url, { cache: "no-cache", mode: "cors" });
+          } catch (e) {}
+        }
+      });
+
+      const minMs = 2500;
+      const done = () => {
+        const elapsed = performance.now() - start;
+        const wait = Math.max(0, minMs - elapsed);
+        setTimeout(() => loader.classList.add("hide"), wait);
+      };
+
+      // If page already ready, end; else wait for load
+      if (document.readyState === "complete") done();
+      else window.addEventListener("load", done, { once: true });
+    })();
   </script>
 </body>
 </html>
