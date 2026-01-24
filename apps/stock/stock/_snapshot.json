@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-24T23:31:19.856Z",
+  "updated_at": "2026-01-24T23:50:25.516Z",
   "items": [
     {
       "id": "absolut",
@@ -19,6 +19,10 @@
     },
     {
       "id": "ciroc_pomme",
+      "qty": 0
+    },
+    {
+      "id": "get_27",
       "qty": 0
     },
     {
