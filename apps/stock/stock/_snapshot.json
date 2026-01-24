@@ -1,17 +1,49 @@
 {
-  "updated_at": "2026-01-23T00:15:05.722Z",
+  "updated_at": "2026-01-24T23:31:19.856Z",
   "items": [
     {
       "id": "absolut",
+      "qty": 3
+    },
+    {
+      "id": "ballantines",
       "qty": 2
+    },
+    {
+      "id": "captain_morgan",
+      "qty": 1
+    },
+    {
+      "id": "ciroc_classic",
+      "qty": 0
     },
     {
       "id": "ciroc_pomme",
+      "qty": 0
+    },
+    {
+      "id": "jack_honey",
+      "qty": 1
+    },
+    {
+      "id": "jack_old7",
       "qty": 2
     },
     {
-      "id": "poliakov",
+      "id": "label_5",
+      "qty": 2
+    },
+    {
+      "id": "old_nick_darkwood",
       "qty": 0
+    },
+    {
+      "id": "poliakov",
+      "qty": 3
+    },
+    {
+      "id": "william_peel",
+      "qty": 2
     }
   ]
 }
