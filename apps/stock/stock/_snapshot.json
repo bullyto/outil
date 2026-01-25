@@ -1,117 +1,117 @@
 {
-  "updated_at": "2026-01-25T00:09:32.520Z",
+  "updated_at": "2026-01-25T00:17:09.880Z",
   "items": [
     {
       "id": "absolut",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "ballantines",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "captain_morgan",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "ciroc_classic",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "ciroc_pomme",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "ciroc_redberry",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "get_27",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "gibsons_gin",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "gordons_gin",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "havana_3ans",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "havana_especial",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "jack_honey",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "jack_old7",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "jagermeister",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "label_5",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "muscat",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "old_nick_blanc",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "old_nick_darkwood",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "pastis_51",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "poliakov",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "ricard",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "saint_james_blanc",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "tequila_sanjose",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "trois_rivieres",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "william_peel",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "xv_catalan_blanc",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "xv_catalan_rose",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "xv_catalan_rouge",
-      "qty": 1
+      "qty": 0
     }
   ]
 }
