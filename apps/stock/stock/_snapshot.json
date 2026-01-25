@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-25T00:01:20.259Z",
+  "updated_at": "2026-01-25T00:07:10.398Z",
   "items": [
     {
       "id": "absolut",
@@ -44,6 +44,10 @@
     {
       "id": "poliakov",
       "qty": 3
+    },
+    {
+      "id": "ricard",
+      "qty": 1
     },
     {
       "id": "william_peel",
