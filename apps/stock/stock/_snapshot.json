@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-25T00:17:09.880Z",
+  "updated_at": "2026-01-25T01:31:07.285Z",
   "items": [
     {
       "id": "absolut",
@@ -63,7 +63,7 @@
     },
     {
       "id": "muscat",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "old_nick_blanc",
@@ -103,15 +103,15 @@
     },
     {
       "id": "xv_catalan_blanc",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "xv_catalan_rose",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "xv_catalan_rouge",
-      "qty": 0
+      "qty": 1
     }
   ]
 }
