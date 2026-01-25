@@ -1,12 +1,12 @@
 {
   "active": true,
-  "mode": "warning",
-  "last_update": "2026-01-25T00:22:28.196+01:00",
+  "mode": "info",
+  "last_update": "2026-01-25T00:47:50.397+01:00",
   "modes": {
     "info": {
-      "title": "Fermé",
-      "message": "Veuillez nous excuser pour la fermeture occasionnelle.",
-      "image": "images/panne.png",
+      "title": "EXCEPTIONNELLEMENT FERMER",
+      "message": "Merci pour vôtre compréhension.",
+      "image": "images/incident.png",
       "severity": "info",
       "ok_delay_seconds": 30
     },
@@ -61,7 +61,7 @@
     }
   },
   "created_at": "2026-01-01T19:53:43.073+01:00",
-  "published_at": "2026-01-25T00:22:28.196+01:00",
+  "published_at": "2026-01-25T00:47:50.397+01:00",
   "ends_at": "",
   "starts_at": "2026-01-01T19:56:27.600+01:00"
 }
