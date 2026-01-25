@@ -1,140 +1,68 @@
-/* PWA APERO DE NUIT 66® — Service Worker (SAFE / Installable)
-   - Pré-cache minimal (sans casser si un fichier manque)
-   - HTML en Network First (fallback cache)
-   - Assets en Stale-While-Revalidate
-   - Status (status-popup.js + status.json) TOUJOURS frais (no-store)
-*/
+/* Outil - ADN66 | SW minimal (cache app-shell) */
+const VERSION = "v1.0.0";
+const CACHE = `adn66-outil-shell-${VERSION}`;
 
-const SW_VERSION = "v2026-01-25-01";
-const CACHE_PREFIX = "adn66-apero";
-const CACHE_NAME = `${CACHE_PREFIX}-${SW_VERSION}`;
-
-// ⚠️ Liste volontairement courte et 100% réelle (pas de /assets/img/*)
-const CORE_ASSETS = [
+const APP_SHELL = [
   "./",
   "./index.html",
-  "./style.css",
   "./manifest.webmanifest",
-  "./status-popup.js",
-
-  // images principales (présentes dans /assets/)
-  "./assets/logo-header.png",
-  "./assets/partage.png",
-  "./assets/og-image-1200x630.jpg",
-
-  // pages légales utiles (présentes à la racine)
-  "./privacy.html",
-  "./mentions.html",
-  "./cgv.html",
-  "./zone_livraison.html",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/icon-192-maskable.png",
+  "./icons/icon-512-maskable.png"
 ];
 
-// Ajout tolérant : si 1 ressource manque, le SW s’installe quand même
-async function precacheSafe(cache) {
-  const results = await Promise.allSettled(
-    CORE_ASSETS.map((url) =>
-      cache.add(new Request(url, { cache: "reload" }))
-    )
-  );
-  return results;
-}
-
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open(CACHE_NAME);
-      await precacheSafe(cache);
-      await self.skipWaiting();
-    })()
-  );
+  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await cache.addAll(APP_SHELL.map(u => new Request(u, { cache: "reload" })));
+  })());
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    (async () => {
-      const keys = await caches.keys();
-      await Promise.all(
-        keys
-          .filter((k) => k.startsWith(CACHE_PREFIX + "-") && k !== CACHE_NAME)
-          .map((k) => caches.delete(k))
-      );
-      await self.clients.claim();
-    })()
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => (k.startsWith("adn66-outil-shell-") && k !== CACHE) ? caches.delete(k) : Promise.resolve()));
+    await self.clients.claim();
+  })());
 });
-
-// Helpers
-function isHTMLRequest(req) {
-  return req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html");
-}
-
-function isSameOrigin(url) {
-  return url.origin === self.location.origin;
-}
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
 
-  const url = new URL(req.url);
+  event.respondWith((async () => {
+    const url = new URL(req.url);
 
-  // ✅ 1) Toujours frais : status-popup.js (local)
-  if (isSameOrigin(url) && url.pathname.endsWith("/status-popup.js")) {
-    event.respondWith(fetch(req, { cache: "no-store" }));
-    return;
-  }
+    // Only handle same-origin
+    if (url.origin !== self.location.origin) {
+      return fetch(req).catch(() => caches.match(req));
+    }
 
-  // ✅ 2) Toujours frais : status.json central (outil/apps/status/status.json)
-  // + tout ce qui est sous /outil/apps/status/ (au cas où)
-  if (url.href.includes("bullyto.github.io/outil/apps/status/")) {
-    event.respondWith(fetch(req, { cache: "no-store" }));
-    return;
-  }
-
-  // ✅ 3) Ne pas cacher le cross-origin (évite opaque/bugs install)
-  if (!isSameOrigin(url)) return;
-
-  // ✅ 4) HTML = Network First (meilleure installabilité + mises à jour)
-  if (isHTMLRequest(req)) {
-    event.respondWith(
-      (async () => {
-        try {
-          const res = await fetch(req);
-          const cache = await caches.open(CACHE_NAME);
-          cache.put(req, res.clone());
-          return res;
-        } catch (e) {
-          const cached = await caches.match(req);
-          return cached || (await caches.match("./index.html")) || Response.error();
-        }
-      })()
-    );
-    return;
-  }
-
-  // ✅ 5) Assets = Stale-While-Revalidate
-  event.respondWith(
-    (async () => {
-      const cached = await caches.match(req);
-      const cache = await caches.open(CACHE_NAME);
-
-      const fetchPromise = fetch(req)
-        .then((res) => {
-          // on ne met en cache que les réponses OK
-          if (res && res.ok) cache.put(req, res.clone());
-          return res;
-        })
-        .catch(() => null);
-
-      // si on a du cache, on le sert tout de suite, et on met à jour en fond
-      if (cached) {
-        event.waitUntil(fetchPromise);
-        return cached;
+    // Navigation: network-first then cache fallback
+    if (req.mode === "navigate") {
+      try {
+        const fresh = await fetch(req);
+        const cache = await caches.open(CACHE);
+        cache.put("./index.html", fresh.clone());
+        return fresh;
+      } catch (e) {
+        return (await caches.match("./index.html")) || (await caches.match("./"));
       }
+    }
 
-      // sinon on attend le réseau
-      const net = await fetchPromise;
-      return net || Response.error();
-    })()
-  );
+    // Static: cache-first, then network + put
+    const cached = await caches.match(req);
+    if (cached) return cached;
+
+    try {
+      const fresh = await fetch(req);
+      const cache = await caches.open(CACHE);
+      cache.put(req, fresh.clone());
+      return fresh;
+    } catch (e) {
+      return cached || Response.error();
+    }
+  })());
 });
