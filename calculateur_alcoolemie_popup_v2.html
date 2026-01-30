@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculateur d'alcoolémie — Apéro de Nuit 66</title>
+  <meta name="description" content="Estimation indicative d'alcoolémie. Ne remplace pas un éthylotest homologué." />
+  <style>
+    :root{
+      --bg:#050b12;
+      --panel:#0b1420;
+      --panel2:#0e1826;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --muted2:rgba(255,255,255,.56);
+      --border:rgba(255,255,255,.10);
+      --blue:#54b4ff;
+
+      --ok:#21d07a;
+      --warn:#ffcc33;
+      --danger:#ff4d4d;
+      --orange:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(84,180,255,.16), transparent 55%),
+        radial-gradient(900px 500px at 90% 0%, rgba(80,255,170,.08), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    header{
+      padding:18px 16px 10px;
+      max-width:760px;
+      width:100%;
+      margin:0 auto;
+    }
+    .brand{display:flex;align-items:center;gap:12px;}
+    .badge{
+      width:40px;height:40px;border-radius:14px;
+      background:linear-gradient(180deg, rgba(84,180,255,.22), rgba(84,180,255,.08));
+      border:1px solid rgba(84,180,255,.28);
+      display:grid;place-items:center;
+      box-shadow:0 0 22px rgba(84,180,255,.16);
+      flex:0 0 auto;
+    }
+    h1{margin:0;font-size:20px;letter-spacing:.2px;}
+    .sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;line-height:1.35;}
+
+    main{
+      flex:1;
+      max-width:760px;
+      width:100%;
+      margin:0 auto;
+      padding:12px 16px 22px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:20px;
+      padding:16px;
+      box-shadow:0 10px 32px rgba(0,0,0,.26);
+    }
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    label{display:block;font-size:12.5px;color:var(--muted2);margin:2px 0 8px;}
+    .seg{
+      display:flex;gap:8px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      padding:6px;
+    }
+    .seg button{
+      flex:1;border:1px solid transparent;background:transparent;
+      color:var(--muted);padding:11px 10px;border-radius:14px;
+      font-weight:950;cursor:pointer;transition:.15s ease;
+      letter-spacing:.2px;
+    }
+    .seg button.active{
+      color:var(--text);
+      background:linear-gradient(180deg, rgba(84,180,255,.24), rgba(84,180,255,.10));
+      border-color:rgba(84,180,255,.32);
+      box-shadow:0 0 18px rgba(84,180,255,.16);
+    }
+    input{
+      width:100%;padding:13px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.22);
+      color:var(--text);font-size:16px;outline:none;
+    }
+    input:focus{
+      border-color:rgba(84,180,255,.45);
+      box-shadow:0 0 0 3px rgba(84,180,255,.12);
+    }
+    .actions{
+      display:flex;gap:10px;flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .btn{
+      flex:1;
+      min-width:170px;
+      padding:13px 14px;
+      border-radius:16px;
+      border:1px solid rgba(84,180,255,.35);
+      background:linear-gradient(180deg, rgba(84,180,255,.26), rgba(84,180,255,.10));
+      color:var(--text);
+      font-weight:1000;
+      cursor:pointer;
+      box-shadow:0 0 22px rgba(84,180,255,.14);
+      transition:.15s ease;
+      letter-spacing:.2px;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.secondary{
+      border-color:rgba(255,255,255,.14);
+      background:rgba(255,255,255,.05);
+      box-shadow:none;
+      color:rgba(255,255,255,.82);
+      font-weight:950;
+    }
+    .note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+      margin-top:10px;
+    }
+    .hintline{
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:rgba(255,255,255,.80);
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    footer{
+      background:#000;
+      border-top:1px solid rgba(255,255,255,.10);
+      padding:14px 14px;
+      text-align:center;
+      color:rgba(255,255,255,.88);
+      font-size:12.5px;
+      line-height:1.35;
+    }
+
+    /* Modal overlay: NOT transparent */
+    .overlay{
+      position:fixed;
+      inset:0;
+      background: var(--bg);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:9999;
+    }
+    .overlay.show{display:flex;}
+
+    .modal{
+      width:min(560px, 96vw);
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 18px 80px rgba(0,0,0,.65);
+      overflow:hidden;
+      transform:translateY(6px);
+      animation:pop .14s ease-out forwards;
+      background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
+    }
+    @keyframes pop{to{transform:translateY(0)}}
+
+    .modalTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 12px;
+      background:rgba(0,0,0,.22);
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+    .modalTop .ttl{
+      font-weight:1000;
+      letter-spacing:.2px;
+      font-size:14px;
+      color:rgba(255,255,255,.92);
+      display:flex;align-items:center;gap:8px;
+    }
+    .close{
+      width:40px;height:40px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.06);
+      color:rgba(255,255,255,.92);
+      font-size:22px;
+      line-height:1;
+      cursor:pointer;
+    }
+    .close:active{transform:translateY(1px)}
+
+    .modalBody{
+      padding:18px 16px 16px;
+      text-align:center;
+    }
+    .iconBig{
+      width:92px;height:92px;border-radius:24px;
+      display:grid;place-items:center;
+      margin:10px auto 14px;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.06);
+    }
+    .bigValue{
+      font-size:30px;
+      font-weight:1100;
+      letter-spacing:.2px;
+      margin:0;
+    }
+    .smallLine{
+      margin:10px 0 0;
+      color:rgba(255,255,255,.90);
+      font-size:14px;
+      font-weight:900;
+    }
+    .smallLine span{font-weight:1100}
+    .desc{
+      margin:14px auto 0;
+      color:rgba(255,255,255,.92);
+      font-size:14px;
+      line-height:1.35;
+      max-width:460px;
+      font-weight:850;
+    }
+
+    .list{
+      margin:14px auto 0;
+      max-width:460px;
+      text-align:left;
+      background:rgba(0,0,0,.16);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      padding:12px 12px;
+    }
+    .li{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:8px 6px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .li:last-child{border-bottom:none}
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      margin-top:5px;
+      background:rgba(255,255,255,.36);
+      flex:0 0 auto;
+    }
+    .li b{display:block;font-size:13.5px}
+    .li span{display:block;color:rgba(255,255,255,.78);font-size:12.8px;line-height:1.3;margin-top:2px}
+
+    .muted{
+      margin:14px auto 0;
+      color:rgba(255,255,255,.76);
+      font-weight:750;
+      font-size:12.5px;
+      line-height:1.35;
+      max-width:480px;
+    }
+    .muted strong{color:rgba(255,255,255,.88)}
+
+    .modalFooter{
+      padding:12px 12px 14px;
+      display:flex; gap:10px; flex-wrap:wrap;
+      border-top:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.12);
+    }
+    .modalFooter .btn{min-width:170px}
+
+    /* Color themes for modal */
+    .theme-ok{--accent: var(--ok);}
+    .theme-warn{--accent: var(--warn);}
+    .theme-orange{--accent: var(--orange);}
+    .theme-danger{--accent: var(--danger);}
+
+    .modal[class*="theme-"] .iconBig{
+      box-shadow:
+        0 0 0 7px color-mix(in srgb, var(--accent) 18%, transparent),
+        0 18px 70px rgba(0,0,0,.45);
+    }
+    .modal[class*="theme-"] .bigValue{
+      color: color-mix(in srgb, var(--accent) 92%, white);
+      text-shadow: 0 0 26px color-mix(in srgb, var(--accent) 30%, transparent);
+    }
+    .dot.accent{background: color-mix(in srgb, var(--accent) 80%, white);}
+
+    .svg{width:46px;height:46px;opacity:.95}
+
+    @media (max-width:520px){
+      .row{grid-template-columns:1fr}
+      .btn{min-width:150px}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="badge" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2c4.4 0 8 3.6 8 8 0 5.6-8 12-8 12S4 15.6 4 10c0-4.4 3.6-8 8-8Z" stroke="rgba(255,255,255,.92)" stroke-width="1.8"/>
+          <path d="M12 13.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="rgba(84,180,255,.95)" stroke-width="1.8"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Calculateur d’alcoolémie</h1>
+        <div class="sub">Estimation indicative • ne remplace pas un éthylotest homologué</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" aria-label="Entrées">
+      <div class="row">
+        <div>
+          <label>Sexe</label>
+          <div class="seg" role="group" aria-label="Sexe">
+            <button type="button" id="btnH" class="active">Homme</button>
+            <button type="button" id="btnF">Femme</button>
+          </div>
+        </div>
+        <div>
+          <label for="poids">Poids (kg)</label>
+          <input id="poids" inputmode="decimal" placeholder="Ex : 75" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <div>
+          <label for="verres">Nombre de verres</label>
+          <input id="verres" inputmode="numeric" placeholder="Ex : 3" />
+          <div class="note">1 verre “standard” ≈ 10 g d’alcool (bière 25 cl, vin 10 cl, spiritueux 3 cl).</div>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <div class="actions">
+            <button class="btn" id="calc" type="button">Calculer</button>
+            <button class="btn secondary" id="reset" type="button">Réinitialiser</button>
+          </div>
+          <div class="hintline">⚠️ Cet outil n’est pas une autorisation à prendre la route. En cas de doute : ne conduisez pas.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    L’abus d’alcool est dangereux pour la santé. À consommer avec modération.
+  </footer>
+
+  <!-- Result Modal (opaque background) -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="modal theme-ok" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalTop">
+        <div class="ttl" id="modalTitle">Résultat (estimation)</div>
+        <button class="close" id="close" type="button" aria-label="Fermer">×</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="iconBig" aria-hidden="true">
+          <svg class="svg" id="iconSvg" viewBox="0 0 24 24" fill="none">
+            <path d="M7 12l3 3 7-7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <p class="bigValue" id="bacText">—</p>
+        <p class="smallLine">Taux estimé : <span id="bacGL">—</span> g/L</p>
+        <p class="smallLine">Élimination estimée : <span id="elimH">—</span></p>
+
+        <p class="desc" id="desc">—</p>
+
+        <div class="list" id="sanctions">
+          <div class="li">
+            <div class="dot accent"></div>
+            <div>
+              <b>Seuil légal (général) : 0,5 g/L</b>
+              <span>Au-dessus : sanctions + retrait de points. Ne conduisez pas.</span>
+            </div>
+          </div>
+          <div class="li">
+            <div class="dot accent"></div>
+            <div>
+              <b>À partir de 0,8 g/L</b>
+              <span>Délit : sanctions aggravées possibles (suspension / annulation, etc.).</span>
+            </div>
+          </div>
+          <div class="li">
+            <div class="dot accent"></div>
+            <div>
+              <b>Conseil sécurité</b>
+              <span>Faites-vous raccompagner / taxi / VTC. Ne prenez pas le volant après avoir bu.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="muted" id="muted">
+          <strong>Important :</strong> estimation indicative (formule simplifiée). Les effets varient selon la personne, le repas, le temps, etc.
+          <strong>Seul un éthylotest homologué</strong> permet de déterminer un taux réel.
+        </div>
+      </div>
+
+      <div class="modalFooter">
+        <button class="btn secondary" id="recalc" type="button">Modifier</button>
+        <button class="btn" id="ok" type="button">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const btnH = document.getElementById('btnH');
+      const btnF = document.getElementById('btnF');
+      const poidsEl = document.getElementById('poids');
+      const verresEl = document.getElementById('verres');
+
+      const overlay = document.getElementById('overlay');
+      const modal = document.getElementById('modal');
+      const closeBtn = document.getElementById('close');
+      const okBtn = document.getElementById('ok');
+      const recalcBtn = document.getElementById('recalc');
+
+      const bacText = document.getElementById('bacText');
+      const bacGL = document.getElementById('bacGL');
+      const elimH = document.getElementById('elimH');
+      const desc = document.getElementById('desc');
+      const muted = document.getElementById('muted');
+      const iconSvg = document.getElementById('iconSvg');
+
+      const calcBtn = document.getElementById('calc');
+      const resetBtn = document.getElementById('reset');
+
+      let sex = 'H'; // H or F
+
+      function setSex(s){
+        sex = s;
+        btnH.classList.toggle('active', sex === 'H');
+        btnF.classList.toggle('active', sex === 'F');
+      }
+      btnH.addEventListener('click', ()=>setSex('H'));
+      btnF.addEventListener('click', ()=>setSex('F'));
+
+      function num(v){
+        if(!v) return NaN;
+        const s = String(v).replace(',', '.').trim();
+        return Number(s);
+      }
+      function fmt(n){ return n.toFixed(2).replace('.', ','); }
+
+      function humanHours(h){
+        if (h <= 0.01) return '0 h';
+        const hrs = Math.floor(h);
+        const mins = Math.round((h - hrs) * 60);
+        if (hrs === 0) return mins + ' min';
+        if (mins === 0) return hrs + ' h';
+        return hrs + ' h ' + mins + ' min';
+      }
+
+      function show(){
+        overlay.classList.add('show');
+        overlay.setAttribute('aria-hidden','false');
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+      }
+      function hide(){
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden','true');
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+      }
+
+      function setTheme(theme){
+        modal.classList.remove('theme-ok','theme-warn','theme-orange','theme-danger');
+        modal.classList.add(theme);
+      }
+
+      function setIcon(kind){
+        if(kind === 'ok'){
+          iconSvg.innerHTML = '<path d="M7 12l3 3 7-7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+        } else if(kind === 'warn'){
+          iconSvg.innerHTML = '<path d="M12 8v5" stroke="white" stroke-width="2.4" stroke-linecap="round"/><path d="M12 16.8h.01" stroke="white" stroke-width="3.2" stroke-linecap="round"/>';
+        } else {
+          iconSvg.innerHTML = '<path d="M8 8l8 8" stroke="white" stroke-width="2.4" stroke-linecap="round"/><path d="M16 8l-8 8" stroke="white" stroke-width="2.4" stroke-linecap="round"/>';
+        }
+      }
+
+      function openResult(bac){
+        // Color ranges:
+        // <0.2 ok, 0.2–0.49 warn, 0.5–0.79 orange, >=0.8 danger
+        const elimRate = 0.13; // g/L/h (more cautious)
+        const hours = Math.max(0, bac / elimRate);
+
+        bacText.textContent = fmt(bac) + ' g/L';
+        bacGL.textContent = fmt(bac);
+        elimH.textContent = humanHours(hours);
+
+        // Very cautious wording: never "ok to drive".
+        if (bac < 0.2){
+          setTheme('theme-ok');
+          setIcon('ok');
+          desc.textContent = "Sous 0,2 g/L (estimation). L’alcool peut quand même réduire la vigilance : évitez de conduire si possible.";
+        } else if (bac < 0.5){
+          setTheme('theme-warn');
+          setIcon('warn');
+          desc.textContent = "Entre 0,2 et 0,5 g/L (estimation). Risque accru : privilégiez un conducteur sobre / un transport sûr.";
+        } else if (bac < 0.8){
+          setTheme('theme-orange');
+          setIcon('warn');
+          desc.textContent = "Au-dessus du seuil légal 0,5 g/L (estimation). Ne conduisez pas. Faites-vous raccompagner / taxi / VTC.";
+        } else {
+          setTheme('theme-danger');
+          setIcon('danger');
+          desc.textContent = "Taux très élevé (estimation ≥ 0,8 g/L). Ne conduisez pas. Demandez de l’aide et un moyen de transport sûr.";
+        }
+
+        show();
+      }
+
+      function compute(){
+        const w = num(poidsEl.value);
+        const drinks = num(verresEl.value);
+
+        if(!isFinite(w) || w <= 0){
+          setTheme('theme-warn');
+          setIcon('warn');
+          bacText.textContent = '—';
+          bacGL.textContent = '—';
+          elimH.textContent = '—';
+          desc.textContent = "Poids requis. Entrez un poids valide (ex : 75).";
+          show();
+          return;
+        }
+        if(!isFinite(drinks) || drinks < 0){
+          setTheme('theme-warn');
+          setIcon('warn');
+          bacText.textContent = '—';
+          bacGL.textContent = '—';
+          elimH.textContent = '—';
+          desc.textContent = "Nombre de verres requis. Entrez une valeur valide (ex : 3).";
+          show();
+          return;
+        }
+
+        const r = (sex === 'H') ? 0.7 : 0.6;
+        const grams = drinks * 10; // 1 verre standard = 10g
+        let bac = grams / (r * w); // g/L approx
+        if(!isFinite(bac) || bac < 0) bac = 0;
+
+        openResult(bac);
+      }
+
+      calcBtn.addEventListener('click', compute);
+      resetBtn.addEventListener('click', ()=>{
+        setSex('H');
+        poidsEl.value = '';
+        verresEl.value = '';
+        poidsEl.focus();
+      });
+
+      closeBtn.addEventListener('click', hide);
+      okBtn.addEventListener('click', hide);
+      recalcBtn.addEventListener('click', ()=>{
+        hide();
+        setTimeout(()=>{ verresEl.focus(); }, 80);
+      });
+
+      document.addEventListener('keydown', (e)=>{
+        if(e.key === 'Escape' && overlay.classList.contains('show')) hide();
+      });
+
+      [poidsEl, verresEl].forEach(el=>{
+        el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') compute(); });
+      });
+    })();
+  </script>
+</body>
+</html>
