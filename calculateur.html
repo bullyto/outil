@@ -373,6 +373,14 @@ border:1px solid rgba(255,255,255,.12)}
 padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
 .metric-card .metric-line:first-of-type{border-top:0}
 
+
+    .metricCard{margin:10px auto 8px; width:min(520px, 92vw);}
+    .metricRows{margin-top:10px; border-top:1px solid rgba(255,255,255,.10);}
+    .metricRow{display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.08);}
+    .metricRow:last-child{border-bottom:0;}
+    .metricLabel{color:rgba(255,255,255,.72); font-weight:700;}
+    .metricValue{color:rgba(255,255,255,.92); font-weight:900;}
+
 </style>
 </head>
 <body>
@@ -445,8 +453,21 @@ padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
         </div>
 
         <p class="bigValue" id="bacText">—</p>
-        <p class="smallLine">Taux estimé : <span id="bacGL">—</span> g/L</p>
-        <p class="smallLine">Élimination estimée : <span id="elimH">—</span></p>
+        <div class="miniCard metricCard" id="metricCard">
+          <div class="miniHead">
+            <div class="miniTitle">Données estimées</div>
+          </div>
+          <div class="metricRows">
+            <div class="metricRow">
+              <span class="metricLabel">Taux estimé</span>
+              <span class="metricValue"><span id="bacGL">—</span> g/L</span>
+            </div>
+            <div class="metricRow">
+              <span class="metricLabel">Élimination estimée</span>
+              <span class="metricValue"><span id="elimH">—</span></span>
+            </div>
+          </div>
+        </div>
 
         <p class="desc" id="desc">—</p>
 
