@@ -390,6 +390,72 @@ padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
   .miniTitle{font-size:16px;}
 }
 
+
+/* === Compact mobile-first modal fit (full screen safe) === */
+.overlay{padding:10px;}
+.modal{
+  max-height: calc(100dvh - 20px);
+  display:flex;
+  flex-direction:column;
+}
+.modalTop{
+  position:sticky;
+  top:0;
+  background:linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,0));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index:2;
+}
+.modalBody{
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+  padding:14px 14px 12px;
+}
+.modalFooter{
+  position:sticky;
+  bottom:0;
+  z-index:2;
+  background:linear-gradient(0deg, rgba(0,0,0,.28), rgba(0,0,0,0));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding:10px 12px 12px;
+  gap:10px;
+}
+.modalFooter .btn{
+  flex:1;
+  min-width:0;
+}
+.close{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+}
+.bigValue{
+  font-size:40px;
+  line-height:1.05;
+  margin:10px 0 8px;
+}
+.miniCard{width: min(560px, 94vw);}
+.metricCard{width: min(560px, 94vw);}
+@media (max-width:520px){
+  .overlay{padding:8px;}
+  .modal{width: min(560px, 96vw); border-radius:18px;}
+  .modalTop .ttl{font-size:16px;}
+  .bigValue{font-size:34px;}
+  .miniCard{padding:12px;}
+  .card{padding:12px;}
+  .metricRow{padding:8px 0;}
+  .btn{height:48px; font-size:16px;}
+}
+@media (max-height:700px){
+  .bigValue{font-size:32px;}
+  .iconBig{margin:2px auto 6px;}
+}
+
+
+/* Compact: remove unused big icon space */
+.modalBody{padding-top:12px;}
+
 </style>
 </head>
 <body>
@@ -455,13 +521,14 @@ padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
       </div>
 
       <div class="modalBody">
-        <div class="iconBig" aria-hidden="true">
+        <!-- Hidden icon SVG kept for JS compatibility (no layout impact) -->
+        <div class="iconBig" aria-hidden="true" style="display:none">
           <svg class="svg" id="iconSvg" viewBox="0 0 24 24" fill="none">
             <path d="M7 12l3 3 7-7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
 
-        <p class="bigValue" id="bacText">—</p>
+<p class="bigValue" id="bacText">—</p>
         <div class="miniCard metricCard" id="metricCard">
           <div class="miniHead">
             <div class="miniTitle">Données estimées</div>
@@ -481,13 +548,7 @@ padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
         <p class="desc" id="desc">—</p>
 
         <div class="cards" id="cards"></div>
-
-
-        <div class="muted" id="muted">
-          <strong>Important :</strong> estimation indicative (formule simplifiée). Les effets varient selon la personne, le repas, le temps, etc.
-          <strong>Seul un éthylotest homologué</strong> permet de déterminer un taux réel.
-        </div>
-      </div>
+</div>
 
       <div class="modalFooter">
         <button class="btn secondary" id="recalc" type="button">Modifier</button>
@@ -564,6 +625,7 @@ padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
       }
 
       function setIcon(kind){
+        if(!iconSvg) return;
         if(kind === 'ok'){
           iconSvg.innerHTML = '<path d="M7 12l3 3 7-7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
         } else if(kind === 'warn'){
