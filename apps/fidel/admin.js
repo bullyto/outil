@@ -1,3 +1,48 @@
+
+  // --- Canonical public domain (force aperos.net instead of GitHub Pages) ---
+  const CANON_HOST = "aperos.net";
+  function canonicalizePublicUrl(inputUrl) {
+    try {
+      const u = new URL(inputUrl, window.location.href);
+      // Force hostname to aperos.net when running on github.io or aperos.net
+      if (u.hostname.endsWith(".github.io") || u.hostname === "github.io" || u.hostname === "aperos.net") {
+        u.hostname = CANON_HOST;
+        u.protocol = "https:";
+      }
+      // Also force if current host is github.io but URL is relative
+      if (window.location.hostname.endsWith(".github.io")) {
+        u.hostname = CANON_HOST;
+        u.protocol = "https:";
+      }
+      return u.toString();
+    } catch {
+      return inputUrl;
+    }
+  }
+
+  // Build the client card URL from a clientId, on canonical domain
+  function buildClientUrl(clientId, extraParams = {}) {
+    const base = new URL("./client.html", window.location.href);
+    // keep the same path base (ex: /fidel/ or /apps/fidel/) but force host
+    base.searchParams.set("id", clientId);
+    for (const [k, v] of Object.entries(extraParams)) base.searchParams.set(k, String(v));
+    return canonicalizePublicUrl(base.toString());
+  }
+
+  // Extract clientId from scanned text (URL or raw id)
+  function extractClientId(scannedText) {
+    const t = (scannedText || "").trim();
+    if (!t) return "";
+    try {
+      const u = new URL(t);
+      const id = u.searchParams.get("id") || "";
+      return (id || "").trim();
+    } catch {
+      return t;
+    }
+  }
+
+  let _currentClientId = "";
 function extractClientIdFromAny(raw){
   // Nettoyage agressif (espaces, retours, caractères invisibles)
   let s = String(raw || "");
@@ -60,13 +105,17 @@ function extractIdByPrefix(raw){
   return m ? m[0] : s;
 }
 
-function setScanned(raw){
-  window.__adn66_last_scan_raw = String(raw || "").trim();
-  const id = extractIdByPrefix(raw);
-  const idEl = document.getElementById("clientId");
-  if(idEl) idEl.value = id;
-  return id;
-}
+function setScanned(raw) {
+    const cid = extractClientId(raw);
+    _currentClientId = cid || "";
+    const fullUrl = cid ? buildClientUrl(cid) : "";
+    // Show FULL URL in the input (as requested), never just the UUID
+    const el = document.getElementById("clientId") || document.querySelector("#clientId") || document.querySelector('input[name="clientId"]');
+    if (el) el.value = fullUrl || "";
+    // Also keep any legacy field if present
+    const legacy = document.getElementById("cid") || document.getElementById("client_id");
+    if (legacy) legacy.value = fullUrl || "";
+  }
 
 // auto-tri si on colle dans le champ ID
 document.addEventListener("input", (e)=>{
@@ -237,8 +286,7 @@ async function startScan(){
           const val = barcodes[0].rawValue || "";
           const cid = pickCid(val);
           if(cid){
-            setScanned(val);
-
+            setScanned(val || txt || cid);
             scanHint.textContent = "QR détecté ✅";
             await stopScan();
             return;
@@ -270,7 +318,7 @@ async function startScan(){
         const txt = result.getText();
         const cid = pickCid(txt);
         if(cid){
-          setScanned(cid);
+          setScanned(val || txt || cid);
           scanHint.textContent = "QR détecté ✅";
           stopScan();
         }
@@ -344,7 +392,7 @@ function showRecoveryQr(cid){
   const id = String(cid || "").trim();
 
   // page client (adapter si tu changes la route)
-  const restoreUrl = (location.origin || "") + "/fidel/client.html?restore=1&id=" + encodeURIComponent(id);
+  const restoreUrl = buildClientUrl(row.client_id || row.clientId || row.id || clientId, { restore: 1 });
 
   document.getElementById("qrSub").textContent =
     "URL (scan) : " + restoreUrl;
