@@ -339,17 +339,23 @@ function renderResults(items){
 }
 
 function showRecoveryQr(cid){
+  try{
+
   // QR de récupération : URL http(s) que le client scanne
   const id = String(cid || "").trim();
 
   // page client (adapter si tu changes la route)
-  const restoreUrl = clientUrl("restore=1&id=" + encodeURIComponent(id));
+  const restoreUrl = "https://www.aperos.net/fidel/client.html?restore=1&id=" + encodeURIComponent(id);
 
   document.getElementById("qrSub").textContent =
     "URL (scan) : " + restoreUrl;
 
   qrRender(restoreUrl);
   document.getElementById("qrFull").classList.add("open");
+  }catch(e){
+    console.error(e);
+    alert("Erreur QR: "+(e && e.message ? e.message : e));
+  }
 }
 
 async function stamp(){
@@ -382,7 +388,7 @@ async function stamp(){
   }
 
   try{
-    const r = await api("/loyalty/stamp", {method:"POST", body: JSON.stringify({admin_key:key, client_id:cid})});
+    const r = await api("/loyalty/stamp", {method:"POST", headers: {"content-type":"text/plain;charset=utf-8"}, body: JSON.stringify({admin_key:key, client_id:cid})});
     setApiState(true, "Validé ✅");
     alert("OK ✅ Points: " + (r.points ?? "?"));
   }catch(e){
