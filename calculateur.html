@@ -298,7 +298,69 @@
 
     .svg{width:46px;height:46px;opacity:.95}
 
-    @media (max-width:520px){
+    
+    /* HIDE static sanctions list (replaced by dynamic text) */
+    #sanctions{display:none !important;}
+
+    /* Marketing cards for legal/prevention */
+    .cards{
+      margin:14px auto 0;
+      width:min(520px, 100%);
+      display:grid;
+      gap:10px;
+    }
+    .cardBox{
+      border-radius:18px;
+      padding:12px 14px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      text-align:left;
+    }
+    .cardTitleRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .cardTitle{
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:14px;
+      opacity:.95;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .pill{
+      font-size:12px;
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.12);
+      white-space:nowrap;
+    }
+    .cardBody{
+      font-size:13px;
+      line-height:1.35;
+      opacity:.90;
+    }
+    .cardBody b{opacity:1;}
+    .bul{
+      margin:0;
+      padding-left:16px;
+    }
+    .bul li{ margin:6px 0; }
+    .mutedSmall{
+      margin-top:8px;
+      font-size:12px;
+      opacity:.72;
+      font-weight:800;
+    }
+
+@media (max-width:520px){
       .row{grid-template-columns:1fr}
       .btn{min-width:150px}
     }
@@ -379,29 +441,8 @@
 
         <p class="desc" id="desc">—</p>
 
-        <div class="list" id="sanctions">
-          <div class="li">
-            <div class="dot accent"></div>
-            <div>
-              <b>Seuil légal (général) : 0,5 g/L</b>
-              <span>Au-dessus : sanctions + retrait de points. Ne conduisez pas.</span>
-            </div>
-          </div>
-          <div class="li">
-            <div class="dot accent"></div>
-            <div>
-              <b>À partir de 0,8 g/L</b>
-              <span>Délit : sanctions aggravées possibles (suspension / annulation, etc.).</span>
-            </div>
-          </div>
-          <div class="li">
-            <div class="dot accent"></div>
-            <div>
-              <b>Conseil sécurité</b>
-              <span>Faites-vous raccompagner / taxi / VTC. Ne prenez pas le volant après avoir bu.</span>
-            </div>
-          </div>
-        </div>
+        <div class="cards" id="cards"></div>
+
 
         <div class="muted" id="muted">
           <strong>Important :</strong> estimation indicative (formule simplifiée). Les effets varient selon la personne, le repas, le temps, etc.
@@ -494,32 +535,117 @@
       }
 
       function openResult(bac){
-        // Color ranges:
-        // <0.2 ok, 0.2–0.49 warn, 0.5–0.79 orange, >=0.8 danger
-        const elimRate = 0.13; // g/L/h (more cautious)
+        // 3 ranges:
+        // <0.5 ok (prevention), 0.5–0.79 orange (contravention), >=0.8 danger (délit)
+        const elimRate = 0.13; // g/L/h (cautious)
         const hours = Math.max(0, bac / elimRate);
 
         bacText.textContent = fmt(bac) + ' g/L';
         bacGL.textContent = fmt(bac);
         elimH.textContent = humanHours(hours);
 
-        // Very cautious wording: never "ok to drive".
-        if (bac < 0.2){
+        const cards = document.getElementById('cards');
+
+        const mkCard = (title, pill, bodyHtml) => {
+          return `
+            <div class="cardBox">
+              <div class="cardTitleRow">
+                <div class="cardTitle">${title}</div>
+                <div class="pill">${pill}</div>
+              </div>
+              <div class="cardBody">${bodyHtml}</div>
+            </div>
+          `;
+        };
+
+        if (bac < 0.5){
           setTheme('theme-ok');
           setIcon('ok');
-          desc.textContent = "Sous 0,2 g/L (estimation). L’alcool peut quand même réduire la vigilance : évitez de conduire si possible.";
-        } else if (bac < 0.5){
-          setTheme('theme-warn');
-          setIcon('warn');
-          desc.textContent = "Entre 0,2 et 0,5 g/L (estimation). Risque accru : privilégiez un conducteur sobre / un transport sûr.";
+
+          // short headline
+          desc.innerHTML = "✅ <b>Prévention :</b> même sous le seuil, ne prenez pas la route si vous ne vous sentez pas apte.";
+
+          const body1 = `
+            <ul class="bul">
+              <li><b>Sous le seuil légal</b> (0,5 g/L) — estimation.</li>
+              <li>L’alcool peut déjà réduire vigilance, réflexes et perception.</li>
+            </ul>
+          `;
+          const body2 = `
+            <ul class="bul">
+              <li>Attendez l’élimination complète si vous devez conduire.</li>
+              <li>Faites‑vous raccompagner / taxi / VTC.</li>
+            </ul>
+            <div class="mutedSmall">Estimation indicative : seul un <b>éthylotest homologué</b> donne un taux réel.</div>
+          `;
+          cards.innerHTML = [
+            mkCard("Votre situation", "OK (< 0,5 g/L)", body1),
+            mkCard("Conseil sécurité", "Prévention", body2),
+          ].join("");
+
         } else if (bac < 0.8){
           setTheme('theme-orange');
           setIcon('warn');
-          desc.textContent = "Au-dessus du seuil légal 0,5 g/L (estimation). Ne conduisez pas. Faites-vous raccompagner / taxi / VTC.";
+
+          desc.innerHTML = "⚠️ <b>Infraction :</b> au‑dessus de 0,5 g/L, <b>ne conduisez pas</b>.";
+
+          const body1 = `
+            <ul class="bul">
+              <li><b>Seuil atteint :</b> ≥ 0,5 g/L (contravention) — estimation.</li>
+              <li><b>Interdiction de conduire</b> : risque immédiat en cas de contrôle.</li>
+            </ul>
+          `;
+          const body2 = `
+            <ul class="bul">
+              <li><b>Amende forfaitaire :</b> 135 € (montants majorables).</li>
+              <li><b>Retrait :</b> 6 points.</li>
+            </ul>
+          `;
+          const body3 = `
+            <ul class="bul">
+              <li>Ne prenez pas le volant.</li>
+              <li>Organisez un retour sûr : raccompagnement / taxi / VTC.</li>
+            </ul>
+            <div class="mutedSmall">Estimation indicative : seul un <b>éthylotest homologué</b> donne un taux réel.</div>
+          `;
+          cards.innerHTML = [
+            mkCard("Votre situation", "0,5 à 0,79 g/L", body1),
+            mkCard("Conséquences juridiques", "Contravention", body2),
+            mkCard("Conseil sécurité", "À faire maintenant", body3),
+          ].join("");
+
         } else {
           setTheme('theme-danger');
           setIcon('danger');
-          desc.textContent = "Taux très élevé (estimation ≥ 0,8 g/L). Ne conduisez pas. Demandez de l’aide et un moyen de transport sûr.";
+
+          desc.innerHTML = "⛔ <b>Délit :</b> au‑dessus de 0,8 g/L, les sanctions peuvent être <b>très lourdes</b>.";
+
+          const body1 = `
+            <ul class="bul">
+              <li><b>Seuil délit :</b> ≥ 0,8 g/L — estimation.</li>
+              <li><b>Interdiction absolue de conduire</b>.</li>
+            </ul>
+          `;
+          const body2 = `
+            <ul class="bul">
+              <li><b>Amende :</b> jusqu’à 4 500 €.</li>
+              <li><b>Retrait :</b> 6 points.</li>
+              <li><b>Permis :</b> suspension / annulation possible.</li>
+              <li><b>Prison :</b> peine possible selon les circonstances.</li>
+            </ul>
+          `;
+          const body3 = `
+            <ul class="bul">
+              <li>Demandez de l’aide immédiatement.</li>
+              <li>Choisissez un transport sûr : raccompagnement / taxi / VTC.</li>
+            </ul>
+            <div class="mutedSmall">Estimation indicative : seul un <b>éthylotest homologué</b> donne un taux réel.</div>
+          `;
+          cards.innerHTML = [
+            mkCard("Votre situation", "≥ 0,8 g/L", body1),
+            mkCard("Conséquences juridiques", "Délit", body2),
+            mkCard("Conseil sécurité", "Urgent", body3),
+          ].join("");
         }
 
         show();
