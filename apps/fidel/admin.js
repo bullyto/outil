@@ -1,6 +1,3 @@
-const CANON_ORIGIN = "https://www.aperos.net";
-const CLIENT_PATH = "/fidel/client.html";
-
 function extractClientIdFromAny(raw){
   // Nettoyage agressif (espaces, retours, caractères invisibles)
   let s = String(raw || "");
@@ -65,25 +62,21 @@ function extractIdByPrefix(raw){
 
 function setScanned(raw){
   window.__adn66_last_scan_raw = String(raw || "").trim();
-  const id = extractIdByPrefix(raw);
-  window.__adn66_last_client_id = id || "";
+  const id = extractIdByPrefix(raw) || extractClientIdFromAny(raw);
   const idEl = document.getElementById("clientId");
-  if(idEl){
-    idEl.value = id ? (CANON_ORIGIN + CLIENT_PATH + "?id=" + encodeURIComponent(id)) : "";
-  }
-  return id;
+  if(idEl) idEl.value = id ? canonicalClientUrl(id) : "";
+  return id || "";
 }
 
 // auto-tri si on colle dans le champ ID
-// auto-tri si on colle dans le champ ID (accepte UUID ou URL, et affiche l'URL canonique)
 document.addEventListener("input", (e)=>{
   const t = e.target;
   if(t && t.id === "clientId"){
-    const v = (t.value || "").trim();
+    const v = t.value || "";
     const id = extractIdByPrefix(v);
-    window.__adn66_last_client_id = id || "";
-    const canon = id ? (CANON_ORIGIN + CLIENT_PATH + "?id=" + encodeURIComponent(id)) : "";
-    if(canon && canon !== v) t.value = canon;
+    if(id && id !== v){
+      t.value = id;
+    }
   }
 }, true);
 // ===============================================
@@ -156,6 +149,37 @@ function extractClientIdFromAny(text) {
 
 const ADMIN_LS = "adn66_loyalty_admin_key";
 
+
+
+// Canonical public URL for client card (independent from where admin is hosted)
+const CANON_ORIGIN = "https://www.aperos.net";
+const CLIENT_PATH = "/fidel/client.html";
+
+function readAdminKey(){
+  const el =
+    document.getElementById("adminKey") ||
+    document.getElementById("admin_key") ||
+    document.querySelector('input[name="admin_key"]') ||
+    document.querySelector('input[name="adminKey"]');
+  let key = el ? String(el.value || "") : "";
+  key = key.replace(/[\u200B-\u200D\uFEFF]/g, ""); // zero-width
+  key = key.trim();
+  return key;
+}
+
+function readClientId(){
+  const el = document.getElementById("clientId") || document.getElementById("client_id") || document.querySelector('input[name="client_id"]');
+  const raw = el ? String(el.value || "") : "";
+  return extractClientIdFromAny(raw) || extractIdByPrefix(raw) || "";
+}
+
+function canonicalClientUrl(id, extra={}){
+  if(!id) return "";
+  const u = new URL(CLIENT_PATH, CANON_ORIGIN);
+  u.searchParams.set("id", id);
+  for(const k of Object.keys(extra||{})) u.searchParams.set(k, String(extra[k]));
+  return u.toString();
+}
 function normalizePhone(raw){ return (raw||"").replace(/[^0-9+]/g,"").trim(); }
 function setEnvPill(){ document.getElementById("envPill").innerHTML = "Mode : <b>" + (API_BASE ? "Serveur" : "Démo") + "</b>"; }
 setEnvPill();
@@ -244,7 +268,7 @@ async function startScan(){
           const val = barcodes[0].rawValue || "";
           const cid = pickCid(val);
           if(cid){
-            setScanned(val);
+            setScanned(val || txt || cid || '');
             scanHint.textContent = "QR détecté ✅";
             await stopScan();
             return;
@@ -276,7 +300,7 @@ async function startScan(){
         const txt = result.getText();
         const cid = pickCid(txt);
         if(cid){
-          setScanned(val);
+          setScanned(val || txt || cid || '');
           scanHint.textContent = "QR détecté ✅";
           stopScan();
         }
@@ -333,7 +357,7 @@ function renderResults(items){
   for(const it of items){
     html += "<tr>";
     html += "<td><b>"+escapeHtml(it.name||"—")+"</b></td>";
-    html += "<td class='mono'>"+escapeHtml((it.phone_last4 ? ("** ** " + it.phone_last4) : maskPhone(it.phone||"")))+"</td>";
+    html += "<td class='mono'>"+escapeHtml((it.phone_last4 ? ("** ** " + String(it.phone_last4)) : maskPhone(it.phone||"")))+"</td>";
     html += "<td>"+Number(it.points||0)+"</td>";
     html += "<td><button class='secondary' data-cid='"+escapeHtml(it.client_id)+"'>Afficher QR</button></td>";
     html += "</tr>";
@@ -350,7 +374,7 @@ function showRecoveryQr(cid){
   const id = String(cid || "").trim();
 
   // page client (adapter si tu changes la route)
-  const restoreUrl = CANON_ORIGIN + CLIENT_PATH + "?restore=1&id=" + encodeURIComponent(id);
+  const restoreUrl = canonicalClientUrl(id, { restore: 1 });
 
   document.getElementById("qrSub").textContent =
     "URL (scan) : " + restoreUrl;
@@ -360,9 +384,8 @@ function showRecoveryQr(cid){
 }
 
 async function stamp(){
-  const key = (document.getElementById("adminKey").value||"").trim();
-  const cidRaw = (document.getElementById("clientId").value||"").trim();
-  const cid = extractIdByPrefix(cidRaw);
+  const key = readAdminKey();
+  const cid = readClientId();
   if(!key) return alert("Clé admin manquante");
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cid)) return alert("ID client invalide");
 
@@ -400,7 +423,7 @@ async function stamp(){
 }
 
 async function search(){
-  const key = (document.getElementById("adminKey").value||"").trim();
+  const key = readAdminKey();
   const phone = normalizePhone(document.getElementById("searchPhone").value);
   if(!key) return alert("Clé admin manquante");
   if(!phone || phone.length < 10) return alert("Téléphone invalide");
@@ -442,7 +465,7 @@ document.getElementById("btnCopy").addEventListener("click", ()=>{
 
 const saved = localStorage.getItem(ADMIN_LS);
 if(saved){
-  document.getElementById("adminKey").value = saved;
+  const _ak = (document.getElementById("adminKey")||document.getElementById("admin_key")); if(_ak) _ak.value = saved;
   document.getElementById("who").textContent = "PIN: " + saved;
 }
 setApiState(true, API_BASE ? "Serveur" : "Démo locale");
