@@ -1,3 +1,6 @@
+const CANON_ORIGIN = "https://www.aperos.net";
+const CLIENT_PATH = "/fidel/client.html";
+
 function extractClientIdFromAny(raw){
   // Nettoyage agressif (espaces, retours, caractères invisibles)
   let s = String(raw || "");
@@ -61,22 +64,26 @@ function extractIdByPrefix(raw){
 }
 
 function setScanned(raw){
-  const id = extractClientIdFromAny(raw);
+  window.__adn66_last_scan_raw = String(raw || "").trim();
+  const id = extractIdByPrefix(raw);
   window.__adn66_last_client_id = id || "";
-  const fullUrl = id ? buildClientUrl(id, false) : "";
-  const el = document.getElementById("clientId");
-  if(el) el.value = fullUrl;
+  const idEl = document.getElementById("clientId");
+  if(idEl){
+    idEl.value = id ? (CANON_ORIGIN + CLIENT_PATH + "?id=" + encodeURIComponent(id)) : "";
+  }
+  return id;
 }
 
 // auto-tri si on colle dans le champ ID
+// auto-tri si on colle dans le champ ID (accepte UUID ou URL, et affiche l'URL canonique)
 document.addEventListener("input", (e)=>{
   const t = e.target;
   if(t && t.id === "clientId"){
-    const v = t.value || "";
+    const v = (t.value || "").trim();
     const id = extractIdByPrefix(v);
-    if(id && id !== v){
-      t.value = id;
-    }
+    window.__adn66_last_client_id = id || "";
+    const canon = id ? (CANON_ORIGIN + CLIENT_PATH + "?id=" + encodeURIComponent(id)) : "";
+    if(canon && canon !== v) t.value = canon;
   }
 }, true);
 // ===============================================
@@ -86,17 +93,6 @@ document.addEventListener("input", (e)=>{
 // CONFIG : URL Worker Cloudflare (ex: https://xxxx.workers.dev). Laisse vide = mode démo local.
 const API_BASE = "https://carte-de-fideliter.apero-nuit-du-66.workers.dev";
 
-
-// Public URL used in QR + displayed in the field (must be EXACT)
-const PUBLIC_ORIGIN = "https://www.aperos.net";
-const PUBLIC_CLIENT_PATH = "/fidel/client.html";
-
-function buildClientUrl(clientId, restore){
-  const id = String(clientId || "").trim();
-  if(!id) return "";
-  const qs = restore ? ("?restore=1&id=" + encodeURIComponent(id)) : ("?id=" + encodeURIComponent(id));
-  return PUBLIC_ORIGIN + PUBLIC_CLIENT_PATH + qs;
-}
 function makeQrSvg(text, size){
   // Supports both legacy `qrcode()` API and the bundled `QRCodeGenerator`.
   size = Number(size || 220);
@@ -248,7 +244,7 @@ async function startScan(){
           const val = barcodes[0].rawValue || "";
           const cid = pickCid(val);
           if(cid){
-            setScanned(val || txt || cid);
+            setScanned(val);
             scanHint.textContent = "QR détecté ✅";
             await stopScan();
             return;
@@ -280,7 +276,7 @@ async function startScan(){
         const txt = result.getText();
         const cid = pickCid(txt);
         if(cid){
-          setScanned(val || txt || cid);
+          setScanned(val);
           scanHint.textContent = "QR détecté ✅";
           stopScan();
         }
@@ -337,7 +333,7 @@ function renderResults(items){
   for(const it of items){
     html += "<tr>";
     html += "<td><b>"+escapeHtml(it.name||"—")+"</b></td>";
-    html += "<td class='mono'>"+escapeHtml((it.phone_last4 ? ("••••••"+it.phone_last4) : maskPhone(it.phone||"")))+"</td>";
+    html += "<td class='mono'>"+escapeHtml((it.phone_last4 ? ("** ** " + it.phone_last4) : maskPhone(it.phone||"")))+"</td>";
     html += "<td>"+Number(it.points||0)+"</td>";
     html += "<td><button class='secondary' data-cid='"+escapeHtml(it.client_id)+"'>Afficher QR</button></td>";
     html += "</tr>";
@@ -350,9 +346,15 @@ function renderResults(items){
 }
 
 function showRecoveryQr(cid){
-  const id = extractClientIdFromAny(cid);
-  const restoreUrl = buildClientUrl(id, true);
-  document.getElementById("qrSub").textContent = "URL (scan) : " + restoreUrl;
+  // QR de récupération : URL http(s) que le client scanne
+  const id = String(cid || "").trim();
+
+  // page client (adapter si tu changes la route)
+  const restoreUrl = CANON_ORIGIN + CLIENT_PATH + "?restore=1&id=" + encodeURIComponent(id);
+
+  document.getElementById("qrSub").textContent =
+    "URL (scan) : " + restoreUrl;
+
   qrRender(restoreUrl);
   document.getElementById("qrFull").classList.add("open");
 }
@@ -360,7 +362,7 @@ function showRecoveryQr(cid){
 async function stamp(){
   const key = (document.getElementById("adminKey").value||"").trim();
   const cidRaw = (document.getElementById("clientId").value||"").trim();
-  const cid = extractClientIdFromAny(cidRaw) || (window.__adn66_last_client_id||"");
+  const cid = extractIdByPrefix(cidRaw);
   if(!key) return alert("Clé admin manquante");
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cid)) return alert("ID client invalide");
 
