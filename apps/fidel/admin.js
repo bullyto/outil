@@ -237,7 +237,8 @@ async function startScan(){
           const val = barcodes[0].rawValue || "";
           const cid = pickCid(val);
           if(cid){
-            setScanned(val || txt || cid);
+            setScanned(val);
+
             scanHint.textContent = "QR détecté ✅";
             await stopScan();
             return;
@@ -269,7 +270,7 @@ async function startScan(){
         const txt = result.getText();
         const cid = pickCid(txt);
         if(cid){
-          setScanned(val || txt || cid);
+          setScanned(cid);
           scanHint.textContent = "QR détecté ✅";
           stopScan();
         }
