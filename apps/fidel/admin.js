@@ -343,7 +343,7 @@ function showRecoveryQr(cid){
   const id = String(cid || "").trim();
 
   // page client (adapter si tu changes la route)
-  const restoreUrl = apiUrl("/fidel/client.html?restore=1&id=") + encodeURIComponent(id);
+  const restoreUrl = "https://www.aperos.net/fidel/client.html?restore=1&id=" + encodeURIComponent(id);
 
   document.getElementById("qrSub").textContent =
     "URL (scan) : " + restoreUrl;
