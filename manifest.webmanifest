@@ -40,5 +40,21 @@
     "business",
     "productivity",
     "utilities"
+  ],
+  "shortcuts": [
+    {
+      "name": "Calculateur d’alcoolémie",
+      "short_name": "Alcoolémie",
+      "description": "Estimation indicative du taux d’alcoolémie (ne remplace pas un éthylotest homologué).",
+      "url": "./calculateur",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    }
   ]
 }
