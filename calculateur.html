@@ -456,6 +456,16 @@ padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
 /* Compact: remove unused big icon space */
 .modalBody{padding-top:12px;}
 
+
+/* === IFRAME EMBED MODE === */
+html, body{height:100%;}
+body{margin:0;}
+body.embed{background:transparent !important;}
+body.embed .overlay{display:flex !important;background:transparent !important;padding:0 !important;}
+body.embed .modal{width:100% !important;max-width:none !important;border-radius:16px !important;max-height:100% !important;}
+body.embed .modalBody{padding:14px 14px 10px !important;}
+body.embed .modalFooter{padding:10px 12px 12px !important;}
+
 </style>
 </head>
 <body>
@@ -618,6 +628,49 @@ padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
         document.documentElement.style.overflow = '';
         document.body.style.overflow = '';
       }
+
+      // === Embed / iframe helpers ===
+      function isInIframe(){ try { return window.self !== window.top; } catch(e){ return true; } }
+      const qs = new URLSearchParams(location.search);
+      const EMBED = qs.get("embed") === "1" || isInIframe();
+      if (EMBED){
+        document.body.classList.add("embed");
+        // show container so it behaves like a popup component inside an iframe
+        overlay.style.display = "flex";
+      }
+
+      function postToParent(payload){
+        if (!isInIframe()) return;
+        try { parent.postMessage(payload, "*"); } catch(e){}
+      }
+
+      function requestParentResize(){
+        if (!isInIframe()) return;
+        const h = Math.ceil(document.documentElement.scrollHeight);
+        postToParent({ type:"adn66-iframe-resize", height:h });
+      }
+
+      function closeEmbed(){
+        hide();
+        postToParent({ type:"adn66-iframe-close" });
+      }
+
+      // Hook close buttons
+      closeBtn.addEventListener('click', (e)=>{ e.preventDefault(); EMBED ? closeEmbed() : hide(); });
+      okBtn.addEventListener('click', (e)=>{ e.preventDefault(); EMBED ? closeEmbed() : hide(); });
+      recalcBtn.addEventListener('click', (e)=>{ e.preventDefault(); hide(); requestParentResize(); });
+
+      // Resize observer to keep popup sized
+      const ro = new ResizeObserver(()=>requestParentResize());
+      ro.observe(document.body);
+      window.addEventListener("load", requestParentResize);
+
+      // Optional API for parent
+      window.ADN66_CALC = {
+        open: () => { overlay.style.display = "flex"; requestParentResize(); },
+        close: () => { EMBED ? closeEmbed() : hide(); },
+        recalc: () => { hide(); requestParentResize(); }
+      };
 
       function setTheme(theme){
         modal.classList.remove('theme-ok','theme-warn','theme-orange','theme-danger');
@@ -793,11 +846,7 @@ padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
         poidsEl.focus();
       });
 
-      closeBtn.addEventListener('click', hide);
-      okBtn.addEventListener('click', hide);
-      recalcBtn.addEventListener('click', ()=>{
-        hide();
-        setTimeout(()=>{ verresEl.focus(); }, 80);
+              setTimeout(()=>{ verresEl.focus(); }, 80);
       });
 
       document.addEventListener('keydown', (e)=>{
