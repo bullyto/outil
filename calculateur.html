@@ -846,14 +846,13 @@ body.embed .modalFooter{padding:10px 12px 12px !important;}
         poidsEl.focus();
       });
 
-              setTimeout(()=>{ verresEl.focus(); }, 80);
-      });
-
       document.addEventListener('keydown', (e)=>{
-        if(e.key === 'Escape' && overlay.classList.contains('show')) hide();
+        if(e.key === 'Escape' && overlay.classList.contains('show')){
+          EMBED ? closeEmbed() : hide();
+        }
       });
 
-      [poidsEl, verresEl].forEach(el=>{
+[poidsEl, verresEl].forEach(el=>{
         el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') compute(); });
       });
     })();
