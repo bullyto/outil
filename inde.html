@@ -2,53 +2,75 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Outil interne — ADN66</title>
 
   <style>
+    :root{
+      --bg:#050b12;
+      --card:#0b1420;
+      --card2:#0e1826;
+      --border:rgba(255,255,255,.08);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+    }
+    html,body{height:100%;}
     body{
       margin:0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background:#050b12;
-      color:#fff;
+      background:var(--bg);
+      color:var(--text);
     }
+    body.lock{overflow:hidden;}
+
     .menu{
       padding:16px;
       display:grid;
       gap:12px;
     }
     .card{
-      background:#0b1420;
-      border:1px solid rgba(255,255,255,.08);
+      background:var(--card);
+      border:1px solid var(--border);
       border-radius:18px;
       padding:16px;
       cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
     }
-    .card:hover{background:#0e1826;}
+    .card:hover{background:var(--card2);}
     .card h3{margin:0 0 6px;font-size:18px;}
-    .card p{margin:0;color:rgba(255,255,255,.7);font-size:14px;}
+    .card p{margin:0;color:var(--muted);font-size:14px;}
 
-    /* Popup */
+    /* Popup iframe (fullscreen, mobile safe) */
     .overlay{
       position:fixed;
       inset:0;
-      background:rgba(0,0,0,.7);
+      background:rgba(0,0,0,.72);
       display:none;
-      align-items:center;
-      justify-content:center;
+      align-items:stretch;
+      justify-content:stretch;
       z-index:9999;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
+    .overlay.show{display:flex;}
+
     .popup{
       width:100%;
       height:100%;
-      background:#050b12;
+      background:var(--bg);
       position:relative;
+      border-radius:0;
+      overflow:hidden;
     }
+
     .popup iframe{
       width:100%;
       height:100%;
       border:0;
+      display:block;
+      background:transparent;
     }
+
     .closeBtn{
       position:absolute;
       top:12px;
@@ -56,12 +78,22 @@
       width:44px;
       height:44px;
       border-radius:14px;
-      border:0;
-      background:#0b1420;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(11,20,32,.92);
       color:#fff;
       font-size:20px;
       cursor:pointer;
       z-index:10;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    @media (max-width:520px){
+      .menu{padding:14px;}
+      .card{padding:14px;border-radius:16px;}
+      .closeBtn{top:10px; right:10px;}
     }
   </style>
 </head>
@@ -75,27 +107,51 @@
   </div>
 
   <!-- POPUP IFRAME -->
-  <div class="overlay" id="overlay">
-    <div class="popup">
-      <button class="closeBtn" id="closePopup">✕</button>
-      <iframe src="./calculateur.html?embed=1"></iframe>
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Calculateur alcoolémie">
+      <button class="closeBtn" id="closePopup" type="button" aria-label="Fermer">✕</button>
+      <iframe id="calcFrame" src="./calculateur.html?embed=1" title="Calculateur alcoolémie" loading="eager"></iframe>
     </div>
   </div>
 
   <script>
     const overlay = document.getElementById('overlay');
-    document.getElementById('openCalc').onclick = () => {
-      overlay.style.display = 'flex';
-    };
-    document.getElementById('closePopup').onclick = () => {
-      overlay.style.display = 'none';
-    };
+    const frame = document.getElementById('calcFrame');
+    const openBtn = document.getElementById('openCalc');
+    const closeBtn = document.getElementById('closePopup');
 
-    // Listen iframe messages
+    function openPopup(){
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden','false');
+      document.body.classList.add('lock');
+      // Recharger l'iframe à chaque ouverture (évite état bloqué si popup fermée en plein résultat)
+      frame.src = "./calculateur.html?embed=1";
+    }
+
+    function closePopup(){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden','true');
+      document.body.classList.remove('lock');
+    }
+
+    openBtn.addEventListener('click', openPopup);
+    closeBtn.addEventListener('click', closePopup);
+
+    // click sur le fond (pas sur la popup) => fermer
+    overlay.addEventListener('click', (e)=>{
+      if(e.target === overlay) closePopup();
+    });
+
+    // ESC => fermer
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && overlay.classList.contains('show')) closePopup();
+    });
+
+    // Messages depuis l'iframe
     window.addEventListener("message", (e)=>{
       if(!e.data || !e.data.type) return;
       if(e.data.type === "adn66-iframe-close"){
-        overlay.style.display = "none";
+        closePopup();
       }
     });
   </script>
