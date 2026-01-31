@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Outil interne — ADN66</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background:#050b12;
+      color:#fff;
+    }
+    .menu{
+      padding:16px;
+      display:grid;
+      gap:12px;
+    }
+    .card{
+      background:#0b1420;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:16px;
+      cursor:pointer;
+    }
+    .card:hover{background:#0e1826;}
+    .card h3{margin:0 0 6px;font-size:18px;}
+    .card p{margin:0;color:rgba(255,255,255,.7);font-size:14px;}
+
+    /* Popup */
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.7);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+    }
+    .popup{
+      width:100%;
+      height:100%;
+      background:#050b12;
+      position:relative;
+    }
+    .popup iframe{
+      width:100%;
+      height:100%;
+      border:0;
+    }
+    .closeBtn{
+      position:absolute;
+      top:12px;
+      right:12px;
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      border:0;
+      background:#0b1420;
+      color:#fff;
+      font-size:20px;
+      cursor:pointer;
+      z-index:10;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="menu">
+    <div class="card" id="openCalc">
+      <h3>Calculateur alcoolémie</h3>
+      <p>Estimation & prévention</p>
+    </div>
+  </div>
+
+  <!-- POPUP IFRAME -->
+  <div class="overlay" id="overlay">
+    <div class="popup">
+      <button class="closeBtn" id="closePopup">✕</button>
+      <iframe src="./calculateur.html?embed=1"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const overlay = document.getElementById('overlay');
+    document.getElementById('openCalc').onclick = () => {
+      overlay.style.display = 'flex';
+    };
+    document.getElementById('closePopup').onclick = () => {
+      overlay.style.display = 'none';
+    };
+
+    // Listen iframe messages
+    window.addEventListener("message", (e)=>{
+      if(!e.data || !e.data.type) return;
+      if(e.data.type === "adn66-iframe-close"){
+        overlay.style.display = "none";
+      }
+    });
+  </script>
+
+</body>
+</html>
