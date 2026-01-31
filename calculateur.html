@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculateur d'alcoolémie — Apéro de Nuit 66</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Calculateur d'alcoolémie — ADN66</title>
   <meta name="description" content="Estimation indicative d'alcoolémie. Ne remplace pas un éthylotest homologué." />
+
   <style>
     :root{
       --bg:#050b12;
@@ -14,890 +15,492 @@
       --muted:rgba(255,255,255,.68);
       --muted2:rgba(255,255,255,.56);
       --border:rgba(255,255,255,.10);
-      --blue:#54b4ff;
-
-      --ok:#21d07a;
-      --warn:#ffcc33;
-      --danger:#ff4d4d;
-      --orange:#f59e0b;
+      --glow:rgba(84,180,255,.22);
+      --ok:rgba(33,208,122,.18);
+      --warn:rgba(255,204,51,.18);
+      --danger:rgba(255,77,77,.18);
+      --ok2:#21d07a;
+      --warn2:#ffcc33;
+      --danger2:#ff4d4d;
+      --btn:#122538;
+      --btn2:#17314b;
     }
-    *{box-sizing:border-box}
+
+    html,body{height:100%;}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:
-        radial-gradient(1200px 600px at 20% -10%, rgba(84,180,255,.16), transparent 55%),
-        radial-gradient(900px 500px at 90% 0%, rgba(80,255,170,.08), transparent 60%),
-        var(--bg);
+      background: radial-gradient(1200px 700px at 15% 10%, rgba(84,180,255,.10), transparent 55%),
+                  radial-gradient(900px 600px at 85% 20%, rgba(80,255,170,.08), transparent 60%),
+                  var(--bg);
       color:var(--text);
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
-    header{
-      padding:18px 16px 10px;
-      max-width:760px;
-      width:100%;
+    *, *:before, *:after{box-sizing:border-box;}
+    button, input{font:inherit;}
+    button{touch-action:manipulation;}
+
+    .wrap{
+      max-width:520px;
       margin:0 auto;
+      padding:16px 14px 18px;
     }
-    .brand{display:flex;align-items:center;gap:12px;}
+
+    header{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:12px;
+    }
     .badge{
-      width:40px;height:40px;border-radius:14px;
-      background:linear-gradient(180deg, rgba(84,180,255,.22), rgba(84,180,255,.08));
-      border:1px solid rgba(84,180,255,.28);
-      display:grid;place-items:center;
-      box-shadow:0 0 22px rgba(84,180,255,.16);
+      width:44px;height:44px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: 0 0 0 1px rgba(84,180,255,.08) inset, 0 18px 70px rgba(0,0,0,.55);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:rgba(255,255,255,.86);
       flex:0 0 auto;
     }
-    h1{margin:0;font-size:20px;letter-spacing:.2px;}
-    .sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;line-height:1.35;}
-
-    main{
-      flex:1;
-      max-width:760px;
-      width:100%;
-      margin:0 auto;
-      padding:12px 16px 22px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:20px;
-      padding:16px;
-      box-shadow:0 10px 32px rgba(0,0,0,.26);
-    }
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    label{display:block;font-size:12.5px;color:var(--muted2);margin:2px 0 8px;}
-    .seg{
-      display:flex;gap:8px;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:16px;
-      padding:6px;
-    }
-    .seg button{
-      flex:1;border:1px solid transparent;background:transparent;
-      color:var(--muted);padding:11px 10px;border-radius:14px;
-      font-weight:950;cursor:pointer;transition:.15s ease;
+    h1{
+      font-size:26px;
+      line-height:1.12;
+      margin:0;
       letter-spacing:.2px;
     }
-    .seg button.active{
-      color:var(--text);
-      background:linear-gradient(180deg, rgba(84,180,255,.24), rgba(84,180,255,.10));
-      border-color:rgba(84,180,255,.32);
-      box-shadow:0 0 18px rgba(84,180,255,.16);
+    .sub{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13.5px;
+      line-height:1.35;
     }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:22px;
+      padding:14px;
+      box-shadow: 0 18px 90px rgba(0,0,0,.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .row{display:flex; gap:10px;}
+    .row + .row{margin-top:12px;}
+    .row label{
+      display:block;
+      color:var(--muted);
+      font-size:13px;
+      margin:0 0 8px 2px;
+    }
+
+    .seg{
+      display:flex;
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      padding:6px;
+      gap:6px;
+    }
+    .seg button{
+      flex:1;
+      border:1px solid transparent;
+      background:transparent;
+      color:rgba(255,255,255,.82);
+      padding:12px 12px;
+      border-radius:14px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .seg button.active{
+      background:linear-gradient(180deg, rgba(84,180,255,.25), rgba(84,180,255,.10));
+      border-color:rgba(84,180,255,.35);
+      box-shadow: 0 0 0 1px rgba(84,180,255,.12) inset, 0 14px 40px rgba(0,0,0,.45);
+    }
+
     input{
-      width:100%;padding:13px 12px;border-radius:16px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.22);
-      color:var(--text);font-size:16px;outline:none;
+      width:100%;
+      background:rgba(0,0,0,.30);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      padding:14px 14px;
+      color:var(--text);
+      outline:none;
     }
     input:focus{
       border-color:rgba(84,180,255,.45);
-      box-shadow:0 0 0 3px rgba(84,180,255,.12);
+      box-shadow:0 0 0 4px rgba(84,180,255,.12);
     }
-    .actions{
-      display:flex;gap:10px;flex-wrap:wrap;
-      margin-top:12px;
-    }
-    .btn{
-      flex:1;
-      min-width:170px;
-      padding:13px 14px;
-      border-radius:16px;
-      border:1px solid rgba(84,180,255,.35);
-      background:linear-gradient(180deg, rgba(84,180,255,.26), rgba(84,180,255,.10));
-      color:var(--text);
-      font-weight:1000;
-      cursor:pointer;
-      box-shadow:0 0 22px rgba(84,180,255,.14);
-      transition:.15s ease;
-      letter-spacing:.2px;
-    }
-    .btn:active{transform:translateY(1px)}
-    .btn.secondary{
-      border-color:rgba(255,255,255,.14);
-      background:rgba(255,255,255,.05);
-      box-shadow:none;
-      color:rgba(255,255,255,.82);
-      font-weight:950;
-    }
-    .note{
+
+    .hint{
+      margin-top:10px;
       color:var(--muted);
       font-size:13px;
       line-height:1.35;
-      margin-top:10px;
-    }
-    .hintline{
-      margin-top:10px;
-      padding-top:10px;
-      border-top:1px solid rgba(255,255,255,.08);
-      color:rgba(255,255,255,.80);
-      font-size:13px;
-      line-height:1.35;
     }
 
-    footer{
-      background:#000;
-      border-top:1px solid rgba(255,255,255,.10);
+    .actions{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.10);
+      background:linear-gradient(180deg, rgba(18,37,56,.95), rgba(11,20,32,.95));
+      color:rgba(255,255,255,.92);
       padding:14px 14px;
-      text-align:center;
-      color:rgba(255,255,255,.88);
-      font-size:12.5px;
-      line-height:1.35;
-    }
-
-    /* Modal overlay: NOT transparent */
-    .overlay{
-      position:fixed;
-      inset:0;
-      background: var(--bg);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
-      z-index:9999;
-    }
-    .overlay.show{display:flex;}
-
-    .modal{
-      width:min(560px, 96vw);
-      border-radius:22px;
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow:0 18px 80px rgba(0,0,0,.65);
-      overflow:hidden;
-      transform:translateY(6px);
-      animation:pop .14s ease-out forwards;
-      background:linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03));
-    }
-    @keyframes pop{to{transform:translateY(0)}}
-
-    .modalTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:12px 12px;
-      background:rgba(0,0,0,.22);
-      border-bottom:1px solid rgba(255,255,255,.10);
-    }
-    .modalTop .ttl{
-      font-weight:1000;
-      letter-spacing:.2px;
-      font-size:14px;
-      color:rgba(255,255,255,.92);
-      display:flex;align-items:center;gap:8px;
-    }
-    .close{
-      width:40px;height:40px;border-radius:14px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(255,255,255,.06);
-      color:rgba(255,255,255,.92);
-      font-size:22px;
-      line-height:1;
+      border-radius:18px;
+      font-weight:800;
       cursor:pointer;
+      flex:1;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
     }
-    .close:active{transform:translateY(1px)}
-
-    .modalBody{
-      padding:18px 16px 16px;
-      text-align:center;
-    }
-    .iconBig{
-      width:92px;height:92px;border-radius:24px;
-      display:grid;place-items:center;
-      margin:10px auto 14px;
-      border:1px solid rgba(255,255,255,.16);
-      background:rgba(255,255,255,.06);
-    }
-    .bigValue{
-      font-size:30px;
-      font-weight:1100;
-      letter-spacing:.2px;
-      margin:0;
-    }
-    .smallLine{
-      margin:10px 0 0;
-      color:rgba(255,255,255,.90);
-      font-size:14px;
-      font-weight:900;
-    }
-    .smallLine span{font-weight:1100}
-    .desc{
-      margin:14px auto 0;
-      color:rgba(255,255,255,.92);
-      font-size:14px;
-      line-height:1.35;
-      max-width:460px;
-      font-weight:850;
+    .btn.primary{
+      background:linear-gradient(180deg, rgba(23,49,75,.98), rgba(12,26,40,.98));
+      border-color: rgba(84,180,255,.25);
+      box-shadow: 0 0 0 1px rgba(84,180,255,.10) inset, 0 18px 70px rgba(0,0,0,.55);
     }
 
-    .list{
-      margin:14px auto 0;
-      max-width:460px;
-      text-align:left;
-      background:rgba(0,0,0,.16);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;
-      padding:12px 12px;
-    }
-    .li{
+    .resultWrap{margin-top:14px; display:none;}
+    .resultWrap.show{display:block;}
+
+    .resultTop{
       display:flex;
-      gap:10px;
-      align-items:flex-start;
-      padding:8px 6px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .li:last-child{border-bottom:none}
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      margin-top:5px;
-      background:rgba(255,255,255,.36);
-      flex:0 0 auto;
-    }
-    .li b{display:block;font-size:13.5px}
-    .li span{display:block;color:rgba(255,255,255,.78);font-size:12.8px;line-height:1.3;margin-top:2px}
-
-    .muted{
-      margin:14px auto 0;
-      color:rgba(255,255,255,.76);
-      font-weight:750;
-      font-size:12.5px;
-      line-height:1.35;
-      max-width:480px;
-    }
-    .muted strong{color:rgba(255,255,255,.88)}
-
-    .modalFooter{
-      padding:12px 12px 14px;
-      display:flex; gap:10px; flex-wrap:wrap;
-      border-top:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.12);
-    }
-    .modalFooter .btn{min-width:170px}
-
-    /* Color themes for modal */
-    .theme-ok{--accent: var(--ok);}
-    .theme-warn{--accent: var(--warn);}
-    .theme-orange{--accent: var(--orange);}
-    .theme-danger{--accent: var(--danger);}
-
-    .modal[class*="theme-"] .iconBig{
-      box-shadow:
-        0 0 0 7px color-mix(in srgb, var(--accent) 18%, transparent),
-        0 18px 70px rgba(0,0,0,.45);
-    }
-    .modal[class*="theme-"] .bigValue{
-      color: color-mix(in srgb, var(--accent) 92%, white);
-      text-shadow: 0 0 26px color-mix(in srgb, var(--accent) 30%, transparent);
-    }
-    .dot.accent{background: color-mix(in srgb, var(--accent) 80%, white);}
-
-    .svg{width:46px;height:46px;opacity:.95}
-
-    
-    /* HIDE static sanctions list (replaced by dynamic text) */
-    #sanctions{display:none !important;}
-
-    /* Marketing cards for legal/prevention */
-    .cards{
-      margin:14px auto 0;
-      width:min(520px, 100%);
-      display:grid;
-      gap:10px;
-    }
-    .cardBox{
-      border-radius:18px;
-      padding:12px 14px;
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: 0 10px 28px rgba(0,0,0,.35);
-      text-align:left;
-    }
-    .cardTitleRow{
-      display:flex;
-      align-items:center;
+      align-items:flex-end;
       justify-content:space-between;
       gap:10px;
-      margin-bottom:8px;
+      margin-bottom:10px;
+      padding:12px 14px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.25);
     }
-    .cardTitle{
+    .big{
+      font-size:40px;
+      line-height:1;
       font-weight:900;
-      letter-spacing:.2px;
-      font-size:14px;
-      opacity:.95;
-      display:flex;
+      letter-spacing:.4px;
+    }
+    .meta{
+      text-align:right;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.3;
+    }
+
+    .pill{
+      display:inline-flex;
       align-items:center;
       gap:8px;
-    }
-    .pill{
-      font-size:12px;
-      font-weight:900;
-      padding:6px 10px;
+      padding:8px 10px;
       border-radius:999px;
-      background: rgba(255,255,255,.10);
       border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      font-weight:800;
+      font-size:12.5px;
+      color:rgba(255,255,255,.86);
       white-space:nowrap;
     }
-    .cardBody{
-      font-size:13px;
+
+    .box{
+      margin-top:10px;
+      padding:12px 12px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.20);
+    }
+    .box h3{
+      margin:0 0 8px;
+      font-size:15px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .box ul{margin:0; padding-left:18px; color:rgba(255,255,255,.88);}
+    .box li{margin:6px 0; color:rgba(255,255,255,.86); font-size:13.5px; line-height:1.35;}
+    .box .note{
+      margin-top:10px;
+      color:var(--muted2);
+      font-size:12.5px;
       line-height:1.35;
-      opacity:.90;
-    }
-    .cardBody b{opacity:1;}
-    .bul{
-      margin:0;
-      padding-left:16px;
-    }
-    .bul li{ margin:6px 0; }
-    .mutedSmall{
-      margin-top:8px;
-      font-size:12px;
-      opacity:.72;
-      font-weight:800;
     }
 
-@media (max-width:520px){
-      .row{grid-template-columns:1fr}
-      .btn{min-width:150px}
+    .tone-ok{border-color:rgba(33,208,122,.28); background:linear-gradient(180deg, var(--ok), rgba(0,0,0,.18));}
+    .tone-warn{border-color:rgba(255,204,51,.30); background:linear-gradient(180deg, var(--warn), rgba(0,0,0,.18));}
+    .tone-danger{border-color:rgba(255,77,77,.30); background:linear-gradient(180deg, var(--danger), rgba(0,0,0,.18));}
+
+    .tone-ok .big{color:var(--ok2);}
+    .tone-warn .big{color:var(--warn2);}
+    .tone-danger .big{color:var(--danger2);}
+
+    .fine{
+      margin-top:14px;
+      color:rgba(255,255,255,.60);
+      font-size:12.5px;
+      text-align:center;
+      line-height:1.35;
     }
-  
-.metric-card{margin:14px auto 0;padding:14px 16px;border-radius:16px;
-background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
-border:1px solid rgba(255,255,255,.12)}
-.metric-card .card-title{font-weight:800;margin-bottom:10px}
-.metric-card .metric-line{display:flex;justify-content:space-between;
-padding:8px 0;border-top:1px solid rgba(255,255,255,.08)}
-.metric-card .metric-line:first-of-type{border-top:0}
 
-
-    .metricCard{margin:10px auto 8px; width:min(520px, 92vw);}
-    .metricRows{margin-top:10px; border-top:1px solid rgba(255,255,255,.10);}
-    .metricRow{display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.08);}
-    .metricRow:last-child{border-bottom:0;}
-    .metricLabel{color:rgba(255,255,255,.72); font-weight:700;}
-    .metricValue{color:rgba(255,255,255,.92); font-weight:900;}
-
-
-@media (max-width: 520px){
-  .bigValue{font-size:42px !important;}
-  .card, .miniCard{padding:14px !important;}
-  .metricValue{font-size:16px;}
-  .metricLabel{font-size:14px;}
-  .miniTitle{font-size:16px;}
-}
-
-
-/* === Compact mobile-first modal fit (full screen safe) === */
-.overlay{padding:10px;}
-.modal{
-  max-height: calc(100dvh - 20px);
-  display:flex;
-  flex-direction:column;
-}
-.modalTop{
-  position:sticky;
-  top:0;
-  background:linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,0));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index:2;
-}
-.modalBody{
-  overflow:auto;
-  -webkit-overflow-scrolling: touch;
-  padding:14px 14px 12px;
-}
-.modalFooter{
-  position:sticky;
-  bottom:0;
-  z-index:2;
-  background:linear-gradient(0deg, rgba(0,0,0,.28), rgba(0,0,0,0));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding:10px 12px 12px;
-  gap:10px;
-}
-.modalFooter .btn{
-  flex:1;
-  min-width:0;
-}
-.close{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-}
-.bigValue{
-  font-size:40px;
-  line-height:1.05;
-  margin:10px 0 8px;
-}
-.miniCard{width: min(560px, 94vw);}
-.metricCard{width: min(560px, 94vw);}
-@media (max-width:520px){
-  .overlay{padding:8px;}
-  .modal{width: min(560px, 96vw); border-radius:18px;}
-  .modalTop .ttl{font-size:16px;}
-  .bigValue{font-size:34px;}
-  .miniCard{padding:12px;}
-  .card{padding:12px;}
-  .metricRow{padding:8px 0;}
-  .btn{height:48px; font-size:16px;}
-}
-@media (max-height:700px){
-  .bigValue{font-size:32px;}
-  .iconBig{margin:2px auto 6px;}
-}
-
-
-/* Compact: remove unused big icon space */
-.modalBody{padding-top:12px;}
-
-
-/* === IFRAME EMBED MODE === */
-html, body{height:100%;}
-body{margin:0;}
-body.embed{background:transparent !important;}
-body.embed .overlay{display:flex !important;background:transparent !important;padding:0 !important;}
-body.embed .modal{width:100% !important;max-width:none !important;border-radius:16px !important;max-height:100% !important;}
-body.embed .modalBody{padding:14px 14px 10px !important;}
-body.embed .modalFooter{padding:10px 12px 12px !important;}
-
-
-/* === EMBED / IFRAME FIX (no overlay glitch) === */
-html, body { height:100%; }
-body.lock { overflow:hidden !important; }
-
-body.embed header { display:none !important; } /* host popup already has a close button */
-body.embed .wrap { padding:12px 12px 18px !important; }
-
-body.embed .overlay{
-  position:fixed !important;
-  inset:0 !important;
-  padding:0 !important;
-  background:rgba(5,11,18,.92) !important;
-  z-index:9999 !important;
-}
-
-body.embed .overlay.show{ display:flex !important; }
-
-body.embed .modal{
-  width:100% !important;
-  height:100% !important;
-  max-width:none !important;
-  max-height:100% !important;
-  border-radius:0 !important;
-  margin:0 !important;
-  display:flex !important;
-  flex-direction:column !important;
-  overflow:hidden !important;
-}
-
-body.embed .modalTop{ display:none !important; } /* remove inner header + X (duplicate) */
-
-body.embed .modalBody{
-  flex:1 1 auto !important;
-  overflow:auto !important;
-  -webkit-overflow-scrolling:touch;
-  padding:14px 14px 10px !important;
-}
-
-body.embed .modalFooter{
-  flex:0 0 auto !important;
-  position:sticky !important;
-  bottom:0 !important;
-  background:linear-gradient(0deg, rgba(5,11,18,.96), rgba(5,11,18,.0)) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding:10px 12px 12px !important;
-}
-
-body.embed .modalFooter .btn{ flex:1; min-width:0; }
-
-
-/* Ensure hidden overlay doesn't block clicks */
-.overlay{pointer-events:none;}
-.overlay.show{pointer-events:auto;}
-
-</style>
+    /* EMBED MODE: hide top header + footer text to fit in iframe popup */
+    body.embed header{display:none;}
+    body.embed .fine{display:none;}
+    body.embed .wrap{padding:12px 12px 16px;}
+    body.embed .card{border-radius:22px;}
+    body.embed .btn{border-radius:18px;}
+    @media (max-width:420px){
+      h1{font-size:24px;}
+      .big{font-size:36px;}
+      .wrap{padding:14px 12px 16px;}
+    }
+  </style>
 </head>
+
 <body>
-  <header>
-    <div class="brand">
-      <div class="badge" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2c4.4 0 8 3.6 8 8 0 5.6-8 12-8 12S4 15.6 4 10c0-4.4 3.6-8 8-8Z" stroke="rgba(255,255,255,.92)" stroke-width="1.8"/>
-          <path d="M12 13.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="rgba(84,180,255,.95)" stroke-width="1.8"/>
-        </svg>
-      </div>
+  <div class="wrap">
+    <header>
+      <div class="badge">🧪</div>
       <div>
         <h1>Calculateur d’alcoolémie</h1>
-        <div class="sub">Estimation indicative • ne remplace pas un éthylotest homologué</div>
+        <p class="sub">Estimation indicative • ne remplace pas un éthylotest homologué</p>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <main>
-    <section class="card" aria-label="Entrées">
+    <div class="card" id="card">
       <div class="row">
-        <div>
+        <div style="flex:1;">
           <label>Sexe</label>
-          <div class="seg" role="group" aria-label="Sexe">
-</div>
-          <div class="hintline">⚠️ Cet outil n’est pas une autorisation à prendre la route. En cas de doute : ne conduisez pas.</div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    L’abus d’alcool est dangereux pour la santé. À consommer avec modération.
-  </footer>
-
-  <!-- Result Modal (opaque background) -->
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <div class="modal theme-ok" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modalTop">
-        <div class="ttl" id="modalTitle">Résultat (estimation)</div>
-        <button class="close" id="close" type="button" aria-label="Fermer">×</button>
-      </div>
-
-      <div class="modalBody">
-        <!-- Hidden icon SVG kept for JS compatibility (no layout impact) -->
-        <div class="iconBig" aria-hidden="true" style="display:none">
-          <svg class="svg" id="iconSvg" viewBox="0 0 24 24" fill="none">
-            <path d="M7 12l3 3 7-7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-
-<p class="bigValue" id="bacText">—</p>
-        <div class="miniCard metricCard" id="metricCard">
-          <div class="miniHead">
-            <div class="miniTitle">Données estimées</div>
+          <div class="seg" role="tablist" aria-label="Sexe">
+            <button id="btnH" class="active" type="button" role="tab" aria-selected="true">Homme</button>
+            <button id="btnF" type="button" role="tab" aria-selected="false">Femme</button>
           </div>
-          <div class="metricRows">
-            <div class="metricRow">
-              <span class="metricLabel">Taux estimé</span>
-              <span class="metricValue"><span id="bacGL">—</span> g/L</span>
-            </div>
-            <div class="metricRow">
-              <span class="metricLabel">Élimination estimée</span>
-              <span class="metricValue"><span id="elimH">—</span></span>
-            </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div style="flex:1;">
+          <label for="poids">Poids (kg)</label>
+          <input id="poids" inputmode="decimal" placeholder="Ex : 75" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div style="flex:1;">
+          <label for="verres">Nombre de verres</label>
+          <input id="verres" inputmode="decimal" placeholder="Ex : 3" />
+          <div class="hint">1 verre “standard” ≈ 10 g d’alcool (bière 25 cl, vin 10 cl, spiritueux 3 cl).</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" type="button" id="calcBtn">Calculer</button>
+      </div>
+
+      <div class="resultWrap" id="resultWrap" aria-live="polite">
+        <div class="resultTop" id="resultTop">
+          <div>
+            <div class="big" id="bigValue">— g/L</div>
+            <div class="pill" id="badgePill">—</div>
+          </div>
+          <div class="meta">
+            <div><strong>Taux estimé</strong> : <span id="tauxInline">—</span></div>
+            <div><strong>Élimination estimée</strong> : <span id="elimInline">—</span></div>
           </div>
         </div>
 
-        <p class="desc" id="desc">—</p>
+        <div class="box" id="boxSituation">
+          <h3>Votre situation <span class="pill" id="pillSituation">—</span></h3>
+          <ul id="listSituation"></ul>
+        </div>
 
-        <div class="cards" id="cards"></div>
-</div>
+        <div class="box" id="boxJuridique">
+          <h3>Conséquences juridiques <span class="pill" id="pillJuridique">—</span></h3>
+          <ul id="listJuridique"></ul>
+        </div>
 
-      <div class="modalFooter">
-        <button class="btn secondary" id="recalc" type="button">Modifier</button>
-        <button class="btn" id="ok" type="button">Fermer</button>
+        <div class="box" id="boxConseil">
+          <h3>Conseil sécurité <span class="pill" id="pillConseil">—</span></h3>
+          <ul id="listConseil"></ul>
+          <div class="note">Estimation indicative : seul un éthylotest homologué donne un taux réel.</div>
+        </div>
+      </div>
+
+      <div class="box" style="margin-top:14px;">
+        <h3 style="margin:0; font-size:14.5px;">⚠️ Information</h3>
+        <div style="color:rgba(255,255,255,.78); font-size:13.5px; line-height:1.4; margin-top:8px;">
+          Cet outil n’est pas une autorisation à prendre la route. En cas de doute : ne conduisez pas.
+        </div>
       </div>
     </div>
+
+    <div class="fine">L’abus d’alcool est dangereux pour la santé. À consommer avec modération.</div>
   </div>
 
   <script>
-    (function(){
-      const btnH = document.getElementById('btnH');
-      const btnF = document.getElementById('btnF');
-      const poidsEl = document.getElementById('poids');
-      const verresEl = document.getElementById('verres');
+    // Detect embed mode (iframe or ?embed=1)
+    function isInIframe(){ try { return window.self !== window.top; } catch(e){ return true; } }
+    const qs = new URLSearchParams(location.search);
+    const EMBED = (qs.get("embed") === "1") || isInIframe();
+    if (EMBED) document.body.classList.add("embed");
 
-      const overlay = document.getElementById('overlay');
-      const modal = document.getElementById('modal');
-      const closeBtn = document.getElementById('close');
-      const okBtn = document.getElementById('ok');
-      const recalcBtn = document.getElementById('recalc');
+    // State
+    let coef = 0.68; // Homme
+    const GRAMS_PER_GLASS = 10; // standard
+    const ELIM_PER_HOUR = 0.15; // g/L per hour (indicative)
 
-      const bacText = document.getElementById('bacText');
-      const bacGL = document.getElementById('bacGL');
-      const elimH = document.getElementById('elimH');
-      const desc = document.getElementById('desc');
-      const muted = document.getElementById('muted');
-      const iconSvg = document.getElementById('iconSvg');
+    // Elements
+    const btnH = document.getElementById('btnH');
+    const btnF = document.getElementById('btnF');
+    const poids = document.getElementById('poids');
+    const verres = document.getElementById('verres');
+    const calcBtn = document.getElementById('calcBtn');
 
-      const calcBtn = document.getElementById('calc');
-      const resetBtn = document.getElementById('reset');
+    const resultWrap = document.getElementById('resultWrap');
+    const resultTop = document.getElementById('resultTop');
+    const bigValue = document.getElementById('bigValue');
+    const badgePill = document.getElementById('badgePill');
 
-      let sex = 'H'; // H or F
+    const tauxInline = document.getElementById('tauxInline');
+    const elimInline = document.getElementById('elimInline');
 
-      function setSex(s){
-        sex = s;
-        btnH.classList.toggle('active', sex === 'H');
-        btnF.classList.toggle('active', sex === 'F');
+    const boxSituation = document.getElementById('boxSituation');
+    const boxJuridique = document.getElementById('boxJuridique');
+    const boxConseil = document.getElementById('boxConseil');
+
+    const pillSituation = document.getElementById('pillSituation');
+    const pillJuridique = document.getElementById('pillJuridique');
+    const pillConseil = document.getElementById('pillConseil');
+
+    const listSituation = document.getElementById('listSituation');
+    const listJuridique = document.getElementById('listJuridique');
+    const listConseil = document.getElementById('listConseil');
+
+    function setSex(sex){
+      if(sex === 'H'){
+        coef = 0.68;
+        btnH.classList.add('active'); btnH.setAttribute('aria-selected','true');
+        btnF.classList.remove('active'); btnF.setAttribute('aria-selected','false');
+      } else {
+        coef = 0.55;
+        btnF.classList.add('active'); btnF.setAttribute('aria-selected','true');
+        btnH.classList.remove('active'); btnH.setAttribute('aria-selected','false');
       }
-      btnH.addEventListener('click', ()=>setSex('H'));
-      btnF.addEventListener('click', ()=>setSex('F'));
+    }
 
-      function num(v){
-        if(!v) return NaN;
-        const s = String(v).replace(',', '.').trim();
-        return Number(s);
-      }
-      function fmt(n){ return n.toFixed(2).replace('.', ','); }
+    btnH.addEventListener('click', ()=> setSex('H'));
+    btnF.addEventListener('click', ()=> setSex('F'));
 
-      function humanHours(h){
-        if (h <= 0.01) return '0 h';
-        const hrs = Math.floor(h);
-        const mins = Math.round((h - hrs) * 60);
-        if (hrs === 0) return mins + ' min';
-        if (mins === 0) return hrs + ' h';
-        return hrs + ' h ' + mins + ' min';
-      }
+    function toFixedFr(n, digits){
+      const s = n.toFixed(digits);
+      return s.replace('.', ',');
+    }
 
-      function show(){
-        overlay.classList.add('show');
-        overlay.setAttribute('aria-hidden','false');
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.overflow = 'hidden';
-      }
-      function hide(){
-        overlay.classList.remove('show');
-        overlay.setAttribute('aria-hidden','true');
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
-      }
+    function formatElim(hours){
+      // hours can be huge; display h + min
+      const h = Math.floor(hours);
+      const m = Math.round((hours - h) * 60);
+      if (h <= 0) return m + " min";
+      return h + " h " + String(m).padStart(2,'0') + " min";
+    }
 
-      // === Embed / iframe helpers ===
-      function isInIframe(){ try { return window.self !== window.top; } catch(e){ return true; } }
-      const qs = new URLSearchParams(location.search);
-      const EMBED = qs.get("embed") === "1" || isInIframe();
-      if (EMBED){
-        document.body.classList.add("embed");
-        // show container so it behaves like a popup component inside an iframe
-        overlay.style.display = "flex";
-      }
+    function clearList(ul){ ul.innerHTML = ""; }
+    function addItem(ul, text){
+      const li = document.createElement('li');
+      li.textContent = text;
+      ul.appendChild(li);
+    }
 
-      function postToParent(payload){
-        if (!isInIframe()) return;
-        try { parent.postMessage(payload, "*"); } catch(e){}
-      }
+    function applyTone(tone){
+      resultTop.classList.remove('tone-ok','tone-warn','tone-danger');
+      boxSituation.classList.remove('tone-ok','tone-warn','tone-danger');
+      boxJuridique.classList.remove('tone-ok','tone-warn','tone-danger');
+      boxConseil.classList.remove('tone-ok','tone-warn','tone-danger');
 
-      function requestParentResize(){
-        if (!isInIframe()) return;
-        const h = Math.ceil(document.documentElement.scrollHeight);
-        postToParent({ type:"adn66-iframe-resize", height:h });
-      }
+      resultTop.classList.add(tone);
+      boxSituation.classList.add(tone);
+      boxJuridique.classList.add(tone);
+      boxConseil.classList.add(tone);
+    }
 
-      function closeEmbed(){
-        hide();
-        postToParent({ type:"adn66-iframe-close" });
-      }
+    function compute(){
+      const p = parseFloat(String(poids.value).replace(',', '.'));
+      const v = parseFloat(String(verres.value).replace(',', '.'));
 
-      // Hook close buttons
-      closeBtn.addEventListener('click', (e)=>{ e.preventDefault(); EMBED ? closeEmbed() : hide(); });
-      okBtn.addEventListener('click', (e)=>{ e.preventDefault(); EMBED ? closeEmbed() : hide(); });
-      recalcBtn.addEventListener('click', (e)=>{ e.preventDefault(); hide(); requestParentResize(); });
-
-      // Resize observer to keep popup sized
-      const ro = new ResizeObserver(()=>requestParentResize());
-      ro.observe(document.body);
-      window.addEventListener("load", requestParentResize);
-
-      // Optional API for parent
-      window.ADN66_CALC = {
-        open: () => { overlay.style.display = "flex"; requestParentResize(); },
-        close: () => { EMBED ? closeEmbed() : hide(); },
-        recalc: () => { hide(); requestParentResize(); }
-      };
-
-      function setTheme(theme){
-        modal.classList.remove('theme-ok','theme-warn','theme-orange','theme-danger');
-        modal.classList.add(theme);
+      if(!p || p <= 0 || !v || v <= 0){
+        // Minimal feedback: focus first missing field
+        if(!p || p <= 0) poids.focus();
+        else verres.focus();
+        return;
       }
 
-      function setIcon(kind){
-        if(!iconSvg) return;
-        if(kind === 'ok'){
-          iconSvg.innerHTML = '<path d="M7 12l3 3 7-7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
-        } else if(kind === 'warn'){
-          iconSvg.innerHTML = '<path d="M12 8v5" stroke="white" stroke-width="2.4" stroke-linecap="round"/><path d="M12 16.8h.01" stroke="white" stroke-width="3.2" stroke-linecap="round"/>';
-        } else {
-          iconSvg.innerHTML = '<path d="M8 8l8 8" stroke="white" stroke-width="2.4" stroke-linecap="round"/><path d="M16 8l-8 8" stroke="white" stroke-width="2.4" stroke-linecap="round"/>';
-        }
+      const grams = v * GRAMS_PER_GLASS;
+      const taux = grams / (p * coef); // simple Widmark-ish
+      const hours = Math.max(0, taux / ELIM_PER_HOUR);
+
+      // Render top
+      bigValue.textContent = toFixedFr(taux, 2) + " g/L";
+      badgePill.textContent = "Données estimées";
+      tauxInline.textContent = toFixedFr(taux, 2) + " g/L";
+      elimInline.textContent = formatElim(hours);
+
+      // Decide level
+      clearList(listSituation);
+      clearList(listJuridique);
+      clearList(listConseil);
+
+      if(taux < 0.5){
+        applyTone('tone-ok');
+        pillSituation.textContent = "< 0,5 g/L";
+        pillJuridique.textContent = "Sous le seuil";
+        pillConseil.textContent = "Prévention";
+        addItem(listSituation, "Vous êtes en dessous du seuil légal général (0,5 g/L).");
+        addItem(listSituation, "Restez prudent : l’alcool altère vigilance et réflexes.");
+        addItem(listJuridique, "Aucune sanction liée au seuil général si le taux reste inférieur à 0,5 g/L.");
+        addItem(listJuridique, "En cas d’accident, la responsabilité peut être engagée selon les circonstances.");
+        addItem(listConseil, "Évitez de reprendre le volant si vous vous sentez fatigué ou diminué.");
+        addItem(listConseil, "Attendez davantage ou faites-vous raccompagner si vous avez un doute.");
+      } else if(taux < 0.8){
+        applyTone('tone-warn');
+        pillSituation.textContent = "0,5–0,79 g/L";
+        pillJuridique.textContent = "Contravention";
+        pillConseil.textContent = "Risque";
+        addItem(listSituation, "Vous dépassez le seuil légal général (0,5 g/L).");
+        addItem(listSituation, "Risque important pour vous et les autres : ne conduisez pas.");
+        addItem(listJuridique, "Sanctions possibles : amende (forfaitaire), retrait de points.");
+        addItem(listJuridique, "Contrôles routiers : immobilisation du véhicule possible.");
+        addItem(listConseil, "Ne reprenez pas le volant : taxi / VTC / raccompagnement.");
+        addItem(listConseil, "Attendez la baisse du taux (estimatif) avant toute conduite.");
+      } else {
+        applyTone('tone-danger');
+        pillSituation.textContent = "≥ 0,8 g/L";
+        pillJuridique.textContent = "Délit";
+        pillConseil.textContent = "Urgent";
+        addItem(listSituation, "Vous êtes au-dessus du seuil délit (0,8 g/L).");
+        addItem(listSituation, "Interdiction absolue de conduire.");
+        addItem(listJuridique, "Sanctions possibles : amende jusqu’à 4 500 €.");
+        addItem(listJuridique, "Retrait de 6 points.");
+        addItem(listJuridique, "Suspension / annulation du permis possible.");
+        addItem(listJuridique, "Peine de prison possible selon les circonstances.");
+        addItem(listConseil, "Demandez de l’aide immédiatement.");
+        addItem(listConseil, "Choisissez un transport sûr : raccompagnement / taxi / VTC.");
       }
 
-      function openResult(bac){
-        // 3 ranges:
-        // <0.5 ok (prevention), 0.5–0.79 orange (contravention), >=0.8 danger (délit)
-        const elimRate = 0.13; // g/L/h (cautious)
-        const hours = Math.max(0, bac / elimRate);
+      resultWrap.classList.add('show');
+      // scroll to result in iframe
+      resultWrap.scrollIntoView({behavior:'smooth', block:'start'});
+    }
 
-        bacText.textContent = fmt(bac) + ' g/L';
-        bacGL.textContent = fmt(bac);
-        elimH.textContent = humanHours(hours);
+    calcBtn.addEventListener('click', compute);
 
-        const cards = document.getElementById('cards');
-
-        const mkCard = (title, pill, bodyHtml) => {
-          return `
-            <div class="cardBox">
-              <div class="cardTitleRow">
-                <div class="cardTitle">${title}</div>
-                <div class="pill">${pill}</div>
-              </div>
-              <div class="cardBody">${bodyHtml}</div>
-            </div>
-          `;
-        };
-
-        if (bac < 0.5){
-          setTheme('theme-ok');
-          setIcon('ok');
-
-          // short headline
-          desc.innerHTML = "✅ <b>Prévention :</b> même sous le seuil, ne prenez pas la route si vous ne vous sentez pas apte.";
-
-          const body1 = `
-            <ul class="bul">
-              <li><b>Sous le seuil légal</b> (0,5 g/L) — estimation.</li>
-              <li>L’alcool peut déjà réduire vigilance, réflexes et perception.</li>
-            </ul>
-          `;
-          const body2 = `
-            <ul class="bul">
-              <li>Attendez l’élimination complète si vous devez conduire.</li>
-              <li>Faites‑vous raccompagner / taxi / VTC.</li>
-            </ul>
-            <div class="mutedSmall">Estimation indicative : seul un <b>éthylotest homologué</b> donne un taux réel.</div>
-          `;
-          cards.innerHTML = [
-            mkCard("Votre situation", "OK (< 0,5 g/L)", body1),
-            mkCard("Conseil sécurité", "Prévention", body2),
-          ].join("");
-
-        } else if (bac < 0.8){
-          setTheme('theme-orange');
-          setIcon('warn');
-
-          desc.innerHTML = "⚠️ <b>Infraction :</b> au‑dessus de 0,5 g/L, <b>ne conduisez pas</b>.";
-
-          const body1 = `
-            <ul class="bul">
-              <li><b>Seuil atteint :</b> ≥ 0,5 g/L (contravention) — estimation.</li>
-              <li><b>Interdiction de conduire</b> : risque immédiat en cas de contrôle.</li>
-            </ul>
-          `;
-          const body2 = `
-            <ul class="bul">
-              <li><b>Amende forfaitaire :</b> 135 € (montants majorables).</li>
-              <li><b>Retrait :</b> 6 points.</li>
-            </ul>
-          `;
-          const body3 = `
-            <ul class="bul">
-              <li>Ne prenez pas le volant.</li>
-              <li>Organisez un retour sûr : raccompagnement / taxi / VTC.</li>
-            </ul>
-            <div class="mutedSmall">Estimation indicative : seul un <b>éthylotest homologué</b> donne un taux réel.</div>
-          `;
-          cards.innerHTML = [
-            mkCard("Votre situation", "0,5 à 0,79 g/L", body1),
-            mkCard("Conséquences juridiques", "Contravention", body2),
-            mkCard("Conseil sécurité", "À faire maintenant", body3),
-          ].join("");
-
-        } else {
-          setTheme('theme-danger');
-          setIcon('danger');
-
-          desc.innerHTML = "⛔ <b>Délit :</b> au‑dessus de 0,8 g/L, les sanctions peuvent être <b>très lourdes</b>.";
-
-          const body1 = `
-            <ul class="bul">
-              <li><b>Seuil délit :</b> ≥ 0,8 g/L — estimation.</li>
-              <li><b>Interdiction absolue de conduire</b>.</li>
-            </ul>
-          `;
-          const body2 = `
-            <ul class="bul">
-              <li><b>Amende :</b> jusqu’à 4 500 €.</li>
-              <li><b>Retrait :</b> 6 points.</li>
-              <li><b>Permis :</b> suspension / annulation possible.</li>
-              <li><b>Prison :</b> peine possible selon les circonstances.</li>
-            </ul>
-          `;
-          const body3 = `
-            <ul class="bul">
-              <li>Demandez de l’aide immédiatement.</li>
-              <li>Choisissez un transport sûr : raccompagnement / taxi / VTC.</li>
-            </ul>
-            <div class="mutedSmall">Estimation indicative : seul un <b>éthylotest homologué</b> donne un taux réel.</div>
-          `;
-          cards.innerHTML = [
-            mkCard("Votre situation", "≥ 0,8 g/L", body1),
-            mkCard("Conséquences juridiques", "Délit", body2),
-            mkCard("Conseil sécurité", "Urgent", body3),
-          ].join("");
-        }
-
-        show();
-      }
-
-      function compute(){
-        const w = num(poidsEl.value);
-        const drinks = num(verresEl.value);
-
-        if(!isFinite(w) || w <= 0){
-          setTheme('theme-warn');
-          setIcon('warn');
-          bacText.textContent = '—';
-          bacGL.textContent = '—';
-          elimH.textContent = '—';
-          desc.textContent = "Poids requis. Entrez un poids valide (ex : 75).";
-          show();
-          return;
-        }
-        if(!isFinite(drinks) || drinks < 0){
-          setTheme('theme-warn');
-          setIcon('warn');
-          bacText.textContent = '—';
-          bacGL.textContent = '—';
-          elimH.textContent = '—';
-          desc.textContent = "Nombre de verres requis. Entrez une valeur valide (ex : 3).";
-          show();
-          return;
-        }
-
-        const r = (sex === 'H') ? 0.7 : 0.6;
-        const grams = drinks * 10; // 1 verre standard = 10g
-        let bac = grams / (r * w); // g/L approx
-        if(!isFinite(bac) || bac < 0) bac = 0;
-
-        openResult(bac);
-      }
-
-      calcBtn.addEventListener('click', compute);
-      if (resetBtn) {
-      resetBtn.addEventListener('click', ()=>{
-        setSex('H');
-        poidsEl.value = '';
-        verresEl.value = '';
-        poidsEl.focus();
+    // Enter to compute
+    [poids, verres].forEach((el)=>{
+      el.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){ e.preventDefault(); compute(); }
       });
-      }
-poidsEl.value = '';
-        verresEl.value = '';
-        poidsEl.focus();
-      });
-
-              setTimeout(()=>{ verresEl.focus(); }, 80);
-      });
-
-      document.addEventListener('keydown', (e)=>{
-        if(e.key === 'Escape' && overlay.classList.contains('show')) hide();
-      });
-
-      [poidsEl, verresEl].forEach(el=>{
-        el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') compute(); });
-      });
-    })();
+    });
   </script>
 </body>
 </html>
