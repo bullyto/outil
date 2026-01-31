@@ -467,20 +467,55 @@ body.embed .modalBody{padding:14px 14px 10px !important;}
 body.embed .modalFooter{padding:10px 12px 12px !important;}
 
 
-/* === IFRAME EMBED MODE (no popup-in-popup) === */
-body.embed{background:transparent;}
-body.embed .wrap{padding:12px 12px 18px;}
-body.embed header{display:none;} /* iframe popup already has its own header/close */
-body.embed .overlay{padding:0; background:rgba(5,11,18,.92);} /* stronger backdrop */
-body.embed .modal{
-  width:100%;
-  max-width:none;
-  max-height:100dvh;
-  border-radius:0;
-  border-left:0;border-right:0;
+/* === EMBED / IFRAME FIX (no overlay glitch) === */
+html, body { height:100%; }
+body.lock { overflow:hidden !important; }
+
+body.embed header { display:none !important; } /* host popup already has a close button */
+body.embed .wrap { padding:12px 12px 18px !important; }
+
+body.embed .overlay{
+  position:fixed !important;
+  inset:0 !important;
+  padding:0 !important;
+  background:rgba(5,11,18,.92) !important;
+  z-index:9999 !important;
 }
-body.embed .modalTop{display:none;} /* remove 'Résultat' bar + X (duplicate) */
-body.embed .modalFooter{padding:10px 12px 12px;}
+
+body.embed .overlay.show{ display:flex !important; }
+
+body.embed .modal{
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:100% !important;
+  border-radius:0 !important;
+  margin:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  overflow:hidden !important;
+}
+
+body.embed .modalTop{ display:none !important; } /* remove inner header + X (duplicate) */
+
+body.embed .modalBody{
+  flex:1 1 auto !important;
+  overflow:auto !important;
+  -webkit-overflow-scrolling:touch;
+  padding:14px 14px 10px !important;
+}
+
+body.embed .modalFooter{
+  flex:0 0 auto !important;
+  position:sticky !important;
+  bottom:0 !important;
+  background:linear-gradient(0deg, rgba(5,11,18,.96), rgba(5,11,18,.0)) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding:10px 12px 12px !important;
+}
+
+body.embed .modalFooter .btn{ flex:1; min-width:0; }
 
 </style>
 </head>
@@ -862,13 +897,14 @@ body.embed .modalFooter{padding:10px 12px 12px;}
         poidsEl.focus();
       });
 
-      document.addEventListener('keydown', (e)=>{
-        if(e.key === 'Escape' && overlay.classList.contains('show')){
-          EMBED ? closeEmbed() : hide();
-        }
+              setTimeout(()=>{ verresEl.focus(); }, 80);
       });
 
-[poidsEl, verresEl].forEach(el=>{
+      document.addEventListener('keydown', (e)=>{
+        if(e.key === 'Escape' && overlay.classList.contains('show')) hide();
+      });
+
+      [poidsEl, verresEl].forEach(el=>{
         el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') compute(); });
       });
     })();
