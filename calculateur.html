@@ -466,6 +466,22 @@ body.embed .modal{width:100% !important;max-width:none !important;border-radius:
 body.embed .modalBody{padding:14px 14px 10px !important;}
 body.embed .modalFooter{padding:10px 12px 12px !important;}
 
+
+/* === IFRAME EMBED MODE (no popup-in-popup) === */
+body.embed{background:transparent;}
+body.embed .wrap{padding:12px 12px 18px;}
+body.embed header{display:none;} /* iframe popup already has its own header/close */
+body.embed .overlay{padding:0; background:rgba(5,11,18,.92);} /* stronger backdrop */
+body.embed .modal{
+  width:100%;
+  max-width:none;
+  max-height:100dvh;
+  border-radius:0;
+  border-left:0;border-right:0;
+}
+body.embed .modalTop{display:none;} /* remove 'Résultat' bar + X (duplicate) */
+body.embed .modalFooter{padding:10px 12px 12px;}
+
 </style>
 </head>
 <body>
