@@ -517,6 +517,11 @@ body.embed .modalFooter{
 
 body.embed .modalFooter .btn{ flex:1; min-width:0; }
 
+
+/* Ensure hidden overlay doesn't block clicks */
+.overlay{pointer-events:none;}
+.overlay.show{pointer-events:auto;}
+
 </style>
 </head>
 <body>
@@ -541,28 +546,7 @@ body.embed .modalFooter .btn{ flex:1; min-width:0; }
         <div>
           <label>Sexe</label>
           <div class="seg" role="group" aria-label="Sexe">
-            <button type="button" id="btnH" class="active">Homme</button>
-            <button type="button" id="btnF">Femme</button>
-          </div>
-        </div>
-        <div>
-          <label for="poids">Poids (kg)</label>
-          <input id="poids" inputmode="decimal" placeholder="Ex : 75" />
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:12px;">
-        <div>
-          <label for="verres">Nombre de verres</label>
-          <input id="verres" inputmode="numeric" placeholder="Ex : 3" />
-          <div class="note">1 verre “standard” ≈ 10 g d’alcool (bière 25 cl, vin 10 cl, spiritueux 3 cl).</div>
-        </div>
-        <div>
-          <label>&nbsp;</label>
-          <div class="actions">
-            <button class="btn" id="calc" type="button">Calculer</button>
-            <button class="btn secondary" id="reset" type="button">Réinitialiser</button>
-          </div>
+</div>
           <div class="hintline">⚠️ Cet outil n’est pas une autorisation à prendre la route. En cas de doute : ne conduisez pas.</div>
         </div>
       </div>
@@ -890,9 +874,15 @@ body.embed .modalFooter .btn{ flex:1; min-width:0; }
       }
 
       calcBtn.addEventListener('click', compute);
+      if (resetBtn) {
       resetBtn.addEventListener('click', ()=>{
         setSex('H');
         poidsEl.value = '';
+        verresEl.value = '';
+        poidsEl.focus();
+      });
+      }
+poidsEl.value = '';
         verresEl.value = '';
         poidsEl.focus();
       });
