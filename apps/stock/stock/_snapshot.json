@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-26T22:46:12.560Z",
+  "updated_at": "2026-04-26T22:46:40.799Z",
   "items": [
     {
       "id": "absolut",
@@ -7,11 +7,11 @@
     },
     {
       "id": "ballantines",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "captain_morgan",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "ciroc_classic",
@@ -27,23 +27,23 @@
     },
     {
       "id": "get_27",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "gibsons_gin",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "gordons_gin",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "havana_3ans",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "havana_especial",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "jack_honey",
@@ -51,19 +51,19 @@
     },
     {
       "id": "jack_old7",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "jagermeister",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "label_5",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "muscat",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "old_nick_blanc",
@@ -75,15 +75,15 @@
     },
     {
       "id": "pastis_51",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "poliakov",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "ricard",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "saint_james_blanc",
@@ -91,7 +91,7 @@
     },
     {
       "id": "tequila_sanjose",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "trois_rivieres",
@@ -99,19 +99,19 @@
     },
     {
       "id": "william_peel",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "xv_catalan_blanc",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "xv_catalan_rose",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "xv_catalan_rouge",
-      "qty": 0
+      "qty": 1
     }
   ]
 }
