@@ -128,10 +128,13 @@ function normalizeStatus(raw){
       data.presets[key] = { title, message, image, severity:"info" };
     }
   };
-  ensurePreset("incident","Incident","Incident en cours. Merci de ta compréhension.","images/incident.png");
+
+  ensurePreset("incident","Incident","Incident en cours. Merci de votre compréhension.","images/incident.png");
   ensurePreset("météo","Météo","Conditions météo compliquées. Service possiblement ralenti.","images/météo.png");
   ensurePreset("panne","Panne","Panne technique en cours. Service impacté.","images/panne.png");
   ensurePreset("sécurité","Sécurité","Mesure de sécurité en cours. Service temporairement indisponible.","images/sécurité.png");
+  ensurePreset("ouverture_2230","Ouverture exceptionnelle","Le service ouvrira exceptionnellement à partir de 22h30 ce soir. Merci de votre compréhension.","images/panne.png");
+
   if(!data.presets.libre) data.presets.libre = { title:"", message:"", image:"images/panne.png", severity:"info" };
 
   return data;
@@ -143,12 +146,12 @@ function fillPresetSelect(data){
   const presets = data.presets || {};
   const keys = Object.keys(presets);
 
-  const order = ["météo","incident","panne","sécurité","libre"];
+  const order = ["météo","incident","panne","sécurité","ouverture_2230","libre"];
   const sorted = Array.from(new Set([...order, ...keys]));
 
   sel.innerHTML = sorted
     .filter(k => presets[k])
-    .map(k => `<option value="${k}">${k === "libre" ? "message libre" : k}</option>`)
+    .map(k => `<option value="${k}">${k === "libre" ? "message libre" : (k === "ouverture_2230" ? "ouverture 22h30" : k)}</option>`)
     .join("");
 }
 
