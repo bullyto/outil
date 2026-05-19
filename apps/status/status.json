@@ -1,14 +1,14 @@
 {
-  "active": false,
-  "mode": "none",
-  "last_update": "2026-05-18T21:05:41.144+02:00",
+  "active": true,
+  "mode": "info",
+  "last_update": "2026-05-19T16:23:17.177+02:00",
   "modes": {
     "info": {
       "title": "Ouverture exceptionnelle",
       "message": "Le service ouvrira exceptionnellement à partir de 22h30 ce soir. Merci de votre compréhension.",
       "image": "https://image.noelshack.com/fichiers/2026/21/1/1779120236-file-00000000e1e471f4a3258ede6e2e540c.jpg",
       "severity": "info",
-      "ok_delay_seconds": 15
+      "ok_delay_seconds": 8
     },
     "warning": {
       "title": "EXCEPTIONNELLEMENT FERMER",
@@ -67,7 +67,7 @@
     }
   },
   "created_at": "2026-01-01T19:53:43.073+01:00",
-  "published_at": "2026-05-18T21:05:41.144+02:00",
+  "published_at": "2026-05-19T16:23:17.177+02:00",
   "ends_at": "",
   "starts_at": "2026-01-01T19:56:27.600+01:00"
 }
