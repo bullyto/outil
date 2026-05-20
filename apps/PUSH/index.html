@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Notifications ADN66</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050b12">
+  <meta name="description" content="Activation des notifications Apéro de Nuit 66 et Apéro Catalan.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="card hero">
+      <div class="badge">ADN66 • Notifications</div>
+      <h1>Recevoir les alertes d’ouverture et les promos</h1>
+      <p>
+        Activez les notifications pour être prévenu des ouvertures,
+        informations importantes et offres ponctuelles.
+      </p>
+
+      <div class="target-box">
+        <label for="targetSelect">Site concerné</label>
+        <select id="targetSelect">
+          <option value="apero">Apéro de Nuit 66</option>
+          <option value="catalan">Apéro Catalan</option>
+          <option value="x">X — futur projet</option>
+        </select>
+      </div>
+
+      <button id="subscribeBtn" class="primary-btn">
+        Activer les notifications
+      </button>
+
+      <button id="unsubscribeBtn" class="ghost-btn">
+        Désactiver sur cet appareil
+      </button>
+
+      <p id="status" class="status">Initialisation...</p>
+    </section>
+
+    <section class="card info">
+      <h2>Important</h2>
+      <p>
+        Les notifications ne sont activées qu’après votre accord.
+        Vous pouvez les bloquer à tout moment depuis les paramètres de votre navigateur.
+      </p>
+      <a class="admin-link" href="./admin.html">Accès admin</a>
+    </section>
+  </main>
+
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

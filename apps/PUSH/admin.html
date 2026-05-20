@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Admin Notifications ADN66</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050b12">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="card hero">
+      <div class="badge">ADN66 • Admin Push</div>
+      <h1>Envoyer une notification</h1>
+      <p>
+        Cette page appellera le futur Cloudflare Worker pour envoyer une notification
+        aux abonnés sélectionnés.
+      </p>
+
+      <div class="stats-grid">
+        <div>
+          <span class="stat-label">Total actifs</span>
+          <strong id="statTotal">—</strong>
+        </div>
+        <div>
+          <span class="stat-label">Apéro</span>
+          <strong id="statApero">—</strong>
+        </div>
+        <div>
+          <span class="stat-label">Catalan</span>
+          <strong id="statCatalan">—</strong>
+        </div>
+        <div>
+          <span class="stat-label">X</span>
+          <strong id="statX">—</strong>
+        </div>
+      </div>
+
+      <form id="sendForm" class="form">
+        <label>
+          Code admin
+          <input id="adminKey" type="password" autocomplete="off" placeholder="Votre code admin">
+        </label>
+
+        <label>
+          Cible
+          <select id="target">
+            <option value="all">Tous les abonnés</option>
+            <option value="apero">Apéro de Nuit 66</option>
+            <option value="catalan">Apéro Catalan</option>
+            <option value="x">X — futur projet</option>
+          </select>
+        </label>
+
+        <label>
+          Titre
+          <input id="title" type="text" maxlength="80" placeholder="Ex : Apéro de Nuit 66 est ouvert">
+        </label>
+
+        <label>
+          Message
+          <textarea id="body" maxlength="180" placeholder="Ex : Livraison disponible ce soir jusqu’à 6h."></textarea>
+        </label>
+
+        <label>
+          URL au clic
+          <input id="url" type="url" placeholder="https://aperos.net">
+        </label>
+
+        <button class="primary-btn" type="submit">Envoyer la notification</button>
+      </form>
+
+      <p id="adminStatus" class="status">Configuration en attente du Worker Cloudflare.</p>
+
+      <a class="admin-link" href="./index.html">Retour inscription</a>
+    </section>
+  </main>
+
+  <script src="./config.js"></script>
+  <script src="./admin.js"></script>
+</body>
+</html>
