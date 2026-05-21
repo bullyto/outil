@@ -8,12 +8,12 @@
   - affiche title/body/icon_url/image_url/badge_url
   - gère tag, renotify, requireInteraction, silent, vibrate
   - gère les boutons d’action :
-      open_site   -> site_url
       install_app -> playstore_url
-  - clic normal sur la notification -> url
+  - clic normal sur la notification -> site
+  - choix retenu : pas de bouton "Voir le site" car Android/Chrome inverse les actions quand il y a 2 boutons sur certains téléphones
 */
 
-const CACHE_NAME = "adn66-push-v12-test-one-button-site";
+const CACHE_NAME = "adn66-push-v13-site-body-app-button";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
@@ -156,7 +156,15 @@ async function showLatestNotification() {
     requireInteraction: Boolean(payload.require_interaction),
     silent: Boolean(payload.silent),
     vibrate: cleanVibrate(payload.vibrate),
-    actions: [{ action: "open_site", title: "Voir le site" }]
+    // Solution fiable Android/Chrome : 1 seul bouton action.
+    // Le clic sur la notification complète ouvre le site.
+    // Le seul bouton ouvre le Play Store.
+    actions: [
+      {
+        action: "install_app",
+        title: "Télécharger l’app"
+      }
+    ]
   };
 
   /*
@@ -199,8 +207,8 @@ function getDefaultPayload() {
     vibrate: [500, 150, 500, 150, 800],
     actions: [
       {
-        action: "open_site",
-        title: "Voir le site"
+        action: "install_app",
+        title: "Télécharger l’app"
       }
     ]
   };
@@ -334,47 +342,41 @@ function cleanVibrate(value) {
 }
 
 function cleanActions(value) {
-  const fallback = [
+  // On garde volontairement un seul bouton fiable : Télécharger l’app.
+  // Le site reste accessible en cliquant sur la notification complète.
+  return [
     {
-      action: "open_site",
-      title: "Voir le site"
+      action: "install_app",
+      title: "Télécharger l’app"
     }
   ];
-
-  if (!Array.isArray(value)) {
-    return fallback;
-  }
-
-  const allowedActions = new Set(["open_site"]);
-
-  const cleaned = value
-    .map(action => ({
-      action: String(action?.action || "").trim(),
-      title: String(action?.title || "").trim().slice(0, 40)
-    }))
-    .filter(action => allowedActions.has(action.action) && action.title)
-    .slice(0, 2);
-
-  return cleaned.length ? cleaned : fallback;
 }
 
 self.addEventListener("notificationclick", event => {
   event.notification.close();
 
   const data = event.notification.data || {};
-
-  // TEST 1 : un seul bouton.
-  // Tout clic sur la notification ou sur le bouton ouvre le site, jamais Google Play.
   const target = String(data.target || "").toLowerCase();
-  const siteUrlFromData = cleanSiteUrl(data.site_url) || cleanSiteUrl(data.url);
+  const urlText = String(data.url || "").toLowerCase();
+  const siteText = String(data.site_url || "").toLowerCase();
 
   const isCatalan =
     target === "catalan" ||
-    siteUrlFromData.includes("catalan.aperos.net");
+    urlText.includes("catalan.aperos.net") ||
+    siteText.includes("catalan.aperos.net");
 
-  const targetUrl = isCatalan
-    ? "https://catalan.aperos.net/?push_test=one_button_site"
-    : "https://aperos.net/?push_test=one_button_site";
+  const siteUrl = isCatalan
+    ? "https://catalan.aperos.net/"
+    : "https://aperos.net/";
+
+  const appUrl = isCatalan
+    ? "https://play.google.com/store/apps/details?id=net.aperos.catalan"
+    : "https://play.google.com/store/apps/details?id=fr.aperos.nuit66";
+
+  // Solution finale fiable :
+  // - clic sur la notification complète = site
+  // - bouton unique Télécharger l’app = Play Store
+  const targetUrl = event.action === "install_app" ? appUrl : siteUrl;
 
   event.waitUntil(openCleanWindow(targetUrl));
 });
