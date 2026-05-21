@@ -13,7 +13,7 @@
   - clic normal sur la notification -> url
 */
 
-const CACHE_NAME = "adn66-push-v10-boutons-test-direct";
+const CACHE_NAME = "adn66-push-v11-diagnostic-liens";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
@@ -158,12 +158,12 @@ async function showLatestNotification() {
     vibrate: cleanVibrate(payload.vibrate),
     actions: [
       {
-        action: "adn66_open_site_v10",
-        title: "🌐 SITE"
+        action: "adn66_open_site_v11",
+        title: "Voir le site"
       },
       {
-        action: "adn66_open_app_v10",
-        title: "📲 APP"
+        action: "adn66_open_app_v11",
+        title: "Télécharger l’app"
       }
     ]
   };
@@ -208,12 +208,12 @@ function getDefaultPayload() {
     vibrate: [500, 150, 500, 150, 800],
     actions: [
       {
-        action: "adn66_open_site_v10",
-        title: "🌐 SITE"
+        action: "adn66_open_site_v11",
+        title: "Voir le site"
       },
       {
-        action: "adn66_open_app_v10",
-        title: "📲 APP"
+        action: "adn66_open_app_v11",
+        title: "Télécharger l’app"
       }
     ]
   };
@@ -377,10 +377,10 @@ function cleanActions(value) {
 
 self.addEventListener("notificationclick", event => {
   /*
-    V10 test direct :
+    V11 diagnostic liens :
     - clic notification complète = site
-    - bouton 🌐 SITE = site
-    - bouton 📲 APP = Play Store
+    - bouton Voir le site = site
+    - bouton Télécharger l’app = Play Store
     - toute action inconnue = site
     Objectif : empêcher définitivement "Voir le site" d’ouvrir Google Play.
   */
@@ -397,8 +397,8 @@ self.addEventListener("notificationclick", event => {
     siteText.includes("catalan.aperos.net");
 
   const siteUrl = isCatalan
-    ? "https://catalan.aperos.net/"
-    : "https://aperos.net/";
+    ? "https://catalan.aperos.net/?push_action=voir_site_v11"
+    : "https://aperos.net/?push_action=voir_site_v11";
 
   const appUrl = isCatalan
     ? "https://play.google.com/store/apps/details?id=net.aperos.catalan"
@@ -407,7 +407,7 @@ self.addEventListener("notificationclick", event => {
   let targetUrl = siteUrl;
 
   // Seule cette action précise ouvre le Play Store.
-  if (event.action === "adn66_open_app_v10") {
+  if (event.action === "adn66_open_app_v11") {
     targetUrl = appUrl;
   }
 
