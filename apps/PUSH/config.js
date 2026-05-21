@@ -1,17 +1,11 @@
 /*
   Configuration ADN66 Push
-
-  Étape actuelle :
-  - GitHub Pages héberge ces fichiers statiques.
-  - Le Worker Cloudflare sera ajouté ensuite.
-
-  Quand le Worker sera prêt, remplacer WORKER_BASE_URL par son URL finale.
+  GitHub Pages + Cloudflare Worker
 */
 window.ADN_PUSH_CONFIG = {
-  WORKER_BASE_URL: "https://VOTRE-WORKER.workers.dev",
+  WORKER_BASE_URL: "https://adn66-push.apero-nuit-du-66.workers.dev",
 
-  // Clé publique VAPID à remplacer après génération côté Cloudflare / Web Push.
-  VAPID_PUBLIC_KEY: "A_REMPLACER_PAR_LA_CLE_PUBLIQUE_VAPID",
+  VAPID_PUBLIC_KEY: "BG7Vo1rUSIoCQSqEx-tS91696VwWDpxAl65__ilnZW-eKP7Bzu8HrHhsRT8J0gI5aZ0-wPmIXDhNdb-iQ5LsCS8",
 
   DEFAULT_TARGET: "apero",
 

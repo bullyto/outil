@@ -1,4 +1,5 @@
-const CACHE_NAME = "adn66-push-v1";
+const CACHE_NAME = "adn66-push-v2";
+const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const STATIC_ASSETS = [
   "./",
@@ -40,21 +41,38 @@ self.addEventListener("fetch", event => {
 });
 
 self.addEventListener("push", event => {
+  event.waitUntil(showLatestNotification());
+});
+
+async function showLatestNotification() {
   let payload = {
     title: "ADN66",
     body: "Nouvelle notification.",
     url: "./"
   };
 
-  if (event.data) {
-    try {
-      payload = event.data.json();
-    } catch (error) {
-      payload.body = event.data.text();
+  try {
+    if (eventHasDataAvailable()) {
+      // Sécurité : garde une compatibilité si on ajoute plus tard un payload chiffré.
     }
+
+    const response = await fetch(`${WORKER_BASE_URL}/push/latest`, {
+      cache: "no-store"
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      if (data && data.notification) {
+        payload = data.notification;
+      }
+    }
+  } catch (error) {
+    // Fallback silencieux : une notification générique est affichée.
   }
 
   const title = payload.title || "ADN66";
+
   const options = {
     body: payload.body || "",
     icon: "./icons/icon-192.png",
@@ -65,10 +83,12 @@ self.addEventListener("push", event => {
     requireInteraction: false
   };
 
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
-});
+  return self.registration.showNotification(title, options);
+}
+
+function eventHasDataAvailable() {
+  return false;
+}
 
 self.addEventListener("notificationclick", event => {
   event.notification.close();
