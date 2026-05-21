@@ -693,24 +693,127 @@ function getScheduleSlots() {
   }
 
   const slots = [];
+  const seen = new Set();
 
   for (const slot of scheduleSlotsContainer.querySelectorAll(".schedule-slot")) {
     const days = Array.from(slot.querySelectorAll('input[name="schedule_day"]:checked'))
-      .map(input => input.value);
+      .map(input => Number(input.value))
+      .filter(day => Number.isInteger(day) && day >= 0 && day <= 6);
 
     const time = slot.querySelector('input[name="schedule_time"]')?.value || "";
 
-    if (!days.length || !time) {
+    if (!days.length || !/^\d{2}:\d{2}$/.test(time)) {
       continue;
     }
 
-    slots.push({
-      days,
-      time
-    });
+    for (const day of days) {
+      const key = `${day}|${time}`;
+
+      if (seen.has(key)) {
+        continue;
+      }
+
+      seen.add(key);
+      slots.push({
+        day,
+        time
+      });
+    }
   }
 
   return slots;
+}
+
+function groupSlotsForUi(slots) {
+  const groups = new Map();
+
+  for (const slot of slots || []) {
+    const day = String(slot?.day ?? "");
+    const time = String(slot?.time || "").trim();
+
+    if (!/^[0-6]$/.test(day) || !/^\d{2}:\d{2}$/.test(time)) {
+      continue;
+    }
+
+    if (!groups.has(time)) {
+      groups.set(time, []);
+    }
+
+    groups.get(time).push(day);
+  }
+
+  return Array.from(groups.entries()).map(([time, days]) => ({
+    time,
+    days: Array.from(new Set(days))
+  }));
+}
+
+function renderScheduleFromSettings(settings) {
+  if (!scheduleSlotsContainer) return;
+
+  scheduleSlotsContainer.innerHTML = "";
+
+  if (scheduleEnabledInput) {
+    scheduleEnabledInput.checked = Boolean(settings?.enabled);
+  }
+
+  const groupedSlots = groupSlotsForUi(settings?.slots || []);
+
+  if (groupedSlots.length) {
+    for (const slot of groupedSlots) {
+      createScheduleSlotRow(slot);
+    }
+  } else {
+    createScheduleSlotRow({
+      days: ["2"],
+      time: "19:30"
+    });
+  }
+
+  updateScheduleEnabledText();
+}
+
+async function loadScheduleSettings() {
+  if (!isWorkerConfigured()) {
+    ensureDefaultScheduleSlot();
+    updateScheduleEnabledText();
+    return;
+  }
+
+  const adminKey = (scheduleAdminKeyInput?.value || adminKeyInput?.value || "").trim();
+
+  if (!adminKey) {
+    ensureDefaultScheduleSlot();
+    updateScheduleEnabledText();
+    return;
+  }
+
+  try {
+    const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/schedule-settings`, {
+      headers: {
+        "X-Admin-Key": adminKey
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Réglages programmation indisponibles : " + response.status);
+    }
+
+    const data = await response.json();
+    renderScheduleFromSettings(data.settings || {});
+
+    setAdminStatus(
+      data.settings?.enabled
+        ? `Programmation chargée : ${formatScheduleSlots(data.settings.slots || [])}.`
+        : "Programmation chargée : désactivée.",
+      "success"
+    );
+  } catch (error) {
+    console.error(error);
+    ensureDefaultScheduleSlot();
+    updateScheduleEnabledText();
+    setAdminStatus("Impossible de charger la programmation : " + error.message, "warn");
+  }
 }
 
 
@@ -782,8 +885,9 @@ function formatScheduleSlots(slots) {
   }
 
   const dayLabels = Object.fromEntries(WEEK_DAYS.map(day => [day.value, day.label]));
+  const groupedSlots = groupSlotsForUi(slots);
 
-  return slots
+  return groupedSlots
     .map(slot => {
       const days = slot.days.map(day => dayLabels[day] || day).join(", ");
       return `${days} à ${slot.time}`;
@@ -854,7 +958,10 @@ if (adminKeyInput) {
 
 if (scheduleAdminKeyInput) {
   scheduleAdminKeyInput.addEventListener("input", () => syncAdminKeys("scheduled"));
-  scheduleAdminKeyInput.addEventListener("change", loadStats);
+  scheduleAdminKeyInput.addEventListener("change", () => {
+    loadStats();
+    loadScheduleSettings();
+  });
 }
 
 setActiveTab("instant");
@@ -863,3 +970,4 @@ updateScheduleEnabledText();
 refreshImageGallery(false);
 loadProgramList();
 loadStats();
+loadScheduleSettings();
