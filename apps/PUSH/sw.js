@@ -13,7 +13,7 @@
   - clic normal sur la notification -> url
 */
 
-const CACHE_NAME = "adn66-push-v6-fix-image-site-actions";
+const CACHE_NAME = "adn66-push-v7-force-site-button-new-window";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
@@ -367,41 +367,36 @@ function cleanActions(value) {
 }
 
 self.addEventListener("notificationclick", event => {
+  /*
+    Correction v7 :
+    - Le bouton "Voir le site" ne doit jamais ouvrir Google Play.
+    - On ouvre une nouvelle fenêtre au lieu de reprendre un ancien onglet,
+      car certains navigateurs refocusaient un onglet Play Store déjà ouvert.
+  */
   event.notification.close();
 
   const data = event.notification.data || {};
 
-  let targetUrl = cleanSiteUrl(data.url) || DEFAULT_URL;
+  let targetUrl = cleanSiteUrl(data.url) || cleanSiteUrl(data.site_url) || DEFAULT_URL;
 
   if (event.action === "open_site") {
     targetUrl = cleanSiteUrl(data.site_url) || cleanSiteUrl(data.url) || DEFAULT_URL;
   }
 
   if (event.action === "install_app") {
-    targetUrl = cleanNotificationUrl(data.install_url || data.playstore_url) || DEFAULT_PLAYSTORE_URL;
+    targetUrl = cleanNotificationUrl(data.playstore_url || data.install_url) || DEFAULT_PLAYSTORE_URL;
   }
 
-  event.waitUntil(openOrFocusUrl(targetUrl));
+  // Sécurité absolue : open_site ne peut pas ouvrir un lien Play Store.
+  if (event.action === "open_site" && isPlayStoreUrl(targetUrl)) {
+    targetUrl = DEFAULT_URL;
+  }
+
+  event.waitUntil(openUrlInNewWindow(targetUrl));
 });
 
-async function openOrFocusUrl(url) {
+async function openUrlInNewWindow(url) {
   const finalUrl = cleanNotificationUrl(url) || DEFAULT_URL;
-
-  const clientList = await clients.matchAll({
-    type: "window",
-    includeUncontrolled: true
-  });
-
-  for (const client of clientList) {
-    if ("focus" in client) {
-      try {
-        await client.navigate(finalUrl);
-        return client.focus();
-      } catch {
-        return client.focus();
-      }
-    }
-  }
 
   if (clients.openWindow) {
     return clients.openWindow(finalUrl);
