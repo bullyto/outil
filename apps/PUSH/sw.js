@@ -13,7 +13,7 @@
   - clic normal sur la notification -> url
 */
 
-const CACHE_NAME = "adn66-push-v11-diagnostic-liens";
+const CACHE_NAME = "adn66-push-v12-test-one-button-site";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
@@ -156,16 +156,7 @@ async function showLatestNotification() {
     requireInteraction: Boolean(payload.require_interaction),
     silent: Boolean(payload.silent),
     vibrate: cleanVibrate(payload.vibrate),
-    actions: [
-      {
-        action: "adn66_open_site_v11",
-        title: "Voir le site"
-      },
-      {
-        action: "adn66_open_app_v11",
-        title: "Télécharger l’app"
-      }
-    ]
+    actions: [{ action: "open_site", title: "Voir le site" }]
   };
 
   /*
@@ -208,12 +199,8 @@ function getDefaultPayload() {
     vibrate: [500, 150, 500, 150, 800],
     actions: [
       {
-        action: "adn66_open_site_v11",
+        action: "open_site",
         title: "Voir le site"
-      },
-      {
-        action: "adn66_open_app_v11",
-        title: "Télécharger l’app"
       }
     ]
   };
@@ -351,10 +338,6 @@ function cleanActions(value) {
     {
       action: "open_site",
       title: "Voir le site"
-    },
-    {
-      action: "install_app",
-      title: "Télécharger l’app"
     }
   ];
 
@@ -362,7 +345,7 @@ function cleanActions(value) {
     return fallback;
   }
 
-  const allowedActions = new Set(["open_site", "install_app"]);
+  const allowedActions = new Set(["open_site"]);
 
   const cleaned = value
     .map(action => ({
@@ -376,43 +359,24 @@ function cleanActions(value) {
 }
 
 self.addEventListener("notificationclick", event => {
-  /*
-    V11 diagnostic liens :
-    - clic notification complète = site
-    - bouton Voir le site = site
-    - bouton Télécharger l’app = Play Store
-    - toute action inconnue = site
-    Objectif : empêcher définitivement "Voir le site" d’ouvrir Google Play.
-  */
   event.notification.close();
 
   const data = event.notification.data || {};
+
+  // TEST 1 : un seul bouton.
+  // Tout clic sur la notification ou sur le bouton ouvre le site, jamais Google Play.
   const target = String(data.target || "").toLowerCase();
-  const urlText = String(data.url || "").toLowerCase();
-  const siteText = String(data.site_url || "").toLowerCase();
+  const siteUrlFromData = cleanSiteUrl(data.site_url) || cleanSiteUrl(data.url);
 
   const isCatalan =
     target === "catalan" ||
-    urlText.includes("catalan.aperos.net") ||
-    siteText.includes("catalan.aperos.net");
+    siteUrlFromData.includes("catalan.aperos.net");
 
-  const siteUrl = isCatalan
-    ? "https://catalan.aperos.net/?push_action=voir_site_v11"
-    : "https://aperos.net/?push_action=voir_site_v11";
+  const targetUrl = isCatalan
+    ? "https://catalan.aperos.net/?push_test=one_button_site"
+    : "https://aperos.net/?push_test=one_button_site";
 
-  const appUrl = isCatalan
-    ? "https://play.google.com/store/apps/details?id=net.aperos.catalan"
-    : "https://play.google.com/store/apps/details?id=fr.aperos.nuit66";
-
-  let targetUrl = siteUrl;
-
-  // Seule cette action précise ouvre le Play Store.
-  if (event.action === "adn66_open_app_v11") {
-    targetUrl = appUrl;
-  }
-
-  // Action site, clic normal, action vide ou inconnue => site.
-  event.waitUntil(clients.openWindow(targetUrl));
+  event.waitUntil(openCleanWindow(targetUrl));
 });
 
 async function openCleanWindow(url) {
