@@ -2,12 +2,6 @@
   ADN66 Push - admin.js complet
   Emplacement GitHub :
   /apps/PUSH/admin.js
-
-  Fonctions :
-  - onglets Notification instantanée / Notification programmée
-  - stats abonnés
-  - envoi instantané avec icon_url / image_url
-  - préparation formulaire programmation
 */
 
 const cfg = window.ADN_PUSH_CONFIG;
@@ -28,6 +22,8 @@ const scheduledPanel = document.getElementById("scheduledPanel");
 
 const adminKeyInput = document.getElementById("adminKey");
 const scheduleAdminKeyInput = document.getElementById("scheduleAdminKey");
+
+const DEFAULT_ICON_URL = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png";
 
 function setAdminStatus(message, type = "") {
   if (!adminStatus) return;
@@ -65,7 +61,7 @@ function setActiveTab(tabName) {
   setAdminStatus(
     isInstant
       ? "Mode notification instantanée."
-      : "Mode notification programmée. Le formulaire est prêt, le Worker de programmation sera ajouté ensuite.",
+      : "Mode notification programmée. Le Worker de programmation sera ajouté ensuite.",
     isInstant ? "success" : "warn"
   );
 }
@@ -104,7 +100,13 @@ function getSelectedIcon(prefix = "") {
   const preset = document.getElementById(prefix + "IconPreset")?.value?.trim() || "";
   const custom = document.getElementById(prefix + "IconUrl")?.value?.trim() || "";
 
-  return normalizeImageUrl(custom || preset);
+  const customUrl = normalizeImageUrl(custom);
+  if (customUrl) return customUrl;
+
+  const presetUrl = normalizeImageUrl(preset);
+  if (presetUrl) return presetUrl;
+
+  return DEFAULT_ICON_URL;
 }
 
 async function loadStats() {
@@ -166,20 +168,22 @@ async function sendNotification(event) {
   }
 
   try {
+    const payload = {
+      target,
+      title,
+      body,
+      url,
+      icon_url: iconUrl,
+      image_url: iconUrl
+    };
+
     const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/send`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Admin-Key": adminKey
       },
-      body: JSON.stringify({
-        target,
-        title,
-        body,
-        url,
-        icon_url: iconUrl,
-        image_url: iconUrl
-      })
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
@@ -190,7 +194,7 @@ async function sendNotification(event) {
     const result = await response.json();
 
     setAdminStatus(
-      `Notification envoyée. Succès : ${result.sent_count ?? 0}, échecs : ${result.failed_count ?? 0}.`,
+      `Notification envoyée. Succès : ${result.sent_count ?? 0}, échecs : ${result.failed_count ?? 0}. Image envoyée : ${iconUrl}`,
       "success"
     );
 
@@ -279,7 +283,7 @@ async function saveSchedule(event) {
     const result = await response.json();
 
     setAdminStatus(
-      `Programmation enregistrée${result.id ? " #" + result.id : ""}.`,
+      `Programmation enregistrée${result.id ? " #" + result.id : ""}. Image : ${iconUrl}`,
       "success"
     );
   } catch (error) {
