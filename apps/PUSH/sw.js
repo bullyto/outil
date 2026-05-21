@@ -1,5 +1,7 @@
-const CACHE_NAME = "adn66-push-v2";
+const CACHE_NAME = "adn66-push-v3";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
+
+const DEFAULT_ICON = "./icons/icon-192.png";
 
 const STATIC_ASSETS = [
   "./",
@@ -9,7 +11,9 @@ const STATIC_ASSETS = [
   "./config.js",
   "./app.js",
   "./admin.js",
-  "./manifest.webmanifest"
+  "./manifest.webmanifest",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png"
 ];
 
 self.addEventListener("install", event => {
@@ -41,21 +45,24 @@ self.addEventListener("fetch", event => {
 });
 
 self.addEventListener("push", event => {
-  event.waitUntil(showLatestNotification());
+  event.waitUntil(showLatestNotification(event));
 });
 
-async function showLatestNotification() {
+async function showLatestNotification(event) {
   let payload = {
     title: "ADN66",
     body: "Nouvelle notification.",
-    url: "./"
+    url: "./",
+    icon_url: DEFAULT_ICON,
+    image_url: ""
   };
 
   try {
-    if (eventHasDataAvailable()) {
-      // Sécurité : garde une compatibilité si on ajoute plus tard un payload chiffré.
-    }
-
+    /*
+      Le Worker envoie volontairement un push vide.
+      Le Service Worker récupère ensuite le dernier message depuis /push/latest.
+      Cela permet de garder un système simple sans payload chiffré.
+    */
     const response = await fetch(`${WORKER_BASE_URL}/push/latest`, {
       cache: "no-store"
     });
@@ -64,30 +71,68 @@ async function showLatestNotification() {
       const data = await response.json();
 
       if (data && data.notification) {
-        payload = data.notification;
+        payload = {
+          ...payload,
+          ...data.notification
+        };
       }
     }
   } catch (error) {
-    // Fallback silencieux : une notification générique est affichée.
+    // Fallback silencieux : notification générique.
   }
 
   const title = payload.title || "ADN66";
+  const iconUrl = cleanNotificationImageUrl(payload.icon_url) || DEFAULT_ICON;
+  const imageUrl = cleanNotificationImageUrl(payload.image_url);
 
   const options = {
     body: payload.body || "",
-    icon: "./icons/icon-192.png",
-    badge: "./icons/icon-192.png",
+    icon: iconUrl,
+    badge: iconUrl,
     data: {
       url: payload.url || "./"
     },
     requireInteraction: false
   };
 
+  /*
+    Chrome peut afficher une image large avec "image".
+    Certains navigateurs l’ignorent : l’icône reste alors utilisée.
+  */
+  if (imageUrl) {
+    options.image = imageUrl;
+  }
+
   return self.registration.showNotification(title, options);
 }
 
-function eventHasDataAvailable() {
-  return false;
+function cleanNotificationImageUrl(value) {
+  const raw = String(value || "").trim();
+
+  if (!raw) {
+    return "";
+  }
+
+  /*
+    Accepte :
+    - URL absolue https://...
+    - chemin relatif local ./icons/icon-192.png
+  */
+  if (raw.startsWith("./") || raw.startsWith("/")) {
+    return raw;
+  }
+
+  try {
+    const url = new URL(raw);
+
+    if (url.protocol !== "https:") {
+      return "";
+    }
+
+    return url.toString();
+  } catch {
+    return "";
+  }
 }
 
 self.addEventListener("notificationclick", event => {
