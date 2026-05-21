@@ -158,8 +158,12 @@ async function showLatestNotification() {
     vibrate: cleanVibrate(payload.vibrate),
     // Solution fiable Android/Chrome : 1 seul bouton action.
     // Le clic sur la notification complète ouvre le site.
-    // Le seul bouton ouvre le Play Store.
+    // Deux boutons affichés, mais les deux ouvrent volontairement le site.
     actions: [
+      {
+        action: "open_site",
+        title: "Voir le site"
+      },
       {
         action: "install_app",
         title: "Télécharger l’app"
@@ -206,6 +210,10 @@ function getDefaultPayload() {
     silent: false,
     vibrate: [500, 150, 500, 150, 800],
     actions: [
+      {
+        action: "open_site",
+        title: "Voir le site"
+      },
       {
         action: "install_app",
         title: "Télécharger l’app"
@@ -342,9 +350,13 @@ function cleanVibrate(value) {
 }
 
 function cleanActions(value) {
-  // On garde volontairement un seul bouton fiable : Télécharger l’app.
-  // Le site reste accessible en cliquant sur la notification complète.
+  // On ignore volontairement les actions venant du Worker/D1.
+  // On affiche deux boutons, mais dans notificationclick les deux ouvrent le site.
   return [
+    {
+      action: "open_site",
+      title: "Voir le site"
+    },
     {
       action: "install_app",
       title: "Télécharger l’app"
@@ -369,14 +381,12 @@ self.addEventListener("notificationclick", event => {
     ? "https://catalan.aperos.net/"
     : "https://aperos.net/";
 
-  const appUrl = isCatalan
-    ? "https://play.google.com/store/apps/details?id=net.aperos.catalan"
-    : "https://play.google.com/store/apps/details?id=fr.aperos.nuit66";
-
-  // Solution finale fiable :
+  // Choix demandé : les deux boutons ouvrent le site.
   // - clic sur la notification complète = site
-  // - bouton unique Télécharger l’app = Play Store
-  const targetUrl = event.action === "install_app" ? appUrl : siteUrl;
+  // - bouton Voir le site = site
+  // - bouton Télécharger l’app = site aussi
+  // Aucun clic de cette notification n’ouvre le Play Store dans cette version.
+  const targetUrl = siteUrl;
 
   event.waitUntil(openCleanWindow(targetUrl));
 });
