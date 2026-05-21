@@ -1,0 +1,82 @@
+[
+  {
+    "id": "adn66_ouverture_soir",
+    "brand": "apero",
+    "target": "all",
+    "title": "Apéro de Nuit 66",
+    "body": "Service ouvert ce soir, livraison de 19h à 6h dans les Pyrénées-Orientales.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_commande_rapide",
+    "brand": "apero",
+    "target": "all",
+    "title": "Livraison nocturne disponible",
+    "body": "Commandez simplement depuis le site, nous nous occupons de la livraison.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_soiree_prete",
+    "brand": "apero",
+    "target": "all",
+    "title": "Votre soirée continue",
+    "body": "Apéro de Nuit 66 vous livre ce soir, rapidement et simplement.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_anticipez",
+    "brand": "apero",
+    "target": "all",
+    "title": "Pensez à commander en avance",
+    "body": "Forte demande possible ce soir : préparez votre commande dès maintenant.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_suivi_commande",
+    "brand": "apero",
+    "target": "all",
+    "title": "Suivi de commande disponible",
+    "body": "Après votre commande, suivez facilement l’avancement de votre livraison.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_restez_au_chaud",
+    "brand": "apero",
+    "target": "all",
+    "title": "Restez tranquille, on livre",
+    "body": "Pas besoin de vous déplacer : Apéro de Nuit 66 livre jusqu’à 6h.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_weekend",
+    "brand": "apero",
+    "target": "all",
+    "title": "Week-end avec Apéro de Nuit 66",
+    "body": "Le service est disponible ce soir pour vos commandes de dernière minute.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_fidelite",
+    "brand": "apero",
+    "target": "all",
+    "title": "Carte fidélité Apéro de Nuit 66",
+    "body": "Pensez à présenter votre carte fidélité lors de vos prochaines commandes.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_pwa",
+    "brand": "apero",
+    "target": "all",
+    "title": "Ajoutez l’app à votre téléphone",
+    "body": "Gardez Apéro de Nuit 66 à portée de main depuis votre écran d’accueil.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_rappel_ouverture",
+    "brand": "apero",
+    "target": "all",
+    "title": "Ouvert cette nuit",
+    "body": "Apéro de Nuit 66 assure les livraisons de 19h à 6h, 7j/7.",
+    "image_mode": "random"
+  }
+]

@@ -31,6 +31,9 @@ const scheduledPanel = document.getElementById("scheduledPanel");
 
 const adminKeyInput = document.getElementById("adminKey");
 const scheduleAdminKeyInput = document.getElementById("scheduleAdminKey");
+const refreshProgramListBtn = document.getElementById("refreshProgramList");
+const programListStatus = document.getElementById("programListStatus");
+const programList = document.getElementById("programList");
 
 const scheduleEnabledInput = document.getElementById("scheduleEnabled");
 const scheduleStateText = document.getElementById("scheduleStateText");
@@ -61,6 +64,7 @@ const DEFAULT_ACTIONS = [
 ];
 
 const GITHUB_IMAGES_API_URL = "https://api.github.com/repos/bullyto/outil/contents/apps/PUSH/images";
+const GITHUB_PROGRAMMATION_URL = "https://bullyto.github.io/outil/apps/PUSH/admin-programmation.json";
 const GITHUB_PAGES_IMAGES_BASE_URL = "https://bullyto.github.io/outil/apps/PUSH/images/";
 const SUPPORTED_IMAGE_EXTENSIONS = /\.(png|jpe?g|webp|gif)$/i;
 
@@ -118,7 +122,11 @@ function isWorkerConfigured() {
 function setActiveTab(tabName) {
   const isInstant = tabName === "instant";
 
-  if (instantTabBtn) {
+  if (refreshProgramListBtn) {
+  refreshProgramListBtn.addEventListener("click", loadProgramList);
+}
+
+if (instantTabBtn) {
     instantTabBtn.classList.toggle("active", isInstant);
     instantTabBtn.setAttribute("aria-selected", isInstant ? "true" : "false");
   }
@@ -527,6 +535,74 @@ async function sendNotification(event) {
 }
 
 
+
+function setProgramListStatus(message, type = "") {
+  if (!programListStatus) return;
+  programListStatus.textContent = message;
+  programListStatus.dataset.type = type;
+}
+
+function normalizeProgramItems(value) {
+  const items = Array.isArray(value) ? value : [];
+  return items
+    .filter(item => item && item.title && item.body)
+    .map((item, index) => ({
+      id: String(item.id || `item_${index + 1}`),
+      position: index + 1,
+      brand: String(item.brand || "apero"),
+      target: String(item.target || "all"),
+      title: String(item.title || "").trim(),
+      body: String(item.body || "").trim(),
+      image_mode: String(item.image_mode || "random")
+    }));
+}
+
+async function loadProgramList() {
+  if (!programList) return;
+
+  setProgramListStatus("Chargement de admin-programmation.json...", "loading");
+  programList.innerHTML = "";
+
+  try {
+    const response = await fetch(GITHUB_PROGRAMMATION_URL, { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error("Impossible de lire admin-programmation.json : " + response.status);
+    }
+
+    const data = await response.json();
+    const items = normalizeProgramItems(data);
+
+    if (!items.length) {
+      setProgramListStatus("Aucune notification trouvée dans admin-programmation.json.", "warn");
+      return;
+    }
+
+    for (const item of items) {
+      const card = document.createElement("article");
+      card.className = "program-item";
+
+      const title = document.createElement("strong");
+      title.textContent = `${item.position}. ${item.title}`;
+
+      const body = document.createElement("p");
+      body.textContent = item.body;
+
+      const meta = document.createElement("div");
+      meta.className = "program-meta";
+      meta.textContent = `brand=${item.brand} • target=${item.target} • image=${item.image_mode}`;
+
+      card.append(title, body, meta);
+      programList.appendChild(card);
+    }
+
+    setProgramListStatus(`${items.length} notification${items.length > 1 ? "s" : ""} chargée${items.length > 1 ? "s" : ""} depuis GitHub.`, "success");
+  } catch (error) {
+    console.error(error);
+    setProgramListStatus(error.message, "error");
+  }
+}
+
 function updateScheduleEnabledText() {
   if (!scheduleEnabledInput || !scheduleStateText) return;
 
@@ -740,6 +816,10 @@ if (scheduleCopyImageUrlBtn) {
   scheduleCopyImageUrlBtn.addEventListener("click", () => copySelectedImageUrl("schedule"));
 }
 
+if (refreshProgramListBtn) {
+  refreshProgramListBtn.addEventListener("click", loadProgramList);
+}
+
 if (instantTabBtn) {
   instantTabBtn.addEventListener("click", () => setActiveTab("instant"));
 }
@@ -781,4 +861,5 @@ setActiveTab("instant");
 ensureDefaultScheduleSlot();
 updateScheduleEnabledText();
 refreshImageGallery(false);
+loadProgramList();
 loadStats();

@@ -179,6 +179,56 @@
       line-height: 1.45;
     }
 
+
+
+    .program-list-box {
+      display: grid;
+      gap: 0.85rem;
+      padding: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.055);
+    }
+
+    .program-list-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .program-list {
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    .program-item {
+      display: grid;
+      gap: 0.35rem;
+      padding: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      background: rgba(0,0,0,0.16);
+    }
+
+    .program-item strong {
+      font-size: 0.95rem;
+    }
+
+    .program-item p {
+      margin: 0;
+      opacity: 0.86;
+      line-height: 1.38;
+      font-size: 0.9rem;
+    }
+
+    .program-meta {
+      font-size: 0.78rem;
+      opacity: 0.72;
+      overflow-wrap: anywhere;
+    }
+
     @media (min-width: 560px) {
       .schedule-days {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -337,6 +387,23 @@
             </p>
           </div>
 
+
+
+          <div class="program-list-box">
+            <div class="program-list-head">
+              <div>
+                <strong>Liste GitHub de programmation</strong>
+                <p class="schedule-note">
+                  Le Worker lira <code>admin-programmation.json</code>, puis piochera les notifications dans l’ordre et en boucle.
+                  L’image grande sera choisie aléatoirement dans <code>/apps/PUSH/images/</code> à chaque envoi.
+                </p>
+              </div>
+              <button id="refreshProgramList" class="secondary-btn" type="button">Actualiser la liste</button>
+            </div>
+            <p id="programListStatus" class="mini-status">Chargement de la liste GitHub...</p>
+            <div id="programList" class="program-list" aria-label="Notifications programmées depuis GitHub"></div>
+          </div>
+
           <button class="primary-btn" type="submit">Enregistrer la programmation</button>
         </form>
       </section>
@@ -348,6 +415,6 @@
   </main>
 
   <script src="./config.js"></script>
-  <script src="./admin.js?v=schedule-simple-weekly-20260521-1"></script>
+  <script src="./admin.js?v=github-programmation-random-20260521-1"></script>
 </body>
 </html>
