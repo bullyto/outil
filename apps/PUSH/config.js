@@ -9,18 +9,35 @@ window.ADN_PUSH_CONFIG = {
 
   DEFAULT_TARGET: "apero",
 
-  TARGETS: {
+  BRANDS: {
     apero: {
       label: "Apéro de Nuit 66",
-      defaultUrl: "https://aperos.net"
+      siteUrl: "https://aperos.net/",
+      playstoreUrl: "https://play.google.com/store/apps/details?id=fr.aperos.nuit66",
+      iconUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png",
+      badgeUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/badge-adn66-96.png"
     },
     catalan: {
       label: "Apéro Catalan",
-      defaultUrl: "https://catalan.aperos.net"
+      siteUrl: "https://catalan.aperos.net/",
+      playstoreUrl: "https://play.google.com/store/apps/details?id=net.aperos.catalan",
+      iconUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/icon-catalan-192.png",
+      badgeUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/badge-catalan-96.png"
+    }
+  },
+
+  TARGETS: {
+    apero: {
+      label: "Apéro de Nuit 66",
+      defaultUrl: "https://aperos.net/"
+    },
+    catalan: {
+      label: "Apéro Catalan",
+      defaultUrl: "https://catalan.aperos.net/"
     },
     x: {
       label: "X — futur projet",
-      defaultUrl: "https://aperos.net"
+      defaultUrl: "https://aperos.net/"
     }
   }
 };

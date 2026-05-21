@@ -3,10 +3,12 @@
   Emplacement GitHub :
   /apps/PUSH/admin.js
 
-  Correction :
-  - URL image personnalisée prioritaire sur le menu déroulant.
-  - Si URL personnalisée remplie mais invalide : envoi bloqué.
-  - Le statut affiche l’URL réellement envoyée.
+  Modifications :
+  - image grande séparée de l’icône ; elle n’est plus remplacée par l’icône par défaut ;
+  - choix des liens boutons : Apéro de Nuit 66 ou Apéro Catalan ;
+  - choix de l’icône : automatique, Apéro de Nuit 66 ou Apéro Catalan ;
+  - notification forte par défaut ;
+  - envoi des champs utiles uniquement pour l’affichage et les clics.
 */
 
 const cfg = window.ADN_PUSH_CONFIG;
@@ -28,7 +30,48 @@ const scheduledPanel = document.getElementById("scheduledPanel");
 const adminKeyInput = document.getElementById("adminKey");
 const scheduleAdminKeyInput = document.getElementById("scheduleAdminKey");
 
-const DEFAULT_ICON_URL = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png";
+const DEFAULT_BRAND_KEY = "apero";
+const DEFAULT_TAG = "adn66-alerte";
+const DEFAULT_VIBRATE = [500, 150, 500, 150, 800];
+const DEFAULT_ACTIONS = [
+  {
+    action: "open_site",
+    title: "Voir le site"
+  },
+  {
+    action: "install_app",
+    title: "Télécharger l’app"
+  }
+];
+
+const FALLBACK_BRANDS = {
+  apero: {
+    label: "Apéro de Nuit 66",
+    siteUrl: "https://aperos.net/",
+    playstoreUrl: "https://play.google.com/store/apps/details?id=fr.aperos.nuit66",
+    iconUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png",
+    badgeUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/badge-adn66-96.png"
+  },
+  catalan: {
+    label: "Apéro Catalan",
+    siteUrl: "https://catalan.aperos.net/",
+    playstoreUrl: "https://play.google.com/store/apps/details?id=net.aperos.catalan",
+    iconUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/icon-catalan-192.png",
+    badgeUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/badge-catalan-96.png"
+  }
+};
+
+function getBrands() {
+  return {
+    ...FALLBACK_BRANDS,
+    ...(cfg?.BRANDS || {})
+  };
+}
+
+function getBrand(brandKey) {
+  const brands = getBrands();
+  return brands[brandKey] || brands[DEFAULT_BRAND_KEY] || FALLBACK_BRANDS.apero;
+}
 
 function setAdminStatus(message, type = "") {
   if (!adminStatus) return;
@@ -81,47 +124,83 @@ function syncAdminKeys(source) {
   }
 }
 
-function normalizeHttpsUrl(value) {
+function normalizeHttpsUrl(value, allowEmpty = true) {
   const raw = String(value || "").trim();
 
   if (!raw) {
-    return "";
+    return allowEmpty ? "" : null;
   }
 
   try {
     const url = new URL(raw, window.location.href);
 
     if (url.protocol !== "https:") {
-      return "";
+      return null;
     }
 
     return url.toString();
   } catch {
-    return "";
+    return null;
   }
 }
 
-function pickImageUrl(customInputId, presetSelectId) {
-  const customRaw = document.getElementById(customInputId)?.value?.trim() || "";
-  const presetRaw = document.getElementById(presetSelectId)?.value?.trim() || "";
+function getSelectedBrand(prefix = "") {
+  const elementId = prefix ? `${prefix}BrandChoice` : "brandChoice";
+  const brandKey = document.getElementById(elementId)?.value || DEFAULT_BRAND_KEY;
+  return getBrand(brandKey);
+}
 
-  if (customRaw) {
-    const customUrl = normalizeHttpsUrl(customRaw);
+function getSelectedIconBrand(prefix = "") {
+  const brand = getSelectedBrand(prefix);
+  const elementId = prefix ? `${prefix}IconChoice` : "iconChoice";
+  const choice = document.getElementById(elementId)?.value || "auto";
 
-    if (!customUrl) {
-      throw new Error("URL image personnalisée invalide. Elle doit commencer par https:// et ouvrir directement une image.");
-    }
-
-    return customUrl;
+  if (choice === "auto") {
+    return brand;
   }
 
-  const presetUrl = normalizeHttpsUrl(presetRaw);
+  return getBrand(choice);
+}
 
-  if (presetUrl) {
-    return presetUrl;
+function getImageUrl(inputId) {
+  const raw = document.getElementById(inputId)?.value?.trim() || "";
+
+  if (!raw) {
+    return "";
   }
 
-  return DEFAULT_ICON_URL;
+  const imageUrl = normalizeHttpsUrl(raw);
+
+  if (!imageUrl) {
+    throw new Error("URL de l’image grande invalide. Elle doit commencer par https:// et ouvrir directement une image.");
+  }
+
+  return imageUrl;
+}
+
+function buildNotificationPayload({ target, title, body, brand, iconBrand, imageUrl }) {
+  const siteUrl = normalizeHttpsUrl(brand.siteUrl, false) || FALLBACK_BRANDS.apero.siteUrl;
+  const playstoreUrl = normalizeHttpsUrl(brand.playstoreUrl, false) || FALLBACK_BRANDS.apero.playstoreUrl;
+  const iconUrl = normalizeHttpsUrl(iconBrand.iconUrl, false) || FALLBACK_BRANDS.apero.iconUrl;
+  const badgeUrl = normalizeHttpsUrl(iconBrand.badgeUrl, true) || "";
+
+  return {
+    target,
+    title,
+    body,
+    url: siteUrl,
+    site_url: siteUrl,
+    playstore_url: playstoreUrl,
+    icon_url: iconUrl,
+    image_url: imageUrl || "",
+    badge_url: badgeUrl,
+    tag: DEFAULT_TAG,
+    renotify: true,
+    require_interaction: true,
+    silent: false,
+    vibrate: DEFAULT_VIBRATE,
+    actions: DEFAULT_ACTIONS
+  };
 }
 
 async function loadStats() {
@@ -145,10 +224,10 @@ async function loadStats() {
 
     const data = await response.json();
 
-    statTotal.textContent = data.total ?? 0;
-    statApero.textContent = data.targets?.apero ?? 0;
-    statCatalan.textContent = data.targets?.catalan ?? 0;
-    statX.textContent = data.targets?.x ?? 0;
+    if (statTotal) statTotal.textContent = data.total ?? 0;
+    if (statApero) statApero.textContent = data.targets?.apero ?? 0;
+    if (statCatalan) statCatalan.textContent = data.targets?.catalan ?? 0;
+    if (statX) statX.textContent = data.targets?.x ?? 0;
 
     setAdminStatus("Statistiques chargées.", "success");
   } catch (error) {
@@ -164,12 +243,13 @@ async function sendNotification(event) {
   const target = document.getElementById("target").value;
   const title = document.getElementById("title").value.trim();
   const body = document.getElementById("body").value.trim();
-  const url = document.getElementById("url").value.trim();
+  const brand = getSelectedBrand("");
+  const iconBrand = getSelectedIconBrand("");
 
-  let iconUrl = "";
+  let imageUrl = "";
 
   try {
-    iconUrl = pickImageUrl("iconUrl", "iconPreset");
+    imageUrl = getImageUrl("imageUrl");
   } catch (error) {
     setAdminStatus(error.message, "error");
     return;
@@ -191,14 +271,14 @@ async function sendNotification(event) {
   }
 
   try {
-    const payload = {
+    const payload = buildNotificationPayload({
       target,
       title,
       body,
-      url,
-      icon_url: iconUrl,
-      image_url: iconUrl
-    };
+      brand,
+      iconBrand,
+      imageUrl
+    });
 
     const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/send`, {
       method: "POST",
@@ -217,7 +297,7 @@ async function sendNotification(event) {
     const result = await response.json();
 
     setAdminStatus(
-      `Notification envoyée. Succès : ${result.sent_count ?? 0}, échecs : ${result.failed_count ?? 0}. Image envoyée : ${iconUrl}`,
+      `Notification envoyée. Succès : ${result.sent_count ?? 0}, échecs : ${result.failed_count ?? 0}. Site : ${payload.site_url}. Image : ${payload.image_url || "aucune image grande"}`,
       "success"
     );
 
@@ -239,12 +319,13 @@ async function saveSchedule(event) {
   const time = document.getElementById("scheduleTime").value;
   const title = document.getElementById("scheduleTitle").value.trim();
   const body = document.getElementById("scheduleBody").value.trim();
-  const url = document.getElementById("scheduleUrl").value.trim();
+  const brand = getSelectedBrand("schedule");
+  const iconBrand = getSelectedIconBrand("schedule");
 
-  let iconUrl = "";
+  let imageUrl = "";
 
   try {
-    iconUrl = pickImageUrl("scheduleIconUrl", "scheduleIconPreset");
+    imageUrl = getImageUrl("scheduleImageUrl");
   } catch (error) {
     setAdminStatus(error.message, "error");
     return;
@@ -281,24 +362,31 @@ async function saveSchedule(event) {
   }
 
   try {
+    const notificationPayload = buildNotificationPayload({
+      target,
+      title,
+      body,
+      brand,
+      iconBrand,
+      imageUrl
+    });
+
+    const schedulePayload = {
+      target,
+      mode,
+      weekday,
+      date,
+      time,
+      ...notificationPayload
+    };
+
     const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/schedule`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Admin-Key": adminKey
       },
-      body: JSON.stringify({
-        target,
-        mode,
-        weekday,
-        date,
-        time,
-        title,
-        body,
-        url,
-        icon_url: iconUrl,
-        image_url: iconUrl
-      })
+      body: JSON.stringify(schedulePayload)
     });
 
     if (!response.ok) {
@@ -314,7 +402,7 @@ async function saveSchedule(event) {
     const result = await response.json();
 
     setAdminStatus(
-      `Programmation enregistrée${result.id ? " #" + result.id : ""}. Image : ${iconUrl}`,
+      `Programmation enregistrée${result.id ? " #" + result.id : ""}. Site : ${notificationPayload.site_url}. Image : ${notificationPayload.image_url || "aucune image grande"}`,
       "success"
     );
   } catch (error) {

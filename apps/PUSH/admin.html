@@ -16,7 +16,7 @@
       <h1>Notifications push</h1>
       <p>
         Gérez les notifications instantanées et les futures notifications programmées
-        pour Apéro de Nuit 66, Apéro Catalan et X.
+        pour Apéro de Nuit 66 et Apéro Catalan.
       </p>
 
       <div class="stats-grid">
@@ -55,28 +55,35 @@
           </label>
 
           <label>
-            Cible
+            Cible des abonnés
             <select id="target">
               <option value="all">Tous les abonnés</option>
-              <option value="apero">Apéro de Nuit 66</option>
-              <option value="catalan">Apéro Catalan</option>
+              <option value="apero">Abonnés Apéro de Nuit 66</option>
+              <option value="catalan">Abonnés Apéro Catalan</option>
               <option value="x">X — futur projet</option>
             </select>
           </label>
 
           <label>
-            Image / icône de notification
-            <select id="iconPreset">
-              <option value="https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png">ADN66</option>
-              <option value="https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png">Apéro de Nuit 66</option>
-              <option value="https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png">Apéro Catalan</option>
-              <option value="https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png">Promo</option>
+            Liens des boutons
+            <select id="brandChoice">
+              <option value="apero">Apéro de Nuit 66 — aperos.net</option>
+              <option value="catalan">Apéro Catalan — catalan.aperos.net</option>
             </select>
           </label>
 
           <label>
-            URL image personnalisée
-            <input id="iconUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://.../image.png">
+            Icône de notification
+            <select id="iconChoice">
+              <option value="auto">Automatique selon les liens choisis</option>
+              <option value="apero">Icône Apéro de Nuit 66</option>
+              <option value="catalan">Icône Apéro Catalan</option>
+            </select>
+          </label>
+
+          <label>
+            Image grande de la notification
+            <input id="imageUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://.../image-promo.png">
           </label>
 
           <label>
@@ -87,11 +94,6 @@
           <label>
             Message
             <textarea id="body" maxlength="180" placeholder="Ex : Livraison disponible ce soir jusqu’à 6h."></textarea>
-          </label>
-
-          <label>
-            URL au clic
-            <input id="url" type="text" inputmode="url" placeholder="https://aperos.net">
           </label>
 
           <button class="primary-btn" type="submit">Envoyer la notification</button>
@@ -106,12 +108,20 @@
           </label>
 
           <label>
-            Cible
+            Cible des abonnés
             <select id="scheduleTarget">
               <option value="all">Tous les abonnés</option>
-              <option value="apero">Apéro de Nuit 66</option>
-              <option value="catalan">Apéro Catalan</option>
+              <option value="apero">Abonnés Apéro de Nuit 66</option>
+              <option value="catalan">Abonnés Apéro Catalan</option>
               <option value="x">X — futur projet</option>
+            </select>
+          </label>
+
+          <label>
+            Liens des boutons
+            <select id="scheduleBrandChoice">
+              <option value="apero">Apéro de Nuit 66 — aperos.net</option>
+              <option value="catalan">Apéro Catalan — catalan.aperos.net</option>
             </select>
           </label>
 
@@ -150,18 +160,17 @@
           </label>
 
           <label>
-            Image / icône de notification
-            <select id="scheduleIconPreset">
-              <option value="https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png">ADN66</option>
-              <option value="https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png">Apéro de Nuit 66</option>
-              <option value="https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png">Apéro Catalan</option>
-              <option value="https://bullyto.github.io/outil/apps/PUSH/icons/icon-512.png">Promo</option>
+            Icône de notification
+            <select id="scheduleIconChoice">
+              <option value="auto">Automatique selon les liens choisis</option>
+              <option value="apero">Icône Apéro de Nuit 66</option>
+              <option value="catalan">Icône Apéro Catalan</option>
             </select>
           </label>
 
           <label>
-            URL image personnalisée
-            <input id="scheduleIconUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://.../image.png">
+            Image grande de la notification
+            <input id="scheduleImageUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://.../image-promo.png">
           </label>
 
           <label>
@@ -172,11 +181,6 @@
           <label>
             Message
             <textarea id="scheduleBody" maxlength="180" placeholder="Ex : Livraison disponible ce soir jusqu’à 6h."></textarea>
-          </label>
-
-          <label>
-            URL au clic
-            <input id="scheduleUrl" type="text" inputmode="url" placeholder="https://aperos.net">
           </label>
 
           <button class="primary-btn" type="submit">Enregistrer la programmation</button>
@@ -198,6 +202,6 @@
   </main>
 
   <script src="./config.js"></script>
-  <script src="./admin.js?v=custom-image-priority-20260521-3"></script>
+  <script src="./admin.js?v=brand-image-links-20260521-1"></script>
 </body>
 </html>

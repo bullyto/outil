@@ -13,11 +13,11 @@
   - clic normal sur la notification -> url
 */
 
-const CACHE_NAME = "adn66-push-v4-advanced";
+const CACHE_NAME = "adn66-push-v5-brand-links";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
-const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-192.png";
-const DEFAULT_BADGE = "https://bullyto.github.io/outil/apps/PUSH/icons/badge-96.png";
+const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
+const DEFAULT_BADGE = "https://bullyto.github.io/outil/apps/PUSH/icons/badge-adn66-96.png";
 const DEFAULT_URL = "https://aperos.net/";
 const DEFAULT_PLAYSTORE_URL = "https://play.google.com/store/apps/details?id=fr.aperos.nuit66";
 
@@ -31,7 +31,13 @@ const STATIC_ASSETS = [
   "./admin.js",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icons/icon-512.png",
+  "./icons/icon-adn66-192.png",
+  "./icons/icon-adn66-512.png",
+  "./icons/icon-catalan-192.png",
+  "./icons/icon-catalan-512.png",
+  "./icons/badge-adn66-96.png",
+  "./icons/badge-catalan-96.png"
 ];
 
 self.addEventListener("install", event => {
@@ -274,7 +280,7 @@ self.addEventListener("notificationclick", event => {
   let targetUrl = data.url || DEFAULT_URL;
 
   if (event.action === "open_site") {
-    targetUrl = data.site_url || data.url || DEFAULT_URL;
+    targetUrl = data.site_url || DEFAULT_URL;
   }
 
   if (event.action === "install_app") {
