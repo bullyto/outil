@@ -13,7 +13,7 @@
   - clic normal sur la notification -> url
 */
 
-const CACHE_NAME = "adn66-push-v5-brand-links";
+const CACHE_NAME = "adn66-push-v6-fix-image-site-actions";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
@@ -101,13 +101,45 @@ async function showLatestNotification() {
 
   const title = cleanText(payload.title) || "Apéro de Nuit 66";
 
-  const iconUrl = cleanNotificationImageUrl(payload.icon_url) || DEFAULT_ICON;
-  const badgeUrl = cleanNotificationImageUrl(payload.badge_url) || "";
-  const imageUrl = cleanNotificationImageUrl(payload.image_url);
+  const iconUrl = cleanNotificationImageUrl(firstValue(
+    payload.icon_url,
+    payload.icon,
+    payload.iconUrl
+  )) || DEFAULT_ICON;
 
-  const clickUrl = cleanNotificationUrl(payload.url) || DEFAULT_URL;
-  const siteUrl = cleanNotificationUrl(payload.site_url) || clickUrl || DEFAULT_URL;
-  const playstoreUrl = cleanNotificationUrl(payload.playstore_url) || DEFAULT_PLAYSTORE_URL;
+  const badgeUrl = cleanNotificationImageUrl(firstValue(
+    payload.badge_url,
+    payload.badge,
+    payload.badgeUrl
+  )) || "";
+
+  // Grande image : on accepte plusieurs noms de champs.
+  // Si le Worker renvoie par erreur l’icône comme image, on l’ignore pour éviter
+  // d’afficher le logo en grand à la place de l’image promo.
+  const rawImageUrl = firstValue(
+    payload.image_url,
+    payload.image,
+    payload.imageUrl,
+    payload.big_image_url,
+    payload.large_image_url
+  );
+  const imageUrl = cleanLargeImageUrl(rawImageUrl, iconUrl);
+
+  // Liens : "Voir le site" ne doit jamais ouvrir le Play Store.
+  const rawClickUrl = firstValue(payload.url, payload.site_url, DEFAULT_URL);
+  const clickUrl = cleanSiteUrl(rawClickUrl) || DEFAULT_URL;
+
+  const rawSiteUrl = firstValue(payload.site_url, payload.url, DEFAULT_URL);
+  const siteUrl = cleanSiteUrl(rawSiteUrl) || clickUrl || DEFAULT_URL;
+
+  const rawInstallUrl = firstValue(
+    payload.install_url,
+    payload.playstore_url,
+    payload.app_url,
+    payload.download_url,
+    DEFAULT_PLAYSTORE_URL
+  );
+  const installUrl = cleanNotificationUrl(rawInstallUrl) || DEFAULT_PLAYSTORE_URL;
 
   const options = {
     body: cleanText(payload.body) || "Service ouvert ce soir.",
@@ -115,7 +147,8 @@ async function showLatestNotification() {
     data: {
       url: clickUrl,
       site_url: siteUrl,
-      playstore_url: playstoreUrl,
+      install_url: installUrl,
+      playstore_url: installUrl,
       target: payload.target || "all"
     },
     tag: cleanTag(payload.tag) || "adn66-alerte",
@@ -153,6 +186,7 @@ function getDefaultPayload() {
     body: "Service ouvert ce soir, livraison de 19h à 6h.",
     url: DEFAULT_URL,
     site_url: DEFAULT_URL,
+    install_url: DEFAULT_PLAYSTORE_URL,
     playstore_url: DEFAULT_PLAYSTORE_URL,
     target: "all",
     icon_url: DEFAULT_ICON,
@@ -208,6 +242,43 @@ function cleanNotificationUrl(value) {
   }
 }
 
+function firstValue(...values) {
+  for (const value of values) {
+    const text = String(value || "").trim();
+
+    if (text) {
+      return text;
+    }
+  }
+
+  return "";
+}
+
+function isPlayStoreUrl(value) {
+  const url = cleanNotificationUrl(value);
+
+  if (!url) {
+    return false;
+  }
+
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.includes("play.google.com");
+  } catch {
+    return false;
+  }
+}
+
+function cleanSiteUrl(value) {
+  const url = cleanNotificationUrl(value);
+
+  if (!url || isPlayStoreUrl(url)) {
+    return "";
+  }
+
+  return url;
+}
+
 function cleanNotificationImageUrl(value) {
   const raw = String(value || "").trim();
 
@@ -226,6 +297,29 @@ function cleanNotificationImageUrl(value) {
   } catch {
     return "";
   }
+}
+
+function cleanLargeImageUrl(value, iconUrl = "") {
+  const imageUrl = cleanNotificationImageUrl(value);
+
+  if (!imageUrl) {
+    return "";
+  }
+
+  const normalizedImage = imageUrl.toLowerCase();
+  const normalizedIcon = String(iconUrl || "").toLowerCase();
+
+  // Sécurité : si le Worker renvoie l’icône comme grande image par défaut,
+  // on ne l’utilise pas comme image large.
+  if (normalizedIcon && normalizedImage === normalizedIcon) {
+    return "";
+  }
+
+  if (normalizedImage.includes("/apps/push/icons/icon-") || normalizedImage.includes("/apps/push/icons/badge-")) {
+    return "";
+  }
+
+  return imageUrl;
 }
 
 function cleanVibrate(value) {
@@ -277,14 +371,14 @@ self.addEventListener("notificationclick", event => {
 
   const data = event.notification.data || {};
 
-  let targetUrl = data.url || DEFAULT_URL;
+  let targetUrl = cleanSiteUrl(data.url) || DEFAULT_URL;
 
   if (event.action === "open_site") {
-    targetUrl = data.site_url || DEFAULT_URL;
+    targetUrl = cleanSiteUrl(data.site_url) || cleanSiteUrl(data.url) || DEFAULT_URL;
   }
 
   if (event.action === "install_app") {
-    targetUrl = data.playstore_url || DEFAULT_PLAYSTORE_URL;
+    targetUrl = cleanNotificationUrl(data.install_url || data.playstore_url) || DEFAULT_PLAYSTORE_URL;
   }
 
   event.waitUntil(openOrFocusUrl(targetUrl));

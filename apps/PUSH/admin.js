@@ -184,16 +184,34 @@ function buildNotificationPayload({ target, title, body, brand, iconBrand, image
   const iconUrl = normalizeHttpsUrl(iconBrand.iconUrl, false) || FALLBACK_BRANDS.apero.iconUrl;
   const badgeUrl = normalizeHttpsUrl(iconBrand.badgeUrl, true) || "";
 
+  const finalImageUrl = imageUrl || "";
+
   return {
     target,
     title,
     body,
+
+    // Clic normal + bouton "Voir le site"
     url: siteUrl,
     site_url: siteUrl,
+
+    // Bouton "Télécharger l’app"
+    install_url: playstoreUrl,
     playstore_url: playstoreUrl,
+
+    // Icône + badge choisis depuis l’admin
     icon_url: iconUrl,
-    image_url: imageUrl || "",
     badge_url: badgeUrl,
+
+    // Grande image choisie depuis l’admin.
+    // Plusieurs alias sont envoyés pour rester compatible avec le Worker actuel
+    // et avec les futures versions.
+    image_url: finalImageUrl,
+    image: finalImageUrl,
+    imageUrl: finalImageUrl,
+    big_image_url: finalImageUrl,
+    large_image_url: finalImageUrl,
+
     tag: DEFAULT_TAG,
     renotify: true,
     require_interaction: true,
