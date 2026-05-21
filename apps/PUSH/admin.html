@@ -8,6 +8,91 @@
   <meta name="robots" content="noindex,nofollow">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./style.css">
+  <style>
+    .image-picker {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .image-picker-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .image-picker-head label {
+      margin: 0;
+    }
+
+    .secondary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0.55rem 0.8rem;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      color: inherit;
+      text-decoration: none;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .image-preview-box {
+      display: grid;
+      grid-template-columns: minmax(96px, 150px) 1fr;
+      gap: 0.85rem;
+      align-items: stretch;
+      padding: 0.8rem;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .image-preview-box img {
+      width: 100%;
+      min-height: 84px;
+      max-height: 120px;
+      object-fit: cover;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.25);
+    }
+
+    .image-preview-info {
+      display: grid;
+      gap: 0.45rem;
+      min-width: 0;
+    }
+
+    .image-preview-info code {
+      display: block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      font-size: 0.78rem;
+      opacity: 0.9;
+    }
+
+    .image-preview-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .mini-status {
+      margin: -0.25rem 0 0;
+      font-size: 0.82rem;
+      opacity: 0.8;
+    }
+
+    @media (max-width: 560px) {
+      .image-preview-box {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <main class="shell">
@@ -81,10 +166,32 @@
             </select>
           </label>
 
-          <label>
-            Image grande de la notification
-            <input id="imageUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://.../image-promo.png">
-          </label>
+          <div class="image-picker" data-picker="instant">
+            <div class="image-picker-head">
+              <label for="imageGallerySelect">Image grande de la notification</label>
+              <button id="refreshImageGallery" class="secondary-btn" type="button">Actualiser les images</button>
+            </div>
+
+            <select id="imageGallerySelect">
+              <option value="">Chargement des images...</option>
+            </select>
+
+            <input id="imageUrl" type="hidden">
+
+            <div id="imagePreviewBox" class="image-preview-box" hidden>
+              <img id="imagePreview" alt="Aperçu de l’image sélectionnée">
+              <div class="image-preview-info">
+                <strong id="imagePreviewName">—</strong>
+                <code id="imagePreviewUrl">—</code>
+                <div class="image-preview-actions">
+                  <button id="copyImageUrl" class="secondary-btn" type="button">Copier l’URL</button>
+                  <a id="openImageUrl" class="secondary-btn" href="#" target="_blank" rel="noopener">Ouvrir</a>
+                </div>
+              </div>
+            </div>
+
+            <p id="imageGalleryStatus" class="mini-status">Les images sont lues automatiquement depuis /apps/PUSH/images/.</p>
+          </div>
 
           <label>
             Titre
@@ -168,10 +275,32 @@
             </select>
           </label>
 
-          <label>
-            Image grande de la notification
-            <input id="scheduleImageUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://.../image-promo.png">
-          </label>
+          <div class="image-picker" data-picker="schedule">
+            <div class="image-picker-head">
+              <label for="scheduleImageGallerySelect">Image grande de la notification</label>
+              <button id="scheduleRefreshImageGallery" class="secondary-btn" type="button">Actualiser les images</button>
+            </div>
+
+            <select id="scheduleImageGallerySelect">
+              <option value="">Chargement des images...</option>
+            </select>
+
+            <input id="scheduleImageUrl" type="hidden">
+
+            <div id="scheduleImagePreviewBox" class="image-preview-box" hidden>
+              <img id="scheduleImagePreview" alt="Aperçu de l’image sélectionnée">
+              <div class="image-preview-info">
+                <strong id="scheduleImagePreviewName">—</strong>
+                <code id="scheduleImagePreviewUrl">—</code>
+                <div class="image-preview-actions">
+                  <button id="scheduleCopyImageUrl" class="secondary-btn" type="button">Copier l’URL</button>
+                  <a id="scheduleOpenImageUrl" class="secondary-btn" href="#" target="_blank" rel="noopener">Ouvrir</a>
+                </div>
+              </div>
+            </div>
+
+            <p id="scheduleImageGalleryStatus" class="mini-status">Les images sont lues automatiquement depuis /apps/PUSH/images/.</p>
+          </div>
 
           <label>
             Titre
@@ -202,6 +331,6 @@
   </main>
 
   <script src="./config.js"></script>
-  <script src="./admin.js?v=brand-image-links-20260521-1"></script>
+  <script src="./admin.js?v=github-images-gallery-20260521-1"></script>
 </body>
 </html>

@@ -7,6 +7,8 @@
   - image grande séparée de l’icône ; elle n’est plus remplacée par l’icône par défaut ;
   - choix des liens boutons : Apéro de Nuit 66 ou Apéro Catalan ;
   - choix de l’icône : automatique, Apéro de Nuit 66 ou Apéro Catalan ;
+  - galerie automatique des images depuis GitHub API (/apps/PUSH/images/) ;
+  - aperçu, URL, copie et sélection de l’image grande ;
   - notification forte par défaut ;
   - envoi des champs utiles uniquement pour l’affichage et les clics.
 */
@@ -30,6 +32,15 @@ const scheduledPanel = document.getElementById("scheduledPanel");
 const adminKeyInput = document.getElementById("adminKey");
 const scheduleAdminKeyInput = document.getElementById("scheduleAdminKey");
 
+const imageGallerySelect = document.getElementById("imageGallerySelect");
+const scheduleImageGallerySelect = document.getElementById("scheduleImageGallerySelect");
+const refreshImageGalleryBtn = document.getElementById("refreshImageGallery");
+const scheduleRefreshImageGalleryBtn = document.getElementById("scheduleRefreshImageGallery");
+const imageGalleryStatus = document.getElementById("imageGalleryStatus");
+const scheduleImageGalleryStatus = document.getElementById("scheduleImageGalleryStatus");
+const copyImageUrlBtn = document.getElementById("copyImageUrl");
+const scheduleCopyImageUrlBtn = document.getElementById("scheduleCopyImageUrl");
+
 const DEFAULT_BRAND_KEY = "apero";
 const DEFAULT_TAG = "adn66-alerte";
 const DEFAULT_VIBRATE = [500, 150, 500, 150, 800];
@@ -43,6 +54,12 @@ const DEFAULT_ACTIONS = [
     title: "Télécharger l’app"
   }
 ];
+
+const GITHUB_IMAGES_API_URL = "https://api.github.com/repos/bullyto/outil/contents/apps/PUSH/images";
+const GITHUB_PAGES_IMAGES_BASE_URL = "https://bullyto.github.io/outil/apps/PUSH/images/";
+const SUPPORTED_IMAGE_EXTENSIONS = /\.(png|jpe?g|webp|gif)$/i;
+let imageCatalog = [];
+let imageCatalogLoaded = false;
 
 const FALLBACK_BRANDS = {
   apero: {
@@ -141,6 +158,174 @@ function normalizeHttpsUrl(value, allowEmpty = true) {
     return url.toString();
   } catch {
     return null;
+  }
+}
+
+function buildGithubPagesImageUrl(fileName) {
+  return GITHUB_PAGES_IMAGES_BASE_URL + encodeURIComponent(fileName).replace(/%20/g, "%20");
+}
+
+function getImageElements(prefix = "") {
+  const schedule = prefix === "schedule";
+
+  return {
+    select: document.getElementById(schedule ? "scheduleImageGallerySelect" : "imageGallerySelect"),
+    hiddenInput: document.getElementById(schedule ? "scheduleImageUrl" : "imageUrl"),
+    previewBox: document.getElementById(schedule ? "scheduleImagePreviewBox" : "imagePreviewBox"),
+    preview: document.getElementById(schedule ? "scheduleImagePreview" : "imagePreview"),
+    name: document.getElementById(schedule ? "scheduleImagePreviewName" : "imagePreviewName"),
+    url: document.getElementById(schedule ? "scheduleImagePreviewUrl" : "imagePreviewUrl"),
+    open: document.getElementById(schedule ? "scheduleOpenImageUrl" : "openImageUrl"),
+    status: document.getElementById(schedule ? "scheduleImageGalleryStatus" : "imageGalleryStatus")
+  };
+}
+
+function setImageGalleryStatus(message, type = "") {
+  for (const element of [imageGalleryStatus, scheduleImageGalleryStatus]) {
+    if (!element) continue;
+    element.textContent = message;
+    element.dataset.type = type;
+  }
+}
+
+async function loadImageCatalog(force = false) {
+  if (imageCatalogLoaded && !force) {
+    return imageCatalog;
+  }
+
+  setImageGalleryStatus("Chargement des images depuis GitHub...", "loading");
+
+  const response = await fetch(GITHUB_IMAGES_API_URL, {
+    cache: "no-store",
+    headers: {
+      "Accept": "application/vnd.github+json"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error("Impossible de lire le dossier images GitHub : " + response.status);
+  }
+
+  const files = await response.json();
+
+  imageCatalog = (Array.isArray(files) ? files : [])
+    .filter(file => file && file.type === "file" && SUPPORTED_IMAGE_EXTENSIONS.test(file.name || ""))
+    .map(file => ({
+      name: file.name,
+      url: buildGithubPagesImageUrl(file.name),
+      apiUrl: file.download_url || ""
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" }));
+
+  imageCatalogLoaded = true;
+  return imageCatalog;
+}
+
+function renderImageSelector(prefix = "") {
+  const elements = getImageElements(prefix);
+
+  if (!elements.select) {
+    return;
+  }
+
+  const previousValue = elements.select.value;
+  elements.select.innerHTML = "";
+
+  const emptyOption = document.createElement("option");
+  emptyOption.value = "";
+  emptyOption.textContent = "Aucune image grande";
+  elements.select.appendChild(emptyOption);
+
+  for (const image of imageCatalog) {
+    const option = document.createElement("option");
+    option.value = image.url;
+    option.textContent = image.name;
+    option.dataset.name = image.name;
+    elements.select.appendChild(option);
+  }
+
+  if (previousValue && imageCatalog.some(image => image.url === previousValue)) {
+    elements.select.value = previousValue;
+  }
+
+  updateSelectedImage(prefix);
+}
+
+function renderImageSelectors() {
+  renderImageSelector("");
+  renderImageSelector("schedule");
+
+  const count = imageCatalog.length;
+  setImageGalleryStatus(
+    count
+      ? `${count} image${count > 1 ? "s" : ""} disponible${count > 1 ? "s" : ""}.`
+      : "Aucune image trouvée dans /apps/PUSH/images/.",
+    count ? "success" : "warn"
+  );
+}
+
+function updateSelectedImage(prefix = "") {
+  const elements = getImageElements(prefix);
+
+  if (!elements.select || !elements.hiddenInput) {
+    return;
+  }
+
+  const selectedUrl = elements.select.value || "";
+  const selectedImage = imageCatalog.find(image => image.url === selectedUrl);
+
+  elements.hiddenInput.value = selectedUrl;
+
+  if (!selectedUrl || !selectedImage) {
+    if (elements.previewBox) elements.previewBox.hidden = true;
+    if (elements.preview) elements.preview.removeAttribute("src");
+    if (elements.name) elements.name.textContent = "—";
+    if (elements.url) elements.url.textContent = "—";
+    if (elements.open) elements.open.href = "#";
+    return;
+  }
+
+  if (elements.previewBox) elements.previewBox.hidden = false;
+  if (elements.preview) elements.preview.src = selectedUrl;
+  if (elements.name) elements.name.textContent = selectedImage.name;
+  if (elements.url) elements.url.textContent = selectedUrl;
+  if (elements.open) elements.open.href = selectedUrl;
+}
+
+async function refreshImageGallery(force = false) {
+  try {
+    await loadImageCatalog(force);
+    renderImageSelectors();
+  } catch (error) {
+    console.error(error);
+    setImageGalleryStatus(error.message, "error");
+
+    for (const prefix of ["", "schedule"]) {
+      const elements = getImageElements(prefix);
+      if (elements.select && !elements.select.options.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Erreur chargement images";
+        elements.select.appendChild(option);
+      }
+    }
+  }
+}
+
+async function copySelectedImageUrl(prefix = "") {
+  const elements = getImageElements(prefix);
+  const value = elements.hiddenInput?.value || "";
+
+  if (!value) {
+    setAdminStatus("Aucune image sélectionnée à copier.", "warn");
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(value);
+    setAdminStatus("URL de l’image copiée.", "success");
+  } catch {
+    setAdminStatus("Copie impossible automatiquement. URL : " + value, "warn");
   }
 }
 
@@ -429,6 +614,31 @@ async function saveSchedule(event) {
   }
 }
 
+
+if (imageGallerySelect) {
+  imageGallerySelect.addEventListener("change", () => updateSelectedImage(""));
+}
+
+if (scheduleImageGallerySelect) {
+  scheduleImageGallerySelect.addEventListener("change", () => updateSelectedImage("schedule"));
+}
+
+if (refreshImageGalleryBtn) {
+  refreshImageGalleryBtn.addEventListener("click", () => refreshImageGallery(true));
+}
+
+if (scheduleRefreshImageGalleryBtn) {
+  scheduleRefreshImageGalleryBtn.addEventListener("click", () => refreshImageGallery(true));
+}
+
+if (copyImageUrlBtn) {
+  copyImageUrlBtn.addEventListener("click", () => copySelectedImageUrl(""));
+}
+
+if (scheduleCopyImageUrlBtn) {
+  scheduleCopyImageUrlBtn.addEventListener("click", () => copySelectedImageUrl("schedule"));
+}
+
 if (instantTabBtn) {
   instantTabBtn.addEventListener("click", () => setActiveTab("instant"));
 }
@@ -456,4 +666,5 @@ if (scheduleAdminKeyInput) {
 }
 
 setActiveTab("instant");
+refreshImageGallery(false);
 loadStats();
