@@ -32,6 +32,11 @@ const scheduledPanel = document.getElementById("scheduledPanel");
 const adminKeyInput = document.getElementById("adminKey");
 const scheduleAdminKeyInput = document.getElementById("scheduleAdminKey");
 
+const scheduleEnabledInput = document.getElementById("scheduleEnabled");
+const scheduleStateText = document.getElementById("scheduleStateText");
+const scheduleSlotsContainer = document.getElementById("scheduleSlots");
+const addScheduleSlotBtn = document.getElementById("addScheduleSlot");
+
 const imageGallerySelect = document.getElementById("imageGallerySelect");
 const scheduleImageGallerySelect = document.getElementById("scheduleImageGallerySelect");
 const refreshImageGalleryBtn = document.getElementById("refreshImageGallery");
@@ -58,6 +63,16 @@ const DEFAULT_ACTIONS = [
 const GITHUB_IMAGES_API_URL = "https://api.github.com/repos/bullyto/outil/contents/apps/PUSH/images";
 const GITHUB_PAGES_IMAGES_BASE_URL = "https://bullyto.github.io/outil/apps/PUSH/images/";
 const SUPPORTED_IMAGE_EXTENSIONS = /\.(png|jpe?g|webp|gif)$/i;
+
+const WEEK_DAYS = [
+  { value: "1", label: "Lundi" },
+  { value: "2", label: "Mardi" },
+  { value: "3", label: "Mercredi" },
+  { value: "4", label: "Jeudi" },
+  { value: "5", label: "Vendredi" },
+  { value: "6", label: "Samedi" },
+  { value: "0", label: "Dimanche" }
+];
 let imageCatalog = [];
 let imageCatalogLoaded = false;
 
@@ -126,7 +141,7 @@ function setActiveTab(tabName) {
   setAdminStatus(
     isInstant
       ? "Mode notification instantanée."
-      : "Mode notification programmée. Le Worker de programmation sera ajouté ensuite.",
+      : "Mode notification programmée : activation, jours et horaires hebdomadaires.",
     isInstant ? "success" : "warn"
   );
 }
@@ -511,51 +526,132 @@ async function sendNotification(event) {
   }
 }
 
+
+function updateScheduleEnabledText() {
+  if (!scheduleEnabledInput || !scheduleStateText) return;
+
+  scheduleStateText.textContent = scheduleEnabledInput.checked ? "Activé" : "Désactivé";
+  scheduleStateText.dataset.enabled = scheduleEnabledInput.checked ? "true" : "false";
+}
+
+function createScheduleSlotRow({ days = ["2"], time = "19:30" } = {}) {
+  if (!scheduleSlotsContainer) return;
+
+  const slot = document.createElement("div");
+  slot.className = "schedule-slot";
+
+  const head = document.createElement("div");
+  head.className = "schedule-slot-head";
+
+  const title = document.createElement("strong");
+  title.textContent = "Créneau hebdomadaire";
+
+  const removeBtn = document.createElement("button");
+  removeBtn.className = "secondary-btn";
+  removeBtn.type = "button";
+  removeBtn.textContent = "Supprimer";
+  removeBtn.addEventListener("click", () => {
+    slot.remove();
+
+    if (scheduleSlotsContainer && !scheduleSlotsContainer.querySelector(".schedule-slot")) {
+      createScheduleSlotRow();
+    }
+  });
+
+  head.appendChild(title);
+  head.appendChild(removeBtn);
+
+  const daysBox = document.createElement("div");
+  daysBox.className = "schedule-days";
+
+  for (const day of WEEK_DAYS) {
+    const label = document.createElement("label");
+    label.className = "schedule-day";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "schedule_day";
+    checkbox.value = day.value;
+    checkbox.checked = days.includes(day.value);
+
+    const span = document.createElement("span");
+    span.textContent = day.label;
+
+    label.appendChild(checkbox);
+    label.appendChild(span);
+    daysBox.appendChild(label);
+  }
+
+  const timeRow = document.createElement("label");
+  timeRow.className = "schedule-time-row";
+  timeRow.textContent = "Heure d’envoi";
+
+  const timeInput = document.createElement("input");
+  timeInput.type = "time";
+  timeInput.name = "schedule_time";
+  timeInput.value = time || "19:30";
+
+  timeRow.appendChild(timeInput);
+
+  slot.appendChild(head);
+  slot.appendChild(daysBox);
+  slot.appendChild(timeRow);
+
+  scheduleSlotsContainer.appendChild(slot);
+}
+
+function ensureDefaultScheduleSlot() {
+  if (!scheduleSlotsContainer) return;
+
+  if (!scheduleSlotsContainer.querySelector(".schedule-slot")) {
+    createScheduleSlotRow({
+      days: ["2"],
+      time: "19:30"
+    });
+  }
+}
+
+function getScheduleSlots() {
+  if (!scheduleSlotsContainer) {
+    return [];
+  }
+
+  const slots = [];
+
+  for (const slot of scheduleSlotsContainer.querySelectorAll(".schedule-slot")) {
+    const days = Array.from(slot.querySelectorAll('input[name="schedule_day"]:checked'))
+      .map(input => input.value);
+
+    const time = slot.querySelector('input[name="schedule_time"]')?.value || "";
+
+    if (!days.length || !time) {
+      continue;
+    }
+
+    slots.push({
+      days,
+      time
+    });
+  }
+
+  return slots;
+}
+
+
 async function saveSchedule(event) {
   event.preventDefault();
 
-  const adminKey = scheduleAdminKeyInput.value.trim();
-  const target = document.getElementById("scheduleTarget").value;
-  const mode = document.getElementById("scheduleMode").value;
-  const weekday = document.getElementById("scheduleWeekday").value;
-  const date = document.getElementById("scheduleDate").value;
-  const time = document.getElementById("scheduleTime").value;
-  const title = document.getElementById("scheduleTitle").value.trim();
-  const body = document.getElementById("scheduleBody").value.trim();
-  const brand = getSelectedBrand("schedule");
-  const iconBrand = getSelectedIconBrand("schedule");
-
-  let imageUrl = "";
-
-  try {
-    imageUrl = getImageUrl("scheduleImageUrl");
-  } catch (error) {
-    setAdminStatus(error.message, "error");
-    return;
-  }
+  const adminKey = scheduleAdminKeyInput?.value.trim() || "";
+  const enabled = Boolean(scheduleEnabledInput?.checked);
+  const slots = getScheduleSlots();
 
   if (!adminKey) {
     setAdminStatus("Code admin obligatoire.", "warn");
     return;
   }
 
-  if (!title || !body) {
-    setAdminStatus("Titre et message obligatoires.", "warn");
-    return;
-  }
-
-  if (!time) {
-    setAdminStatus("Heure d’envoi obligatoire.", "warn");
-    return;
-  }
-
-  if (mode === "once" && !date) {
-    setAdminStatus("Pour une notification unique, la date précise est obligatoire.", "warn");
-    return;
-  }
-
-  if ((mode === "weekly" || mode === "rotation") && weekday === "") {
-    setAdminStatus("Pour une programmation hebdomadaire ou en rotation, choisissez un jour de la semaine.", "warn");
+  if (enabled && !slots.length) {
+    setAdminStatus("Choisissez au moins un jour et une heure pour activer la programmation.", "warn");
     return;
   }
 
@@ -565,25 +661,15 @@ async function saveSchedule(event) {
   }
 
   try {
-    const notificationPayload = buildNotificationPayload({
-      target,
-      title,
-      body,
-      brand,
-      iconBrand,
-      imageUrl
-    });
-
     const schedulePayload = {
-      target,
-      mode,
-      weekday,
-      date,
-      time,
-      ...notificationPayload
+      enabled,
+      mode: "weekly_rotation",
+      default_time: "19:30",
+      rotation: true,
+      slots
     };
 
-    const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/schedule`, {
+    const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/schedule-settings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -596,22 +682,37 @@ async function saveSchedule(event) {
       const text = await response.text();
 
       if (response.status === 404) {
-        throw new Error("La route de programmation n’existe pas encore dans le Worker. On l’ajoutera à l’étape suivante.");
+        throw new Error("La route de programmation n’existe pas encore dans le Worker. Interface prête : il faudra ajouter /admin/push/schedule-settings côté Worker.");
       }
 
       throw new Error(text || "Erreur Worker : " + response.status);
     }
 
-    const result = await response.json();
-
     setAdminStatus(
-      `Programmation enregistrée${result.id ? " #" + result.id : ""}. Site : ${notificationPayload.site_url}. Image : ${notificationPayload.image_url || "aucune image grande"}`,
+      enabled
+        ? `Programmation activée : ${formatScheduleSlots(slots)}.`
+        : "Programmation désactivée.",
       "success"
     );
   } catch (error) {
     console.error(error);
     setAdminStatus("Erreur programmation : " + error.message, "error");
   }
+}
+
+function formatScheduleSlots(slots) {
+  if (!slots.length) {
+    return "aucun créneau";
+  }
+
+  const dayLabels = Object.fromEntries(WEEK_DAYS.map(day => [day.value, day.label]));
+
+  return slots
+    .map(slot => {
+      const days = slot.days.map(day => dayLabels[day] || day).join(", ");
+      return `${days} à ${slot.time}`;
+    })
+    .join(" • ");
 }
 
 
@@ -655,6 +756,17 @@ if (scheduleForm) {
   scheduleForm.addEventListener("submit", saveSchedule);
 }
 
+if (scheduleEnabledInput) {
+  scheduleEnabledInput.addEventListener("change", updateScheduleEnabledText);
+}
+
+if (addScheduleSlotBtn) {
+  addScheduleSlotBtn.addEventListener("click", () => createScheduleSlotRow({
+    days: [],
+    time: "19:30"
+  }));
+}
+
 if (adminKeyInput) {
   adminKeyInput.addEventListener("input", () => syncAdminKeys("instant"));
   adminKeyInput.addEventListener("change", loadStats);
@@ -666,5 +778,7 @@ if (scheduleAdminKeyInput) {
 }
 
 setActiveTab("instant");
+ensureDefaultScheduleSlot();
+updateScheduleEnabledText();
 refreshImageGallery(false);
 loadStats();

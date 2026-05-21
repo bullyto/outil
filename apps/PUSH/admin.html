@@ -87,6 +87,104 @@
       opacity: 0.8;
     }
 
+
+    .schedule-simple-box {
+      display: grid;
+      gap: 1rem;
+      padding: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.055);
+    }
+
+    .schedule-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      padding: 0.8rem;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.18);
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .toggle-label input {
+      width: auto;
+      min-height: auto;
+      transform: scale(1.15);
+    }
+
+    .schedule-slot-list {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .schedule-slot {
+      display: grid;
+      gap: 0.8rem;
+      padding: 0.8rem;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.045);
+    }
+
+    .schedule-slot-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .schedule-days {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+
+    .schedule-day {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      background: rgba(0,0,0,0.16);
+      font-size: 0.92rem;
+    }
+
+    .schedule-day input {
+      width: auto;
+      min-height: auto;
+    }
+
+    .schedule-time-row {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .schedule-note {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.86;
+      line-height: 1.45;
+    }
+
+    @media (min-width: 560px) {
+      .schedule-days {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
     @media (max-width: 560px) {
       .image-preview-box {
         grid-template-columns: 1fr;
@@ -214,114 +312,33 @@
             <input id="scheduleAdminKey" type="password" autocomplete="off" placeholder="Votre code admin">
           </label>
 
-          <label>
-            Cible des abonnés
-            <select id="scheduleTarget">
-              <option value="all">Tous les abonnés</option>
-              <option value="apero">Abonnés Apéro de Nuit 66</option>
-              <option value="catalan">Abonnés Apéro Catalan</option>
-              <option value="x">X — futur projet</option>
-            </select>
-          </label>
-
-          <label>
-            Liens des boutons
-            <select id="scheduleBrandChoice">
-              <option value="apero">Apéro de Nuit 66 — aperos.net</option>
-              <option value="catalan">Apéro Catalan — catalan.aperos.net</option>
-            </select>
-          </label>
-
-          <label>
-            Mode d’envoi
-            <select id="scheduleMode">
-              <option value="once">Une seule fois</option>
-              <option value="daily">Tous les jours</option>
-              <option value="weekly">Toutes les semaines</option>
-              <option value="rotation">Liste automatique dans l’ordre</option>
-            </select>
-          </label>
-
-          <label>
-            Jour de la semaine
-            <select id="scheduleWeekday">
-              <option value="">Aucun / date précise</option>
-              <option value="1">Lundi</option>
-              <option value="2">Mardi</option>
-              <option value="3">Mercredi</option>
-              <option value="4">Jeudi</option>
-              <option value="5">Vendredi</option>
-              <option value="6">Samedi</option>
-              <option value="0">Dimanche</option>
-            </select>
-          </label>
-
-          <label>
-            Date précise
-            <input id="scheduleDate" type="date">
-          </label>
-
-          <label>
-            Heure d’envoi
-            <input id="scheduleTime" type="time">
-          </label>
-
-          <label>
-            Icône de notification
-            <select id="scheduleIconChoice">
-              <option value="auto">Automatique selon les liens choisis</option>
-              <option value="apero">Icône Apéro de Nuit 66</option>
-              <option value="catalan">Icône Apéro Catalan</option>
-            </select>
-          </label>
-
-          <div class="image-picker" data-picker="schedule">
-            <div class="image-picker-head">
-              <label for="scheduleImageGallerySelect">Image grande de la notification</label>
-              <button id="scheduleRefreshImageGallery" class="secondary-btn" type="button">Actualiser les images</button>
+          <div class="schedule-simple-box">
+            <div class="schedule-toggle-row">
+              <label class="toggle-label" for="scheduleEnabled">
+                <input id="scheduleEnabled" type="checkbox">
+                Activer les notifications programmées
+              </label>
+              <span id="scheduleStateText">Désactivé</span>
             </div>
 
-            <select id="scheduleImageGallerySelect">
-              <option value="">Chargement des images...</option>
-            </select>
+            <p class="schedule-note">
+              Une fois activé, le système enverra automatiquement une notification chaque semaine
+              aux jours et horaires choisis. Les messages seront piochés dans l’ordre et en boucle
+              dans la liste que nous établirons ensuite.
+            </p>
 
-            <input id="scheduleImageUrl" type="hidden">
+            <div id="scheduleSlots" class="schedule-slot-list" aria-label="Créneaux d’envoi programmés"></div>
 
-            <div id="scheduleImagePreviewBox" class="image-preview-box" hidden>
-              <img id="scheduleImagePreview" alt="Aperçu de l’image sélectionnée">
-              <div class="image-preview-info">
-                <strong id="scheduleImagePreviewName">—</strong>
-                <code id="scheduleImagePreviewUrl">—</code>
-                <div class="image-preview-actions">
-                  <button id="scheduleCopyImageUrl" class="secondary-btn" type="button">Copier l’URL</button>
-                  <a id="scheduleOpenImageUrl" class="secondary-btn" href="#" target="_blank" rel="noopener">Ouvrir</a>
-                </div>
-              </div>
-            </div>
+            <button id="addScheduleSlot" class="secondary-btn" type="button">Ajouter un autre créneau</button>
 
-            <p id="scheduleImageGalleryStatus" class="mini-status">Les images sont lues automatiquement depuis /apps/PUSH/images/.</p>
+            <p class="schedule-note">
+              Par défaut : mardi à 19h30. Vous pouvez cocher plusieurs jours sur un même créneau,
+              ou ajouter un deuxième créneau avec un horaire différent, par exemple jeudi à 20h00.
+            </p>
           </div>
-
-          <label>
-            Titre
-            <input id="scheduleTitle" type="text" maxlength="80" placeholder="Ex : Apéro de Nuit 66 est ouvert">
-          </label>
-
-          <label>
-            Message
-            <textarea id="scheduleBody" maxlength="180" placeholder="Ex : Livraison disponible ce soir jusqu’à 6h."></textarea>
-          </label>
 
           <button class="primary-btn" type="submit">Enregistrer la programmation</button>
         </form>
-
-        <div class="schedule-help">
-          <h2>Liste automatique</h2>
-          <p>
-            Cette interface prépare la partie visuelle. À l’étape suivante, le Worker Cloudflare
-            gérera l’enregistrement, la lecture et l’envoi automatique des programmations.
-          </p>
-        </div>
       </section>
 
       <p id="adminStatus" class="status">Configuration en attente du Worker Cloudflare.</p>
@@ -331,6 +348,6 @@
   </main>
 
   <script src="./config.js"></script>
-  <script src="./admin.js?v=github-images-gallery-20260521-1"></script>
+  <script src="./admin.js?v=schedule-simple-weekly-20260521-1"></script>
 </body>
 </html>
