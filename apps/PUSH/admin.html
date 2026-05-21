@@ -13,10 +13,10 @@
   <main class="shell">
     <section class="card hero">
       <div class="badge">ADN66 • Admin Push</div>
-      <h1>Envoyer une notification</h1>
+      <h1>Notifications push</h1>
       <p>
-        Cette page appellera le futur Cloudflare Worker pour envoyer une notification
-        aux abonnés sélectionnés.
+        Gérez les notifications instantanées et les futures notifications programmées
+        pour Apéro de Nuit 66, Apéro Catalan et X.
       </p>
 
       <div class="stats-grid">
@@ -38,39 +38,161 @@
         </div>
       </div>
 
-      <form id="sendForm" class="form">
-        <label>
-          Code admin
-          <input id="adminKey" type="password" autocomplete="off" placeholder="Votre code admin">
-        </label>
+      <div class="push-tabs" role="tablist" aria-label="Type de notification">
+        <button id="instantTabBtn" class="push-tab active" type="button" data-tab="instant" aria-controls="instantPanel" aria-selected="true">
+          Notification instantanée
+        </button>
+        <button id="scheduledTabBtn" class="push-tab" type="button" data-tab="scheduled" aria-controls="scheduledPanel" aria-selected="false">
+          Notification programmée
+        </button>
+      </div>
 
-        <label>
-          Cible
-          <select id="target">
-            <option value="all">Tous les abonnés</option>
-            <option value="apero">Apéro de Nuit 66</option>
-            <option value="catalan">Apéro Catalan</option>
-            <option value="x">X — futur projet</option>
-          </select>
-        </label>
+      <section id="instantPanel" class="push-panel active" role="tabpanel" aria-labelledby="instantTabBtn">
+        <form id="sendForm" class="form">
+          <label>
+            Code admin
+            <input id="adminKey" type="password" autocomplete="off" placeholder="Votre code admin">
+          </label>
 
-        <label>
-          Titre
-          <input id="title" type="text" maxlength="80" placeholder="Ex : Apéro de Nuit 66 est ouvert">
-        </label>
+          <label>
+            Cible
+            <select id="target">
+              <option value="all">Tous les abonnés</option>
+              <option value="apero">Apéro de Nuit 66</option>
+              <option value="catalan">Apéro Catalan</option>
+              <option value="x">X — futur projet</option>
+            </select>
+          </label>
 
-        <label>
-          Message
-          <textarea id="body" maxlength="180" placeholder="Ex : Livraison disponible ce soir jusqu’à 6h."></textarea>
-        </label>
+          <label>
+            Image / icône de notification
+            <select id="iconPreset">
+              <option value="">Icône par défaut</option>
+              <option value="./icons/icon-192.png">ADN66</option>
+              <option value="./icons/icon-192.png">Apéro de Nuit 66</option>
+              <option value="./icons/icon-192.png">Apéro Catalan</option>
+              <option value="./icons/icon-192.png">Promo</option>
+            </select>
+          </label>
 
-        <label>
-          URL au clic
-          <input id="url" type="url" placeholder="https://aperos.net">
-        </label>
+          <label>
+            URL image personnalisée
+            <input id="iconUrl" type="url" placeholder="https://.../image.png">
+          </label>
 
-        <button class="primary-btn" type="submit">Envoyer la notification</button>
-      </form>
+          <label>
+            Titre
+            <input id="title" type="text" maxlength="80" placeholder="Ex : Apéro de Nuit 66 est ouvert">
+          </label>
+
+          <label>
+            Message
+            <textarea id="body" maxlength="180" placeholder="Ex : Livraison disponible ce soir jusqu’à 6h."></textarea>
+          </label>
+
+          <label>
+            URL au clic
+            <input id="url" type="url" placeholder="https://aperos.net">
+          </label>
+
+          <button class="primary-btn" type="submit">Envoyer la notification</button>
+        </form>
+      </section>
+
+      <section id="scheduledPanel" class="push-panel" role="tabpanel" aria-labelledby="scheduledTabBtn" hidden>
+        <form id="scheduleForm" class="form">
+          <label>
+            Code admin
+            <input id="scheduleAdminKey" type="password" autocomplete="off" placeholder="Votre code admin">
+          </label>
+
+          <label>
+            Cible
+            <select id="scheduleTarget">
+              <option value="all">Tous les abonnés</option>
+              <option value="apero">Apéro de Nuit 66</option>
+              <option value="catalan">Apéro Catalan</option>
+              <option value="x">X — futur projet</option>
+            </select>
+          </label>
+
+          <label>
+            Mode d’envoi
+            <select id="scheduleMode">
+              <option value="once">Une seule fois</option>
+              <option value="daily">Tous les jours</option>
+              <option value="weekly">Toutes les semaines</option>
+              <option value="rotation">Liste automatique dans l’ordre</option>
+            </select>
+          </label>
+
+          <label>
+            Jour de la semaine
+            <select id="scheduleWeekday">
+              <option value="">Aucun / date précise</option>
+              <option value="1">Lundi</option>
+              <option value="2">Mardi</option>
+              <option value="3">Mercredi</option>
+              <option value="4">Jeudi</option>
+              <option value="5">Vendredi</option>
+              <option value="6">Samedi</option>
+              <option value="0">Dimanche</option>
+            </select>
+          </label>
+
+          <label>
+            Date précise
+            <input id="scheduleDate" type="date">
+          </label>
+
+          <label>
+            Heure d’envoi
+            <input id="scheduleTime" type="time">
+          </label>
+
+          <label>
+            Image / icône de notification
+            <select id="scheduleIconPreset">
+              <option value="">Icône par défaut</option>
+              <option value="./icons/icon-192.png">ADN66</option>
+              <option value="./icons/icon-192.png">Apéro de Nuit 66</option>
+              <option value="./icons/icon-192.png">Apéro Catalan</option>
+              <option value="./icons/icon-192.png">Promo</option>
+            </select>
+          </label>
+
+          <label>
+            URL image personnalisée
+            <input id="scheduleIconUrl" type="url" placeholder="https://.../image.png">
+          </label>
+
+          <label>
+            Titre
+            <input id="scheduleTitle" type="text" maxlength="80" placeholder="Ex : Apéro de Nuit 66 est ouvert">
+          </label>
+
+          <label>
+            Message
+            <textarea id="scheduleBody" maxlength="180" placeholder="Ex : Livraison disponible ce soir jusqu’à 6h."></textarea>
+          </label>
+
+          <label>
+            URL au clic
+            <input id="scheduleUrl" type="url" placeholder="https://aperos.net">
+          </label>
+
+          <button class="primary-btn" type="submit">Enregistrer la programmation</button>
+        </form>
+
+        <div class="schedule-help">
+          <h2>Liste automatique</h2>
+          <p>
+            Cette interface prépare la partie visuelle. À l’étape suivante, le fichier
+            <strong>admin.js</strong> et le Worker Cloudflare géreront l’enregistrement,
+            la lecture et l’envoi automatique des programmations.
+          </p>
+        </div>
+      </section>
 
       <p id="adminStatus" class="status">Configuration en attente du Worker Cloudflare.</p>
 
