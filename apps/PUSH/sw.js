@@ -13,7 +13,7 @@
   - clic normal sur la notification -> url
 */
 
-const CACHE_NAME = "adn66-push-v7-force-site-button-new-window";
+const CACHE_NAME = "adn66-push-v8-hard-links-actions";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
@@ -367,35 +367,36 @@ function cleanActions(value) {
 }
 
 self.addEventListener("notificationclick", event => {
-  /*
-    Correction v7 :
-    - Le bouton "Voir le site" ne doit jamais ouvrir Google Play.
-    - On ouvre une nouvelle fenêtre au lieu de reprendre un ancien onglet,
-      car certains navigateurs refocusaient un onglet Play Store déjà ouvert.
-  */
   event.notification.close();
 
   const data = event.notification.data || {};
+  const target = String(data.target || "").toLowerCase();
+  const siteUrlFromData = cleanSiteUrl(data.site_url);
 
-  let targetUrl = cleanSiteUrl(data.url) || cleanSiteUrl(data.site_url) || DEFAULT_URL;
+  const isCatalan =
+    target === "catalan" ||
+    siteUrlFromData.includes("catalan.aperos.net");
 
-  if (event.action === "open_site") {
-    targetUrl = cleanSiteUrl(data.site_url) || cleanSiteUrl(data.url) || DEFAULT_URL;
-  }
+  // Sécurité radicale : les boutons ne dépendent plus de data.url.
+  // open_site ne peut JAMAIS ouvrir Google Play.
+  // install_app ouvre uniquement le lien Play Store correspondant.
+  let targetUrl = isCatalan ? "https://catalan.aperos.net/" : "https://aperos.net/";
 
   if (event.action === "install_app") {
-    targetUrl = cleanNotificationUrl(data.playstore_url || data.install_url) || DEFAULT_PLAYSTORE_URL;
+    targetUrl = isCatalan
+      ? "https://play.google.com/store/apps/details?id=net.aperos.catalan"
+      : "https://play.google.com/store/apps/details?id=fr.aperos.nuit66";
   }
 
-  // Sécurité absolue : open_site ne peut pas ouvrir un lien Play Store.
-  if (event.action === "open_site" && isPlayStoreUrl(targetUrl)) {
-    targetUrl = DEFAULT_URL;
+  if (event.action === "open_site") {
+    targetUrl = isCatalan ? "https://catalan.aperos.net/" : "https://aperos.net/";
   }
 
-  event.waitUntil(openUrlInNewWindow(targetUrl));
+  // Clic sur la notification hors boutons = site, pas Play Store.
+  event.waitUntil(openCleanWindow(targetUrl));
 });
 
-async function openUrlInNewWindow(url) {
+async function openCleanWindow(url) {
   const finalUrl = cleanNotificationUrl(url) || DEFAULT_URL;
 
   if (clients.openWindow) {
