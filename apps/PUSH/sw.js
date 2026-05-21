@@ -13,7 +13,7 @@
   - clic normal sur la notification -> url
 */
 
-const CACHE_NAME = "adn66-push-v8-hard-links-actions";
+const CACHE_NAME = "adn66-push-v9-fixed-action-buttons";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
@@ -156,7 +156,20 @@ async function showLatestNotification() {
     requireInteraction: Boolean(payload.require_interaction),
     silent: Boolean(payload.silent),
     vibrate: cleanVibrate(payload.vibrate),
-    actions: cleanActions(payload.actions)
+    // Important : on force les actions ici.
+    // Certains anciens logs peuvent contenir des actions inversées en D1.
+    // Le libellé "Voir le site" doit TOUJOURS avoir action="open_site".
+    // Le libellé "Télécharger l’app" doit TOUJOURS avoir action="install_app".
+    actions: [
+      {
+        action: "open_site",
+        title: "Voir le site"
+      },
+      {
+        action: "install_app",
+        title: "Télécharger l’app"
+      }
+    ]
   };
 
   /*
@@ -371,28 +384,39 @@ self.addEventListener("notificationclick", event => {
 
   const data = event.notification.data || {};
   const target = String(data.target || "").toLowerCase();
-  const siteUrlFromData = cleanSiteUrl(data.site_url);
+
+  const siteFromUrl = cleanSiteUrl(data.url);
+  const siteFromSiteUrl = cleanSiteUrl(data.site_url);
 
   const isCatalan =
     target === "catalan" ||
-    siteUrlFromData.includes("catalan.aperos.net");
+    String(siteFromUrl || "").includes("catalan.aperos.net") ||
+    String(siteFromSiteUrl || "").includes("catalan.aperos.net");
 
-  // Sécurité radicale : les boutons ne dépendent plus de data.url.
-  // open_site ne peut JAMAIS ouvrir Google Play.
-  // install_app ouvre uniquement le lien Play Store correspondant.
-  let targetUrl = isCatalan ? "https://catalan.aperos.net/" : "https://aperos.net/";
+  const defaultSiteUrl = isCatalan
+    ? "https://catalan.aperos.net/"
+    : "https://aperos.net/";
+
+  const defaultPlaystoreUrl = isCatalan
+    ? "https://play.google.com/store/apps/details?id=net.aperos.catalan"
+    : "https://play.google.com/store/apps/details?id=fr.aperos.nuit66";
+
+  let targetUrl = defaultSiteUrl;
 
   if (event.action === "install_app") {
-    targetUrl = isCatalan
-      ? "https://play.google.com/store/apps/details?id=net.aperos.catalan"
-      : "https://play.google.com/store/apps/details?id=fr.aperos.nuit66";
+    targetUrl = cleanNotificationUrl(data.install_url || data.playstore_url) || defaultPlaystoreUrl;
+
+    // Sécurité : si le lien reçu n'est pas Google Play, on force le Play Store connu.
+    if (!isPlayStoreUrl(targetUrl)) {
+      targetUrl = defaultPlaystoreUrl;
+    }
+  } else {
+    // Clic normal OU bouton "Voir le site".
+    // On utilise le même lien que le clic normal, car chez vous il ouvre déjà le bon site.
+    // On refuse strictement Google Play pour cette branche.
+    targetUrl = siteFromUrl || siteFromSiteUrl || defaultSiteUrl;
   }
 
-  if (event.action === "open_site") {
-    targetUrl = isCatalan ? "https://catalan.aperos.net/" : "https://aperos.net/";
-  }
-
-  // Clic sur la notification hors boutons = site, pas Play Store.
   event.waitUntil(openCleanWindow(targetUrl));
 });
 
