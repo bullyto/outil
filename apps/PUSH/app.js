@@ -5,11 +5,12 @@
 
   Objectif :
   - bouton discret côté UX : "Recevoir les offres et alertes"
-  - le navigateur affiche quand même la popup officielle d’autorisation
+  - le navigateur affiche sa popup officielle d’autorisation
   - gestion intelligente :
     default  = demande possible
     granted  = déjà autorisé / resynchronisation D1
     denied   = bloqué dans le navigateur
+  - si la popup est ignorée / fermée : cooldown local de 5 minutes
   - compatible avec plusieurs boutons sur une même page via :
     [data-push-subscribe]
     [data-push-unsubscribe]
@@ -31,6 +32,9 @@ const unsubscribeButtons = [
 const DEFAULT_SUBSCRIBE_TEXT = "Recevoir les offres et alertes";
 const ACTIVE_SUBSCRIBE_TEXT = "Alertes activées";
 const DEFAULT_UNSUBSCRIBE_TEXT = "Ne plus recevoir les alertes";
+
+const COOLDOWN_KEY = "adn66_push_ignored_cooldown_until";
+const IGNORE_COOLDOWN_MS = 5 * 60 * 1000;
 
 function setStatus(message, type = "") {
   if (!statusEl) return;
@@ -78,6 +82,38 @@ function setButtonsDisabled(disabled) {
   unsubscribeButtons.forEach((button) => {
     button.disabled = disabled;
   });
+}
+
+function setIgnoredCooldown() {
+  const until = Date.now() + IGNORE_COOLDOWN_MS;
+  localStorage.setItem(COOLDOWN_KEY, String(until));
+}
+
+function clearIgnoredCooldown() {
+  localStorage.removeItem(COOLDOWN_KEY);
+}
+
+function getIgnoredCooldownRemainingMs() {
+  const raw = localStorage.getItem(COOLDOWN_KEY);
+  const until = Number(raw || 0);
+
+  if (!until || Number.isNaN(until)) {
+    return 0;
+  }
+
+  const remaining = until - Date.now();
+
+  if (remaining <= 0) {
+    clearIgnoredCooldown();
+    return 0;
+  }
+
+  return remaining;
+}
+
+function formatRemainingMinutes(ms) {
+  const minutes = Math.ceil(ms / 60000);
+  return Math.max(1, minutes);
 }
 
 function urlBase64ToUint8Array(base64String) {
@@ -213,29 +249,38 @@ async function subscribe(event) {
       return;
     }
 
-    /*
-      Important UX :
-      Le texte du bouton reste discret.
-      Le navigateur affichera sa propre popup officielle.
-    */
     if (Notification.permission === "default") {
+      const cooldownRemaining = getIgnoredCooldownRemainingMs();
+
+      if (cooldownRemaining > 0) {
+        const minutes = formatRemainingMinutes(cooldownRemaining);
+        setStatus(`Vous pourrez réessayer dans environ ${minutes} min.`, "warn");
+        setButtonsState(false);
+        return;
+      }
+
       const permission = await Notification.requestPermission();
 
       if (permission === "denied") {
+        clearIgnoredCooldown();
         setStatus(getDeniedMessage(), "error");
         setButtonsState(false);
         return;
       }
 
       if (permission !== "granted") {
-        setStatus("Action annulée. Vous pourrez réessayer plus tard.", "warn");
+        setIgnoredCooldown();
+        setStatus("Action annulée. Vous pourrez réessayer dans 5 min.", "warn");
         setButtonsState(false);
         return;
       }
+
+      clearIgnoredCooldown();
     }
 
     await createOrRefreshSubscription(target);
 
+    clearIgnoredCooldown();
     setStatus("C’est activé sur cet appareil.", "success");
     setButtonsState(true);
   } catch (error) {
@@ -310,6 +355,15 @@ async function refreshState() {
   }
 
   if (Notification.permission === "default") {
+    const cooldownRemaining = getIgnoredCooldownRemainingMs();
+
+    if (cooldownRemaining > 0) {
+      const minutes = formatRemainingMinutes(cooldownRemaining);
+      setStatus(`Vous pourrez réessayer dans environ ${minutes} min.`, "warn");
+      setButtonsState(false);
+      return;
+    }
+
     setStatus("Recevez les offres, ouvertures et infos importantes.", "success");
     setButtonsState(false);
     return;
@@ -325,6 +379,7 @@ async function refreshState() {
 
       await saveSubscriptionToWorker(subscription, target);
 
+      clearIgnoredCooldown();
       setStatus("C’est déjà activé sur cet appareil.", "success");
       setButtonsState(true);
       return;
