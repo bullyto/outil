@@ -2,6 +2,11 @@
   ADN66 Push - admin.js complet
   Emplacement GitHub :
   /apps/PUSH/admin.js
+
+  Correction :
+  - URL image personnalisée prioritaire sur le menu déroulant.
+  - Si URL personnalisée remplie mais invalide : envoi bloqué.
+  - Le statut affiche l’URL réellement envoyée.
 */
 
 const cfg = window.ADN_PUSH_CONFIG;
@@ -76,7 +81,7 @@ function syncAdminKeys(source) {
   }
 }
 
-function normalizeImageUrl(value) {
+function normalizeHttpsUrl(value) {
   const raw = String(value || "").trim();
 
   if (!raw) {
@@ -96,15 +101,25 @@ function normalizeImageUrl(value) {
   }
 }
 
-function getSelectedIcon(prefix = "") {
-  const preset = document.getElementById(prefix + "IconPreset")?.value?.trim() || "";
-  const custom = document.getElementById(prefix + "IconUrl")?.value?.trim() || "";
+function pickImageUrl(customInputId, presetSelectId) {
+  const customRaw = document.getElementById(customInputId)?.value?.trim() || "";
+  const presetRaw = document.getElementById(presetSelectId)?.value?.trim() || "";
 
-  const customUrl = normalizeImageUrl(custom);
-  if (customUrl) return customUrl;
+  if (customRaw) {
+    const customUrl = normalizeHttpsUrl(customRaw);
 
-  const presetUrl = normalizeImageUrl(preset);
-  if (presetUrl) return presetUrl;
+    if (!customUrl) {
+      throw new Error("URL image personnalisée invalide. Elle doit commencer par https:// et ouvrir directement une image.");
+    }
+
+    return customUrl;
+  }
+
+  const presetUrl = normalizeHttpsUrl(presetRaw);
+
+  if (presetUrl) {
+    return presetUrl;
+  }
 
   return DEFAULT_ICON_URL;
 }
@@ -150,7 +165,15 @@ async function sendNotification(event) {
   const title = document.getElementById("title").value.trim();
   const body = document.getElementById("body").value.trim();
   const url = document.getElementById("url").value.trim();
-  const iconUrl = getSelectedIcon("");
+
+  let iconUrl = "";
+
+  try {
+    iconUrl = pickImageUrl("iconUrl", "iconPreset");
+  } catch (error) {
+    setAdminStatus(error.message, "error");
+    return;
+  }
 
   if (!adminKey) {
     setAdminStatus("Code admin obligatoire.", "warn");
@@ -217,7 +240,15 @@ async function saveSchedule(event) {
   const title = document.getElementById("scheduleTitle").value.trim();
   const body = document.getElementById("scheduleBody").value.trim();
   const url = document.getElementById("scheduleUrl").value.trim();
-  const iconUrl = getSelectedIcon("schedule");
+
+  let iconUrl = "";
+
+  try {
+    iconUrl = pickImageUrl("scheduleIconUrl", "scheduleIconPreset");
+  } catch (error) {
+    setAdminStatus(error.message, "error");
+    return;
+  }
 
   if (!adminKey) {
     setAdminStatus("Code admin obligatoire.", "warn");

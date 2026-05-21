@@ -48,7 +48,7 @@
       </div>
 
       <section id="instantPanel" class="push-panel active" role="tabpanel" aria-labelledby="instantTabBtn">
-        <form id="sendForm" class="form">
+        <form id="sendForm" class="form" novalidate>
           <label>
             Code admin
             <input id="adminKey" type="password" autocomplete="off" placeholder="Votre code admin">
@@ -76,7 +76,7 @@
 
           <label>
             URL image personnalisée
-            <input id="iconUrl" type="url" placeholder="https://.../image.png">
+            <input id="iconUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://.../image.png">
           </label>
 
           <label>
@@ -91,7 +91,7 @@
 
           <label>
             URL au clic
-            <input id="url" type="url" placeholder="https://aperos.net">
+            <input id="url" type="text" inputmode="url" placeholder="https://aperos.net">
           </label>
 
           <button class="primary-btn" type="submit">Envoyer la notification</button>
@@ -99,7 +99,7 @@
       </section>
 
       <section id="scheduledPanel" class="push-panel" role="tabpanel" aria-labelledby="scheduledTabBtn" hidden>
-        <form id="scheduleForm" class="form">
+        <form id="scheduleForm" class="form" novalidate>
           <label>
             Code admin
             <input id="scheduleAdminKey" type="password" autocomplete="off" placeholder="Votre code admin">
@@ -161,7 +161,7 @@
 
           <label>
             URL image personnalisée
-            <input id="scheduleIconUrl" type="url" placeholder="https://.../image.png">
+            <input id="scheduleIconUrl" type="text" inputmode="url" autocomplete="off" placeholder="https://.../image.png">
           </label>
 
           <label>
@@ -176,7 +176,7 @@
 
           <label>
             URL au clic
-            <input id="scheduleUrl" type="url" placeholder="https://aperos.net">
+            <input id="scheduleUrl" type="text" inputmode="url" placeholder="https://aperos.net">
           </label>
 
           <button class="primary-btn" type="submit">Enregistrer la programmation</button>
@@ -198,6 +198,6 @@
   </main>
 
   <script src="./config.js"></script>
-  <script src="./admin.js?v=images-final-20260521-2"></script>
+  <script src="./admin.js?v=custom-image-priority-20260521-3"></script>
 </body>
 </html>
