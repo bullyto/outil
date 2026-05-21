@@ -13,7 +13,7 @@
   - clic normal sur la notification -> url
 */
 
-const CACHE_NAME = "adn66-push-v9-fixed-action-buttons";
+const CACHE_NAME = "adn66-push-v10-boutons-test-direct";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
@@ -156,18 +156,14 @@ async function showLatestNotification() {
     requireInteraction: Boolean(payload.require_interaction),
     silent: Boolean(payload.silent),
     vibrate: cleanVibrate(payload.vibrate),
-    // Important : on force les actions ici.
-    // Certains anciens logs peuvent contenir des actions inversées en D1.
-    // Le libellé "Voir le site" doit TOUJOURS avoir action="open_site".
-    // Le libellé "Télécharger l’app" doit TOUJOURS avoir action="install_app".
     actions: [
       {
-        action: "open_site",
-        title: "Voir le site"
+        action: "adn66_open_site_v10",
+        title: "🌐 SITE"
       },
       {
-        action: "install_app",
-        title: "Télécharger l’app"
+        action: "adn66_open_app_v10",
+        title: "📲 APP"
       }
     ]
   };
@@ -212,12 +208,12 @@ function getDefaultPayload() {
     vibrate: [500, 150, 500, 150, 800],
     actions: [
       {
-        action: "open_site",
-        title: "Voir le site"
+        action: "adn66_open_site_v10",
+        title: "🌐 SITE"
       },
       {
-        action: "install_app",
-        title: "Télécharger l’app"
+        action: "adn66_open_app_v10",
+        title: "📲 APP"
       }
     ]
   };
@@ -380,44 +376,43 @@ function cleanActions(value) {
 }
 
 self.addEventListener("notificationclick", event => {
+  /*
+    V10 test direct :
+    - clic notification complète = site
+    - bouton 🌐 SITE = site
+    - bouton 📲 APP = Play Store
+    - toute action inconnue = site
+    Objectif : empêcher définitivement "Voir le site" d’ouvrir Google Play.
+  */
   event.notification.close();
 
   const data = event.notification.data || {};
   const target = String(data.target || "").toLowerCase();
-
-  const siteFromUrl = cleanSiteUrl(data.url);
-  const siteFromSiteUrl = cleanSiteUrl(data.site_url);
+  const urlText = String(data.url || "").toLowerCase();
+  const siteText = String(data.site_url || "").toLowerCase();
 
   const isCatalan =
     target === "catalan" ||
-    String(siteFromUrl || "").includes("catalan.aperos.net") ||
-    String(siteFromSiteUrl || "").includes("catalan.aperos.net");
+    urlText.includes("catalan.aperos.net") ||
+    siteText.includes("catalan.aperos.net");
 
-  const defaultSiteUrl = isCatalan
+  const siteUrl = isCatalan
     ? "https://catalan.aperos.net/"
     : "https://aperos.net/";
 
-  const defaultPlaystoreUrl = isCatalan
+  const appUrl = isCatalan
     ? "https://play.google.com/store/apps/details?id=net.aperos.catalan"
     : "https://play.google.com/store/apps/details?id=fr.aperos.nuit66";
 
-  let targetUrl = defaultSiteUrl;
+  let targetUrl = siteUrl;
 
-  if (event.action === "install_app") {
-    targetUrl = cleanNotificationUrl(data.install_url || data.playstore_url) || defaultPlaystoreUrl;
-
-    // Sécurité : si le lien reçu n'est pas Google Play, on force le Play Store connu.
-    if (!isPlayStoreUrl(targetUrl)) {
-      targetUrl = defaultPlaystoreUrl;
-    }
-  } else {
-    // Clic normal OU bouton "Voir le site".
-    // On utilise le même lien que le clic normal, car chez vous il ouvre déjà le bon site.
-    // On refuse strictement Google Play pour cette branche.
-    targetUrl = siteFromUrl || siteFromSiteUrl || defaultSiteUrl;
+  // Seule cette action précise ouvre le Play Store.
+  if (event.action === "adn66_open_app_v10") {
+    targetUrl = appUrl;
   }
 
-  event.waitUntil(openCleanWindow(targetUrl));
+  // Action site, clic normal, action vide ou inconnue => site.
+  event.waitUntil(clients.openWindow(targetUrl));
 });
 
 async function openCleanWindow(url) {
