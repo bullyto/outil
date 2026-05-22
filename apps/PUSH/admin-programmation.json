@@ -1,82 +1,322 @@
 [
   {
-    "id": "adn66_ouverture_soir",
+    "id": "adn66_ouverture_5_etoiles",
     "brand": "apero",
     "target": "all",
-    "title": "Apéro de Nuit 66",
-    "body": "Service ouvert ce soir, livraison de 19h à 6h dans les Pyrénées-Orientales.",
+    "title": "⭐ Apéro de Nuit 66 ouvert",
+    "body": "Livraison d’alcool de nuit 5⭐ à Perpignan et dans le 66, de 19h à 6h.",
     "image_mode": "random"
   },
   {
-    "id": "adn66_commande_rapide",
+    "id": "adn66_meilleur_service_livraison",
     "brand": "apero",
     "target": "all",
-    "title": "Livraison nocturne disponible",
-    "body": "Commandez simplement depuis le site, nous nous occupons de la livraison.",
+    "title": "🏆 Apéro de Nuit 66",
+    "body": "Le service de livraison d’alcool de nuit pensé pour vos soirées dans les Pyrénées-Orientales.",
     "image_mode": "random"
   },
   {
-    "id": "adn66_soiree_prete",
+    "id": "adn66_livraison_alcool_rapide",
     "brand": "apero",
     "target": "all",
-    "title": "Votre soirée continue",
-    "body": "Apéro de Nuit 66 vous livre ce soir, rapidement et simplement.",
+    "title": "🚚 Livraison alcool 66",
+    "body": "Apéro de Nuit 66 livre vos boissons rapidement, simplement et professionnellement jusqu’à 6h.",
     "image_mode": "random"
   },
   {
-    "id": "adn66_anticipez",
+    "id": "adn66_soiree_continue",
     "brand": "apero",
     "target": "all",
-    "title": "Pensez à commander en avance",
-    "body": "Forte demande possible ce soir : préparez votre commande dès maintenant.",
+    "title": "🍾 Votre soirée continue",
+    "body": "Besoin d’un réassort ? Apéro de Nuit 66 assure la livraison d’alcool de nuit dans le 66.",
     "image_mode": "random"
   },
   {
-    "id": "adn66_suivi_commande",
+    "id": "adn66_commandez_en_avance",
     "brand": "apero",
     "target": "all",
-    "title": "Suivi de commande disponible",
-    "body": "Après votre commande, suivez facilement l’avancement de votre livraison.",
+    "title": "⏰ Apéro de Nuit 66",
+    "body": "Forte demande possible ce soir : anticipez votre commande de livraison d’alcool dès maintenant.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_service_premium",
+    "brand": "apero",
+    "target": "all",
+    "title": "⭐ Service premium ADN66",
+    "body": "Livraison nocturne claire, rapide et fiable : Apéro de Nuit 66 accompagne vos soirées.",
     "image_mode": "random"
   },
   {
     "id": "adn66_restez_au_chaud",
     "brand": "apero",
     "target": "all",
-    "title": "Restez tranquille, on livre",
-    "body": "Pas besoin de vous déplacer : Apéro de Nuit 66 livre jusqu’à 6h.",
+    "title": "🔥 Restez au chaud",
+    "body": "Ne vous déplacez pas : Apéro de Nuit 66 livre l’alcool et les boissons jusqu’à votre porte.",
     "image_mode": "random"
   },
   {
-    "id": "adn66_weekend",
+    "id": "adn66_weekend_5_etoiles",
     "brand": "apero",
     "target": "all",
-    "title": "Week-end avec Apéro de Nuit 66",
-    "body": "Le service est disponible ce soir pour vos commandes de dernière minute.",
+    "title": "🌙 Week-end avec ADN66",
+    "body": "Apéro de Nuit 66, livraison d’alcool de nuit 5⭐ pour vos soirées et fins de nuit.",
     "image_mode": "random"
   },
   {
-    "id": "adn66_fidelite",
+    "id": "adn66_perpignan_66",
     "brand": "apero",
     "target": "all",
-    "title": "Carte fidélité Apéro de Nuit 66",
-    "body": "Pensez à présenter votre carte fidélité lors de vos prochaines commandes.",
+    "title": "📍 Apéro de Nuit 66",
+    "body": "Livraison d’alcool à Perpignan et dans les Pyrénées-Orientales, tous les soirs de 19h à 6h.",
     "image_mode": "random"
   },
   {
-    "id": "adn66_pwa",
+    "id": "adn66_ouvert_7j7",
     "brand": "apero",
     "target": "all",
-    "title": "Ajoutez l’app à votre téléphone",
-    "body": "Gardez Apéro de Nuit 66 à portée de main depuis votre écran d’accueil.",
+    "title": "✅ Ouvert 7j/7",
+    "body": "Apéro de Nuit 66 assure vos commandes nocturnes avec un service sérieux et réactif.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_carte_fidelite",
+    "brand": "apero",
+    "target": "all",
+    "title": "🎁 Fidélité ADN66",
+    "body": "Commandez avec Apéro de Nuit 66 et pensez à votre carte fidélité pour vos avantages.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_pwa_telephone",
+    "brand": "apero",
+    "target": "all",
+    "title": "📲 Apéro de Nuit 66",
+    "body": "Ajoutez l’app à votre téléphone et gardez la livraison d’alcool de nuit à portée de main.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_suivi_livraison",
+    "brand": "apero",
+    "target": "all",
+    "title": "🛰️ Suivi livraison ADN66",
+    "body": "Après commande, Apéro de Nuit 66 vous permet de suivre plus facilement votre livraison.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_derniere_minute",
+    "brand": "apero",
+    "target": "all",
+    "title": "⚡ Commande dernière minute",
+    "body": "Soirée imprévue ? Apéro de Nuit 66 livre l’alcool de nuit à Perpignan et alentours.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_service_fiable",
+    "brand": "apero",
+    "target": "all",
+    "title": "⭐ Livraison fiable ADN66",
+    "body": "Un service clair, professionnel et nocturne pour vos boissons : Apéro de Nuit 66.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_nuit_active",
+    "brand": "apero",
+    "target": "all",
+    "title": "🌃 Apéro de Nuit 66 actif",
+    "body": "Le service tourne ce soir : livraison d’alcool de nuit disponible dans le 66.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_meilleure_solution_soiree",
+    "brand": "apero",
+    "target": "all",
+    "title": "🏆 Meilleur réflexe soirée",
+    "body": "Pour vos soirées, pensez Apéro de Nuit 66 : livraison d’alcool rapide et pratique.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_livraison_boissons",
+    "brand": "apero",
+    "target": "all",
+    "title": "🍷 Livraison boissons 66",
+    "body": "Apéro de Nuit 66 livre vos boissons de nuit avec un service simple et efficace.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_etoiles_clients",
+    "brand": "apero",
+    "target": "all",
+    "title": "⭐⭐⭐⭐⭐ Apéro de Nuit 66",
+    "body": "Un service de livraison d’alcool nocturne pensé pour la rapidité, la clarté et la confiance.",
     "image_mode": "random"
   },
   {
     "id": "adn66_rappel_ouverture",
     "brand": "apero",
     "target": "all",
-    "title": "Ouvert cette nuit",
-    "body": "Apéro de Nuit 66 assure les livraisons de 19h à 6h, 7j/7.",
+    "title": "🔔 Apéro de Nuit 66 ouvert",
+    "body": "Commandez ce soir sur Apéro de Nuit 66 : livraison d’alcool de 19h à 6h, 7j/7.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_50_communes_66",
+    "brand": "apero",
+    "target": "all",
+    "title": "📍 Apéro de Nuit 66 — 50+ communes",
+    "body": "Livraison d’alcool de nuit sur plus de 50 communes du département 66. Service 5⭐ de 19h à 6h.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_meilleur_service_66",
+    "brand": "apero",
+    "target": "all",
+    "title": "🏆 Meilleur service livraison 66",
+    "body": "Apéro de Nuit 66 livre l’alcool et les boissons de nuit à Perpignan et alentours, rapidement et sérieusement.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_app_playstore",
+    "brand": "apero",
+    "target": "all",
+    "title": "📲 Apéro de Nuit 66 sur Play Store",
+    "body": "Téléchargez l’application mobile Apéro de Nuit 66 sur Google Play et gardez le service à portée de main.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_fidelite_app_mobile",
+    "brand": "apero",
+    "target": "all",
+    "title": "🎁 Carte fidélité sur l’app",
+    "body": "La carte de fidélité Apéro de Nuit 66 est disponible depuis l’application mobile. Cumulez vos avantages facilement.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_minijeu_recompenses",
+    "brand": "apero",
+    "target": "all",
+    "title": "🎮 Mini-jeu Apéro de Nuit 66",
+    "body": "Jouez depuis l’application mobile et débloquez des récompenses promotionnelles selon les offres disponibles.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_playstore_recompenses",
+    "brand": "apero",
+    "target": "all",
+    "title": "🏆 App mobile + récompenses",
+    "body": "L’application Apéro de Nuit 66 sur Play Store donne accès à la fidélité, au mini-jeu et aux avantages promotionnels.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_livraison_50_communes",
+    "brand": "apero",
+    "target": "all",
+    "title": "🚚 Livraison alcool 50+ communes",
+    "body": "Apéro de Nuit 66 couvre plus de 50 communes du 66 pour vos livraisons d’alcool de nuit.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_meilleur_reflexe_nuit",
+    "brand": "apero",
+    "target": "all",
+    "title": "⭐⭐⭐⭐⭐ Le réflexe de nuit",
+    "body": "Pour une livraison d’alcool rapide, claire et professionnelle dans le 66 : pensez Apéro de Nuit 66.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_communes_departement",
+    "brand": "apero",
+    "target": "all",
+    "title": "📍 Département 66 couvert",
+    "body": "Perpignan, alentours et plus de 50 communes : Apéro de Nuit 66 assure la livraison d’alcool de nuit.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_jeu_promo_app",
+    "brand": "apero",
+    "target": "all",
+    "title": "🎮 Récompenses dans l’app",
+    "body": "Le mini-jeu Apéro de Nuit 66 peut offrir des récompenses promotionnelles. Téléchargez l’app sur Play Store.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_fidelite_avantages",
+    "brand": "apero",
+    "target": "all",
+    "title": "🎁 Fidélité Apéro de Nuit 66",
+    "body": "Votre carte fidélité est accessible sur l’application mobile pour profiter de vos avantages lors de vos commandes.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_service_5etoiles_communes",
+    "brand": "apero",
+    "target": "all",
+    "title": "⭐ Service 5⭐ dans le 66",
+    "body": "Apéro de Nuit 66 livre vos boissons de nuit sur plus de 50 communes, avec un service sérieux et réactif.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_installez_app",
+    "brand": "apero",
+    "target": "all",
+    "title": "📲 Installez Apéro de Nuit 66",
+    "body": "Application mobile disponible sur Play Store : commande, fidélité, mini-jeu et infos utiles au même endroit.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_livraison_alcool_depart66",
+    "brand": "apero",
+    "target": "all",
+    "title": "🍾 Livraison d’alcool 66",
+    "body": "Besoin d’un réassort ? Apéro de Nuit 66 livre l’alcool de nuit à Perpignan et dans plus de 50 communes.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_promos_mobile",
+    "brand": "apero",
+    "target": "all",
+    "title": "🎁 Avantages sur mobile",
+    "body": "Avec l’application Apéro de Nuit 66, retrouvez la carte fidélité et les récompenses promotionnelles du mini-jeu.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_playstore_soiree",
+    "brand": "apero",
+    "target": "all",
+    "title": "📲 L’app de vos soirées",
+    "body": "Téléchargez Apéro de Nuit 66 sur Play Store pour accéder plus vite à la livraison d’alcool de nuit.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_plus_50_communes_ouvert",
+    "brand": "apero",
+    "target": "all",
+    "title": "✅ Ouvert sur 50+ communes",
+    "body": "Apéro de Nuit 66 est disponible ce soir : livraison d’alcool et boissons de nuit dans le département 66.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_meilleur_service_nuit",
+    "brand": "apero",
+    "target": "all",
+    "title": "🏆 Apéro de Nuit 66 5⭐",
+    "body": "Le meilleur réflexe pour vos livraisons d’alcool de nuit : service rapide, clair et professionnel dans le 66.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_jeu_fidelite_livraison",
+    "brand": "apero",
+    "target": "all",
+    "title": "🎮 Jeu, fidélité, livraison",
+    "body": "Apéro de Nuit 66 réunit livraison d’alcool, carte fidélité et mini-jeu avec récompenses sur l’app mobile.",
+    "image_mode": "random"
+  },
+  {
+    "id": "adn66_couverture_locale",
+    "brand": "apero",
+    "target": "all",
+    "title": "📍 Livraison locale 66",
+    "body": "De Perpignan aux communes voisines, Apéro de Nuit 66 couvre plus de 50 communes pour vos soirées.",
     "image_mode": "random"
   }
 ]
