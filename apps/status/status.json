@@ -1,12 +1,12 @@
 {
   "active": true,
-  "mode": "warning",
-  "last_update": "2026-05-27T21:08:43.741+02:00",
+  "mode": "info",
+  "last_update": "2026-05-28T20:21:49.007+02:00",
   "modes": {
     "info": {
-      "title": "Ouverture exceptionnelle",
-      "message": "Le service ouvrira exceptionnellement à partir de 21h00 ce soir. Merci de votre compréhension.",
-      "image": "",
+      "title": "EXCEPTIONNELLEMENT FERMER",
+      "message": "Merci pour vôtre compréhension.",
+      "image": "images/incident.png",
       "severity": "info",
       "ok_delay_seconds": 4
     },
@@ -67,7 +67,7 @@
     }
   },
   "created_at": "2026-01-01T19:53:43.073+01:00",
-  "published_at": "2026-05-27T21:08:43.741+02:00",
+  "published_at": "2026-05-28T20:21:49.007+02:00",
   "ends_at": "",
   "starts_at": "2026-01-01T19:56:27.600+01:00"
 }
