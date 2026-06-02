@@ -2,375 +2,54 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>ADN66 Notifications Push</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#5db7ee">
-  <meta name="description" content="Notifications ADN66 : activation utilisateur et administration push dans une seule interface.">
-  <meta name="robots" content="noindex,nofollow">
+  <title>Notifications ADN66</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050b12">
+  <meta name="description" content="Activation des notifications Apéro de Nuit 66 et Apéro Catalan.">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css?v=adn66-push-fusion-v1">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <main class="shell">
-    <header class="hero-shell card">
-      <div class="hero-top">
-        <div class="hero-brand">
-          <div class="eyebrow">APÉRO DE NUIT 66</div>
-          <h1>Notifications Push</h1>
-          <p class="hero-text">
-            Une seule interface pour activer les notifications utilisateur,
-            envoyer une notification instantanée et gérer la programmation.
-          </p>
-        </div>
+    <section class="card hero">
+      <div class="badge">ADN66 • Notifications</div>
+      <h1>Recevoir les alertes d’ouverture et les promos</h1>
+      <p>
+        Activez les notifications pour être prévenu des ouvertures,
+        informations importantes et offres ponctuelles.
+      </p>
 
-        <div class="hero-actions">
-          <div class="quick-badges">
-            <span class="mini-pill">PWA ADN66</span>
-            <span class="mini-pill">Push center</span>
-          </div>
-
-          <div class="adn-menu-wrap">
-            <button id="adnMenuBtn" class="adn-menu-btn" type="button" aria-expanded="false" aria-controls="adnMenuPanel">
-              <span class="burger" aria-hidden="true"><span></span><span></span><span></span></span>
-              Menu
-            </button>
-
-            <div id="adnMenuPanel" class="adn-menu-panel" hidden>
-              <a href="./" class="adn-menu-link is-current">
-                <span class="menu-icon">🔔</span>
-                <span><strong>PUSH</strong><small>Notifications et gestion push</small></span>
-              </a>
-              <a href="../apero/" class="adn-menu-link">
-                <span class="menu-icon">🍾</span>
-                <span><strong>Apéro</strong><small>Outil principal ADN66</small></span>
-              </a>
-              <a href="../fidel/admin.html" class="adn-menu-link">
-                <span class="menu-icon">🎁</span>
-                <span><strong>Fidélité</strong><small>Carte de fidélité admin</small></span>
-              </a>
-              <a href="../gps/" class="adn-menu-link">
-                <span class="menu-icon">📍</span>
-                <span><strong>GPS</strong><small>Suivi et géolocalisation</small></span>
-              </a>
-              <a href="../status/" class="adn-menu-link">
-                <span class="menu-icon">📢</span>
-                <span><strong>Status</strong><small>Message global et pop-up</small></span>
-              </a>
-              <a href="../stock/" class="adn-menu-link">
-                <span class="menu-icon">📦</span>
-                <span><strong>Stock</strong><small>Produits et disponibilité</small></span>
-              </a>
-              <a href="../twilio/" class="adn-menu-link">
-                <span class="menu-icon">💬</span>
-                <span><strong>Twilio SMS</strong><small>Campagnes et contacts</small></span>
-              </a>
-            </div>
-          </div>
-        </div>
+      <div class="target-box">
+        <label for="targetSelect">Site concerné</label>
+        <select id="targetSelect">
+          <option value="apero">Apéro de Nuit 66</option>
+          <option value="catalan">Apéro Catalan</option>
+          <option value="x">X — futur projet</option>
+        </select>
       </div>
 
-      <div class="main-tabs" role="tablist" aria-label="Navigation notifications">
-        <button class="main-tab active" type="button" data-panel="subscribeSection" aria-selected="true">Activation</button>
-        <button class="main-tab" type="button" data-panel="adminSection" aria-selected="false">Administration</button>
-      </div>
-    </header>
+      <button id="subscribeBtn" class="primary-btn">
+        Activer les notifications
+      </button>
 
-    <section id="subscribeSection" class="main-panel active" aria-label="Activation notifications">
-      <div class="grid-2">
-        <section class="card section-card">
-          <div class="section-head">
-            <div>
-              <div class="section-tag">UTILISATEUR</div>
-              <h2>Activer les notifications</h2>
-            </div>
-          </div>
+      <button id="unsubscribeBtn" class="ghost-btn">
+        Désactiver sur cet appareil
+      </button>
 
-          <p class="muted-paragraph">
-            Activez les notifications pour être prévenu des ouvertures,
-            informations importantes et offres ponctuelles.
-          </p>
-
-          <div class="target-box">
-            <label for="targetSelect">Site concerné</label>
-            <select id="targetSelect">
-              <option value="apero">Apéro de Nuit 66</option>
-              <option value="catalan">Apéro Catalan</option>
-              <option value="x">X — futur projet</option>
-            </select>
-          </div>
-
-          <button id="subscribeBtn" class="primary-btn" type="button">Activer les notifications</button>
-          <button id="unsubscribeBtn" class="ghost-btn" type="button">Désactiver sur cet appareil</button>
-
-          <p id="status" class="status">Initialisation...</p>
-        </section>
-
-        <section class="card section-card info-card">
-          <div class="section-head">
-            <div>
-              <div class="section-tag">INFORMATION</div>
-              <h2>Ce que fait cet outil</h2>
-            </div>
-          </div>
-
-          <div class="info-list">
-            <div class="info-item">
-              <strong>Ouvertures / fermetures</strong>
-              <p>Informer rapidement les clients de l’ouverture du service ou d’une indisponibilité temporaire.</p>
-            </div>
-            <div class="info-item">
-              <strong>Promotions ponctuelles</strong>
-              <p>Diffuser des offres ciblées sur Apéro de Nuit 66 ou Apéro Catalan.</p>
-            </div>
-            <div class="info-item">
-              <strong>Consentement</strong>
-              <p>Les notifications ne s’activent qu’après accord du client et peuvent être retirées à tout moment.</p>
-            </div>
-          </div>
-
-          <button class="secondary-btn wide-btn" type="button" data-open-panel="adminSection">Ouvrir l’administration</button>
-        </section>
-      </div>
+      <p id="status" class="status">Initialisation...</p>
     </section>
 
-    <section id="adminSection" class="main-panel" aria-label="Administration notifications" hidden>
-      <section class="card hero admin-hero">
-        <div class="section-head large-gap">
-          <div>
-            <div class="section-tag">ADMIN PUSH</div>
-            <h2>Administration des notifications</h2>
-            <p class="muted-paragraph">
-              Gérez les notifications instantanées et les futures notifications programmées
-              pour Apéro de Nuit 66 et Apéro Catalan.
-            </p>
-          </div>
-        </div>
-
-        <div class="stats-grid">
-          <div>
-            <span class="stat-label">Total actifs</span>
-            <strong id="statTotal">—</strong>
-          </div>
-          <div>
-            <span class="stat-label">Apéro</span>
-            <strong id="statApero">—</strong>
-          </div>
-          <div>
-            <span class="stat-label">Catalan</span>
-            <strong id="statCatalan">—</strong>
-          </div>
-          <div>
-            <span class="stat-label">X</span>
-            <strong id="statX">—</strong>
-          </div>
-        </div>
-
-        <div class="push-tabs" role="tablist" aria-label="Type de notification">
-          <button id="instantTabBtn" class="push-tab active" type="button" data-tab="instant" aria-controls="instantPanel" aria-selected="true">
-            Notification instantanée
-          </button>
-          <button id="scheduledTabBtn" class="push-tab" type="button" data-tab="scheduled" aria-controls="scheduledPanel" aria-selected="false">
-            Notification programmée
-          </button>
-        </div>
-
-        <section id="instantPanel" class="push-panel active" role="tabpanel" aria-labelledby="instantTabBtn">
-          <form id="sendForm" class="form" novalidate>
-            <label>
-              Code admin
-              <input id="adminKey" type="password" autocomplete="off" placeholder="Votre code admin">
-            </label>
-
-            <div class="row-2">
-              <label>
-                Cible des abonnés
-                <select id="target">
-                  <option value="all">Tous les abonnés</option>
-                  <option value="apero">Abonnés Apéro de Nuit 66</option>
-                  <option value="catalan">Abonnés Apéro Catalan</option>
-                  <option value="x">X — futur projet</option>
-                </select>
-              </label>
-
-              <label>
-                Liens des boutons
-                <select id="brandChoice">
-                  <option value="apero">Apéro de Nuit 66 — aperos.net</option>
-                  <option value="catalan">Apéro Catalan — catalan.aperos.net</option>
-                </select>
-              </label>
-            </div>
-
-            <label>
-              Icône de notification
-              <select id="iconChoice">
-                <option value="auto">Automatique selon les liens choisis</option>
-                <option value="apero">Icône Apéro de Nuit 66</option>
-                <option value="catalan">Icône Apéro Catalan</option>
-              </select>
-            </label>
-
-            <div class="image-picker" data-picker="instant">
-              <div class="image-picker-head">
-                <label for="imageGallerySelect">Image grande de la notification</label>
-                <button id="refreshImageGallery" class="secondary-btn" type="button">Actualiser les images</button>
-              </div>
-
-              <select id="imageGallerySelect">
-                <option value="">Chargement des images...</option>
-              </select>
-
-              <input id="imageUrl" type="hidden">
-
-              <div id="imagePreviewBox" class="image-preview-box" hidden>
-                <img id="imagePreview" alt="Aperçu de l’image sélectionnée">
-                <div class="image-preview-info">
-                  <strong id="imagePreviewName">—</strong>
-                  <code id="imagePreviewUrl">—</code>
-                  <div class="image-preview-actions">
-                    <button id="copyImageUrl" class="secondary-btn" type="button">Copier l’URL</button>
-                    <a id="openImageUrl" class="secondary-btn" href="#" target="_blank" rel="noopener">Ouvrir</a>
-                  </div>
-                </div>
-              </div>
-
-              <p id="imageGalleryStatus" class="mini-status">Les images sont lues automatiquement depuis /apps/PUSH/images/.</p>
-            </div>
-
-            <label>
-              Titre
-              <input id="title" type="text" maxlength="80" placeholder="Ex : Apéro de Nuit 66 est ouvert">
-            </label>
-
-            <label>
-              Message
-              <textarea id="body" maxlength="180" placeholder="Ex : Livraison disponible ce soir jusqu’à 6h."></textarea>
-            </label>
-
-            <button class="primary-btn" type="submit">Envoyer la notification</button>
-          </form>
-        </section>
-
-        <section id="scheduledPanel" class="push-panel" role="tabpanel" aria-labelledby="scheduledTabBtn" hidden>
-          <form id="scheduleForm" class="form" novalidate>
-            <label>
-              Code admin
-              <input id="scheduleAdminKey" type="password" autocomplete="off" placeholder="Votre code admin">
-            </label>
-
-            <div class="schedule-simple-box">
-              <div class="schedule-toggle-row">
-                <label class="toggle-label" for="scheduleEnabled">
-                  <input id="scheduleEnabled" type="checkbox">
-                  Activer les notifications programmées
-                </label>
-                <span id="scheduleStateText">Désactivé</span>
-              </div>
-
-              <p class="schedule-note">
-                Une fois activé, le système enverra automatiquement une notification chaque semaine
-                aux jours et horaires choisis. Les messages seront piochés dans l’ordre et en boucle
-                dans la liste que nous établirons ensuite.
-              </p>
-
-              <div id="scheduleSlots" class="schedule-slot-list" aria-label="Créneaux d’envoi programmés"></div>
-
-              <button id="addScheduleSlot" class="secondary-btn" type="button">Ajouter un autre créneau</button>
-
-              <p class="schedule-note">
-                Par défaut : mardi à 19h30. Vous pouvez cocher plusieurs jours sur un même créneau,
-                ou ajouter un deuxième créneau avec un horaire différent, par exemple jeudi à 20h00.
-              </p>
-            </div>
-
-            <div class="program-list-box">
-              <div class="program-list-head">
-                <div>
-                  <strong>Liste GitHub de programmation</strong>
-                  <p class="schedule-note">
-                    Le Worker lira <code>admin-programmation.json</code>, puis piochera les notifications dans l’ordre et en boucle.
-                    L’image grande sera choisie aléatoirement dans <code>/apps/PUSH/images/</code> à chaque envoi.
-                  </p>
-                </div>
-                <button id="refreshProgramList" class="secondary-btn" type="button">Actualiser la liste</button>
-              </div>
-              <p id="programListStatus" class="mini-status">Chargement de la liste GitHub...</p>
-              <div id="programList" class="program-list" aria-label="Notifications programmées depuis GitHub"></div>
-            </div>
-
-            <button class="primary-btn" type="submit">Enregistrer la programmation</button>
-          </form>
-        </section>
-
-        <p id="adminStatus" class="status">Configuration en attente du Worker Cloudflare.</p>
-
-        <button class="ghost-btn admin-back-btn" type="button" data-open-panel="subscribeSection">Retour activation</button>
-      </section>
+    <section class="card info">
+      <h2>Important</h2>
+      <p>
+        Les notifications ne sont activées qu’après votre accord.
+        Vous pouvez les bloquer à tout moment depuis les paramètres de votre navigateur.
+      </p>
+      <a class="admin-link" href="./admin.html">Accès admin</a>
     </section>
   </main>
 
-  <script>
-    (function(){
-      const tabs = Array.from(document.querySelectorAll('.main-tab'));
-      const panels = Array.from(document.querySelectorAll('.main-panel'));
-      const switchers = Array.from(document.querySelectorAll('[data-open-panel]'));
-
-      function openPanel(id){
-        panels.forEach(panel => {
-          const active = panel.id === id;
-          panel.hidden = !active;
-          panel.classList.toggle('active', active);
-        });
-
-        tabs.forEach(tab => {
-          const active = tab.dataset.panel === id;
-          tab.classList.toggle('active', active);
-          tab.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-
-        if (id === 'adminSection') {
-          history.replaceState(null, '', '#admin');
-        } else {
-          history.replaceState(null, '', '#activation');
-        }
-      }
-
-      tabs.forEach(tab => tab.addEventListener('click', () => openPanel(tab.dataset.panel)));
-      switchers.forEach(btn => btn.addEventListener('click', () => openPanel(btn.dataset.openPanel)));
-
-      if (location.hash === '#admin') openPanel('adminSection');
-      else openPanel('subscribeSection');
-    })();
-  </script>
-
-  <script>
-    (function(){
-      const btn = document.getElementById('adnMenuBtn');
-      const panel = document.getElementById('adnMenuPanel');
-      if(!btn || !panel) return;
-
-      btn.addEventListener('click', function(){
-        const isHidden = panel.hasAttribute('hidden');
-        if (isHidden) {
-          panel.removeAttribute('hidden');
-          btn.setAttribute('aria-expanded','true');
-        } else {
-          panel.setAttribute('hidden','');
-          btn.setAttribute('aria-expanded','false');
-        }
-      });
-
-      document.addEventListener('click', function(e){
-        if (!e.target.closest('.adn-menu-wrap')) {
-          panel.setAttribute('hidden','');
-          btn.setAttribute('aria-expanded','false');
-        }
-      });
-    })();
-  </script>
-
   <script src="./config.js"></script>
-  <script src="./app.js?v=adn66-push-fusion-v1"></script>
-  <script src="./admin.js?v=adn66-push-fusion-v1"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
