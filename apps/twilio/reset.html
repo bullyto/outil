@@ -10,9 +10,7 @@
   try {
     if ("serviceWorker" in navigator) {
       const regs = await navigator.serviceWorker.getRegistrations();
-      for (const reg of regs) {
-        await reg.unregister();
-      }
+      for (const reg of regs) await reg.unregister();
       lines.push("Service workers supprimés : " + regs.length);
     }
     if ("caches" in window) {
@@ -20,10 +18,9 @@
       for (const key of keys) await caches.delete(key);
       lines.push("Caches supprimés : " + keys.length);
     }
-    try { localStorage.removeItem("adn66_worker_url"); } catch(e){}
-    lines.push("OK. Redirection...");
+    lines.push("OK. Redirection vers la version 6...");
     document.getElementById("status").innerHTML = lines.join("<br>");
-    setTimeout(() => location.href = "./index.html?v=5&t=" + Date.now(), 1200);
+    setTimeout(() => location.href = "./index.html?v=6&t=" + Date.now(), 900);
   } catch (e) {
     document.getElementById("status").textContent = "Erreur : " + e.message;
   }

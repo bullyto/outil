@@ -1,10 +1,10 @@
-const CACHE = "adn66-sms-pwa-v5";
+const CACHE = "adn66-sms-pwa-v6";
 const ASSETS = [
   "./",
-  "./index.html?v=5",
-  "./styles.css?v=5",
-  "./app.js?v=5",
-  "./manifest.json?v=5"
+  "./index.html?v=6",
+  "./styles.css?v=6",
+  "./app.js?v=6",
+  "./manifest.json?v=6"
 ];
 
 self.addEventListener("install", (event) => {
@@ -25,19 +25,10 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
-  if (event.data && event.data.type === "CLEAR_CACHE") {
-    event.waitUntil(caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))));
-  }
-});
-
 self.addEventListener("fetch", (event) => {
-  const requestUrl = new URL(event.request.url);
+  const url = new URL(event.request.url);
 
-  if (requestUrl.hostname.includes("workers.dev")) {
+  if (url.hostname.includes("workers.dev")) {
     event.respondWith(fetch(event.request));
     return;
   }

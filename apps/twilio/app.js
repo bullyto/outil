@@ -20,7 +20,7 @@ $("installBtn")?.addEventListener("click", async () => {
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js?v=4").catch(() => {});
+  navigator.serviceWorker.register("sw.js?v=6").catch(() => {});
 }
 
 document.querySelectorAll(".tab").forEach((button) => {
@@ -57,24 +57,15 @@ function apiBase() {
 }
 
 function headers() {
-  const result = {
-    "Content-Type": "application/json"
-  };
-
-  if (state.adminKey) {
-    result.Authorization = "Bearer " + state.adminKey;
-  }
-
+  const result = { "Content-Type": "application/json" };
+  if (state.adminKey) result.Authorization = "Bearer " + state.adminKey;
   return result;
 }
 
 async function api(path, options = {}) {
   const response = await fetch(apiBase() + path, {
     ...options,
-    headers: {
-      ...headers(),
-      ...(options.headers || {})
-    }
+    headers: { ...headers(), ...(options.headers || {}) }
   });
 
   const data = await response.json().catch(() => ({
@@ -82,30 +73,111 @@ async function api(path, options = {}) {
     error: "Réponse non JSON"
   }));
 
-  if (!response.ok && data.success !== false) {
-    data.success = false;
-  }
-
+  if (!response.ok && data.success !== false) data.success = false;
   return data;
 }
 
 function fmtEuro(value) {
-  if (value === null || value === undefined || isNaN(Number(value))) {
-    return "--";
-  }
-
-  return Number(value).toLocaleString("fr-FR", {
-    style: "currency",
-    currency: "EUR"
-  });
+  if (value === null || value === undefined || isNaN(Number(value))) return "--";
+  return Number(value).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 }
 
-function splitNumbers(rawText) {
+function normalizeInputPhone(value) {
+  return String(value || "").trim();
+}
+
+function parseContactLine(line) {
+  const raw = String(line || "").trim();
+  if (!raw) return null;
+
+  // Formats acceptés :
+  // 0632354272
+  // Kevin ; 0632354272
+  // Kevin, 0632354272
+  // Kevin - 0632354272
+  const phoneMatch = raw.match(/(\+33|0033|0)?[ .-]?[67](?:[ .-]?\d{2}){4}/);
+  if (!phoneMatch) return { name: "", phone: raw };
+
+  const phone = phoneMatch[0].trim();
+  let name = raw.replace(phoneMatch[0], "").replace(/[;,\-–—|]+/g, " ").trim();
+
+  return { name, phone };
+}
+
+function splitContacts(rawText) {
   return String(rawText || "")
-    .split(/[\n,;]+/)
-    .map((line) => line.trim())
+    .split(/\n+/)
+    .map(parseContactLine)
     .filter(Boolean);
 }
+
+function humanImportResult(data) {
+  if (!data.success) {
+    return `<div class="badline"><strong>Erreur :</strong> ${escapeHtml(data.error || "Import impossible")}</div>`;
+  }
+
+  return `
+    <div class="okline"><strong>Import terminé</strong></div>
+    <div>Contacts lus : <strong>${data.totalRead || 0}</strong></div>
+    <div>Nouveaux ajoutés : <strong>${data.added || 0}</strong></div>
+    <div>Doublons ignorés : <strong>${data.duplicates || 0}</strong></div>
+    <div>Numéros invalides : <strong>${data.invalid || 0}</strong></div>
+  `;
+}
+
+function humanCampaignResult(data) {
+  if (!data.success) {
+    return {
+      title: "Erreur campagne",
+      text: data.error || "La campagne n’a pas pu être envoyée.",
+      details: ""
+    };
+  }
+
+  const mode = data.testMode ? "Mode test : aucun vrai SMS envoyé." : "Envoi réel effectué.";
+  return {
+    title: data.testMode ? "Test campagne réussi" : "Campagne envoyée",
+    text: `${mode}\n${data.sent || 0} envoyé(s), ${data.failed || 0} échec(s), ${data.total || 0} destinataire(s).`,
+    details: `
+      Campagne n° ${data.campaignId}<br>
+      Encodage : ${escapeHtml(data.encoding || "")}<br>
+      Segments par SMS : ${data.segmentsPerSms || 0}<br>
+      Total segments : ${data.totalSegments || 0}
+    `
+  };
+}
+
+function showNiceResult(id, html) {
+  const box = $(id);
+  if (!box) return;
+  box.classList.remove("hidden");
+  box.innerHTML = html;
+}
+
+function showModal(title, text, details = "") {
+  const modal = $("adnResultModal");
+  if (!modal) {
+    alert(title + "\n\n" + text);
+    return;
+  }
+
+  $("adnResultTitle").textContent = title;
+  $("adnResultText").textContent = text;
+
+  const detailsBox = $("adnResultDetails");
+  if (details) {
+    detailsBox.innerHTML = details;
+    detailsBox.classList.remove("hidden");
+  } else {
+    detailsBox.classList.add("hidden");
+  }
+
+  modal.classList.remove("hidden");
+}
+
+$("adnResultClose")?.addEventListener("click", () => {
+  $("adnResultModal")?.classList.add("hidden");
+});
 
 // ======================================================
 // DASHBOARD
@@ -115,27 +187,13 @@ async function refreshDashboard() {
   try {
     const dashboard = await api("/stats/dashboard");
 
-    if ($("activeClients")) {
-      $("activeClients").textContent = dashboard?.clients?.active ?? "--";
-    }
-
-    if ($("problemCount")) {
-      $("problemCount").textContent = dashboard?.messages?.failed ?? "--";
-    }
-
-    if ($("sentTotal")) {
-      $("sentTotal").textContent = dashboard?.messages?.sent ?? "--";
-    }
+    setText("activeClients", dashboard?.clients?.active ?? "--");
+    setText("problemCount", dashboard?.messages?.failed ?? "--");
+    setText("sentTotal", dashboard?.messages?.sent ?? "--");
 
     const balance = dashboard?.balance;
-
-    if ($("balanceValue")) {
-      $("balanceValue").textContent = balance?.success ? fmtEuro(balance.balance) : "--";
-    }
-
-    if ($("balanceSub")) {
-      $("balanceSub").textContent = balance?.success ? "Compte Twilio" : (balance?.error || "Erreur solde");
-    }
+    setText("balanceValue", balance?.success ? fmtEuro(balance.balance) : "--");
+    setText("balanceSub", balance?.success ? "Compte Twilio" : (balance?.error || "Erreur solde"));
   } catch (error) {
     toast("Impossible d’actualiser");
   }
@@ -154,23 +212,19 @@ async function previewCampaign() {
     excludeAlreadySent: $("excludeAlreadySent")?.checked === true
   };
 
-  const data = await api("/campaign/preview", {
-    method: "POST",
-    body: JSON.stringify(body)
-  });
+  const data = await api("/campaign/preview", { method: "POST", body: JSON.stringify(body) });
 
   if (!data.success) {
     toast(data.error || "Erreur estimation");
     const warning = $("estimateWarning");
     if (warning) {
-      warning.textContent = JSON.stringify(data, null, 2);
+      warning.textContent = data.error || "Erreur estimation";
       warning.classList.remove("hidden");
     }
     return;
   }
 
   const preview = data.preview || {};
-
   setText("estClients", preview.selectedClients ?? 0);
   setText("estLimit", body.limit || preview.selectedClients || 0);
   setText("estChars", preview.characters ?? 0);
@@ -214,12 +268,9 @@ async function sendCampaign() {
     testMode
   };
 
-  const data = await api("/campaign/send", {
-    method: "POST",
-    body: JSON.stringify(body)
-  });
-
-  showResult(data);
+  const data = await api("/campaign/send", { method: "POST", body: JSON.stringify(body) });
+  const result = humanCampaignResult(data);
+  showModal(result.title, result.text, result.details);
 
   await refreshDashboard();
   await loadHistory();
@@ -228,36 +279,95 @@ async function sendCampaign() {
 }
 
 // ======================================================
-// IMPORT CONTACTS
+// AJOUT CLIENT NOM + NUMÉRO
+// ======================================================
+
+async function addSingleClient() {
+  const name = $("clientName")?.value.trim() || "";
+  const phone = normalizeInputPhone($("clientPhone")?.value || "");
+
+  if (!phone) {
+    showNiceResult("addClientResult", `<div class="badline"><strong>Erreur :</strong> numéro manquant.</div>`);
+    return;
+  }
+
+  const data = await api("/clients/add", {
+    method: "POST",
+    body: JSON.stringify({ name, phone, source: "pwa_manual" })
+  });
+
+  if (data.success) {
+    showNiceResult("addClientResult", data.alreadyExists
+      ? `<div><strong>Client déjà existant</strong><br>${escapeHtml(phone)}</div>`
+      : `<div class="okline"><strong>Client ajouté</strong></div><div>${escapeHtml(name || "Sans nom")} — ${escapeHtml(phone)}</div>`
+    );
+    $("clientName").value = "";
+    $("clientPhone").value = "";
+  } else {
+    showNiceResult("addClientResult", `<div class="badline"><strong>Erreur :</strong> ${escapeHtml(data.error || "Ajout impossible")}</div>`);
+  }
+
+  await loadClients();
+  await refreshDashboard();
+}
+
+// ======================================================
+// IMPORT CONTACTS AVEC NOM POSSIBLE
 // ======================================================
 
 async function importContacts() {
   const rawText = $("importNumbers")?.value || "";
-  const phones = splitNumbers(rawText);
+  const contacts = splitContacts(rawText);
 
-  if (phones.length === 0) {
-    toast("Aucun numéro à importer");
-    showInlineResult("importResult", {
-      success: false,
-      error: "Aucun numéro fourni"
-    });
+  if (contacts.length === 0) {
+    toast("Aucun contact à importer");
+    showNiceResult("importResult", `<div class="badline"><strong>Erreur :</strong> Aucun numéro fourni</div>`);
     return;
   }
 
-  const data = await api("/clients/import", {
-    method: "POST",
-    body: JSON.stringify({
-      phones,
-      source: "pwa_import"
-    })
-  });
+  const withNames = contacts.some((contact) => contact.name);
+  let finalResult;
 
-  showInlineResult("importResult", data);
-
-  if (data.success) {
-    toast(`Import OK : ${data.added || 0} ajouté(s), ${data.duplicates || 0} doublon(s)`);
+  if (!withNames) {
+    const phones = contacts.map((contact) => contact.phone);
+    finalResult = await api("/clients/import", {
+      method: "POST",
+      body: JSON.stringify({ phones, source: "pwa_import" })
+    });
   } else {
-    toast(data.error || "Erreur import");
+    let added = 0, duplicates = 0, invalid = 0;
+
+    for (const contact of contacts) {
+      const data = await api("/clients/add", {
+        method: "POST",
+        body: JSON.stringify({
+          name: contact.name,
+          phone: contact.phone,
+          source: "pwa_import_named"
+        })
+      });
+
+      if (data.success && data.alreadyExists) duplicates++;
+      else if (data.success) added++;
+      else invalid++;
+    }
+
+    finalResult = {
+      success: true,
+      totalRead: contacts.length,
+      added,
+      duplicates,
+      invalid,
+      invalidNumbers: []
+    };
+  }
+
+  showNiceResult("importResult", humanImportResult(finalResult));
+
+  if (finalResult.success) {
+    toast(`Import OK : ${finalResult.added || 0} ajouté(s), ${finalResult.duplicates || 0} doublon(s)`);
+  } else {
+    toast(finalResult.error || "Erreur import");
   }
 
   await loadClients();
@@ -274,12 +384,12 @@ async function loadClients() {
 
   const tbody = $("clientsTable");
   if (!tbody) return;
-
   tbody.innerHTML = "";
 
   (data.clients || []).forEach((client) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
+      <td>${escapeHtml(client.name || "—")}</td>
       <td>${escapeHtml(client.phone || "")}</td>
       <td>${statusPill(client.is_active)}</td>
       <td>${client.total_sent || 0}</td>
@@ -294,10 +404,7 @@ async function loadClients() {
 }
 
 function statusPill(active) {
-  if (!active) {
-    return '<span class="pill neutral">Désactivé</span>';
-  }
-
+  if (!active) return '<span class="pill neutral">Désactivé</span>';
   return '<span class="pill ok">Actif</span>';
 }
 
@@ -319,14 +426,9 @@ document.addEventListener("click", async (event) => {
   }
 
   const route = action === "delete" ? "/clients/delete" : "/clients/deactivate";
-
-  const data = await api(route, {
-    method: "POST",
-    body: JSON.stringify({ phone })
-  });
+  const data = await api(route, { method: "POST", body: JSON.stringify({ phone }) });
 
   toast(data.success ? "Action effectuée" : (data.error || "Erreur"));
-
   await loadClients();
   await loadProblems();
   await refreshDashboard();
@@ -338,7 +440,6 @@ document.addEventListener("click", async (event) => {
 
 async function loadProblems() {
   const data = await api("/problems/list");
-
   const tbody = $("problemsTable");
   if (!tbody) return;
 
@@ -348,7 +449,7 @@ async function loadProblems() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${escapeHtml(problem.phone || "")}</td>
-      <td>${problem.twilioCode || problem.code || ""}</td>
+      <td>${escapeHtml(problem.twilio_sid || "")}</td>
       <td>${escapeHtml(problem.error_message || "")}</td>
       <td>${escapeHtml(problem.created_at || "")}</td>
       <td>
@@ -366,7 +467,6 @@ async function loadProblems() {
 
 async function loadHistory() {
   const data = await api("/campaigns/history");
-
   const tbody = $("historyTable");
   if (!tbody) return;
 
@@ -407,9 +507,11 @@ function initSettings() {
 
   $("testWorkerBtn")?.addEventListener("click", async () => {
     $("saveSettingsBtn")?.click();
-
     const data = await api("/status");
-    showInlineResult("settingsResult", data);
+    showNiceResult("settingsResult", data.success
+      ? `<div class="okline"><strong>Worker connecté</strong></div><div>${escapeHtml(data.service || "")}</div>`
+      : `<div class="badline"><strong>Erreur :</strong> ${escapeHtml(data.error || "Worker inaccessible")}</div>`
+    );
   });
 }
 
@@ -420,20 +522,6 @@ function initSettings() {
 function setText(id, value) {
   const element = $(id);
   if (element) element.textContent = value;
-}
-
-function showInlineResult(id, data) {
-  const box = $(id);
-  if (!box) return;
-
-  box.classList.remove("hidden");
-  box.textContent = JSON.stringify(data, null, 2);
-}
-
-function showResult(data) {
-  toast(data.success ? "Terminé" : "Erreur");
-  console.log(data);
-  alert(JSON.stringify(data, null, 2));
 }
 
 function escapeHtml(value) {
@@ -452,6 +540,7 @@ function escapeHtml(value) {
 $("refreshAllBtn")?.addEventListener("click", refreshDashboard);
 $("previewBtn")?.addEventListener("click", previewCampaign);
 $("sendCampaignBtn")?.addEventListener("click", sendCampaign);
+$("addClientBtn")?.addEventListener("click", addSingleClient);
 $("importBtn")?.addEventListener("click", importContacts);
 $("clearImportBtn")?.addEventListener("click", () => {
   if ($("importNumbers")) $("importNumbers").value = "";

@@ -8,8 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#111827" />
   <title>ADN66 Marketing SMS</title>
-  <link rel="manifest" href="manifest.json?v=5" />
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="manifest" href="manifest.json?v=6" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body>
   <div class="app-shell">
@@ -103,14 +103,32 @@
 
       <section id="clients" class="screen">
         <div class="card">
+          <h2>Ajouter un client</h2>
+          <div class="grid two">
+            <div>
+              <label>Nom du client</label>
+              <input id="clientName" placeholder="Ex : Kevin, Client Perpignan, Habitué..." />
+            </div>
+            <div>
+              <label>Numéro</label>
+              <input id="clientPhone" placeholder="Ex : 0632354272" />
+            </div>
+          </div>
+          <div class="quick-actions">
+            <button class="primary" id="addClientBtn">Ajouter le client</button>
+          </div>
+          <div id="addClientResult" class="nice-result hidden"></div>
+        </div>
+
+        <div class="card">
           <h2>Importer contacts</h2>
-          <label>Colle des numéros, un par ligne ou séparés par virgule/point-virgule</label>
-          <textarea id="importNumbers" rows="7" placeholder="0652336461\n06 52 33 64 61\n+33712345678"></textarea>
+          <label>Colle des numéros, un par ligne. Tu peux aussi mettre : Nom ; Numéro</label>
+          <textarea id="importNumbers" rows="7" placeholder="Kevin ; 0632354272\nClient Perpignan ; 0652336461\n+33712345678"></textarea>
           <div class="quick-actions">
             <button class="primary" id="importBtn">Importer dans D1</button>
             <button class="secondary" id="clearImportBtn">Vider</button>
           </div>
-          <div id="importResult" class="result-box hidden"></div>
+          <div id="importResult" class="nice-result hidden"></div>
         </div>
 
         <div class="card">
@@ -126,7 +144,7 @@
               <option value="all">Tous</option>
             </select>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>Numéro</th><th>Statut</th><th>Envoyés</th><th>Erreur</th><th>Action</th></tr></thead><tbody id="clientsTable"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Nom</th><th>Numéro</th><th>Statut</th><th>Envoyés</th><th>Erreur</th><th>Action</th></tr></thead><tbody id="clientsTable"></tbody></table></div>
         </div>
       </section>
 
@@ -168,8 +186,18 @@
       </section>
     </main>
 
+
+    <div id="adnResultModal" class="adn-result-modal hidden" role="dialog" aria-modal="true">
+      <div class="adn-result-card">
+        <h2 id="adnResultTitle">Résultat</h2>
+        <p id="adnResultText"></p>
+        <div id="adnResultDetails" class="adn-result-details hidden"></div>
+        <button id="adnResultClose" class="primary">OK</button>
+      </div>
+    </div>
+
     <div id="toast" class="toast hidden"></div>
   </div>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
