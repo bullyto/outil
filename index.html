@@ -1,179 +1,871 @@
 <!doctype html>
-<html lang="fr" dir="ltr">
+<html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Outils internes ADN66 — Apéro de Nuit 66</title>
-  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>Outils ADN66 — Apéro de Nuit 66</title>
   <meta name="theme-color" content="#5db7ee" />
+  <meta name="robots" content="noindex,nofollow" />
   <link rel="icon" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-  <link rel="stylesheet" href="./shared/charte.css">
-  <link rel="stylesheet" href="./shared/menu.css">
+
   <style>
     :root{
-      --night:#0b1c2d;--night2:#071421;--night3:#050b12;--sky:#5db7ee;--sky2:#9bddff;
-      --txt:rgba(255,255,255,.94);--muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.55);
-      --stroke:rgba(255,255,255,.12);--strokeBlue:rgba(93,183,238,.34);--radius:24px;
+      --primary:#5db7ee;
+      --bg:#0b1220;
+      --bg-deep:#070b12;
+      --bg-mid:#111827;
+      --bg-soft:#1f2937;
+      --card:#111827;
+      --card-2:#172033;
+      --input:#0f172a;
+      --border:#283447;
+      --text:#f8fafc;
+      --text-soft:#cbd5e1;
+      --text-muted:#94a3b8;
+      --success:#16a34a;
+      --success-soft:#86efac;
+      --danger:#dc2626;
+      --danger-soft:#fecaca;
+      --radius-xl:26px;
+      --radius-lg:20px;
+      --radius-md:16px;
+      --shadow:0 18px 40px rgba(0,0,0,.35);
     }
+
     *{box-sizing:border-box}
-    html,body{min-height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--txt);background:radial-gradient(900px 520px at 50% -8%,rgba(93,183,238,.26),transparent 58%),radial-gradient(760px 520px at 100% 18%,rgba(255,255,255,.08),transparent 60%),radial-gradient(920px 620px at 8% 84%,rgba(93,183,238,.13),transparent 64%),linear-gradient(180deg,var(--night),var(--night2) 48%,var(--night3));overflow-x:hidden;}
-    body::before{content:"";position:fixed;inset:-40%;z-index:-1;pointer-events:none;background:repeating-linear-gradient(115deg,rgba(255,255,255,.032) 0 1px,transparent 1px 42px);opacity:.34;transform:rotate(-4deg)}
-    .wrap{max-width:1120px;margin:0 auto;padding:18px 14px 30px}
-    .hero{display:flex;align-items:center;gap:15px;padding:18px;border-radius:28px;background:radial-gradient(380px 170px at 18% 10%,rgba(93,183,238,.24),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.16);box-shadow:0 24px 70px rgba(0,0,0,.42),0 0 0 1px rgba(93,183,238,.14) inset;backdrop-filter:blur(14px);position:relative;overflow:hidden}
-    .logo{width:64px;height:64px;border-radius:20px;flex:0 0 auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.20);display:grid;place-items:center;box-shadow:0 14px 34px rgba(0,0,0,.40),0 0 26px rgba(93,183,238,.38);overflow:hidden}
-    .logo img{width:100%;height:100%;object-fit:cover;display:block}
-    .eyebrow{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;margin-bottom:8px;border-radius:999px;border:1px solid rgba(93,183,238,.28);background:rgba(93,183,238,.12);color:rgba(255,255,255,.82);font-size:10px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}
-    .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--sky);box-shadow:0 0 16px var(--sky)}
-    h1{margin:0 0 6px;font-size:clamp(22px,5.5vw,34px);line-height:1.05;font-weight:950;color:#fff;text-shadow:0 10px 30px rgba(0,0,0,.35)}
-    h1 span{color:var(--sky)}
-    .hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.35;font-weight:750}
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:16px 0 12px}
-    .toolbar .hint{color:var(--muted2);font-size:12.5px;font-weight:800}
-    .installRoot{border:1px solid rgba(93,183,238,.40);background:#5db7ee;color:#fff;text-decoration:none;border-radius:16px;padding:11px 14px;font-weight:950;box-shadow:0 14px 32px rgba(93,183,238,.18)}
-    .grid{display:grid;grid-template-columns:1fr;gap:14px}
-    .toolCard{border-radius:var(--radius);background:radial-gradient(420px 170px at 18% 0%,rgba(93,183,238,.16),transparent 68%),linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 44px rgba(0,0,0,.35),0 0 0 1px rgba(93,183,238,.09) inset;backdrop-filter:blur(14px);overflow:hidden}
-    .toolOpen{text-decoration:none;color:inherit;display:grid;grid-template-columns:54px 1fr 32px;gap:13px;align-items:center;padding:16px}
-    .toolIcon{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(93,183,238,.24),rgba(93,183,238,.08));border:1px solid rgba(93,183,238,.30);font-size:24px;box-shadow:0 14px 30px rgba(0,0,0,.34),0 0 22px rgba(93,183,238,.14)}
-    .toolText{min-width:0} .toolText h3{margin:5px 0 6px;font-size:18px;line-height:1.12;font-weight:950;color:#fff} .toolText p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.35;font-weight:650}
-    .toolTag{display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(93,183,238,.12);border:1px solid rgba(93,183,238,.24);color:rgba(255,255,255,.82);font-size:10px;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
-    .chev{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;border:1px solid rgba(93,183,238,.24);background:rgba(93,183,238,.10);font-size:30px;line-height:1;color:#fff}
-    .toolActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px}
-    .openBtn,.installBtn{text-align:center;text-decoration:none;border-radius:16px;padding:12px 13px;font-weight:950}
-    .openBtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff}
-    .installBtn{background:#5db7ee;border:1px solid #5db7ee;color:#fff;box-shadow:0 12px 28px rgba(93,183,238,.20)}
-    footer{margin-top:18px;padding:10px 6px 4px;color:var(--muted2);font-size:12.5px;text-align:center;font-weight:700}
-    @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
-    @media(min-width:1040px){.grid{grid-template-columns:1fr 1fr 1fr}}
-    @media(max-width:430px){.wrap{padding:14px 12px 24px}.hero{padding:15px 14px}.logo{width:56px;height:56px;border-radius:18px}.toolOpen{grid-template-columns:48px 1fr 28px;padding:14px;gap:11px}.toolIcon{width:48px;height:48px;border-radius:16px}.toolText h3{font-size:16px}.toolText p{font-size:12.8px}}
+    html,body{margin:0;padding:0;min-height:100%}
+    html{scroll-behavior:smooth}
+
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top, rgba(93,183,238,.16) 0%, rgba(93,183,238,0) 28%),
+        linear-gradient(180deg,var(--bg-deep) 0%, var(--bg) 30%, var(--bg-mid) 72%, var(--bg-soft) 100%);
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size:24px 24px;
+      mask-image:linear-gradient(to bottom, rgba(0,0,0,.25), transparent 85%);
+      z-index:0;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      max-width:1180px;
+      margin:0 auto;
+      padding:18px 14px 40px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .brand-logo{
+      width:54px;
+      height:54px;
+      border-radius:18px;
+      overflow:hidden;
+      flex:0 0 auto;
+      background:linear-gradient(180deg, rgba(93,183,238,.18), rgba(93,183,238,.06));
+      border:1px solid rgba(93,183,238,.35);
+      box-shadow:0 0 0 1px rgba(255,255,255,.03) inset, 0 10px 30px rgba(0,0,0,.35);
+      display:grid;
+      place-items:center;
+    }
+
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .brand-text{min-width:0}
+    .brand-kicker{
+      margin:0 0 4px;
+      color:var(--primary);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+
+    .brand-title{
+      margin:0;
+      font-size:clamp(26px, 5vw, 42px);
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+
+    .brand-subtitle{
+      margin:8px 0 0;
+      color:var(--text-soft);
+      font-size:14px;
+      line-height:1.45;
+      max-width:760px;
+    }
+
+    .menu-float{
+      position:relative;
+      flex:0 0 auto;
+    }
+
+    .menu-toggle{
+      appearance:none;
+      border:1px solid var(--border);
+      background:rgba(17,24,39,.92);
+      color:var(--text);
+      border-radius:16px;
+      min-height:52px;
+      padding:0 16px;
+      font-size:15px;
+      font-weight:800;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      box-shadow:var(--shadow);
+    }
+
+    .menu-toggle:hover{
+      border-color:rgba(93,183,238,.45);
+    }
+
+    .menu-toggle .burger{
+      display:inline-grid;
+      gap:4px;
+    }
+
+    .menu-toggle .burger span{
+      width:16px;
+      height:2px;
+      border-radius:999px;
+      background:var(--text);
+      display:block;
+    }
+
+    .menu-dropdown{
+      position:absolute;
+      top:calc(100% + 10px);
+      right:0;
+      width:min(320px, calc(100vw - 28px));
+      background:rgba(17,24,39,.98);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:10px;
+      box-shadow:0 30px 60px rgba(0,0,0,.45);
+      display:none;
+    }
+
+    .menu-dropdown.open{display:block}
+
+    .menu-dropdown-title{
+      padding:10px 12px 8px;
+      font-size:12px;
+      color:var(--text-muted);
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .menu-link{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      width:100%;
+      text-decoration:none;
+      color:var(--text);
+      padding:12px;
+      border-radius:16px;
+      border:1px solid transparent;
+      transition:.18s ease;
+    }
+
+    .menu-link:hover{
+      background:rgba(93,183,238,.08);
+      border-color:rgba(93,183,238,.18);
+    }
+
+    .menu-link-icon{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, rgba(93,183,238,.18), rgba(93,183,238,.08));
+      border:1px solid rgba(93,183,238,.20);
+      font-size:18px;
+      flex:0 0 auto;
+    }
+
+    .menu-link-text strong{
+      display:block;
+      font-size:15px;
+      line-height:1.1;
+      margin-bottom:3px;
+    }
+
+    .menu-link-text span{
+      color:var(--text-muted);
+      font-size:12px;
+      line-height:1.3;
+    }
+
+    .hero{
+      margin-top:14px;
+      background:
+        radial-gradient(circle at top left, rgba(93,183,238,.16), transparent 35%),
+        linear-gradient(180deg, rgba(17,24,39,.96), rgba(17,24,39,.90));
+      border:1px solid var(--border);
+      border-radius:30px;
+      padding:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(93,183,238,.12);
+      border:1px solid rgba(93,183,238,.24);
+      color:var(--text);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .hero-badge::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--primary);
+      box-shadow:0 0 10px var(--primary);
+    }
+
+    .hero-title{
+      margin:12px 0 8px;
+      font-size:clamp(28px, 5vw, 44px);
+      line-height:1.02;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+
+    .hero-desc{
+      margin:0;
+      max-width:760px;
+      color:var(--text-soft);
+      font-size:15px;
+      line-height:1.6;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:12px;
+      margin-top:18px;
+    }
+
+    .stat{
+      padding:16px;
+      border-radius:20px;
+      background:rgba(15,23,42,.82);
+      border:1px solid var(--border);
+      min-height:108px;
+    }
+
+    .stat-label{
+      color:var(--text-muted);
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      margin-bottom:10px;
+    }
+
+    .stat-value{
+      font-size:32px;
+      line-height:1;
+      font-weight:900;
+      margin-bottom:8px;
+      color:var(--text);
+    }
+
+    .stat-note{
+      color:var(--text-soft);
+      font-size:13px;
+      line-height:1.35;
+      font-weight:700;
+    }
+
+    .section{
+      margin-top:18px;
+    }
+
+    .section-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+
+    .section-title{
+      margin:0;
+      font-size:24px;
+      line-height:1.1;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+
+    .section-subtitle{
+      margin:6px 0 0;
+      color:var(--text-muted);
+      font-size:14px;
+      line-height:1.45;
+      font-weight:700;
+    }
+
+    .chips{
+      display:flex;
+      gap:10px;
+      overflow:auto;
+      padding-bottom:2px;
+      -ms-overflow-style:none;
+      scrollbar-width:none;
+    }
+
+    .chips::-webkit-scrollbar{display:none}
+
+    .chip{
+      text-decoration:none;
+      color:var(--text);
+      white-space:nowrap;
+      border-radius:999px;
+      padding:10px 14px;
+      background:rgba(17,24,39,.88);
+      border:1px solid var(--border);
+      font-size:14px;
+      font-weight:800;
+      transition:.18s ease;
+    }
+
+    .chip:hover{
+      border-color:rgba(93,183,238,.38);
+      background:rgba(93,183,238,.10);
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:14px;
+    }
+
+    .card{
+      background:
+        radial-gradient(circle at top left, rgba(93,183,238,.13), transparent 34%),
+        linear-gradient(180deg, rgba(17,24,39,.96), rgba(23,32,51,.94));
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      min-height:260px;
+      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .card:hover{
+      transform:translateY(-2px);
+      border-color:rgba(93,183,238,.36);
+      box-shadow:0 22px 44px rgba(0,0,0,.40);
+    }
+
+    .card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .card-icon{
+      width:60px;
+      height:60px;
+      border-radius:20px;
+      display:grid;
+      place-items:center;
+      font-size:26px;
+      background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
+      border:1px solid rgba(93,183,238,.24);
+      box-shadow:0 10px 24px rgba(0,0,0,.28);
+      flex:0 0 auto;
+    }
+
+    .card-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(93,183,238,.12);
+      border:1px solid rgba(93,183,238,.22);
+      color:var(--text);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .card h3{
+      margin:0 0 8px;
+      font-size:22px;
+      line-height:1.1;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+
+    .card p{
+      margin:0 0 16px;
+      color:var(--text-soft);
+      font-size:14px;
+      line-height:1.55;
+      font-weight:700;
+    }
+
+    .card ul{
+      margin:0 0 18px;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+    }
+
+    .card ul li{
+      display:flex;
+      gap:8px;
+      color:var(--text-muted);
+      font-size:13px;
+      line-height:1.4;
+      font-weight:700;
+    }
+
+    .card ul li::before{
+      content:"•";
+      color:var(--primary);
+      font-weight:900;
+    }
+
+    .card-footer{
+      margin-top:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .card-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:48px;
+      padding:0 18px;
+      border-radius:14px;
+      text-decoration:none;
+      background:var(--primary);
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      border:1px solid var(--primary);
+      box-shadow:0 10px 24px rgba(93,183,238,.22);
+    }
+
+    .card-link:hover{
+      filter:brightness(1.05);
+    }
+
+    .card-arrow{
+      color:var(--text-muted);
+      font-size:22px;
+      font-weight:700;
+    }
+
+    .footer{
+      margin-top:24px;
+      padding:18px 6px 6px;
+      text-align:center;
+      color:var(--text-muted);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .footer strong{
+      color:var(--text-soft);
+    }
+
+    @media (max-width: 1060px){
+      .cards{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .stats{grid-template-columns:repeat(2, minmax(0,1fr))}
+    }
+
+    @media (max-width: 720px){
+      .page{padding:14px 12px 32px}
+      .topbar{align-items:flex-start}
+      .brand-title{font-size:26px}
+      .brand-subtitle{font-size:13px}
+      .hero{padding:18px}
+      .hero-title{font-size:28px}
+      .stats{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr}
+      .card{min-height:auto}
+      .menu-toggle{min-height:48px;padding:0 14px}
+    }
   </style>
-  <script src="./shared/menu.js" defer></script>
 </head>
 <body>
-  <main class="wrap">
-    <header class="hero">
-      <div class="logo"><img src="./icons/icon-512.png" alt="Outil ADN66"></div>
-      <div>
-        <div class="eyebrow">Back-office sécurisé</div>
-        <h1>Outils <span>Apéro de Nuit 66</span></h1>
-        <p>Menu de départ officiel • accès aux modules • installation rapide de chaque outil.</p>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="./icons/icon-512.png" alt="Logo ADN66">
+        </div>
+        <div class="brand-text">
+          <p class="brand-kicker">Apéro de Nuit 66</p>
+          <h1 class="brand-title">Menu des outils</h1>
+          <p class="brand-subtitle">
+            Accès central à tous les modules internes ADN66 avec la charte graphique officielle :
+            sombre premium, bleu clair #5db7ee, mobile-first.
+          </p>
+        </div>
+      </div>
+
+      <div class="menu-float">
+        <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="quickMenu">
+          <span class="burger" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          Menu
+        </button>
+
+        <div class="menu-dropdown" id="quickMenu">
+          <div class="menu-dropdown-title">Accès rapide</div>
+
+          <a class="menu-link" href="./apps/PUSH/">
+            <div class="menu-link-icon">🔔</div>
+            <div class="menu-link-text">
+              <strong>PUSH</strong>
+              <span>Notifications et abonnés</span>
+            </div>
+          </a>
+
+          <a class="menu-link" href="./apps/apero/">
+            <div class="menu-link-icon">🍾</div>
+            <div class="menu-link-text">
+              <strong>Apéro</strong>
+              <span>Outil principal et calculs</span>
+            </div>
+          </a>
+
+          <a class="menu-link" href="./apps/fidel/">
+            <div class="menu-link-icon">🎁</div>
+            <div class="menu-link-text">
+              <strong>Fidélité</strong>
+              <span>Récompenses et avantages clients</span>
+            </div>
+          </a>
+
+          <a class="menu-link" href="./apps/gps/">
+            <div class="menu-link-icon">📍</div>
+            <div class="menu-link-text">
+              <strong>GPS</strong>
+              <span>Livraisons et localisation</span>
+            </div>
+          </a>
+
+          <a class="menu-link" href="./apps/status/">
+            <div class="menu-link-icon">📢</div>
+            <div class="menu-link-text">
+              <strong>Status</strong>
+              <span>Messages et états des sites</span>
+            </div>
+          </a>
+
+          <a class="menu-link" href="./apps/stock/">
+            <div class="menu-link-icon">📦</div>
+            <div class="menu-link-text">
+              <strong>Stock</strong>
+              <span>Produits, disponibilité, tarifs</span>
+            </div>
+          </a>
+
+          <a class="menu-link" href="./apps/twilio/">
+            <div class="menu-link-icon">💬</div>
+            <div class="menu-link-text">
+              <strong>Twilio SMS</strong>
+              <span>Campagnes, contacts, historique</span>
+            </div>
+          </a>
+        </div>
       </div>
     </header>
-    <div class="toolbar">
-      <div class="hint">Charte ADN66 : bleu clair #5db7ee • sombre premium • mobile-first.</div>
-      <a class="installRoot" href="#install">Installer le menu</a>
-    </div>
-    <section class="grid" aria-label="Outils ADN66">
-      
-      <article class="toolCard" data-key="PUSH">
-        <a class="toolOpen" href="./apps/PUSH/" aria-label="Ouvrir Notifications PUSH">
-          <div class="toolIcon">🔔</div>
-          <div class="toolText">
-            <span class="toolTag">Notifications</span>
-            <h3>Notifications PUSH</h3>
-            <p>Envoi instantané, programmation et gestion des abonnés web push.</p>
-          </div>
-          <div class="chev">›</div>
-        </a>
-        <div class="toolActions">
-          <a class="openBtn" href="./apps/PUSH/">Ouvrir</a>
-          <a class="installBtn" href="./apps/PUSH/#install">Installer</a>
+
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="hero-badge">Back-office sécurisé ADN66</div>
+          <h2 class="hero-title">Tous les outils internes sur une seule page</h2>
+          <p class="hero-desc">
+            Menu d’entrée repensé à zéro pour l’écosystème Apéro de Nuit 66.
+            Interface propre, moderne, lisible sur mobile, avec accès direct à tous les modules
+            sans bouton d’installation ni téléchargement.
+          </p>
         </div>
-      </article>
-      <article class="toolCard" data-key="apero">
-        <a class="toolOpen" href="./apps/apero/" aria-label="Ouvrir Apéro / Calculateur">
-          <div class="toolIcon">🍾</div>
-          <div class="toolText">
-            <span class="toolTag">Outil</span>
-            <h3>Apéro / Calculateur</h3>
-            <p>Outil Apéro de Nuit : calculs rapides, accès interne et commandes.</p>
-          </div>
-          <div class="chev">›</div>
-        </a>
-        <div class="toolActions">
-          <a class="openBtn" href="./apps/apero/">Ouvrir</a>
-          <a class="installBtn" href="./apps/apero/#install">Installer</a>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Modules</div>
+          <div class="stat-value">7</div>
+          <div class="stat-note">PUSH, Apéro, Fidélité, GPS, Status, Stock, Twilio.</div>
         </div>
-      </article>
-      <article class="toolCard" data-key="fidel">
-        <a class="toolOpen" href="./apps/fidel/" aria-label="Ouvrir Carte de fidélité">
-          <div class="toolIcon">🎁</div>
-          <div class="toolText">
-            <span class="toolTag">Clients</span>
-            <h3>Carte de fidélité</h3>
-            <p>Administration fidélité, QR codes, avantages et récompenses clients.</p>
-          </div>
-          <div class="chev">›</div>
-        </a>
-        <div class="toolActions">
-          <a class="openBtn" href="./apps/fidel/">Ouvrir</a>
-          <a class="installBtn" href="./apps/fidel/#install">Installer</a>
+
+        <div class="stat">
+          <div class="stat-label">Design</div>
+          <div class="stat-value">ADN66</div>
+          <div class="stat-note">Palette sombre premium avec bleu clair officiel #5db7ee.</div>
         </div>
-      </article>
-      <article class="toolCard" data-key="gps">
-        <a class="toolOpen" href="./apps/gps/" aria-label="Ouvrir GPS Apéro 66">
-          <div class="toolIcon">📍</div>
-          <div class="toolText">
-            <span class="toolTag">Livraison</span>
-            <h3>GPS Apéro 66</h3>
-            <p>Suivi, localisation et outils terrain pour les livraisons.</p>
-          </div>
-          <div class="chev">›</div>
-        </a>
-        <div class="toolActions">
-          <a class="openBtn" href="./apps/gps/">Ouvrir</a>
-          <a class="installBtn" href="./apps/gps/#install">Installer</a>
+
+        <div class="stat">
+          <div class="stat-label">Utilisation</div>
+          <div class="stat-value">Mobile</div>
+          <div class="stat-note">Pensé d’abord pour téléphone, puis tablette et desktop.</div>
         </div>
-      </article>
-      <article class="toolCard" data-key="status">
-        <a class="toolOpen" href="./apps/status/" aria-label="Ouvrir Status sites">
-          <div class="toolIcon">📢</div>
-          <div class="toolText">
-            <span class="toolTag">Pilotage</span>
-            <h3>Status sites</h3>
-            <p>Pilotage des messages, pop-ups et statuts affichés sur les sites.</p>
-          </div>
-          <div class="chev">›</div>
-        </a>
-        <div class="toolActions">
-          <a class="openBtn" href="./apps/status/">Ouvrir</a>
-          <a class="installBtn" href="./apps/status/#install">Installer</a>
+
+        <div class="stat">
+          <div class="stat-label">Accès</div>
+          <div class="stat-value">Direct</div>
+          <div class="stat-note">Un clic pour ouvrir chaque outil, sans écran inutile.</div>
         </div>
-      </article>
-      <article class="toolCard" data-key="stock">
-        <a class="toolOpen" href="./apps/stock/" aria-label="Ouvrir Stock véhicule">
-          <div class="toolIcon">📦</div>
-          <div class="toolText">
-            <span class="toolTag">Stock</span>
-            <h3>Stock véhicule</h3>
-            <p>Gestion stock, produits, tarifs et disponibilités véhicule.</p>
-          </div>
-          <div class="chev">›</div>
-        </a>
-        <div class="toolActions">
-          <a class="openBtn" href="./apps/stock/">Ouvrir</a>
-          <a class="installBtn" href="./apps/stock/#install">Installer</a>
-        </div>
-      </article>
-      <article class="toolCard" data-key="twilio">
-        <a class="toolOpen" href="./apps/twilio/" aria-label="Ouvrir Marketing SMS">
-          <div class="toolIcon">💬</div>
-          <div class="toolText">
-            <span class="toolTag">SMS</span>
-            <h3>Marketing SMS</h3>
-            <p>Campagnes SMS, contacts, estimation, solde Twilio et historique.</p>
-          </div>
-          <div class="chev">›</div>
-        </a>
-        <div class="toolActions">
-          <a class="openBtn" href="./apps/twilio/">Ouvrir</a>
-          <a class="installBtn" href="./apps/twilio/#install">Installer</a>
-        </div>
-      </article>
+      </div>
     </section>
-    <footer>ADN66 • Outils internes Apéro de Nuit 66®</footer>
+
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Raccourcis</h2>
+          <p class="section-subtitle">Navigation rapide entre tous les outils ADN66.</p>
+        </div>
+      </div>
+
+      <div class="chips">
+        <a class="chip" href="./apps/PUSH/">PUSH</a>
+        <a class="chip" href="./apps/apero/">Apéro</a>
+        <a class="chip" href="./apps/fidel/">Fidélité</a>
+        <a class="chip" href="./apps/gps/">GPS</a>
+        <a class="chip" href="./apps/status/">Status</a>
+        <a class="chip" href="./apps/stock/">Stock</a>
+        <a class="chip" href="./apps/twilio/">Twilio SMS</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Applications disponibles</h2>
+          <p class="section-subtitle">
+            Chaque carte ouvre directement son module. Aucune action d’installation n’est affichée.
+          </p>
+        </div>
+      </div>
+
+      <div class="cards">
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">🔔</div>
+            <div class="card-badge">Notifications</div>
+          </div>
+          <h3>PUSH</h3>
+          <p>Gestion des notifications push, de la diffusion instantanée et des abonnés web.</p>
+          <ul>
+            <li>Envoi rapide</li>
+            <li>Campagnes push</li>
+            <li>Gestion des abonnés</li>
+          </ul>
+          <div class="card-footer">
+            <a class="card-link" href="./apps/PUSH/">Ouvrir</a>
+            <div class="card-arrow">→</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">🍾</div>
+            <div class="card-badge">Outil principal</div>
+          </div>
+          <h3>Apéro</h3>
+          <p>Accès au cœur de l’outil Apéro de Nuit avec les fonctions internes essentielles.</p>
+          <ul>
+            <li>Calculs et outils rapides</li>
+            <li>Accès central métier</li>
+            <li>Interface interne ADN66</li>
+          </ul>
+          <div class="card-footer">
+            <a class="card-link" href="./apps/apero/">Ouvrir</a>
+            <div class="card-arrow">→</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">🎁</div>
+            <div class="card-badge">Clients</div>
+          </div>
+          <h3>Fidélité</h3>
+          <p>Gestion de la fidélité client avec avantages, récompenses et administration dédiée.</p>
+          <ul>
+            <li>Carte de fidélité</li>
+            <li>Suivi des avantages</li>
+            <li>Gestion client</li>
+          </ul>
+          <div class="card-footer">
+            <a class="card-link" href="./apps/fidel/">Ouvrir</a>
+            <div class="card-arrow">→</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">📍</div>
+            <div class="card-badge">Livraison</div>
+          </div>
+          <h3>GPS</h3>
+          <p>Outils terrain pour les trajets, la localisation et l’organisation des livraisons.</p>
+          <ul>
+            <li>Positionnement</li>
+            <li>Support tournée</li>
+            <li>Usage mobile terrain</li>
+          </ul>
+          <div class="card-footer">
+            <a class="card-link" href="./apps/gps/">Ouvrir</a>
+            <div class="card-arrow">→</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">📢</div>
+            <div class="card-badge">Pilotage</div>
+          </div>
+          <h3>Status</h3>
+          <p>Pilotage des statuts, annonces et messages visibles sur les différents sites.</p>
+          <ul>
+            <li>Pop-ups et états</li>
+            <li>Messages dynamiques</li>
+            <li>Contrôle centralisé</li>
+          </ul>
+          <div class="card-footer">
+            <a class="card-link" href="./apps/status/">Ouvrir</a>
+            <div class="card-arrow">→</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">📦</div>
+            <div class="card-badge">Stock</div>
+          </div>
+          <h3>Stock</h3>
+          <p>Gestion des produits, disponibilité, tarifs et suivi opérationnel du stock.</p>
+          <ul>
+            <li>Gestion produits</li>
+            <li>Disponibilités</li>
+            <li>Suivi interne</li>
+          </ul>
+          <div class="card-footer">
+            <a class="card-link" href="./apps/stock/">Ouvrir</a>
+            <div class="card-arrow">→</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-top">
+            <div class="card-icon">💬</div>
+            <div class="card-badge">SMS</div>
+          </div>
+          <h3>Twilio / Marketing SMS</h3>
+          <p>Module marketing SMS pour campagnes, contacts, estimation, historique et suivi.</p>
+          <ul>
+            <li>Campagnes SMS</li>
+            <li>Gestion des contacts</li>
+            <li>Suivi et historique</li>
+          </ul>
+          <div class="card-footer">
+            <a class="card-link" href="./apps/twilio/">Ouvrir</a>
+            <div class="card-arrow">→</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <strong>Apéro de Nuit 66®</strong> — Menu officiel des outils internes ADN66
+    </footer>
   </main>
+
+  <script>
+    const toggle = document.getElementById('menuToggle');
+    const dropdown = document.getElementById('quickMenu');
+
+    toggle.addEventListener('click', () => {
+      const isOpen = dropdown.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.menu-float')) {
+        dropdown.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  </script>
 </body>
 </html>
