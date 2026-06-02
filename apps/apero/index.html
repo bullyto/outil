@@ -2,42 +2,442 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#0b0f14" />
-  <title>Calculateur TTC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>Calculateur courses Metro HT • Apéro de Nuit 66</title>
 
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" type="image/png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="icon" href="icon-512.png" sizes="512x512" type="image/png" />
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../../shared/menu.css">
+  <script src="../../shared/menu.js" defer></script>
 
   <style>
-    /* ===== ADN66 – CHARTE OFFICIELLE OUTILS INTERNES (DARK PREMIUM) =====
-       Bleu = actions | Vert = OK | Jaune = warning | Rouge = danger
-       (pas de violet, pas de vert flashy en dehors de OK)
-    */
-    .bg-neon {
+    :root {
+      --bg:#0b1220;
+      --bg2:#070b12;
+      --bg3:#111827;
+      --card:#111827;
+      --card2:#172033;
+      --input:#0f172a;
+      --border:#283447;
+      --border2:rgba(93,183,238,.32);
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --soft:#94a3b8;
+      --blue:#5db7ee;
+      --blue2:#8ed4ff;
+      --green:#16a34a;
+      --greenText:#86efac;
+      --red:#dc2626;
+      --redText:#fecaca;
+      --shadow:0 22px 70px rgba(0,0,0,.42);
+      --radius:22px;
+      --radius2:16px;
+    }
+
+    * { box-sizing:border-box; }
+    html, body { min-height:100%; }
+    body {
+      margin:0;
+      color:var(--text);
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       background:
-        radial-gradient(900px 500px at 15% 10%, rgba(56,189,248,.22), transparent 60%),
-        radial-gradient(900px 520px at 85% 18%, rgba(34,197,94,.12), transparent 58%),
-        linear-gradient(180deg, #050914 0%, #0b0f14 42%, #0b0f14 100%);
+        radial-gradient(900px 460px at 12% 0%, rgba(93,183,238,.18), transparent 62%),
+        radial-gradient(760px 420px at 92% 6%, rgba(93,183,238,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg2) 0%, var(--bg) 42%, #0a101b 100%);
     }
-    .glass {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      backdrop-filter: blur(10px);
+
+    button, input { font:inherit; }
+    button { cursor:pointer; }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    .app-shell { width:min(1180px,100%); margin:0 auto; padding:16px 14px 38px; }
+
+    .hero {
+      position:sticky;
+      top:0;
+      z-index:40;
+      margin:-16px -14px 16px;
+      padding:14px 14px 12px;
+      background:linear-gradient(180deg, rgba(11,18,32,.96), rgba(11,18,32,.78));
+      border-bottom:1px solid rgba(40,52,71,.95);
+      backdrop-filter:blur(14px);
     }
-    .ring-neon {
-      box-shadow: 0 0 0 1px rgba(56,189,248,.18), 0 0 40px rgba(0,0,0,.60);
+    .hero-inner {
+      width:min(1180px,100%);
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
     }
-    .btn {
-      transition: transform .08s ease, box-shadow .12s ease, background .12s ease;
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:13px;
+      min-width:0;
     }
-    .btn:active { transform: translateY(1px); }
-    @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+    .brand-logo {
+      width:54px;
+      height:54px;
+      object-fit:contain;
+      border-radius:18px;
+      background:#0f172a;
+      border:1px solid var(--border);
+      box-shadow:0 12px 28px rgba(0,0,0,.38);
+      padding:4px;
+    }
+    .eyebrow {
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(93,183,238,.12);
+      border:1px solid rgba(93,183,238,.28);
+      color:var(--blue2);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.25px;
+      text-transform:uppercase;
+    }
+    h1 {
+      margin:7px 0 0;
+      font-size:clamp(22px,4.6vw,36px);
+      line-height:1.02;
+      letter-spacing:-.8px;
+      font-weight:1000;
+    }
+    .subtitle {
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .total-card {
+      min-width:190px;
+      padding:12px 14px;
+      border-radius:20px;
+      background:linear-gradient(180deg, rgba(17,24,39,.95), rgba(15,23,42,.9));
+      border:1px solid var(--border2);
+      box-shadow:0 16px 42px rgba(0,0,0,.35);
+      text-align:right;
+    }
+    .total-label { color:var(--soft); font-size:12px; font-weight:800; }
+    .total-value { margin-top:4px; font-size:27px; font-weight:1000; color:var(--blue2); letter-spacing:-.5px; }
+
+    .grid {
+      display:grid;
+      grid-template-columns:minmax(0, .95fr) minmax(0, 1.35fr);
+      gap:16px;
+      align-items:start;
+    }
+    .card {
+      background:linear-gradient(180deg, rgba(17,24,39,.92), rgba(17,24,39,.78));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card-head {
+      padding:16px 16px 0;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+    }
+    .card-title { margin:0; font-size:17px; font-weight:1000; letter-spacing:-.2px; }
+    .card-sub { margin:5px 0 0; color:var(--soft); font-size:12.5px; line-height:1.35; }
+    .card-body { padding:16px; }
+
+    .mode-tabs {
+      display:flex;
+      gap:10px;
+      padding:6px;
+      border-radius:18px;
+      background:rgba(15,23,42,.82);
+      border:1px solid var(--border);
+      margin-bottom:14px;
+    }
+    .mode-tabs button,
+    #modeAlcohol,
+    #modeSoda {
+      flex:1;
+      border:1px solid transparent !important;
+      border-radius:14px !important;
+      padding:11px 12px !important;
+      color:var(--muted) !important;
+      background:transparent !important;
+      font-weight:1000 !important;
+      font-size:14px !important;
+      box-shadow:none !important;
+      transition:transform .08s ease, background .15s ease, border-color .15s ease;
+    }
+    #modeAlcohol:first-child,
+    #modeSoda:first-child { margin:0; }
+    .mode-tabs button:hover,
+    .mode-tabs .tab-active {
+      background:var(--blue) !important;
+      border-color:rgba(93,183,238,.72) !important;
+      color:#fff !important;
+      box-shadow:0 12px 28px rgba(93,183,238,.14) !important;
+    }
+    .mode-tabs .tab-inactive {
+      background:transparent !important;
+      border-color:transparent !important;
+      color:var(--muted) !important;
+    }
+
+    .form-grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:13px;
+    }
+    .field { display:flex; flex-direction:column; gap:8px; }
+    .field.full { grid-column:1/-1; }
+    label {
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.15px;
+    }
+    input {
+      width:100%;
+      border:1px solid var(--border);
+      background:var(--input);
+      color:var(--text);
+      padding:14px 14px;
+      border-radius:16px;
+      outline:none;
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    input::placeholder { color:rgba(148,163,184,.72); }
+    input:focus {
+      border-color:rgba(93,183,238,.62);
+      box-shadow:0 0 0 4px rgba(93,183,238,.12);
+      background:#0b1424;
+    }
+
+    .actions-row {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:15px;
+    }
+    .btn, button {
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:13px 14px;
+      font-weight:1000;
+      color:var(--text);
+      background:rgba(148,163,184,.08);
+      transition:transform .08s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+    .btn:active, button:active { transform:translateY(1px); }
+    .btn-primary, #addBtn {
+      background:var(--blue) !important;
+      border-color:rgba(93,183,238,.72) !important;
+      color:#fff !important;
+      box-shadow:0 16px 30px rgba(93,183,238,.16);
+    }
+    .btn-soft, #undoBtn, #scanBtn, #scanStop, #scanTorch, #scanClose, #cartonClose, #cartonCancel {
+      background:rgba(148,163,184,.08) !important;
+      border-color:var(--border) !important;
+      color:var(--text) !important;
+    }
+    .btn-danger, #clearBtn {
+      background:rgba(220,38,38,.16) !important;
+      border-color:rgba(220,38,38,.38) !important;
+      color:var(--redText) !important;
+    }
+    .btn-ok, #scanManualBtn, #cartonValidate {
+      background:rgba(22,163,74,.18) !important;
+      border-color:rgba(22,163,74,.42) !important;
+      color:var(--greenText) !important;
+    }
+
+    .mini-note {
+      margin-top:14px;
+      padding:12px 13px;
+      border-radius:16px;
+      background:rgba(15,23,42,.62);
+      border:1px solid var(--border);
+      color:var(--soft);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .summary-band {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .stat {
+      padding:12px;
+      border-radius:18px;
+      background:rgba(15,23,42,.7);
+      border:1px solid var(--border);
+    }
+    .stat span { color:var(--soft); font-size:11px; font-weight:900; text-transform:uppercase; }
+    .stat strong { display:block; margin-top:4px; font-size:18px; color:var(--text); }
+
+    .table-wrap {
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:rgba(15,23,42,.44);
+    }
+    table {
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+      font-size:13px;
+    }
+    thead { background:rgba(93,183,238,.12); }
+    th {
+      padding:13px 12px;
+      text-align:right;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:1000;
+      text-transform:uppercase;
+      letter-spacing:.25px;
+      border-bottom:1px solid var(--border);
+      white-space:nowrap;
+    }
+    th:first-child { text-align:left; }
+    td {
+      padding:13px 12px;
+      text-align:right;
+      border-bottom:1px solid rgba(40,52,71,.72);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    td:first-child {
+      text-align:left;
+      color:var(--text);
+      font-weight:850;
+      white-space:normal;
+      max-width:310px;
+    }
+    tbody tr:hover { background:rgba(93,183,238,.055); }
+    tbody tr:last-child td { border-bottom:none; }
+
+    .empty-help {
+      margin-top:12px;
+      color:var(--soft);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .fixed { position:fixed; }
+    .inset-0 { inset:0; }
+    .z-50 { z-index:80; }
+    .hidden { display:none !important; }
+    .absolute { position:absolute; }
+    .relative { position:relative; }
+    .max-w-lg { max-width:540px; }
+    .w-full { width:100%; }
+    .p-4 { padding:16px; }
+    .bg-black\/70 { background:rgba(0,0,0,.70); }
+    .modal-center {
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    #scanModal > .absolute:nth-child(2),
+    #cartonModal > .absolute:nth-child(2) {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    #scanModal .glass,
+    #cartonModal .glass {
+      width:min(560px,100%);
+      max-height:calc(100vh - 28px);
+      overflow:auto;
+      background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(15,23,42,.96)) !important;
+      border:1px solid var(--border) !important;
+      border-radius:24px !important;
+      box-shadow:0 28px 80px rgba(0,0,0,.58) !important;
+      padding:16px !important;
+    }
+    #scanModal h3, #cartonModal h3 {
+      margin:0;
+      font-size:19px;
+      font-weight:1000;
+    }
+    #scanModal p, #cartonModal p {
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.35;
+    }
+    .flex { display:flex; }
+    .grid { display:grid; }
+    .items-start { align-items:flex-start; }
+    .justify-between { justify-content:space-between; }
+    .gap-3 { gap:12px; }
+    .mt-1 { margin-top:4px; }
+    .mt-4 { margin-top:16px; }
+    .rounded-2xl { border-radius:18px; }
+    .overflow-hidden { overflow:hidden; }
+    .border { border:1px solid var(--border); }
+    .bg-black\/20 { background:rgba(0,0,0,.20); }
+    video { width:100%; height:230px; object-fit:cover; display:block; background:#050914; }
+    #scanStatus {
+      padding:12px;
+      color:var(--muted);
+      font-size:13px;
+      border-top:1px solid var(--border);
+    }
+    #scanStart { display:none !important; }
+    .text-xs { font-size:12px; color:var(--soft); line-height:1.45; }
+    .text-sm { font-size:13px; color:var(--muted); line-height:1.4; }
+    .font-bold, .font-extrabold, .font-semibold { font-weight:900; }
+    .text-white\/90, .text-white\/80, .text-white\/75, .text-white\/70, .text-white\/60, .text-white\/55 { color:var(--muted); }
+    .px-4 { padding-left:14px; padding-right:14px; }
+    .py-3 { padding-top:12px; padding-bottom:12px; }
+    .py-2 { padding-top:9px; padding-bottom:9px; }
+    .px-3 { padding-left:11px; padding-right:11px; }
+    .h-52 { height:230px; }
+    .object-cover { object-fit:cover; }
+    .pointer-events-none { pointer-events:none; }
+    .place-items-center { place-items:center; }
+    .shadow-\[0_0_0_9999px_rgba\(0\,0\,0\,\.35\)\] { box-shadow:0 0 0 9999px rgba(0,0,0,.35); }
+    .border-2 { border:2px solid rgba(248,250,252,.78); }
+    .border-white\/70 { border-color:rgba(248,250,252,.78); }
+    .w-\[min\(78vw\,360px\)\] { width:min(78vw,360px); }
+    .h-28 { height:112px; }
+    .flex-wrap { flex-wrap:wrap; }
+    .sm\:grid-cols-3 { grid-template-columns:2fr 1fr; }
+    .sm\:grid-cols-2 { grid-template-columns:1fr 1fr; }
+    .sm\:col-span-2 { grid-column:span 2; }
+    .sm\:col-span-1 { grid-column:span 1; }
+    .items-end { align-items:flex-end; }
+
+    @media (max-width:820px) {
+      .hero-inner { align-items:flex-start; }
+      .total-card { min-width:150px; }
+      .grid { grid-template-columns:1fr; }
+    }
+    @media (max-width:560px) {
+      .app-shell { padding:12px 10px 28px; }
+      .hero { margin:-12px -10px 12px; padding:12px 10px; }
+      .hero-inner { flex-direction:column; }
+      .brand-logo { width:48px; height:48px; }
+      .total-card { width:100%; text-align:left; }
+      .form-grid, .actions-row, .summary-band, .sm\:grid-cols-3, .sm\:grid-cols-2 { grid-template-columns:1fr; }
+      .sm\:col-span-2, .sm\:col-span-1 { grid-column:auto; }
+      .mode-tabs { position:sticky; top:86px; z-index:5; }
+      .card-head { flex-direction:column; }
+    }
   </style>
 
   <script>
@@ -49,258 +449,169 @@
       });
     }
   </script>
-
-  <style>
-    /* UI épurée : masquage VISUEL uniquement (logique inchangée) */
-    .bg-white\/10.px-3.py-1.text-xs.font-semibold.tracking-wide { display:none !important; }
-    .mt-1.text-sm.text-white\/70 { display:none !important; }
-    .glass.rounded-2xl.px-4.py-3.text-sm { display:none !important; }
-    .mt-4.text-xs.text-white\/55 { display:none !important; }
-    footer.mt-8 { display:none !important; }
-  </style>
-
-  <style>
-    /* UI épurée : supprimer l'espace des cartes masquées (stockage/astuce) */
-    header .flex.flex-col.sm\:flex-row.gap-2.sm\:items-center { display:none !important; }
-  </style>
-
-  <style>
-    /* ✅ MAJ: plus besoin du bouton "Démarrer caméra" */
-    #scanStart { display:none !important; }
-  </style>
-
-  <link rel="stylesheet" href="../../shared/menu.css">
-  <script src="../../shared/menu.js" defer></script>
 </head>
 
-<body class="min-h-screen bg-neon text-white">
-  <div class="max-w-6xl mx-auto px-4 py-6">
-    <!-- Header -->
-    <header class="glass ring-neon rounded-3xl px-5 py-5 md:px-7 md:py-6">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div class="flex items-center gap-4">
-          <div class="shrink-0">
-            <img
-              src="https://static.wixstatic.com/media/bc6106_2760d0ad9fe847418ba1d73666102706~mv2.png/v1/fill/w_560,h_320,al_c,lg_1,q_85,enc_avif,quality_auto/apero%20de%20nuit%20n.png"
-              alt="Apéro de Nuit 66"
-              class="h-14 w-auto drop-shadow"
-              onerror="this.onerror=null;this.src='icon-192.png';"
-            />
-          </div>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-inner">
+        <div class="brand">
+          <img
+            src="https://static.wixstatic.com/media/bc6106_2760d0ad9fe847418ba1d73666102706~mv2.png/v1/fill/w_560,h_320,al_c,lg_1,q_85,enc_avif,quality_auto/apero%20de%20nuit%20n.png"
+            alt="Apéro de Nuit 66"
+            class="brand-logo"
+            onerror="this.onerror=null;this.src='icon-192.png';"
+          />
           <div>
-            <div class="flex items-center gap-2">
-              <span class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tracking-wide">
-                Apéro de Nuit 66 • PWA
-              </span>
-              <!-- ✅ Badge "info" : bleu (actions / info) -->
-              <span class="hidden sm:inline-flex items-center rounded-full bg-sky-400/15 px-3 py-1 text-xs font-semibold tracking-wide text-sky-200 border border-sky-300/20">
-                Calcul TTC + taxes
-              </span>
-            </div>
-            <h1 class="mt-2 text-xl md:text-2xl font-extrabold leading-tight">
-              Calculateur TTC
-            </h1>
-            <p class="mt-1 text-sm text-white/70">
-              Ajoute tes produits, vérifie TVA + CSS, et garde tout enregistré <span class="font-semibold text-white/80">en local</span> jusqu’à effacement.
-            </p>
+            <span class="eyebrow">Metro HT • Apéro de Nuit 66</span>
+            <h1>Calculateur courses HT</h1>
+            <p class="subtitle">Ajout produit, scanner article, calcul TVA, CSS alcool et total TTC. Données gardées en local.</p>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
-          <div class="glass rounded-2xl px-4 py-3 text-sm">
-            <div class="text-white/60">Stockage</div>
-            <div class="font-semibold">LocalStorage (persistant)</div>
-          </div>
-          <div class="glass rounded-2xl px-4 py-3 text-sm">
-            <div class="text-white/60">Astuce</div>
-            <div class="font-semibold">“Effacer tout” remet à zéro</div>
-          </div>
+        <div class="total-card">
+          <div class="total-label">Total général TTC</div>
+          <div class="total-value"><span id="grand-total">0,00 €</span></div>
         </div>
       </div>
     </header>
 
-    <!-- Main -->
-    <main class="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- Form card -->
-      <section class="lg:col-span-5 glass ring-neon rounded-3xl p-5 md:p-6">
-        <div class="mt-3 flex gap-2">
-          <button id="modeAlcohol" type="button"
-            class="px-4 py-2 rounded-2xl bg-white/15 hover:bg-white/20 border border-white/15 text-sm font-semibold">
-            Alcool
-          </button>
-          <button id="modeSoda" type="button"
-            class="px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold text-white/80">
-            Soda
-          </button>
-        </div>
-
-        <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="sm:col-span-2">
-            <label for="name" class="block text-xs font-semibold text-white/70">Nom du produit</label>
-            <input id="name" type="text"
-              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-              placeholder="Ex: Vodka 70 cl"
-            />
-          </div>
-
+    <main class="grid">
+      <section class="card">
+        <div class="card-head">
           <div>
-            <label for="price" class="block text-xs font-semibold text-white/70">Prix unitaire HT (€)</label>
-            <input id="price" type="number" step="0.01" inputmode="decimal"
-              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-              placeholder="Ex: 12.90"
-            />
-          </div>
-
-          <div id="volumeField">
-            <label for="volume" class="block text-xs font-semibold text-white/70">Volume (L)</label>
-            <input id="volume" type="number" step="0.01" inputmode="decimal"
-              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-              placeholder="Ex: 0.70"
-            />
-          </div>
-
-          <div id="degreeField">
-            <label for="degree" class="block text-xs font-semibold text-white/70">Degré (%)</label>
-            <input id="degree" type="number" step="0.1" inputmode="decimal"
-              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-              placeholder="Ex: 40"
-            />
-          </div>
-
-          <div>
-            <label for="quantity" class="block text-xs font-semibold text-white/70">Quantité</label>
-            <input id="quantity" type="number" step="1" inputmode="numeric"
-              class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-              placeholder="Ex: 6"
-            />
+            <h2 class="card-title">Ajouter une course Metro</h2>
+            <p class="card-sub">Choisis alcool ou soda, puis renseigne le prix HT et la quantité.</p>
           </div>
         </div>
 
-        <div class="mt-5 flex flex-col sm:flex-row gap-3">
-          <!-- 🔵 Action -->
-          <button id="addBtn"
-            class="btn flex-1 rounded-2xl bg-sky-400/20 hover:bg-sky-400/30 border border-sky-300/30 px-4 py-3 font-bold">
-            ➕ Ajouter
-          </button>
+        <div class="card-body">
+          <div class="mode-tabs" role="group" aria-label="Type de produit">
+            <button id="modeAlcohol" type="button">Alcool</button>
+            <button id="modeSoda" type="button">Soda</button>
+          </div>
 
-          <button id="undoBtn"
-            class="btn flex-1 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-3 font-semibold">
-            ↩️ Annuler
-          </button>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="name">Nom du produit</label>
+              <input id="name" type="text" placeholder="Ex : Vodka 70 cl" autocomplete="off" />
+            </div>
 
-          <!-- 🔴 Danger -->
-          <button id="clearBtn"
-            class="btn flex-1 rounded-2xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 px-4 py-3 font-semibold">
-            🗑️ Effacer tout
-          </button>
+            <div class="field">
+              <label for="price">Prix unitaire HT (€)</label>
+              <input id="price" type="number" step="0.01" inputmode="decimal" placeholder="Ex : 12.90" />
+            </div>
 
-          <!-- 🔵 Action (scanner) -->
-          <button id="scanBtn"
-            class="btn flex-1 rounded-2xl bg-sky-400/15 hover:bg-sky-400/25 border border-sky-300/25 px-4 py-3 font-semibold">
-            📷 Scanner article
-          </button>
-        </div>
+            <div class="field" id="volumeField">
+              <label for="volume">Volume (L)</label>
+              <input id="volume" type="number" step="0.01" inputmode="decimal" placeholder="Ex : 0.70" />
+            </div>
 
-        <div class="mt-4 text-xs text-white/55">
-          Les données sont stockées <span class="font-semibold text-white/70">sur ton appareil</span> (LocalStorage). Rien n’est envoyé sur internet.
+            <div class="field" id="degreeField">
+              <label for="degree">Degré (%)</label>
+              <input id="degree" type="number" step="0.1" inputmode="decimal" placeholder="Ex : 40" />
+            </div>
+
+            <div class="field">
+              <label for="quantity">Quantité</label>
+              <input id="quantity" type="number" step="1" inputmode="numeric" placeholder="Ex : 6" />
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button id="addBtn" class="btn btn-primary">➕ Ajouter</button>
+            <button id="scanBtn" class="btn btn-soft">📷 Scanner article</button>
+            <button id="undoBtn" class="btn btn-soft">↩️ Annuler</button>
+            <button id="clearBtn" class="btn btn-danger">🗑️ Effacer tout</button>
+          </div>
+
+          <div class="mini-note">
+            Le scanner garde la même logique : lecture code-barres, catalogue local, puis confirmation carton pour l’alcool.
+          </div>
         </div>
       </section>
 
-      <!-- Table card -->
-      <section class="lg:col-span-7 glass ring-neon rounded-3xl p-5 md:p-6">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+      <section class="card">
+        <div class="card-head">
           <div>
-            <h2 class="text-base font-bold tracking-wide text-white/90">Détail du calcul</h2>
-            <p class="mt-1 text-sm text-white/65">TVA HT, CSS, TVA CSS et total TTC.</p>
-          </div>
-
-          <div class="glass rounded-2xl px-4 py-3">
-            <div class="text-xs text-white/60">Total général TTC</div>
-            <div class="text-2xl font-extrabold tracking-tight">
-              <span id="grand-total">0.00</span>
-            </div>
+            <h2 class="card-title">Détail du calcul</h2>
+            <p class="card-sub">Total HT, TVA, CSS alcool, TVA CSS et total TTC par ligne.</p>
           </div>
         </div>
 
-        <div class="mt-5 overflow-x-auto rounded-2xl border border-white/10">
-          <table class="min-w-full text-sm">
-            <thead class="bg-white/5 text-white/80">
-              <tr>
-                <th class="px-4 py-3 text-left font-semibold">Produit</th>
-                <th class="px-4 py-3 text-right font-semibold">Total HT</th>
-                <th class="px-4 py-3 text-right font-semibold">TVA</th>
-                <th class="px-4 py-3 text-right font-semibold">CSS</th>
-                <th class="px-4 py-3 text-right font-semibold">TVA CSS</th>
-                <th class="px-4 py-3 text-right font-semibold">Total TTC</th>
-              </tr>
-            </thead>
-            <tbody id="product-table" class="divide-y divide-white/10 bg-black/10">
-              <!-- rows injected -->
-            </tbody>
-          </table>
-        </div>
+        <div class="card-body">
+          <div class="summary-band">
+            <div class="stat"><span>TVA classique</span><strong>20% / 5,5%</strong></div>
+            <div class="stat"><span>CSS alcool</span><strong>Auto</strong></div>
+            <div class="stat"><span>Sauvegarde</span><strong>Locale</strong></div>
+          </div>
 
-        <div class="mt-4 text-xs text-white/55">
-          💡 Conseil : si tu veux “repartir à zéro”, utilise <span class="font-semibold text-white/75">Effacer tout</span> (ça supprime aussi la sauvegarde locale).
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Produit</th>
+                  <th>Total HT</th>
+                  <th>TVA</th>
+                  <th>CSS</th>
+                  <th>TVA CSS</th>
+                  <th>Total TTC</th>
+                </tr>
+              </thead>
+              <tbody id="product-table"></tbody>
+            </table>
+          </div>
+
+          <div class="empty-help">
+            Astuce : “Effacer tout” remet à zéro le tableau et supprime la sauvegarde locale.
+          </div>
         </div>
       </section>
     </main>
-
-    <footer class="mt-8 pb-6 text-center text-xs text-white/45">
-      © Apéro de Nuit 66
-    </footer>
   </div>
 
   <!-- Modal scanner -->
   <div id="scanModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70"></div>
-    <div class="absolute inset-0 flex items-center justify-center p-4">
-      <div class="glass ring-neon w-full max-w-lg rounded-3xl p-5 md:p-6 relative">
+    <div class="absolute inset-0">
+      <div class="glass w-full max-w-lg">
         <div class="flex items-start justify-between gap-3">
           <div>
-            <h3 class="text-lg font-extrabold">Scanner article</h3>
-            <p class="mt-1 text-sm text-white/70">Vise le code-barres (si compatible) ou saisis-le. Bip + vibration à la détection.</p>
+            <h3>Scanner article</h3>
+            <p>Vise le code-barres ou saisis-le manuellement. Bip + vibration à la détection.</p>
           </div>
-          <button id="scanClose" class="btn rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-3 py-2 text-sm font-semibold">✖</button>
+          <button id="scanClose" class="btn btn-soft">✖</button>
         </div>
 
         <div class="mt-4 grid gap-3">
-          <div class="rounded-2xl overflow-hidden border border-white/10 bg-black/20">
+          <div class="rounded-2xl overflow-hidden border bg-black/20">
             <div class="relative">
               <video id="scanVideo" class="w-full h-52 object-cover" autoplay playsinline muted></video>
               <div class="pointer-events-none absolute inset-0 grid place-items-center">
                 <div class="w-[min(78vw,360px)] h-28 rounded-2xl border-2 border-white/70 shadow-[0_0_0_9999px_rgba(0,0,0,.35)]"></div>
               </div>
             </div>
-            <div class="px-4 py-3 text-sm text-white/75" id="scanStatus">Prêt.</div>
+            <div id="scanStatus">Prêt.</div>
           </div>
 
-          <div class="flex flex-wrap gap-2">
-            <!-- ✅ MAJ: scanStart caché par CSS, mais on le garde pour compat/debug -->
-            <button id="scanStart" class="btn rounded-2xl bg-sky-400/20 hover:bg-sky-400/30 border border-sky-300/30 px-4 py-2 font-bold text-sm">Démarrer caméra</button>
-            <button id="scanStop" class="btn rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-2 font-semibold text-sm" disabled>Stop</button>
-            <!-- 🔵 Flash = action (pas warning) -->
-            <button id="scanTorch" class="btn rounded-2xl bg-sky-400/15 hover:bg-sky-400/25 border border-sky-300/25 px-4 py-2 font-semibold text-sm" disabled>Flash</button>
+          <div class="flex flex-wrap gap-3">
+            <button id="scanStart" class="btn btn-primary">Démarrer caméra</button>
+            <button id="scanStop" class="btn btn-soft" disabled>Stop</button>
+            <button id="scanTorch" class="btn btn-soft" disabled>Flash</button>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="grid sm:grid-cols-3 gap-3">
             <div class="sm:col-span-2">
-              <label for="scanManual" class="block text-xs font-semibold text-white/70">Code-barres (saisie manuelle)</label>
-              <input id="scanManual" type="text" inputmode="numeric"
-                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-                placeholder="Ex: 2000000000007" />
+              <label for="scanManual">Code-barres manuel</label>
+              <input id="scanManual" type="text" inputmode="numeric" placeholder="Ex : 2000000000007" />
             </div>
             <div class="sm:col-span-1 flex items-end">
-              <!-- 🟢 Valider = OK -->
-              <button id="scanManualBtn"
-                class="btn w-full rounded-2xl bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-300/25 px-4 py-3 font-bold">
-                Valider
-              </button>
+              <button id="scanManualBtn" class="btn btn-ok w-full">Valider</button>
             </div>
           </div>
 
-          <div class="text-xs text-white/60">
-            ℹ️ Pour l’instant, ton “catalogue” de produits scannables est dans le code (jusqu’à 20 entrées). Les prix HT se mémorisent ensuite automatiquement via la pop-up.
+          <div class="text-xs">
+            Le catalogue reste dans le code. Les prix HT modifiés sont mémorisés en local par code-barres.
           </div>
         </div>
       </div>
@@ -310,75 +621,57 @@
   <!-- Modal confirmation carton alcool -->
   <div id="cartonModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70"></div>
-    <div class="absolute inset-0 flex items-center justify-center p-4">
-      <div class="glass ring-neon w-full max-w-lg rounded-3xl p-5 md:p-6 relative">
+    <div class="absolute inset-0">
+      <div class="glass w-full max-w-lg">
         <div class="flex items-start justify-between gap-3">
           <div>
-            <h3 class="text-lg font-extrabold">Confirmer le carton</h3>
-            <p class="mt-1 text-sm text-white/70">Ajuste les infos (mémorisé en local), puis valide pour l’ajout au calcul.</p>
+            <h3>Confirmer le carton</h3>
+            <p>Ajuste les infos, puis valide pour l’ajout au calcul.</p>
           </div>
-          <button id="cartonClose"
-            class="btn rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-3 py-2 text-sm font-semibold">✖</button>
+          <button id="cartonClose" class="btn btn-soft">✖</button>
         </div>
 
         <div class="mt-4 grid gap-3">
-          <div class="glass rounded-2xl p-4 border border-white/10">
-            <div class="text-xs text-white/60">Produit</div>
-            <div id="cartonName" class="mt-1 font-bold text-white/90">—</div>
-            <div id="cartonBarcode" class="mt-1 text-xs text-white/55">—</div>
+          <div class="stat">
+            <span>Produit</span>
+            <strong id="cartonName">—</strong>
+            <div id="cartonBarcode" class="text-xs">—</div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid sm:grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-semibold text-white/70">Prix HT du carton (€)</label>
-              <input id="cartonPriceHT" type="number" step="0.01" inputmode="decimal"
-                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-                placeholder="Ex: 45.84" />
+              <label>Prix HT du carton (€)</label>
+              <input id="cartonPriceHT" type="number" step="0.01" inputmode="decimal" placeholder="Ex : 45.84" />
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-white/70">Nombre de cartons</label>
-              <input id="cartonCartons" type="number" step="1" inputmode="numeric"
-                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-                value="1" />
+              <label>Nombre de cartons</label>
+              <input id="cartonCartons" type="number" step="1" inputmode="numeric" value="1" />
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-white/70">Bouteilles / carton</label>
-              <input id="cartonBottles" type="number" step="1" inputmode="numeric"
-                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-                placeholder="Ex: 6" />
+              <label>Bouteilles / carton</label>
+              <input id="cartonBottles" type="number" step="1" inputmode="numeric" placeholder="Ex : 6" />
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-white/70">Volume / bouteille (L)</label>
-              <input id="cartonVolume" type="number" step="0.01" inputmode="decimal"
-                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-                value="0.70" />
+              <label>Volume / bouteille (L)</label>
+              <input id="cartonVolume" type="number" step="0.01" inputmode="decimal" value="0.70" />
             </div>
 
             <div class="sm:col-span-2">
-              <label class="block text-xs font-semibold text-white/70">Degré (%)</label>
-              <input id="cartonDegree" type="number" step="0.1" inputmode="decimal"
-                class="mt-1 w-full rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/20"
-                placeholder="Ex: 37.5" />
+              <label>Degré (%)</label>
+              <input id="cartonDegree" type="number" step="0.1" inputmode="decimal" placeholder="Ex : 37.5" />
             </div>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-2">
-            <!-- 🟢 OK -->
-            <button id="cartonValidate"
-              class="btn flex-1 rounded-2xl bg-emerald-400/15 hover:bg-emerald-400/25 border border-emerald-300/25 px-4 py-3 font-bold">
-              ✅ Valider et ajouter
-            </button>
-            <button id="cartonCancel"
-              class="btn flex-1 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-3 font-semibold">
-              Annuler
-            </button>
+          <div class="actions-row">
+            <button id="cartonValidate" class="btn btn-ok">✅ Valider et ajouter</button>
+            <button id="cartonCancel" class="btn btn-soft">Annuler</button>
           </div>
 
-          <div class="text-xs text-white/60">
-            ℹ️ Les modifications (prix, colissage, degré, volume) sont enregistrées en local par code-barres.
+          <div class="text-xs">
+            Les modifications sont enregistrées en local par code-barres.
           </div>
         </div>
       </div>
@@ -400,8 +693,8 @@
       const bA = document.getElementById("modeAlcohol");
       const bS = document.getElementById("modeSoda");
 
-      const activeCls = "px-4 py-2 rounded-2xl bg-white/15 hover:bg-white/20 border border-white/15 text-sm font-semibold";
-      const inactiveCls = "px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-semibold text-white/80";
+      const activeCls = "tab-active";
+      const inactiveCls = "tab-inactive";
 
       if(currentMode === "soda"){
         if(vol) vol.style.display = "none";
