@@ -3,82 +3,117 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title> APERO DE NUIT 66 (V10.17)</title>
+  <title>Apéro GPS · Apéro de Nuit 66</title>
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#0b1220"/>
   <link rel="icon" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=117"/>
+  <link rel="stylesheet" href="styles.css?v=200"/>
   <link rel="stylesheet" href="../../shared/menu.css">
   <script src="../../shared/menu.js" defer></script>
 </head>
 <body>
   <header class="topbar">
-    <div class="topbar__title">
-      <img src="icon-192.png" class="topbar__logo" alt="logo"/>
-      <div>
-        <div class="h1"> APERO GPS </div>
-        <div class="sub">Optimisation par distance à la mairie • www.aperodenuit.com </div>
+    <div class="topbar__inner">
+      <div class="brandblock">
+        <img src="icon-192.png" class="topbar__logo" alt="Logo Apéro de Nuit 66"/>
+        <div class="brandblock__text">
+          <div class="eyebrow">Apéro de Nuit 66</div>
+          <h1 class="h1">Apéro GPS</h1>
+          <p class="sub">Optimisation des tournées • départ mairie ou véhicule • aperos.net</p>
+        </div>
       </div>
-    </div>
 
-    <div class="navtoggle" role="group" aria-label="Ouverture des adresses">
-      <button id="navWaze" class="segbtn" type="button">Waze</button>
-      <button id="navMaps" class="segbtn" type="button">Maps (piéton)</button>
+      <div class="navtoggle" role="group" aria-label="Ouverture des adresses">
+        <button id="navWaze" class="segbtn" type="button">Waze</button>
+        <button id="navMaps" class="segbtn" type="button">Maps piéton</button>
+      </div>
     </div>
   </header>
 
   <main class="wrap">
+    <section class="hero-card" aria-labelledby="gpsTitle">
+      <div class="hero-card__content">
+        <div class="hero-icon">GPS</div>
+        <div>
+          <h2 id="gpsTitle">Préparer une tournée proprement</h2>
+          <p>Ajoute les adresses, géocode-les, puis ouvre la navigation dans l’ordre le plus logique.</p>
+        </div>
+      </div>
+      <div class="hero-card__badge">Mobile first</div>
+    </section>
 
     <section class="vehicle">
+      <div class="section-title">
+        <span class="section-title__dot"></span>
+        <div>
+          <h2>Véhicule</h2>
+          <p>Enregistre la position du véhicule pour le retrouver rapidement.</p>
+        </div>
+      </div>
+
       <div class="vehicle__card">
         <div class="vehicle__actions">
-          <button id="btnSaveVehicle" class="btn btn-ghost" type="button">📍 Enregistrer véhicule</button>
-          <button id="btnFindVehicle" class="btn btn-ghost" type="button">🧭 Retrouver véhicule</button>
+          <button id="btnSaveVehicle" class="btn btn-secondary" type="button">📍 Enregistrer véhicule</button>
+          <button id="btnFindVehicle" class="btn btn-secondary" type="button">🧭 Retrouver véhicule</button>
         </div>
 
         <div class="startmode" role="group" aria-label="Point de départ">
-          <button id="btnStartMairie" class="segmini is-active" type="button">Point départ : Mairie</button>
-          <button id="btnStartVehicle" class="segmini" type="button">Point départ : Véhicule</button>
+          <button id="btnStartMairie" class="segmini is-active" type="button">Départ mairie</button>
+          <button id="btnStartVehicle" class="segmini" type="button">Départ véhicule</button>
         </div>
-        <div class="vehicle__hint" id="vehicleHint">
-          Véhicule non enregistré
-        </div>
+
+        <div class="vehicle__hint" id="vehicleHint">Véhicule non enregistré</div>
       </div>
     </section>
-    <section class="controls">
+
+    <section class="controls" aria-label="Contrôles GPS">
+      <div class="section-title section-title--compact">
+        <span class="section-title__dot"></span>
+        <div>
+          <h2>Adresses</h2>
+          <p>Sélectionne la ville, ajoute les stops, puis optimise.</p>
+        </div>
+      </div>
+
       <label class="field">
-        <span>Ville</span>
+        <span>Ville de référence</span>
         <select id="citySelect"></select>
       </label>
 
       <div class="btnrow">
-        <button id="btnOptimize" class="btn btn-primary">Optimiser (géocoder)</button>
-        <button id="btnAdd" class="btn">Ajouter une adresse</button>
-        <button id="btnExportTxt" class="btn">Exporter (TXT)</button>
+        <button id="btnOptimize" class="btn btn-primary" type="button">Optimiser la tournée</button>
+        <button id="btnAdd" class="btn" type="button">Ajouter une adresse</button>
+        <button id="btnExportTxt" class="btn btn-soft" type="button">Exporter TXT</button>
       </div>
 
-      <div class="status" id="status"></div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
     </section>
 
-    <section class="listwrap">
+    <section class="listwrap" aria-label="Liste des adresses">
       <div class="listhead">
-        <div id="cityMeta" class="citymeta"></div>
+        <div>
+          <div class="listhead__label">Tournée en cours</div>
+          <div id="cityMeta" class="citymeta"></div>
+        </div>
         <div class="legend">
-<span class="pill">✎ modifier • 🗑 supprimer</span>
+          <span class="pill">✎ modifier</span>
+          <span class="pill">🗑 supprimer</span>
         </div>
       </div>
       <ul id="addrList" class="addrlist"></ul>
     </section>
   </main>
 
-  <!-- Modal -->
   <div id="modalBackdrop" class="modal-backdrop hidden"></div>
   <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal__card">
       <div class="modal__head">
-        <div id="modalTitle" class="modal__title">Ajouter une adresse</div>
-        <button id="modalClose" class="iconbtn" aria-label="Fermer">✕</button>
+        <div>
+          <div class="modal__kicker">Nouvelle étape</div>
+          <div id="modalTitle" class="modal__title">Ajouter une adresse</div>
+        </div>
+        <button id="modalClose" class="iconbtn" type="button" aria-label="Fermer">✕</button>
       </div>
 
       <div class="modal__body">
@@ -88,24 +123,23 @@
         </label>
 
         <label class="field">
-          <span>Adresse (rue, numéro, etc.)</span>
+          <span>Adresse</span>
           <input id="modalStreet" type="text" placeholder="Ex : 17 rue des Eaux Vives" autocomplete="street-address"/>
         </label>
 
         <label class="field">
-          <span>Code postal (optionnel)</span>
+          <span>Code postal optionnel</span>
           <input id="modalPostcode" type="tel" inputmode="numeric" placeholder="66xxx" maxlength="5"/>
         </label>
 
         <div class="hint">
-          L’adresse est <b>géocodée immédiatement</b> et refusée si elle ne correspond pas au 66
-          (ou si elle est trop loin de la mairie de la ville sélectionnée).
+          L’adresse est <b>géocodée immédiatement</b>. Elle est refusée si elle ne correspond pas au 66 ou si elle est trop éloignée de la mairie sélectionnée.
         </div>
       </div>
 
       <div class="modal__foot">
-        <button id="modalSave" class="btn btn-primary">Enregistrer</button>
-        <button id="modalCancel" class="btn">Annuler</button>
+        <button id="modalSave" class="btn btn-primary" type="button">Enregistrer</button>
+        <button id="modalCancel" class="btn" type="button">Annuler</button>
       </div>
     </div>
   </div>
