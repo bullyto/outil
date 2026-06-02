@@ -3,612 +3,177 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
   <title>Outils internes ADN66 — Apéro de Nuit 66</title>
-
-  <!-- No index -->
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#050b12" />
+  <meta name="theme-color" content="#5db7ee" />
   <link rel="icon" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-
+  <link rel="stylesheet" href="./shared/charte.css">
+  <link rel="stylesheet" href="./shared/menu.css">
   <style>
     :root{
-      --night:#0b1c2d;
-      --night2:#071421;
-      --night3:#050b12;
-      --sky:#5db7ee;
-      --sky2:#9bddff;
-      --white:#ffffff;
-      --card:rgba(11,28,45,.78);
-      --card2:rgba(13,35,56,.92);
-      --stroke:rgba(255,255,255,.12);
-      --stroke2:rgba(93,183,238,.34);
-      --txt:rgba(255,255,255,.94);
-      --muted:rgba(255,255,255,.72);
-      --muted2:rgba(255,255,255,.54);
-      --glow:rgba(93,183,238,.38);
-      --glowStrong:rgba(93,183,238,.55);
-      --gold:#ffd36b;
-      --ok:#21d07a;
-      --warn:#ffcc33;
-      --danger:#ff4d4d;
-      --radius:24px;
+      --night:#0b1c2d;--night2:#071421;--night3:#050b12;--sky:#5db7ee;--sky2:#9bddff;
+      --txt:rgba(255,255,255,.94);--muted:rgba(255,255,255,.72);--muted2:rgba(255,255,255,.55);
+      --stroke:rgba(255,255,255,.12);--strokeBlue:rgba(93,183,238,.34);--radius:24px;
     }
-
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--txt);
-      background:
-        radial-gradient(900px 520px at 50% -8%, rgba(93,183,238,.26), transparent 58%),
-        radial-gradient(760px 520px at 100% 18%, rgba(255,255,255,.08), transparent 60%),
-        radial-gradient(920px 620px at 8% 84%, rgba(93,183,238,.13), transparent 64%),
-        linear-gradient(180deg, var(--night), var(--night2) 48%, var(--night3));
-      overflow-x:hidden;
-    }
-    body::before{
-      content:"";
-      position:fixed;
-      inset:-40%;
-      z-index:-1;
-      pointer-events:none;
-      background: repeating-linear-gradient(115deg, rgba(255,255,255,.032) 0 1px, transparent 1px 42px);
-      opacity:.34;
-      transform:rotate(-4deg);
-    }
-
-    .wrap{
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 20px 16px 30px;
-    }
-
-    .hero{
-      display:flex;
-      gap:15px;
-      align-items:center;
-      padding:18px 18px;
-      border-radius: 28px;
-      background:
-        radial-gradient(380px 170px at 18% 10%, rgba(93,183,238,.22), transparent 62%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow:
-        0 24px 70px rgba(0,0,0,.42),
-        0 0 0 1px rgba(93,183,238,.14) inset;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      position:relative;
-      overflow:hidden;
-      isolation:isolate;
-    }
-    .hero::before{
-      content:"";
-      position:absolute;
-      top:-60%;
-      left:-40%;
-      width:70%;
-      height:220%;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
-      transform:skewX(-22deg);
-      animation: heroShine 5.8s ease-in-out infinite;
-      opacity:.75;
-      pointer-events:none;
-      z-index:0;
-    }
-    @keyframes heroShine{
-      0%,54%{left:-70%; opacity:0}
-      63%{opacity:.85}
-      88%{left:120%; opacity:.55}
-      100%{left:120%; opacity:0}
-    }
-
-    .logo{
-      width:64px;
-      height:64px;
-      border-radius: 20px;
-      flex: 0 0 auto;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.20);
-      display:grid;
-      place-items:center;
-      box-shadow: 0 14px 34px rgba(0,0,0,.40), 0 0 26px var(--glow);
-      overflow:hidden;
-      position:relative;
-      z-index:1;
-    }
+    html,body{min-height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--txt);background:radial-gradient(900px 520px at 50% -8%,rgba(93,183,238,.26),transparent 58%),radial-gradient(760px 520px at 100% 18%,rgba(255,255,255,.08),transparent 60%),radial-gradient(920px 620px at 8% 84%,rgba(93,183,238,.13),transparent 64%),linear-gradient(180deg,var(--night),var(--night2) 48%,var(--night3));overflow-x:hidden;}
+    body::before{content:"";position:fixed;inset:-40%;z-index:-1;pointer-events:none;background:repeating-linear-gradient(115deg,rgba(255,255,255,.032) 0 1px,transparent 1px 42px);opacity:.34;transform:rotate(-4deg)}
+    .wrap{max-width:1120px;margin:0 auto;padding:18px 14px 30px}
+    .hero{display:flex;align-items:center;gap:15px;padding:18px;border-radius:28px;background:radial-gradient(380px 170px at 18% 10%,rgba(93,183,238,.24),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.16);box-shadow:0 24px 70px rgba(0,0,0,.42),0 0 0 1px rgba(93,183,238,.14) inset;backdrop-filter:blur(14px);position:relative;overflow:hidden}
+    .logo{width:64px;height:64px;border-radius:20px;flex:0 0 auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.20);display:grid;place-items:center;box-shadow:0 14px 34px rgba(0,0,0,.40),0 0 26px rgba(93,183,238,.38);overflow:hidden}
     .logo img{width:100%;height:100%;object-fit:cover;display:block}
-
-    .heroTxt{position:relative; z-index:1; min-width:0; flex:1;}
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:5px 9px;
-      margin-bottom:8px;
-      border-radius:999px;
-      border:1px solid rgba(93,183,238,.28);
-      background:rgba(93,183,238,.12);
-      color:rgba(255,255,255,.82);
-      font-size:10px;
-      font-weight:950;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-    }
-    .eyebrow::before{
-      content:"";
-      width:7px;height:7px;border-radius:50%;
-      background:var(--sky);
-      box-shadow:0 0 16px var(--sky);
-    }
-    .heroTitle{
-      font-weight: 950;
-      letter-spacing: .2px;
-      font-size: clamp(20px, 5vw, 30px);
-      line-height: 1.05;
-      margin:0 0 6px 0;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      color:#fff;
-      text-shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-    .heroTitle span{color:var(--sky2)}
-    .heroSub{
-      margin:0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.3;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      font-weight:700;
-    }
-
-    .grid{
-      margin-top:16px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-
-    .cardLink{
-      text-decoration:none;
-      color:inherit;
-      display:block;
-      border-radius: var(--radius);
-      background:
-        radial-gradient(420px 170px at 18% 0%, rgba(93,183,238,.15), transparent 68%),
-        linear-gradient(180deg, rgba(255,255,255,.085), rgba(255,255,255,.035));
-      border: 1px solid rgba(255,255,255,.12);
-      box-shadow:
-        0 18px 44px rgba(0,0,0,.35),
-        0 0 0 1px rgba(93,183,238,.09) inset;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      position:relative;
-      overflow:hidden;
-      transform: translateZ(0);
-      isolation:isolate;
-    }
-    .cardLink::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius:inherit;
-      border:1px solid rgba(93,183,238,.0);
-      pointer-events:none;
-      transition:border-color .18s ease, box-shadow .18s ease;
-      z-index:2;
-    }
-    .cardLink::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.10) 36%, transparent 58%);
-      transform:translateX(-115%);
-      opacity:.85;
-      pointer-events:none;
-      transition: transform .42s ease;
-      z-index:0;
-    }
-    .cardLink:active{ transform: scale(.992); }
-    .cardLink:hover::before{
-      border-color:rgba(93,183,238,.34);
-      box-shadow:0 0 34px rgba(93,183,238,.12) inset;
-    }
-    .cardLink:hover::after{ transform:translateX(115%); }
-
-    .cardInner{
-      padding: 16px 16px 15px;
-      display:flex;
-      gap: 14px;
-      align-items:flex-start;
-      position:relative;
-      z-index:1;
-    }
-
-    .badge{
-      width:50px; height:50px;
-      border-radius: 18px;
-      background:
-        radial-gradient(circle at 35% 25%, rgba(255,255,255,.20), transparent 36%),
-        linear-gradient(180deg, rgba(93,183,238,.22), rgba(93,183,238,.08));
-      border: 1px solid rgba(93,183,238,.30);
-      display:grid;
-      place-items:center;
-      flex: 0 0 auto;
-      box-shadow: 0 14px 30px rgba(0,0,0,.34), 0 0 22px rgba(93,183,238,.14);
-      overflow:hidden;
-    }
-    .badge svg{ width:24px; height:24px; opacity:.96; }
-
-    .cardTxt{min-width:0; flex:1}
-    .cardTitle{
-      margin:0 0 7px 0;
-      font-size: 18px;
-      font-weight: 950;
-      letter-spacing:.1px;
-      line-height:1.12;
-      color:#fff;
-    }
-    .cardDesc{
-      margin:0;
-      color: var(--muted);
-      font-size: 13.5px;
-      line-height: 1.35;
-      font-weight:650;
-    }
-    .toolTag{
-      display:inline-flex;
-      margin-top:10px;
-      padding:4px 8px;
-      border-radius:999px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      color:rgba(255,255,255,.68);
-      font-size:10px;
-      font-weight:950;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-
-    .chev{
-      flex:0 0 auto;
-      width: 30px;
-      height: 30px;
-      border-radius: 999px;
-      display:grid;
-      place-items:center;
-      border: 1px solid rgba(93,183,238,.24);
-      background: rgba(93,183,238,.10);
-      box-shadow: 0 10px 24px rgba(0,0,0,.22);
-      margin-top: 2px;
-    }
-    .chev svg{width:16px;height:16px; opacity:.95}
-
-    footer{
-      margin-top: 18px;
-      padding: 10px 6px 4px;
-      color: var(--muted2);
-      font-size: 12.5px;
-      text-align:center;
-      font-weight:700;
-    }
-
-    /* Fake loader (2.5s) */
-    .loader{
-      position:fixed;
-      inset:0;
-      z-index:9999;
-      display:grid;
-      place-items:center;
-      background:
-        radial-gradient(900px 600px at 50% 25%, rgba(93,183,238,.20), transparent 62%),
-        linear-gradient(180deg, var(--night), var(--night3));
-      transition: opacity .25s ease, visibility .25s ease;
-    }
-    .loader.hide{opacity:0;visibility:hidden;pointer-events:none}
-    .loaderCard{
-      width:min(420px, calc(100vw - 32px));
-      border-radius: 30px;
-      padding: 24px 18px 20px;
-      background:
-        radial-gradient(360px 180px at 50% 0%, rgba(93,183,238,.16), transparent 66%),
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
-      border: 1px solid rgba(255,255,255,.13);
-      box-shadow:
-        0 28px 80px rgba(0,0,0,.58),
-        0 0 0 1px rgba(93,183,238,.12) inset;
-      text-align:center;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .loaderLogo{
-      width: 102px;
-      height: 102px;
-      margin: 2px auto 14px;
-      border-radius: 30px;
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 20px 56px rgba(0,0,0,.48), 0 0 28px var(--glowStrong);
-      background: rgba(255,255,255,.08);
-      transform: translateZ(0);
-      animation: pop 900ms ease-in-out infinite alternate;
-    }
-    .loaderLogo img{width:100%;height:100%;object-fit:cover;display:block}
-    @keyframes pop{from{ transform: scale(.98); filter: saturate(1.05); } to{ transform: scale(1.02); filter: saturate(1.18); }}
-    .loaderTitle{
-      margin:0 0 6px 0;
-      font-weight: 950;
-      letter-spacing:.2px;
-      font-size: 18px;
-      color:#fff;
-    }
-    .loaderSub{
-      margin:0 0 14px 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-      font-weight:700;
-    }
-    .bar{
-      height: 11px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.10);
-      border: 1px solid rgba(255,255,255,.12);
-      overflow:hidden;
-      position:relative;
-      box-shadow: 0 10px 25px rgba(0,0,0,.25) inset;
-    }
-    .bar::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      width: 48%;
-      background: linear-gradient(90deg, rgba(93,183,238,.0), rgba(93,183,238,.78), rgba(255,255,255,.82), rgba(93,183,238,.0));
-      animation: sweep 950ms ease-in-out infinite;
-      filter: blur(.2px);
-    }
-    @keyframes sweep{from{ transform: translateX(-65%); } to{ transform: translateX(220%); }}
-
-    @media (min-width: 720px){.grid{ grid-template-columns: 1fr 1fr; }}
-    @media (max-width: 390px){
-      .wrap{padding:14px 12px 24px}
-      .hero{padding:15px 14px}
-      .logo{width:56px;height:56px;border-radius:18px}
-      .cardInner{padding:14px; gap:12px}
-      .badge{width:46px;height:46px;border-radius:16px}
-      .cardTitle{font-size:16px}
-      .cardDesc{font-size:12.8px}
-    }
+    .eyebrow{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;margin-bottom:8px;border-radius:999px;border:1px solid rgba(93,183,238,.28);background:rgba(93,183,238,.12);color:rgba(255,255,255,.82);font-size:10px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}
+    .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--sky);box-shadow:0 0 16px var(--sky)}
+    h1{margin:0 0 6px;font-size:clamp(22px,5.5vw,34px);line-height:1.05;font-weight:950;color:#fff;text-shadow:0 10px 30px rgba(0,0,0,.35)}
+    h1 span{color:var(--sky)}
+    .hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.35;font-weight:750}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:16px 0 12px}
+    .toolbar .hint{color:var(--muted2);font-size:12.5px;font-weight:800}
+    .installRoot{border:1px solid rgba(93,183,238,.40);background:#5db7ee;color:#fff;text-decoration:none;border-radius:16px;padding:11px 14px;font-weight:950;box-shadow:0 14px 32px rgba(93,183,238,.18)}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px}
+    .toolCard{border-radius:var(--radius);background:radial-gradient(420px 170px at 18% 0%,rgba(93,183,238,.16),transparent 68%),linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 44px rgba(0,0,0,.35),0 0 0 1px rgba(93,183,238,.09) inset;backdrop-filter:blur(14px);overflow:hidden}
+    .toolOpen{text-decoration:none;color:inherit;display:grid;grid-template-columns:54px 1fr 32px;gap:13px;align-items:center;padding:16px}
+    .toolIcon{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(93,183,238,.24),rgba(93,183,238,.08));border:1px solid rgba(93,183,238,.30);font-size:24px;box-shadow:0 14px 30px rgba(0,0,0,.34),0 0 22px rgba(93,183,238,.14)}
+    .toolText{min-width:0} .toolText h3{margin:5px 0 6px;font-size:18px;line-height:1.12;font-weight:950;color:#fff} .toolText p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.35;font-weight:650}
+    .toolTag{display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(93,183,238,.12);border:1px solid rgba(93,183,238,.24);color:rgba(255,255,255,.82);font-size:10px;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
+    .chev{width:32px;height:32px;border-radius:999px;display:grid;place-items:center;border:1px solid rgba(93,183,238,.24);background:rgba(93,183,238,.10);font-size:30px;line-height:1;color:#fff}
+    .toolActions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px}
+    .openBtn,.installBtn{text-align:center;text-decoration:none;border-radius:16px;padding:12px 13px;font-weight:950}
+    .openBtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff}
+    .installBtn{background:#5db7ee;border:1px solid #5db7ee;color:#fff;box-shadow:0 12px 28px rgba(93,183,238,.20)}
+    footer{margin-top:18px;padding:10px 6px 4px;color:var(--muted2);font-size:12.5px;text-align:center;font-weight:700}
+    @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1040px){.grid{grid-template-columns:1fr 1fr 1fr}}
+    @media(max-width:430px){.wrap{padding:14px 12px 24px}.hero{padding:15px 14px}.logo{width:56px;height:56px;border-radius:18px}.toolOpen{grid-template-columns:48px 1fr 28px;padding:14px;gap:11px}.toolIcon{width:48px;height:48px;border-radius:16px}.toolText h3{font-size:16px}.toolText p{font-size:12.8px}}
   </style>
-  <link rel="stylesheet" href="./shared/menu.css">
   <script src="./shared/menu.js" defer></script>
 </head>
-
 <body>
-  <!-- Fake loading screen (2.5s) -->
-  <div class="loader" id="fakeLoader" aria-hidden="true">
-    <div class="loaderCard" role="status" aria-live="polite">
-      <div class="loaderLogo">
-        <img src="./icons/icon-512.png" alt="Outil ADN66" />
-      </div>
-      <h1 class="loaderTitle">Outils ADN66</h1>
-      <p class="loaderSub">Chargement du back-office Apéro de Nuit 66®…</p>
-      <div class="bar"></div>
-    </div>
-  </div>
-
   <main class="wrap">
     <header class="hero">
-      <div class="logo">
-        <img src="./icons/icon-512.png" alt="Outil ADN66" />
-      </div>
-      <div class="heroTxt">
+      <div class="logo"><img src="./icons/icon-512.png" alt="Outil ADN66"></div>
+      <div>
         <div class="eyebrow">Back-office sécurisé</div>
-        <h2 class="heroTitle">Outils <span>ADN66</span></h2>
-        <p class="heroSub">Modules internes • gestion rapide • accès professionnel</p>
+        <h1>Outils <span>Apéro de Nuit 66</span></h1>
+        <p>Menu de départ officiel • accès aux modules • installation rapide de chaque outil.</p>
       </div>
     </header>
-
-    <section class="grid" aria-label="Outils">
-      <!-- Stock -->
-      <a class="cardLink" href="./apps/stock/" data-preload="./apps/stock/">
-        <div class="cardInner">
-          <div class="badge" aria-hidden="true">
-            <!-- boxes icon -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M4 7.5 12 3l8 4.5-8 4.5L4 7.5Z" stroke="white" opacity=".85" stroke-width="1.8" stroke-linejoin="round"/>
-              <path d="M4 7.5V16.5L12 21l8-4.5V7.5" stroke="white" opacity=".85" stroke-width="1.8" stroke-linejoin="round"/>
-              <path d="M12 12v9" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
+    <div class="toolbar">
+      <div class="hint">Charte ADN66 : bleu clair #5db7ee • sombre premium • mobile-first.</div>
+      <a class="installRoot" href="#install">Installer le menu</a>
+    </div>
+    <section class="grid" aria-label="Outils ADN66">
+      
+      <article class="toolCard" data-key="PUSH">
+        <a class="toolOpen" href="./apps/PUSH/" aria-label="Ouvrir Notifications PUSH">
+          <div class="toolIcon">🔔</div>
+          <div class="toolText">
+            <span class="toolTag">Notifications</span>
+            <h3>Notifications PUSH</h3>
+            <p>Envoi instantané, programmation et gestion des abonnés web push.</p>
           </div>
-          <div class="cardTxt">
-            <h3 class="cardTitle">Stock véhicule &amp; tarif</h3>
-            <p class="cardDesc">Catalogue interne + images + snapshot. Gestion stock/produits et tarifs.</p>
-            <span class="toolTag">Stock & tarifs</span>
-          </div>
-          <div class="chev" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <div class="chev">›</div>
+        </a>
+        <div class="toolActions">
+          <a class="openBtn" href="./apps/PUSH/">Ouvrir</a>
+          <a class="installBtn" href="./apps/PUSH/#install">Installer</a>
         </div>
-      </a>
-
-      <!-- Calculateur TTC (Apéro) -->
-      <a class="cardLink" href="./apps/apero/" data-preload="./apps/apero/">
-        <div class="cardInner">
-          <div class="badge" aria-hidden="true">
-            <!-- calculator icon -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" stroke="white" opacity=".85" stroke-width="1.8"/>
-              <path d="M8 7h8" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M8 11h2M12 11h2M16 11h0" stroke="white" opacity=".85" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M8 15h2M12 15h2M16 15h0" stroke="white" opacity=".85" stroke-width="2.2" stroke-linecap="round"/>
-            </svg>
+      </article>
+      <article class="toolCard" data-key="apero">
+        <a class="toolOpen" href="./apps/apero/" aria-label="Ouvrir Apéro / Calculateur">
+          <div class="toolIcon">🍾</div>
+          <div class="toolText">
+            <span class="toolTag">Outil</span>
+            <h3>Apéro / Calculateur</h3>
+            <p>Outil Apéro de Nuit : calculs rapides, accès interne et commandes.</p>
           </div>
-          <div class="cardTxt">
-            <h3 class="cardTitle">Calculateur TTC</h3>
-            <p class="cardDesc">Outil rapide pour calculs TTC / marges / conversions, usage interne.</p>
-            <span class="toolTag">Calcul rapide</span>
-          </div>
-          <div class="chev" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <div class="chev">›</div>
+        </a>
+        <div class="toolActions">
+          <a class="openBtn" href="./apps/apero/">Ouvrir</a>
+          <a class="installBtn" href="./apps/apero/#install">Installer</a>
         </div>
-      </a>
-
-      <!-- Status -->
-      <a class="cardLink" href="./apps/status/" data-preload="./apps/status/">
-        <div class="cardInner">
-          <div class="badge" aria-hidden="true">
-            <!-- window icon -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z" stroke="white" opacity=".85" stroke-width="1.8"/>
-              <path d="M4 8h16" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M7 6.5h.01M9.5 6.5h.01M12 6.5h.01" stroke="white" opacity=".85" stroke-width="3" stroke-linecap="round"/>
-            </svg>
+      </article>
+      <article class="toolCard" data-key="fidel">
+        <a class="toolOpen" href="./apps/fidel/" aria-label="Ouvrir Carte de fidélité">
+          <div class="toolIcon">🎁</div>
+          <div class="toolText">
+            <span class="toolTag">Clients</span>
+            <h3>Carte de fidélité</h3>
+            <p>Administration fidélité, QR codes, avantages et récompenses clients.</p>
           </div>
-          <div class="cardTxt">
-            <h3 class="cardTitle">Pop-up Status sites</h3>
-            <p class="cardDesc">Fenêtres de statut (messages, blocages, horaires) pilotées via status.json.</p>
-            <span class="toolTag">Sites & pop-up</span>
-          </div>
-          <div class="chev" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <div class="chev">›</div>
+        </a>
+        <div class="toolActions">
+          <a class="openBtn" href="./apps/fidel/">Ouvrir</a>
+          <a class="installBtn" href="./apps/fidel/#install">Installer</a>
         </div>
-      </a>
-
-
-      <!-- PUSH -->
-      <a class="cardLink" href="./apps/PUSH/" data-preload="./apps/PUSH/">
-        <div class="cardInner">
-          <div class="badge" aria-hidden="true">
-            <!-- bell icon -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M18 10a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" stroke="white" opacity=".85" stroke-width="1.8" stroke-linejoin="round"/>
-              <path d="M10 21a2 2 0 0 0 4 0" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M12 3V2" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
-            </svg>
+      </article>
+      <article class="toolCard" data-key="gps">
+        <a class="toolOpen" href="./apps/gps/" aria-label="Ouvrir GPS Apéro 66">
+          <div class="toolIcon">📍</div>
+          <div class="toolText">
+            <span class="toolTag">Livraison</span>
+            <h3>GPS Apéro 66</h3>
+            <p>Suivi, localisation et outils terrain pour les livraisons.</p>
           </div>
-          <div class="cardTxt">
-            <h3 class="cardTitle">Notifications PUSH</h3>
-            <p class="cardDesc">Envoi instantané, programmation automatique, images et abonnés web push.</p>
-            <span class="toolTag">Alertes & promos</span>
-          </div>
-          <div class="chev" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <div class="chev">›</div>
+        </a>
+        <div class="toolActions">
+          <a class="openBtn" href="./apps/gps/">Ouvrir</a>
+          <a class="installBtn" href="./apps/gps/#install">Installer</a>
         </div>
-      </a>
-
-      <!-- GPS -->
-      <a class="cardLink" href="./apps/gps/" data-preload="./apps/gps/">
-        <div class="cardInner">
-          <div class="badge" aria-hidden="true">
-            <!-- route icon -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M7 3v4a3 3 0 0 0 3 3h4a3 3 0 0 1 3 3v8" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M7 21v-4a3 3 0 0 1 3-3h4a3 3 0 0 0 3-3V3" stroke="white" opacity=".85" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M7 7h0M17 17h0" stroke="white" opacity=".85" stroke-width="3.2" stroke-linecap="round"/>
-            </svg>
+      </article>
+      <article class="toolCard" data-key="status">
+        <a class="toolOpen" href="./apps/status/" aria-label="Ouvrir Status sites">
+          <div class="toolIcon">📢</div>
+          <div class="toolText">
+            <span class="toolTag">Pilotage</span>
+            <h3>Status sites</h3>
+            <p>Pilotage des messages, pop-ups et statuts affichés sur les sites.</p>
           </div>
-          <div class="cardTxt">
-            <h3 class="cardTitle">Optimiseur de tournée prospection</h3>
-            <p class="cardDesc">Optimisation d’adresses et tournées commerciales (logistique terrain).</p>
-            <span class="toolTag">Terrain</span>
-          </div>
-          <div class="chev" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <div class="chev">›</div>
+        </a>
+        <div class="toolActions">
+          <a class="openBtn" href="./apps/status/">Ouvrir</a>
+          <a class="installBtn" href="./apps/status/#install">Installer</a>
         </div>
-      </a>
-
-      <!-- Fidélité (Admin) -->
-      <a class="cardLink" href="./apps/fidel/admin.html" data-preload="./apps/fidel/admin.html">
-        <div class="cardInner">
-          <div class="badge" aria-hidden="true">
-            <!-- qr icon -->
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 2h2v2h-2v-2Zm4-2h2v6h-6v-2h4v-4Z" stroke="white" opacity=".85" stroke-width="1.8" stroke-linejoin="round"/>
-              <path d="M14 14h2v2h-2v-2Z" fill="white" opacity=".7"/>
-            </svg>
+      </article>
+      <article class="toolCard" data-key="stock">
+        <a class="toolOpen" href="./apps/stock/" aria-label="Ouvrir Stock véhicule">
+          <div class="toolIcon">📦</div>
+          <div class="toolText">
+            <span class="toolTag">Stock</span>
+            <h3>Stock véhicule</h3>
+            <p>Gestion stock, produits, tarifs et disponibilités véhicule.</p>
           </div>
-          <div class="cardTxt">
-            <h3 class="cardTitle">Fidélité</h3>
-            <p class="cardDesc">Validation des cartes, recherche client et suivi des récompenses.</p>
-            <span class="toolTag">Admin / Livreur</span>
-          </div>
-          <div class="chev" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M9 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <div class="chev">›</div>
+        </a>
+        <div class="toolActions">
+          <a class="openBtn" href="./apps/stock/">Ouvrir</a>
+          <a class="installBtn" href="./apps/stock/#install">Installer</a>
         </div>
-      </a>
-
+      </article>
+      <article class="toolCard" data-key="twilio">
+        <a class="toolOpen" href="./apps/twilio/" aria-label="Ouvrir Marketing SMS">
+          <div class="toolIcon">💬</div>
+          <div class="toolText">
+            <span class="toolTag">SMS</span>
+            <h3>Marketing SMS</h3>
+            <p>Campagnes SMS, contacts, estimation, solde Twilio et historique.</p>
+          </div>
+          <div class="chev">›</div>
+        </a>
+        <div class="toolActions">
+          <a class="openBtn" href="./apps/twilio/">Ouvrir</a>
+          <a class="installBtn" href="./apps/twilio/#install">Installer</a>
+        </div>
+      </article>
     </section>
-
-    <footer>
-      Outils internes. L’entreprise Apéro de Nuit 66<span aria-hidden="true">®</span>
-    </footer>
+    <footer>ADN66 • Outils internes Apéro de Nuit 66®</footer>
   </main>
-
-  <script>
-    // Register SW
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js?v=20260517-marketing").catch(() => {}));
-    }
-
-    // Fake loader: keep visible ~2.5s, preload in background
-    (function () {
-      const loader = document.getElementById("fakeLoader");
-      const start = performance.now();
-
-      // Background preloading (best effort)
-      const links = Array.from(document.querySelectorAll("[data-preload]"))
-        .map(a => a.getAttribute("data-preload"))
-        .filter(Boolean);
-
-      // Preload with fetch (won't break if blocked)
-      Promise.resolve().then(async () => {
-        for (const url of links) {
-          try {
-            // Warm navigation + possible SW cache
-            await fetch(url, { cache: "no-cache", mode: "cors" });
-          } catch (e) {}
-        }
-      });
-
-      const minMs = 3000;
-      const done = () => {
-        const elapsed = performance.now() - start;
-        const wait = Math.max(0, minMs - elapsed);
-        setTimeout(() => loader.classList.add("hide"), wait);
-      };
-
-      // If page already ready, end; else wait for load
-      if (document.readyState === "complete") done();
-      else window.addEventListener("load", done, { once: true });
-    })();
-  </script>
 </body>
 </html>
