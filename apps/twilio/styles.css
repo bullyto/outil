@@ -54,3 +54,8 @@
   font-size:14px;
   line-height:1.45;
 }
+
+/* V7 : liste clients plus lisible sur mobile */
+#clientsTable td{vertical-align:middle}
+#clientsTable td:nth-child(2){font-weight:800;color:#f8fafc;white-space:nowrap}
+#clientsTable td[colspan]{color:#94a3b8;text-align:center;padding:18px}

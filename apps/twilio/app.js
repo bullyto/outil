@@ -20,7 +20,7 @@ $("installBtn")?.addEventListener("click", async () => {
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js?v=6").catch(() => {});
+  navigator.serviceWorker.register("sw.js?v=7").catch(() => {});
 }
 
 document.querySelectorAll(".tab").forEach((button) => {
@@ -63,8 +63,16 @@ function headers() {
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(apiBase() + path, {
+  let finalPath = path;
+
+  // Évite que GitHub / PWA / navigateur affiche une ancienne réponse en cache
+  if (!options.method || String(options.method).toUpperCase() === "GET") {
+    finalPath += (finalPath.includes("?") ? "&" : "?") + "_t=" + Date.now();
+  }
+
+  const response = await fetch(apiBase() + finalPath, {
     ...options,
+    cache: "no-store",
     headers: { ...headers(), ...(options.headers || {}) }
   });
 
@@ -379,19 +387,55 @@ async function importContacts() {
 // ======================================================
 
 async function loadClients() {
-  const filter = $("clientFilter")?.value || "all";
-  const data = await api("/clients/list?filter=" + encodeURIComponent(filter));
-
+  const filter = $("clientFilter")?.value || "active";
   const tbody = $("clientsTable");
   if (!tbody) return;
+
+  tbody.innerHTML = `<tr><td colspan="6">Chargement des clients...</td></tr>`;
+
+  let data = await api("/clients/list?filter=" + encodeURIComponent(filter));
+
+  // Sécurité : si le filtre actif ne retourne rien alors qu'il y a des clients,
+  // on tente "all" pour éviter une liste vide incompréhensible.
+  if (data.success && (!data.clients || data.clients.length === 0) && filter === "active") {
+    const allData = await api("/clients/list?filter=all");
+    if (allData.success && Array.isArray(allData.clients) && allData.clients.length > 0) {
+      data = allData;
+    }
+  }
+
   tbody.innerHTML = "";
 
-  (data.clients || []).forEach((client) => {
+  if (!data.success) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          Erreur chargement clients : ${escapeHtml(data.error || "réponse Worker invalide")}
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const clients = Array.isArray(data.clients) ? data.clients : [];
+
+  if (clients.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          Aucun client à afficher. Clique sur Actualiser ou importe un numéro.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  clients.forEach((client) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${escapeHtml(client.name || "—")}</td>
       <td>${escapeHtml(client.phone || "")}</td>
-      <td>${statusPill(client.is_active)}</td>
+      <td>${statusPill(Number(client.is_active) === 1)}</td>
       <td>${client.total_sent || 0}</td>
       <td>${escapeHtml(client.last_error_message || "")}</td>
       <td>
