@@ -59,3 +59,25 @@
 #clientsTable td{vertical-align:middle}
 #clientsTable td:nth-child(2){font-weight:800;color:#f8fafc;white-space:nowrap}
 #clientsTable td[colspan]{color:#94a3b8;text-align:center;padding:18px}
+
+/* V8 : bouton Réactiver */
+.mini.disabled{
+  opacity:.42;
+  cursor:not-allowed;
+  filter:grayscale(1);
+}
+.mini.reactivate{
+  background:#14532d;
+  border-color:rgba(22,163,74,.55);
+  color:#dcfce7;
+  font-weight:800;
+}
+
+/* V9 : historique cliquable + suivi déjà reçus */
+#historyTable tr[data-campaign-id]{cursor:pointer}
+#historyTable tr[data-campaign-id]:hover{background:rgba(93,183,238,.08)}
+.mini-stat{margin-bottom:0!important}
+.sent-summary{margin:10px 0 14px}
+.adn-result-details table{width:100%;min-width:0;background:#0f172a}
+.adn-result-details th,.adn-result-details td{font-size:13px;padding:8px}
+.adn-result-details .msg-preview{background:#111827;border:1px solid #283447;border-radius:14px;padding:10px;margin:8px 0 12px;color:#e5e7eb}

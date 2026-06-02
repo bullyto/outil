@@ -1,10 +1,10 @@
-const CACHE = "adn66-sms-pwa-v7";
+const CACHE = "adn66-sms-pwa-v9";
 const ASSETS = [
   "./",
-  "./index.html?v=7",
-  "./styles.css?v=7",
-  "./app.js?v=7",
-  "./manifest.json?v=7"
+  "./index.html?v=9",
+  "./styles.css?v=9",
+  "./app.js?v=9",
+  "./manifest.json?v=9"
 ];
 
 self.addEventListener("install", (event) => {

@@ -18,9 +18,9 @@
       for (const key of keys) await caches.delete(key);
       lines.push("Caches supprimés : " + keys.length);
     }
-    lines.push("OK. Redirection vers la version 7...");
+    lines.push("OK. Redirection vers la version 9...");
     document.getElementById("status").innerHTML = lines.join("<br>");
-    setTimeout(() => location.href = "./index.html?v=7&t=" + Date.now(), 900);
+    setTimeout(() => location.href = "./index.html?v=9&t=" + Date.now(), 900);
   } catch (e) {
     document.getElementById("status").textContent = "Erreur : " + e.message;
   }

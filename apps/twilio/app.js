@@ -20,7 +20,7 @@ $("installBtn")?.addEventListener("click", async () => {
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js?v=7").catch(() => {});
+  navigator.serviceWorker.register("sw.js?v=9").catch(() => {});
 }
 
 document.querySelectorAll(".tab").forEach((button) => {
@@ -33,10 +33,7 @@ document.querySelectorAll("[data-go]").forEach((button) => {
 
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach((screen) => screen.classList.remove("active"));
-  document.querySelectorAll(".tab").forEach((tab) => {
-    tab.classList.toggle("active", tab.dataset.screen === id);
-  });
-
+  document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.screen === id));
   const target = $(id);
   if (target) target.classList.add("active");
 }
@@ -44,10 +41,8 @@ function showScreen(id) {
 function toast(message) {
   const box = $("toast");
   if (!box) return;
-
   box.textContent = message;
   box.classList.remove("hidden");
-
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => box.classList.add("hidden"), 2600);
 }
@@ -64,8 +59,6 @@ function headers() {
 
 async function api(path, options = {}) {
   let finalPath = path;
-
-  // Évite que GitHub / PWA / navigateur affiche une ancienne réponse en cache
   if (!options.method || String(options.method).toUpperCase() === "GET") {
     finalPath += (finalPath.includes("?") ? "&" : "?") + "_t=" + Date.now();
   }
@@ -76,11 +69,7 @@ async function api(path, options = {}) {
     headers: { ...headers(), ...(options.headers || {}) }
   });
 
-  const data = await response.json().catch(() => ({
-    success: false,
-    error: "Réponse non JSON"
-  }));
-
+  const data = await response.json().catch(() => ({ success: false, error: "Réponse non JSON" }));
   if (!response.ok && data.success !== false) data.success = false;
   return data;
 }
@@ -90,40 +79,22 @@ function fmtEuro(value) {
   return Number(value).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
 }
 
-function normalizeInputPhone(value) {
-  return String(value || "").trim();
-}
-
 function parseContactLine(line) {
   const raw = String(line || "").trim();
   if (!raw) return null;
-
-  // Formats acceptés :
-  // 0632354272
-  // Kevin ; 0632354272
-  // Kevin, 0632354272
-  // Kevin - 0632354272
   const phoneMatch = raw.match(/(\+33|0033|0)?[ .-]?[67](?:[ .-]?\d{2}){4}/);
   if (!phoneMatch) return { name: "", phone: raw };
-
   const phone = phoneMatch[0].trim();
-  let name = raw.replace(phoneMatch[0], "").replace(/[;,\-–—|]+/g, " ").trim();
-
+  const name = raw.replace(phoneMatch[0], "").replace(/[;:,\-–—|]+/g, " ").trim();
   return { name, phone };
 }
 
 function splitContacts(rawText) {
-  return String(rawText || "")
-    .split(/\n+/)
-    .map(parseContactLine)
-    .filter(Boolean);
+  return String(rawText || "").split(/\n+/).map(parseContactLine).filter(Boolean);
 }
 
 function humanImportResult(data) {
-  if (!data.success) {
-    return `<div class="badline"><strong>Erreur :</strong> ${escapeHtml(data.error || "Import impossible")}</div>`;
-  }
-
+  if (!data.success) return `<div class="badline"><strong>Erreur :</strong> ${escapeHtml(data.error || "Import impossible")}</div>`;
   return `
     <div class="okline"><strong>Import terminé</strong></div>
     <div>Contacts lus : <strong>${data.totalRead || 0}</strong></div>
@@ -135,11 +106,7 @@ function humanImportResult(data) {
 
 function humanCampaignResult(data) {
   if (!data.success) {
-    return {
-      title: "Erreur campagne",
-      text: data.error || "La campagne n’a pas pu être envoyée.",
-      details: ""
-    };
+    return { title: "Erreur campagne", text: data.error || "La campagne n’a pas pu être envoyée.", details: "" };
   }
 
   const mode = data.testMode ? "Mode test : aucun vrai SMS envoyé." : "Envoi réel effectué.";
@@ -168,10 +135,8 @@ function showModal(title, text, details = "") {
     alert(title + "\n\n" + text);
     return;
   }
-
   $("adnResultTitle").textContent = title;
   $("adnResultText").textContent = text;
-
   const detailsBox = $("adnResultDetails");
   if (details) {
     detailsBox.innerHTML = details;
@@ -179,13 +144,10 @@ function showModal(title, text, details = "") {
   } else {
     detailsBox.classList.add("hidden");
   }
-
   modal.classList.remove("hidden");
 }
 
-$("adnResultClose")?.addEventListener("click", () => {
-  $("adnResultModal")?.classList.add("hidden");
-});
+$("adnResultClose")?.addEventListener("click", () => $("adnResultModal")?.classList.add("hidden"));
 
 // ======================================================
 // DASHBOARD
@@ -194,11 +156,9 @@ $("adnResultClose")?.addEventListener("click", () => {
 async function refreshDashboard() {
   try {
     const dashboard = await api("/stats/dashboard");
-
     setText("activeClients", dashboard?.clients?.active ?? "--");
     setText("problemCount", dashboard?.messages?.failed ?? "--");
     setText("sentTotal", dashboard?.messages?.sent ?? "--");
-
     const balance = dashboard?.balance;
     setText("balanceValue", balance?.success ? fmtEuro(balance.balance) : "--");
     setText("balanceSub", balance?.success ? "Compte Twilio" : (balance?.error || "Erreur solde"));
@@ -208,7 +168,7 @@ async function refreshDashboard() {
 }
 
 // ======================================================
-// CAMPAGNE — PREVIEW
+// CAMPAGNE
 // ======================================================
 
 async function previewCampaign() {
@@ -221,7 +181,6 @@ async function previewCampaign() {
   };
 
   const data = await api("/campaign/preview", { method: "POST", body: JSON.stringify(body) });
-
   if (!data.success) {
     toast(data.error || "Erreur estimation");
     const warning = $("estimateWarning");
@@ -247,25 +206,14 @@ async function previewCampaign() {
     if (preview.enoughBalance === false) {
       warning.textContent = "Attention : solde Twilio insuffisant pour cette estimation.";
       warning.classList.remove("hidden");
-    } else {
-      warning.classList.add("hidden");
-    }
+    } else warning.classList.add("hidden");
   }
-
   toast("Estimation calculée");
 }
 
-// ======================================================
-// CAMPAGNE — ENVOI
-// ======================================================
-
 async function sendCampaign() {
   const testMode = $("dryRun")?.checked === true;
-
-  if (!testMode) {
-    const confirmed = confirm("Confirmer l’envoi réel de la campagne SMS ?");
-    if (!confirmed) return;
-  }
+  if (!testMode && !confirm("Confirmer l’envoi réel de la campagne SMS ?")) return;
 
   const body = {
     title: $("campaignTitle")?.value || "Campagne ADN66",
@@ -284,25 +232,22 @@ async function sendCampaign() {
   await loadHistory();
   await loadProblems();
   await loadClients();
+  await loadSentTracking();
 }
 
 // ======================================================
-// AJOUT CLIENT NOM + NUMÉRO
+// CLIENTS
 // ======================================================
 
 async function addSingleClient() {
   const name = $("clientName")?.value.trim() || "";
-  const phone = normalizeInputPhone($("clientPhone")?.value || "");
-
+  const phone = String($("clientPhone")?.value || "").trim();
   if (!phone) {
     showNiceResult("addClientResult", `<div class="badline"><strong>Erreur :</strong> numéro manquant.</div>`);
     return;
   }
 
-  const data = await api("/clients/add", {
-    method: "POST",
-    body: JSON.stringify({ name, phone, source: "pwa_manual" })
-  });
+  const data = await api("/clients/add", { method: "POST", body: JSON.stringify({ name, phone, source: "pwa_manual" }) });
 
   if (data.success) {
     showNiceResult("addClientResult", data.alreadyExists
@@ -319,14 +264,8 @@ async function addSingleClient() {
   await refreshDashboard();
 }
 
-// ======================================================
-// IMPORT CONTACTS AVEC NOM POSSIBLE
-// ======================================================
-
 async function importContacts() {
-  const rawText = $("importNumbers")?.value || "";
-  const contacts = splitContacts(rawText);
-
+  const contacts = splitContacts($("importNumbers")?.value || "");
   if (contacts.length === 0) {
     toast("Aucun contact à importer");
     showNiceResult("importResult", `<div class="badline"><strong>Erreur :</strong> Aucun numéro fourni</div>`);
@@ -337,96 +276,52 @@ async function importContacts() {
   let finalResult;
 
   if (!withNames) {
-    const phones = contacts.map((contact) => contact.phone);
     finalResult = await api("/clients/import", {
       method: "POST",
-      body: JSON.stringify({ phones, source: "pwa_import" })
+      body: JSON.stringify({ phones: contacts.map((c) => c.phone), source: "pwa_import" })
     });
   } else {
     let added = 0, duplicates = 0, invalid = 0;
-
     for (const contact of contacts) {
       const data = await api("/clients/add", {
         method: "POST",
-        body: JSON.stringify({
-          name: contact.name,
-          phone: contact.phone,
-          source: "pwa_import_named"
-        })
+        body: JSON.stringify({ name: contact.name, phone: contact.phone, source: "pwa_import_named" })
       });
-
       if (data.success && data.alreadyExists) duplicates++;
       else if (data.success) added++;
       else invalid++;
     }
-
-    finalResult = {
-      success: true,
-      totalRead: contacts.length,
-      added,
-      duplicates,
-      invalid,
-      invalidNumbers: []
-    };
+    finalResult = { success: true, totalRead: contacts.length, added, duplicates, invalid, invalidNumbers: [] };
   }
 
   showNiceResult("importResult", humanImportResult(finalResult));
-
-  if (finalResult.success) {
-    toast(`Import OK : ${finalResult.added || 0} ajouté(s), ${finalResult.duplicates || 0} doublon(s)`);
-  } else {
-    toast(finalResult.error || "Erreur import");
-  }
-
+  toast(finalResult.success ? `Import OK : ${finalResult.added || 0} ajouté(s), ${finalResult.duplicates || 0} doublon(s)` : (finalResult.error || "Erreur import"));
   await loadClients();
   await refreshDashboard();
 }
-
-// ======================================================
-// CLIENTS
-// ======================================================
 
 async function loadClients() {
   const filter = $("clientFilter")?.value || "active";
   const tbody = $("clientsTable");
   if (!tbody) return;
-
   tbody.innerHTML = `<tr><td colspan="6">Chargement des clients...</td></tr>`;
 
   let data = await api("/clients/list?filter=" + encodeURIComponent(filter));
-
-  // Sécurité : si le filtre actif ne retourne rien alors qu'il y a des clients,
-  // on tente "all" pour éviter une liste vide incompréhensible.
   if (data.success && (!data.clients || data.clients.length === 0) && filter === "active") {
     const allData = await api("/clients/list?filter=all");
-    if (allData.success && Array.isArray(allData.clients) && allData.clients.length > 0) {
-      data = allData;
-    }
+    if (allData.success && Array.isArray(allData.clients) && allData.clients.length > 0) data = allData;
   }
 
   tbody.innerHTML = "";
 
   if (!data.success) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6">
-          Erreur chargement clients : ${escapeHtml(data.error || "réponse Worker invalide")}
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = `<tr><td colspan="6">Erreur chargement clients : ${escapeHtml(data.error || "réponse Worker invalide")}</td></tr>`;
     return;
   }
 
   const clients = Array.isArray(data.clients) ? data.clients : [];
-
   if (clients.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6">
-          Aucun client à afficher. Clique sur Actualiser ou importe un numéro.
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = `<tr><td colspan="6">Aucun client à afficher.</td></tr>`;
     return;
   }
 
@@ -438,13 +333,19 @@ async function loadClients() {
       <td>${statusPill(Number(client.is_active) === 1)}</td>
       <td>${client.total_sent || 0}</td>
       <td>${escapeHtml(client.last_error_message || "")}</td>
-      <td>
-        <button class="mini" data-action="deactivate" data-phone="${escapeHtml(client.phone || "")}">Désactiver</button>
-        <button class="mini danger" data-action="delete" data-phone="${escapeHtml(client.phone || "")}">Supprimer</button>
-      </td>
+      <td>${clientActions(client)}</td>
     `;
     tbody.appendChild(tr);
   });
+}
+
+function clientActions(client) {
+  const phone = escapeHtml(client.phone || "");
+  const isActive = Number(client.is_active) === 1;
+  if (isActive) {
+    return `<button class="mini" data-action="deactivate" data-phone="${phone}">Désactiver</button><button class="mini disabled" disabled>Réactiver</button>`;
+  }
+  return `<button class="mini disabled" disabled>Désactiver</button><button class="mini reactivate" data-action="reactivate" data-phone="${phone}">Réactiver</button>`;
 }
 
 function statusPill(active) {
@@ -453,25 +354,20 @@ function statusPill(active) {
 }
 
 document.addEventListener("click", async (event) => {
-  const button = event.target.closest("[data-action]");
-  if (!button) return;
-
-  const phone = button.dataset.phone;
-  const action = button.dataset.action;
-
-  if (!phone) {
-    toast("Numéro manquant");
+  const row = event.target.closest("[data-campaign-id]");
+  if (row && !event.target.closest("button")) {
+    await openCampaignDetails(row.dataset.campaignId);
     return;
   }
 
-  if (action === "delete") {
-    const confirmed = confirm("Supprimer définitivement " + phone + " de D1 ?");
-    if (!confirmed) return;
-  }
+  const button = event.target.closest("[data-action]");
+  if (!button) return;
+  const phone = button.dataset.phone;
+  const action = button.dataset.action;
+  if (!phone) return toast("Numéro manquant");
 
-  const route = action === "delete" ? "/clients/delete" : "/clients/deactivate";
+  let route = action === "reactivate" ? "/clients/reactivate" : "/clients/deactivate";
   const data = await api(route, { method: "POST", body: JSON.stringify({ phone }) });
-
   toast(data.success ? "Action effectuée" : (data.error || "Erreur"));
   await loadClients();
   await loadProblems();
@@ -486,49 +382,126 @@ async function loadProblems() {
   const data = await api("/problems/list");
   const tbody = $("problemsTable");
   if (!tbody) return;
-
   tbody.innerHTML = "";
 
   (data.problems || []).forEach((problem) => {
+    const client = { phone: problem.phone, is_active: problem.is_active ?? 1 };
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${escapeHtml(problem.phone || "")}</td>
       <td>${escapeHtml(problem.twilio_sid || "")}</td>
       <td>${escapeHtml(problem.error_message || "")}</td>
       <td>${escapeHtml(problem.created_at || "")}</td>
-      <td>
-        <button class="mini" data-action="deactivate" data-phone="${escapeHtml(problem.phone || "")}">Désactiver</button>
-        <button class="mini danger" data-action="delete" data-phone="${escapeHtml(problem.phone || "")}">Supprimer</button>
-      </td>
+      <td>${clientActions(client)}</td>
     `;
     tbody.appendChild(tr);
   });
 }
 
 // ======================================================
-// HISTORIQUE
+// HISTORIQUE + DÉJÀ REÇUS
 // ======================================================
 
 async function loadHistory() {
   const data = await api("/campaigns/history");
   const tbody = $("historyTable");
   if (!tbody) return;
-
   tbody.innerHTML = "";
 
   (data.campaigns || []).forEach((campaign) => {
     const tr = document.createElement("tr");
+    tr.dataset.campaignId = campaign.id;
     tr.innerHTML = `
       <td>${campaign.id}</td>
       <td>${escapeHtml(campaign.title || "")}</td>
       <td>${campaign.total_clients || 0}</td>
-      <td>${campaign.status === "sent" ? campaign.total_clients || 0 : 0}</td>
-      <td>${campaign.status === "partial" ? "Voir détail" : 0}</td>
-      <td>${campaign.total_segments || 0} segment(s)</td>
+      <td>${campaign.sent_count ?? (campaign.status === "sent" ? campaign.total_clients || 0 : 0)}</td>
+      <td>${campaign.failed_count ?? (campaign.status === "partial" ? "Voir" : 0)}</td>
+      <td>${campaign.total_segments || 0}</td>
       <td>${escapeHtml(campaign.created_at || "")}</td>
     `;
     tbody.appendChild(tr);
   });
+}
+
+async function openCampaignDetails(id) {
+  const data = await api("/campaign/details?id=" + encodeURIComponent(id));
+  if (!data.success) return showModal("Erreur", data.error || "Impossible de charger la campagne.");
+
+  const campaign = data.campaign || {};
+  const messages = data.messages || [];
+  const rows = messages.map((m) => `
+    <tr>
+      <td>${escapeHtml(m.client_name || m.name || "—")}</td>
+      <td>${escapeHtml(m.phone || "")}</td>
+      <td>${escapeHtml(m.status || "")}</td>
+    </tr>
+  `).join("");
+
+  showModal(
+    `Campagne n° ${campaign.id || id}`,
+    `${campaign.title || "Campagne"} — ${messages.length} destinataire(s)`,
+    `
+      <div class="msg-preview">${escapeHtml(campaign.message || "")}</div>
+      <table>
+        <thead><tr><th>Nom</th><th>Numéro</th><th>Statut</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="3">Aucun détail</td></tr>'}</tbody>
+      </table>
+    `
+  );
+}
+
+async function loadSentTracking() {
+  const data = await api("/history/sent-list");
+  setText("sentTrackedCount", data?.summary?.alreadySent ?? "--");
+  setText("remainingUnsentCount", data?.summary?.remaining ?? "--");
+
+  const tbody = $("sentTrackingTable");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  if (!data.success) {
+    tbody.innerHTML = `<tr><td colspan="4">Erreur : ${escapeHtml(data.error || "chargement impossible")}</td></tr>`;
+    return;
+  }
+
+  const items = data.contacts || [];
+  if (items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4">Aucun SMS réel enregistré depuis le dernier reset.</td></tr>`;
+    return;
+  }
+
+  items.forEach((item) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(item.name || "—")}</td>
+      <td>${escapeHtml(item.phone || "")}</td>
+      <td>${item.sms_count || 0}</td>
+      <td>${escapeHtml(item.last_sent_at || "")}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function resetSentTracking() {
+  const code = prompt("Mot de passe pour remettre la liste à 0");
+  if (code !== "0000") {
+    toast("Mot de passe incorrect");
+    return;
+  }
+
+  const data = await api("/history/reset-sent-tracking", {
+    method: "POST",
+    body: JSON.stringify({ password: code })
+  });
+
+  showNiceResult("resetTrackingResult", data.success
+    ? `<div class="okline"><strong>Liste remise à zéro</strong></div><div>Les anciens SMS restent dans l’historique, mais ils ne comptent plus comme déjà reçus.</div>`
+    : `<div class="badline"><strong>Erreur :</strong> ${escapeHtml(data.error || "reset impossible")}</div>`
+  );
+
+  await loadSentTracking();
+  await previewCampaign();
 }
 
 // ======================================================
@@ -542,10 +515,8 @@ function initSettings() {
   $("saveSettingsBtn")?.addEventListener("click", () => {
     state.workerUrl = $("workerUrl")?.value.trim() || state.workerUrl;
     state.adminKey = $("adminKey")?.value.trim() || "";
-
     localStorage.setItem("adn66_worker_url", state.workerUrl);
     localStorage.setItem("adn66_admin_key", state.adminKey);
-
     toast("Réglages enregistrés");
   });
 
@@ -560,12 +531,12 @@ function initSettings() {
 }
 
 // ======================================================
-// HELPERS
+// HELPERS + EVENTS
 // ======================================================
 
 function setText(id, value) {
-  const element = $(id);
-  if (element) element.textContent = value;
+  const el = $(id);
+  if (el) el.textContent = value;
 }
 
 function escapeHtml(value) {
@@ -577,25 +548,22 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-// ======================================================
-// EVENTS
-// ======================================================
-
 $("refreshAllBtn")?.addEventListener("click", refreshDashboard);
 $("previewBtn")?.addEventListener("click", previewCampaign);
 $("sendCampaignBtn")?.addEventListener("click", sendCampaign);
 $("addClientBtn")?.addEventListener("click", addSingleClient);
 $("importBtn")?.addEventListener("click", importContacts);
-$("clearImportBtn")?.addEventListener("click", () => {
-  if ($("importNumbers")) $("importNumbers").value = "";
-});
+$("clearImportBtn")?.addEventListener("click", () => { if ($("importNumbers")) $("importNumbers").value = ""; });
 $("loadClientsBtn")?.addEventListener("click", loadClients);
 $("clientFilter")?.addEventListener("change", loadClients);
 $("loadProblemsBtn")?.addEventListener("click", loadProblems);
 $("loadHistoryBtn")?.addEventListener("click", loadHistory);
+$("loadSentTrackingBtn")?.addEventListener("click", loadSentTracking);
+$("resetSentTrackingBtn")?.addEventListener("click", resetSentTracking);
 
 initSettings();
 refreshDashboard();
 loadClients();
 loadProblems();
 loadHistory();
+loadSentTracking();

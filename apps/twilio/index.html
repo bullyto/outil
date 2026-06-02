@@ -8,8 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#111827" />
   <title>ADN66 Marketing SMS</title>
-  <link rel="manifest" href="manifest.json?v=7" />
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="manifest" href="manifest.json?v=9" />
+  <link rel="stylesheet" href="styles.css?v=9" />
 </head>
 <body>
   <div class="app-shell">
@@ -165,7 +165,25 @@
             <h2>Historique campagnes</h2>
             <button class="secondary" id="loadHistoryBtn">Actualiser</button>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Titre</th><th>Demandé</th><th>Envoyés</th><th>Échecs</th><th>Coût</th><th>Date</th></tr></thead><tbody id="historyTable"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Titre</th><th>Demandé</th><th>Envoyés</th><th>Échecs</th><th>Segments</th><th>Date</th></tr></thead><tbody id="historyTable"></tbody></table></div>
+          <p class="hint">Clique sur une campagne pour voir le message et la liste des clients envoyés.</p>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <h2>Déjà reçus</h2>
+            <button class="secondary" id="loadSentTrackingBtn">Actualiser</button>
+          </div>
+          <p class="hint">Liste des contacts qui ont déjà reçu au moins un SMS depuis le dernier reset.</p>
+          <div class="grid cards-grid sent-summary">
+            <article class="card stat-card mini-stat"><span>Déjà reçus</span><strong id="sentTrackedCount">--</strong><small>Contacts</small></article>
+            <article class="card stat-card mini-stat"><span>Restants</span><strong id="remainingUnsentCount">--</strong><small>Clients actifs</small></article>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Nom</th><th>Numéro</th><th>SMS reçus</th><th>Dernier SMS</th></tr></thead><tbody id="sentTrackingTable"></tbody></table></div>
+          <div class="quick-actions">
+            <button class="secondary danger" id="resetSentTrackingBtn">Remettre la liste à 0</button>
+          </div>
+          <div id="resetTrackingResult" class="nice-result hidden"></div>
         </div>
       </section>
 
@@ -198,6 +216,6 @@
 
     <div id="toast" class="toast hidden"></div>
   </div>
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
