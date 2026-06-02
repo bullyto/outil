@@ -5,129 +5,78 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <title>Apéro Status Admin</title>
 
-  <meta name="theme-color" content="#0a121c" />
+  <meta name="theme-color" content="#5db7ee" />
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="icon-192.png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="stylesheet" href="./styles.css" />
-
-  <style>
-    /* Cache les boutons pré-programmés (mais ils existent toujours) */
-    #btnServiceOK, #btnPreviewPopup, #btnDownload { display:none !important; }
-
-    /* Zone GitHub masquée par défaut, affichable via bouton Paramètre */
-    .gh-zone { display:none; }
-    .gh-zone.is-open { display:block; }
-
-    /* Empêche les débordements horizontaux */
-    html, body { max-width: 100%; overflow-x: hidden; }
-
-    /* Conteneurs "Publié" vs "Brouillon" bien distincts */
-    .fullwidth { grid-column: 1 / -1; }
-    .section-title {
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px; flex-wrap:wrap;
-    }
-    .section-title .small { opacity:.85; }
-
-    .published-card {
-      border-radius: 16px;
-      background: rgba(255,255,255,.035);
-      border: 1px solid rgba(255,255,255,.12);
-    }
-
-    .published-grid {
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 12px;
-    }
-    @media (max-width: 860px){
-      .published-grid { grid-template-columns: 1fr; }
-    }
-
-    .kv {
-      display:grid;
-      grid-template-columns: 120px 1fr;
-      gap: 8px 10px;
-      margin-top: 10px;
-      font-size: 13px;
-      opacity: .9;
-    }
-    .kv b { font-weight: 800; opacity: .95; }
-    .kv .k { opacity: .7; }
-
-    /* ✅ FIX: badge qui wrap + ne déborde pas + plus petit */
-    .badge{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px 10px;
-      align-items:center;
-      justify-content:flex-start;
-      max-width:100%;
-      overflow:hidden;
-      padding:10px 12px;
-    }
-    .badge span{ opacity:.75; font-size:12px; }
-    .badge b{
-      font-size:13px;
-      font-weight:900;
-      max-width:100%;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    /* Date ISO longue: autoriser la coupure */
-    #liveUpdated, #pUpdated{
-      white-space:normal !important;
-      overflow-wrap:anywhere;
-      word-break:break-word;
-      display:inline-block;
-      max-width:100%;
-    }
-
-    /* Remplacement des pickers d'heure (plus de popup Android qui déborde) */
-    .timepick {
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-    }
-    .timepick select{ min-width: 120px; }
-    .timepick .hint{
-      opacity:.7;
-      font-size:12px;
-      margin-left:2px;
-    }
-    /* On garde les vrais inputs time pour compat app.js, mais cachés */
-    input[type="time"].hidden-time {
-      position:absolute !important;
-      left:-9999px !important;
-      width:1px !important;
-      height:1px !important;
-      opacity:0 !important;
-      pointer-events:none !important;
-    }
-  </style>
-  <link rel="stylesheet" href="../../shared/menu.css">
-  <script src="../../shared/menu.js" defer></script>
 </head>
 
 <body>
   <div class="wrap">
     <div class="top">
       <div class="brand">
-        <img src="icon-192.png" alt="Logo" />
+        <img src="icon-192.png" alt="Logo ADN66" />
         <div>
           <h1>Apéro Status Admin</h1>
           <div class="small">
-            Pilote <code class="inline">status.json</code> (info / blocage commande)
-            et publie directement sur APERO DE NUIT 66® et APERO CATALAN®.
+            Pilotage de <code class="inline">status.json</code>, pop-up info, blocage commande,
+            publication APERO DE NUIT 66® et APERO CATALAN®.
           </div>
-          <div style="margin-top:8px; display:flex; gap:10px; flex-wrap:wrap">
+          <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
             <span class="pill">🕒 <b id="clock">—</b></span>
             <span class="pill">📅 <b id="today">—</b></span>
           </div>
         </div>
+      </div>
+
+      <div class="adn-menu-float">
+        <button class="adn-menu-toggle" id="adnMenuToggle" type="button" aria-expanded="false" aria-controls="adnQuickMenu">
+          <span class="adn-burger" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          Menu
+        </button>
+
+        <nav class="adn-menu-dropdown" id="adnQuickMenu" aria-label="Menu rapide ADN66">
+          <div class="adn-menu-title">Accès rapide</div>
+
+          <a class="adn-menu-link" href="../PUSH/">
+            <div class="adn-menu-icon">🔔</div>
+            <div class="adn-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
+          </a>
+
+          <a class="adn-menu-link" href="../apero/">
+            <div class="adn-menu-icon">🍾</div>
+            <div class="adn-menu-text"><strong>Apéro</strong><span>Outil principal et calculs</span></div>
+          </a>
+
+          <a class="adn-menu-link" href="../fidel/admin.html">
+            <div class="adn-menu-icon">🎁</div>
+            <div class="adn-menu-text"><strong>Fidélité</strong><span>Administration carte fidélité</span></div>
+          </a>
+
+          <a class="adn-menu-link" href="../gps/">
+            <div class="adn-menu-icon">📍</div>
+            <div class="adn-menu-text"><strong>GPS</strong><span>Livraisons et localisation</span></div>
+          </a>
+
+          <a class="adn-menu-link" href="./">
+            <div class="adn-menu-icon">📢</div>
+            <div class="adn-menu-text"><strong>Status</strong><span>Messages et états des sites</span></div>
+          </a>
+
+          <a class="adn-menu-link" href="../stock/">
+            <div class="adn-menu-icon">📦</div>
+            <div class="adn-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
+          </a>
+
+          <a class="adn-menu-link" href="../twilio/">
+            <div class="adn-menu-icon">💬</div>
+            <div class="adn-menu-text"><strong>Twilio SMS</strong><span>Campagnes et contacts</span></div>
+          </a>
+        </nav>
       </div>
 
       <div class="badge">
@@ -137,13 +86,14 @@
       </div>
     </div>
 
-    <!-- ✅ 1) PUBLIÉ ACTUELLEMENT (EN LIGNE) – tout en haut -->
     <section class="card fullwidth published-card" id="publishedNow">
       <div class="hd">
         <div class="section-title">
           <div>
-            <div style="font-weight:900">Publié actuellement (en ligne)</div>
-            <div class="small">Ce bloc reflète EXACTEMENT ce qui est déjà publié sur <code class="inline">status.json</code>.</div>
+            <div style="font-weight:900">Publié actuellement</div>
+            <div class="small">
+              Ce bloc reflète exactement ce qui est déjà publié dans <code class="inline">status.json</code>.
+            </div>
           </div>
 
           <div class="badge">
@@ -158,44 +108,41 @@
 
       <div class="bd">
         <div class="published-grid">
-          <!-- Visuel publié -->
           <div>
-            <img id="liveImg" alt="Image publiée" src="./images/panne.png" style="width:100%; border-radius:14px; display:block;" />
+            <img id="liveImg" alt="Image publiée" src="./images/panne.png" />
           </div>
 
-          <!-- Détails publiés -->
           <div>
-            <div style="font-weight:900; font-size:18px" id="liveTitle">—</div>
-            <div class="small" style="margin-top:6px" id="liveMsg">—</div>
+            <div id="liveTitle">—</div>
+            <div class="small" style="margin-top:8px" id="liveMsg">—</div>
 
             <div class="kv" aria-label="Détails publication">
               <div class="k">Création :</div> <div><b id="liveCreated">—</b></div>
               <div class="k">Diffusion :</div> <div><b id="liveStarts">—</b> <span style="opacity:.6">→</span> <b id="liveEnds">—</b></div>
-
-              <!-- ✅ Severity renommé en "Mode" (car chez toi c’est la même info) -->
               <div class="k">Mode :</div> <div><b id="liveSev">—</b></div>
-
               <div class="k">Image :</div> <div><b id="liveImagePath">—</b></div>
             </div>
 
-            <div id="liveExtra" class="small" style="margin-top:10px; opacity:.85"></div>
+            <div id="liveExtra" class="small" style="margin-top:12px"></div>
           </div>
         </div>
       </div>
     </section>
 
     <div class="grid">
-      <!-- ✅ 2) CONTROLE / BROUILLON -->
       <section class="card">
-        <div class="hd"><div class="small">Contrôle (brouillon avant publication)</div></div>
-        <div class="bd">
+        <div class="hd">
+          <div style="font-weight:900">Contrôle</div>
+          <div class="small">Brouillon avant publication.</div>
+        </div>
 
+        <div class="bd">
           <div class="row">
             <div>
               <label>Statut global</label>
               <select id="active">
-                <option value="false">Inactif (aucun pop-up)</option>
-                <option value="true">Actif (pop-up affiché)</option>
+                <option value="false">Inactif : aucun pop-up</option>
+                <option value="true">Actif : pop-up affiché</option>
               </select>
             </div>
             <div>
@@ -209,7 +156,7 @@
           <div class="row">
             <div>
               <label>Titre</label>
-              <input id="title" placeholder="Ex: Info importante / Service indisponible" />
+              <input id="title" placeholder="Ex : Info importante / Service indisponible" />
             </div>
 
             <div>
@@ -218,62 +165,56 @@
             </div>
           </div>
 
-          <div style="margin-top:10px">
+          <div style="margin-top:12px">
             <label>Message</label>
             <textarea id="message" placeholder="Texte affiché dans le pop-up..."></textarea>
           </div>
 
-          <div style="margin-top:10px">
-            <label>Image (chemin relatif)</label>
+          <div style="margin-top:12px">
+            <label>Image</label>
             <input id="image" placeholder="images/panne.png" />
           </div>
 
           <div class="hr"></div>
 
-          <!-- Réglage mode INFO -->
-          <div id="infoBox" class="card" style="border-radius:14px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.10); box-shadow:none;">
-            <div class="bd" style="padding:12px">
-              <div style="font-weight:800; margin-bottom:8px;">Mode info</div>
+          <div id="infoBox" class="card">
+            <div class="bd">
+              <div style="font-weight:900; margin-bottom:10px;">Mode information</div>
               <div class="row">
                 <div>
                   <label>Délai avant “OK j’ai compris”</label>
                   <input id="okDelay" type="number" min="0" step="1" placeholder="5" />
                 </div>
                 <div>
-                  <label>(auto)</label>
-                  <input disabled value="Le pop-up se ferme ensuite et la commande reste possible." />
+                  <label>Comportement</label>
+                  <input disabled value="Le pop-up se ferme ensuite. Commande possible." />
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Réglage mode WARNING -->
-          <div id="warningBox" class="card ui-hide" style="margin-top:10px; border-radius:14px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.10); box-shadow:none;">
-            <div class="bd" style="padding:12px">
-              <div style="font-weight:800; margin-bottom:8px;">Mode warning (blocage commande)</div>
+          <div id="warningBox" class="card ui-hide" style="margin-top:12px">
+            <div class="bd">
+              <div style="font-weight:900; margin-bottom:10px;">Mode warning / blocage</div>
 
               <div class="row">
                 <div>
-                  <label>Activer un horaire de blocage</label>
+                  <label>Activer un horaire</label>
                   <select id="schedEnabled">
-                    <option value="false">Non (bloque tout le temps)</option>
-                    <option value="true">Oui (bloque seulement sur plage horaire)</option>
+                    <option value="false">Non : bloque tout le temps</option>
+                    <option value="true">Oui : plage horaire</option>
                   </select>
                 </div>
                 <div>
-                  <label>Message si clic sur “OK j’ai compris”</label>
+                  <label>Message au clic</label>
                   <input id="warningClickMsg" placeholder="Impossible de commander pour le moment." />
                 </div>
               </div>
 
-              <div class="row" style="margin-top:10px">
+              <div class="row" style="margin-top:12px">
                 <div>
                   <label>Heure début</label>
-
-                  <!-- VRAI input conservé pour app.js, mais caché -->
                   <input id="schedStart" class="hidden-time" type="time" value="19:00" />
-
-                  <!-- UI custom (pas de popup Android) -->
                   <div class="timepick">
                     <select id="schedStartSel"></select>
                     <span class="hint">Format 24h</span>
@@ -282,11 +223,7 @@
 
                 <div>
                   <label>Heure fin</label>
-
-                  <!-- VRAI input conservé pour app.js, mais caché -->
                   <input id="schedEnd" class="hidden-time" type="time" value="06:00" />
-
-                  <!-- UI custom (pas de popup Android) -->
                   <div class="timepick">
                     <select id="schedEndSel"></select>
                     <span class="hint">Format 24h</span>
@@ -294,7 +231,7 @@
                 </div>
               </div>
 
-              <div style="margin-top:10px">
+              <div style="margin-top:12px">
                 <label>Jours</label>
                 <div class="weekdays" id="schedDays">
                   <label><input type="checkbox" value="1" />Lun</label>
@@ -309,8 +246,7 @@
             </div>
           </div>
 
-          <!-- Zone GitHub (cachée/affichée via bouton Paramètre) -->
-          <div class="gh-zone" style="margin-top:12px">
+          <div class="gh-zone" style="margin-top:14px">
             <div class="row">
               <div>
                 <label>Dépôt GitHub</label>
@@ -325,17 +261,17 @@
               </div>
             </div>
 
-            <div style="margin-top:10px">
+            <div style="margin-top:12px">
               <label>Chemin du fichier</label>
               <input id="ghPath" placeholder="status.json" />
             </div>
 
-            <div style="margin-top:10px">
+            <div style="margin-top:12px">
               <label>Token GitHub</label>
               <input id="ghToken" type="password" autocomplete="off" placeholder="ghp_..." />
               <div class="hint">
-                Stocké en local sur ce téléphone avec expiration automatique (6 mois).
-                <br><span id="tokenStatus" style="opacity:.9">—</span>
+                Stocké localement sur cet appareil avec expiration automatique.
+                <br><span id="tokenStatus">—</span>
               </div>
             </div>
 
@@ -344,62 +280,78 @@
               <button class="danger" id="btnClearToken" type="button">Supprimer le token</button>
             </div>
 
-            <div class="hr" style="margin-top:14px"></div>
+            <div class="hr"></div>
           </div>
 
-          <!-- ✅ Publier + Paramètre côte à côte -->
-          <div class="btns" style="margin-top:12px; display:flex; gap:10px;">
-            <button id="btnPublish" style="flex:1;">Publier</button>
-            <button id="btnToggleGh" type="button" class="secondary" style="min-width:140px;">Paramètre</button>
+          <div class="btns" style="margin-top:14px">
+            <button id="btnPublish">Publier</button>
+            <button id="btnToggleGh" type="button" class="secondary">Paramètre</button>
           </div>
-
         </div>
       </section>
 
-      <!-- ✅ 3) APERÇU BROUILLON (AVANT PUBLICATION) -->
       <section class="card preview">
         <div class="hd">
           <div class="section-title">
             <div>
-              <div style="font-weight:900">Aperçu (brouillon avant publication)</div>
-              <div class="small">Ce bloc est ton rendu en temps réel, avant de cliquer sur “Publier”.</div>
+              <div style="font-weight:900">Aperçu</div>
+              <div class="small">Rendu du brouillon avant publication.</div>
             </div>
           </div>
         </div>
 
         <div class="bd">
           <img id="pImg" alt="Aperçu image" src="./images/panne.png" />
-          <div class="badge">
+          <div class="badge" style="margin-top:12px">
             <span>Dernière maj :</span> <b id="pUpdated">—</b>
             <span style="opacity:.5">•</span>
             <span>Mode :</span> <b id="pSev">—</b>
           </div>
-          <div id="pTitle" style="margin-top:10px;font-weight:900;font-size:18px">—</div>
-          <div id="pMsg" style="margin-top:6px;opacity:.85">—</div>
-          <div id="pExtra" class="small" style="margin-top:10px; opacity:.8"></div>
+          <div id="pTitle" style="margin-top:12px">—</div>
+          <div id="pMsg" style="margin-top:8px">—</div>
+          <div id="pExtra" class="small" style="margin-top:12px"></div>
         </div>
       </section>
     </div>
   </div>
 
-  <!-- Toast -->
   <div id="toast" class="toast"></div>
 
   <script src="./app.js"></script>
 
-  <!-- Token localStorage 6 mois + toggle Paramètre -->
   <script>
   (function(){
-    const LS_KEY = "gh_token_v1"; // JSON { token: string, exp: number }
+    const toggle = document.getElementById("adnMenuToggle");
+    const dropdown = document.getElementById("adnQuickMenu");
+
+    if (!toggle || !dropdown) return;
+
+    toggle.addEventListener("click", () => {
+      const open = dropdown.classList.toggle("open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".adn-menu-float")) {
+        dropdown.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  })();
+  </script>
+
+  <script>
+  (function(){
+    const LS_KEY = "gh_token_v1";
     const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 30 * 6;
 
-    function toast(msg){
+    function showToast(msg){
       const el = document.getElementById("toast");
       if (!el) return;
       el.textContent = msg;
       el.classList.add("show");
-      clearTimeout(toast._t);
-      toast._t = setTimeout(() => el.classList.remove("show"), 2200);
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove("show"), 2200);
     }
 
     function readToken(){
@@ -430,7 +382,7 @@
       const s = document.getElementById("tokenStatus");
       if (!s) return;
       if (!obj) s.textContent = "Aucun token enregistré.";
-      else s.textContent = "Token enregistré ✅ (expire le " + new Date(obj.exp).toLocaleString("fr-FR") + ")";
+      else s.textContent = "Token enregistré ✅ expire le " + new Date(obj.exp).toLocaleString("fr-FR");
     }
 
     function init(){
@@ -440,26 +392,32 @@
       const btnSave = document.getElementById("btnSaveToken");
       const btnClear = document.getElementById("btnClearToken");
 
-      if (btnToggle && ghZone) btnToggle.addEventListener("click", () => ghZone.classList.toggle("is-open"));
+      if (btnToggle && ghZone) {
+        btnToggle.addEventListener("click", () => ghZone.classList.toggle("is-open"));
+      }
 
       const stored = readToken();
       if (input && stored) input.value = stored.token;
       setTokenStatus(stored);
 
-      if (btnSave && input) btnSave.addEventListener("click", () => {
-        const val = (input.value || "").trim();
-        if (!val) return toast("Token vide : rien enregistré.");
-        const obj = saveToken(val);
-        setTokenStatus(obj);
-        toast("Token enregistré (6 mois) ✅");
-      });
+      if (btnSave && input) {
+        btnSave.addEventListener("click", () => {
+          const val = (input.value || "").trim();
+          if (!val) return showToast("Token vide.");
+          const obj = saveToken(val);
+          setTokenStatus(obj);
+          showToast("Token enregistré ✅");
+        });
+      }
 
-      if (btnClear && input) btnClear.addEventListener("click", () => {
-        clearToken();
-        input.value = "";
-        setTokenStatus(null);
-        toast("Token supprimé ✅");
-      });
+      if (btnClear && input) {
+        btnClear.addEventListener("click", () => {
+          clearToken();
+          input.value = "";
+          setTokenStatus(null);
+          showToast("Token supprimé ✅");
+        });
+      }
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
@@ -467,10 +425,10 @@
   })();
   </script>
 
-  <!-- ✅ Time picker custom (remplace la popup Android) -->
   <script>
   (function(){
     function pad(n){ return String(n).padStart(2,"0"); }
+
     function buildTimes(stepMin){
       const arr = [];
       for (let h=0; h<24; h++){
@@ -505,9 +463,10 @@
 
     function init(){
       const startInput = document.getElementById("schedStart");
-      const endInput   = document.getElementById("schedEnd");
-      const startSel   = document.getElementById("schedStartSel");
-      const endSel     = document.getElementById("schedEndSel");
+      const endInput = document.getElementById("schedEnd");
+      const startSel = document.getElementById("schedStartSel");
+      const endSel = document.getElementById("schedEndSel");
+
       if (!startInput || !endInput || !startSel || !endSel) return;
 
       const times = buildTimes(5);
@@ -518,7 +477,7 @@
       if (!endInput.value) endInput.value = "06:00";
 
       startSel.value = startInput.value;
-      endSel.value   = endInput.value;
+      endSel.value = endInput.value;
 
       sync(startSel, startInput);
       sync(endSel, endInput);
