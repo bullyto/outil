@@ -1,81 +1,172 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#07152e">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
   <title>ADN66 Marketing SMS</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>ADN66 Marketing SMS</h1>
-      <p>Campagnes SMS Apéro de Nuit 66</p>
-    </div>
-    <span id="apiStatus" class="badge">API...</span>
-  </header>
-
-  <main class="app">
-    <section class="card">
-      <h2>1. Réglage API</h2>
-      <label>URL Worker Cloudflare</label>
-      <input id="apiUrl" placeholder="https://twillio-sms.apero-nuit-du-66.workers.dev">
-      <button id="saveApi" class="btn secondary">Enregistrer l’URL</button>
-      <button id="testApi" class="btn">Tester l’API</button>
-    </section>
-
-    <section class="card">
-      <h2>2. Import clients</h2>
-      <p class="hint">Colle des numéros, un par ligne, ou séparés par virgule/espace.</p>
-      <textarea id="contactsInput" rows="7" placeholder="0652336461&#10;+33612345678&#10;06 11 22 33 44"></textarea>
-      <div class="row">
-        <button id="cleanContacts" class="btn secondary">Nettoyer</button>
-        <button id="importContacts" class="btn">Importer dans D1</button>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Apéro de Nuit 66</p>
+        <h1>Marketing SMS</h1>
       </div>
-      <p id="contactsResult" class="result"></p>
-    </section>
+      <button id="installBtn" class="ghost hidden">Installer</button>
+    </header>
 
-    <section class="card">
-      <h2>3. Campagne</h2>
-      <label>Titre</label>
-      <input id="campaignTitle" value="Campagne ADN66">
-      <label>Message</label>
-      <textarea id="messageInput" rows="6">Apero de Nuit 66, livraison alcool 19h-6h, 7j/7 dans les Pyrenees-Orientales. Commande rapide sur www.aperos.net ou 0652336461</textarea>
-      <div class="stats">
-        <div><b id="charCount">0</b><span>caractères</span></div>
-        <div><b id="encoding">-</b><span>encodage</span></div>
-        <div><b id="segments">0</b><span>segment/SMS</span></div>
-        <div><b id="clientCount">0</b><span>clients</span></div>
-      </div>
-      <div class="row">
-        <button id="previewCampaign" class="btn secondary">Prévisualiser</button>
-        <button id="sendCampaign" class="btn danger">Envoyer</button>
-      </div>
-      <p id="campaignResult" class="result"></p>
-    </section>
+    <nav class="tabs" aria-label="Navigation">
+      <button class="tab active" data-screen="dashboard">Accueil</button>
+      <button class="tab" data-screen="campaign">Campagne</button>
+      <button class="tab" data-screen="clients">Clients</button>
+      <button class="tab" data-screen="problems">Problèmes</button>
+      <button class="tab" data-screen="history">Historique</button>
+      <button class="tab" data-screen="settings">Réglages</button>
+    </nav>
 
-    <section class="card">
-      <h2>4. Clients</h2>
-      <button id="loadClients" class="btn secondary">Afficher les clients</button>
-      <div id="clientsList" class="list"></div>
-    </section>
+    <main>
+      <section id="dashboard" class="screen active">
+        <div class="grid cards-grid">
+          <article class="card stat-card"><span>Solde Twilio</span><strong id="balanceValue">--</strong><small id="balanceSub">Non chargé</small></article>
+          <article class="card stat-card"><span>Clients actifs</span><strong id="activeClients">--</strong><small>D1</small></article>
+          <article class="card stat-card"><span>Problèmes</span><strong id="problemCount">--</strong><small>SMS échoués / numéros invalides</small></article>
+          <article class="card stat-card"><span>Envoyés total</span><strong id="sentTotal">--</strong><small>Historique</small></article>
+        </div>
 
-    <section class="card">
-      <h2>5. Historique</h2>
-      <button id="loadHistory" class="btn secondary">Charger l’historique</button>
-      <div id="historyList" class="list"></div>
-    </section>
-  </main>
+        <div class="card">
+          <h2>Action rapide</h2>
+          <div class="quick-actions">
+            <button class="primary" data-go="campaign">Créer une campagne</button>
+            <button class="secondary" data-go="clients">Importer contacts</button>
+            <button class="secondary" id="refreshAllBtn">Actualiser</button>
+          </div>
+          <p class="hint">Les clés Twilio restent dans Cloudflare. Les contacts et historiques restent dans D1.</p>
+        </div>
+      </section>
 
-  <nav class="bottom">
-    <a href="#apiUrl">API</a>
-    <a href="#contactsInput">Clients</a>
-    <a href="#messageInput">Campagne</a>
-    <a href="#historyList">Historique</a>
-  </nav>
+      <section id="campaign" class="screen">
+        <div class="card">
+          <h2>Nouvelle campagne</h2>
+          <label>Titre campagne</label>
+          <input id="campaignTitle" value="Campagne ADN66" />
 
+          <label>Message SMS</label>
+          <textarea id="campaignMessage" rows="5">Apero de Nuit 66, livraison alcool 19h-6h, 7j/7 dans les Pyrenees-Orientales. Commande rapide sur www.aperos.net ou 0652336461</textarea>
+
+          <div class="grid two">
+            <div>
+              <label>Nombre de SMS à envoyer maintenant</label>
+              <input id="sendLimit" type="number" min="1" value="300" />
+            </div>
+            <div>
+              <label>Type de cible</label>
+              <select id="targetMode">
+                <option value="active_unsent">Clients actifs jamais contactés</option>
+                <option value="active_all">Clients actifs</option>
+                <option value="error_retry">Clients en erreur à réessayer</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="switch-row">
+            <label><input id="excludeAlreadySent" type="checkbox" checked /> Exclure ceux déjà contactés</label>
+            <label><input id="dryRun" type="checkbox" checked /> Mode test sans envoyer</label>
+          </div>
+
+          <div class="quick-actions">
+            <button class="secondary" id="previewBtn">Calculer estimation</button>
+            <button class="primary danger" id="sendCampaignBtn">Envoyer campagne</button>
+          </div>
+        </div>
+
+        <div class="card estimate-card">
+          <h2>Estimation d'envoi</h2>
+          <div class="estimate-grid">
+            <div><span>Clients ciblés</span><strong id="estClients">--</strong></div>
+            <div><span>Limite envoi</span><strong id="estLimit">--</strong></div>
+            <div><span>Caractères</span><strong id="estChars">--</strong></div>
+            <div><span>Segments/SMS</span><strong id="estSegments">--</strong></div>
+            <div><span>Total segments</span><strong id="estTotalSegments">--</strong></div>
+            <div><span>Coût estimé</span><strong id="estCost">--</strong></div>
+            <div><span>Solde</span><strong id="estBalance">--</strong></div>
+            <div><span>Reste estimé</span><strong id="estRemaining">--</strong></div>
+          </div>
+          <p id="estimateWarning" class="warning hidden"></p>
+        </div>
+      </section>
+
+      <section id="clients" class="screen">
+        <div class="card">
+          <h2>Importer contacts</h2>
+          <label>Colle des numéros, un par ligne ou séparés par virgule/point-virgule</label>
+          <textarea id="importNumbers" rows="7" placeholder="0652336461\n06 52 33 64 61\n+33712345678"></textarea>
+          <div class="quick-actions">
+            <button class="primary" id="importBtn">Importer dans D1</button>
+            <button class="secondary" id="clearImportBtn">Vider</button>
+          </div>
+          <div id="importResult" class="result-box hidden"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <h2>Clients</h2>
+            <button class="secondary" id="loadClientsBtn">Actualiser</button>
+          </div>
+          <div class="filters">
+            <select id="clientFilter">
+              <option value="active">Actifs</option>
+              <option value="inactive">Désactivés</option>
+              <option value="error">En erreur</option>
+              <option value="all">Tous</option>
+            </select>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Numéro</th><th>Statut</th><th>Envoyés</th><th>Erreur</th><th>Action</th></tr></thead><tbody id="clientsTable"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="problems" class="screen">
+        <div class="card">
+          <div class="section-title">
+            <h2>Numéros à problème</h2>
+            <button class="secondary" id="loadProblemsBtn">Actualiser</button>
+          </div>
+          <p class="hint">Ici tu peux désactiver ou supprimer les numéros qui ne s'envoient pas sur Twilio.</p>
+          <div class="table-wrap"><table><thead><tr><th>Numéro</th><th>Code</th><th>Erreur</th><th>Date</th><th>Action</th></tr></thead><tbody id="problemsTable"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="history" class="screen">
+        <div class="card">
+          <div class="section-title">
+            <h2>Historique campagnes</h2>
+            <button class="secondary" id="loadHistoryBtn">Actualiser</button>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Titre</th><th>Demandé</th><th>Envoyés</th><th>Échecs</th><th>Coût</th><th>Date</th></tr></thead><tbody id="historyTable"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="settings" class="screen">
+        <div class="card">
+          <h2>Réglages API</h2>
+          <label>URL Worker Cloudflare</label>
+          <input id="workerUrl" placeholder="https://twillio-sms.apero-nuit-du-66.workers.dev" />
+          <label>Clé admin optionnelle</label>
+          <input id="adminKey" placeholder="Optionnel si tu ajoutes une sécurité Worker" />
+          <div class="quick-actions">
+            <button class="primary" id="saveSettingsBtn">Enregistrer</button>
+            <button class="secondary" id="testWorkerBtn">Tester Worker</button>
+          </div>
+          <div id="settingsResult" class="result-box hidden"></div>
+          <p class="hint">Les secrets Twilio ne vont jamais dans la PWA. Ils restent dans Cloudflare Worker.</p>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
