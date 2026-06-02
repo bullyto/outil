@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reset cache ADN66 SMS</title></head>
+<body style="font-family:system-ui;background:#0b1220;color:#fff;padding:24px">
+<h1>Reset cache ADN66 SMS</h1>
+<p id="status">Nettoyage en cours...</p>
+<script>
+(async () => {
+  const lines = [];
+  try {
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) {
+        await reg.unregister();
+      }
+      lines.push("Service workers supprimés : " + regs.length);
+    }
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      for (const key of keys) await caches.delete(key);
+      lines.push("Caches supprimés : " + keys.length);
+    }
+    try { localStorage.removeItem("adn66_worker_url"); } catch(e){}
+    lines.push("OK. Redirection...");
+    document.getElementById("status").innerHTML = lines.join("<br>");
+    setTimeout(() => location.href = "./index.html?v=5&t=" + Date.now(), 1200);
+  } catch (e) {
+    document.getElementById("status").textContent = "Erreur : " + e.message;
+  }
+})();
+</script>
+</body>
+</html>
