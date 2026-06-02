@@ -1,0 +1,9 @@
+{
+  "name": "ADN66 Marketing SMS",
+  "short_name": "ADN66 SMS",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07152e",
+  "theme_color": "#07152e",
+  "icons": []
+}

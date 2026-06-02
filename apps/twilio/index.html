@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07152e">
+  <title>ADN66 Marketing SMS</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>ADN66 Marketing SMS</h1>
+      <p>Campagnes SMS Apéro de Nuit 66</p>
+    </div>
+    <span id="apiStatus" class="badge">API...</span>
+  </header>
+
+  <main class="app">
+    <section class="card">
+      <h2>1. Réglage API</h2>
+      <label>URL Worker Cloudflare</label>
+      <input id="apiUrl" placeholder="https://twillio-sms.apero-nuit-du-66.workers.dev">
+      <button id="saveApi" class="btn secondary">Enregistrer l’URL</button>
+      <button id="testApi" class="btn">Tester l’API</button>
+    </section>
+
+    <section class="card">
+      <h2>2. Import clients</h2>
+      <p class="hint">Colle des numéros, un par ligne, ou séparés par virgule/espace.</p>
+      <textarea id="contactsInput" rows="7" placeholder="0652336461&#10;+33612345678&#10;06 11 22 33 44"></textarea>
+      <div class="row">
+        <button id="cleanContacts" class="btn secondary">Nettoyer</button>
+        <button id="importContacts" class="btn">Importer dans D1</button>
+      </div>
+      <p id="contactsResult" class="result"></p>
+    </section>
+
+    <section class="card">
+      <h2>3. Campagne</h2>
+      <label>Titre</label>
+      <input id="campaignTitle" value="Campagne ADN66">
+      <label>Message</label>
+      <textarea id="messageInput" rows="6">Apero de Nuit 66, livraison alcool 19h-6h, 7j/7 dans les Pyrenees-Orientales. Commande rapide sur www.aperos.net ou 0652336461</textarea>
+      <div class="stats">
+        <div><b id="charCount">0</b><span>caractères</span></div>
+        <div><b id="encoding">-</b><span>encodage</span></div>
+        <div><b id="segments">0</b><span>segment/SMS</span></div>
+        <div><b id="clientCount">0</b><span>clients</span></div>
+      </div>
+      <div class="row">
+        <button id="previewCampaign" class="btn secondary">Prévisualiser</button>
+        <button id="sendCampaign" class="btn danger">Envoyer</button>
+      </div>
+      <p id="campaignResult" class="result"></p>
+    </section>
+
+    <section class="card">
+      <h2>4. Clients</h2>
+      <button id="loadClients" class="btn secondary">Afficher les clients</button>
+      <div id="clientsList" class="list"></div>
+    </section>
+
+    <section class="card">
+      <h2>5. Historique</h2>
+      <button id="loadHistory" class="btn secondary">Charger l’historique</button>
+      <div id="historyList" class="list"></div>
+    </section>
+  </main>
+
+  <nav class="bottom">
+    <a href="#apiUrl">API</a>
+    <a href="#contactsInput">Clients</a>
+    <a href="#messageInput">Campagne</a>
+    <a href="#historyList">Historique</a>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>
