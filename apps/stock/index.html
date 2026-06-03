@@ -65,9 +65,199 @@ header{
 main{padding:16px 14px 28px}.grid{max-width:980px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:16px}.card,.sheet .panel,.toolsPanel{background:rgba(17,24,39,.88);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.cardHeader{padding:16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(93,183,238,.09),rgba(17,24,39,.20));display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.cardHeader h2{margin:0;font-size:15px;font-weight:900;letter-spacing:.2px}.cardHeader p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.35}.cardBody{padding:14px 16px 16px}.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}.search{display:flex;align-items:center;gap:10px;flex:1 1 320px;min-width:230px;padding:12px 14px;border-radius:16px;border:1px solid var(--border);background:var(--input)}.search:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.12)}.search input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:14px}.search input::placeholder{color:var(--soft)}.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);background:rgba(15,23,42,.82);color:var(--text);border-radius:14px;padding:11px 13px;font-size:13px;font-weight:800;cursor:pointer}.btn:hover{border-color:rgba(93,183,238,.55);background:rgba(93,183,238,.10)}.btn.primary{background:var(--blue);border-color:var(--blue);color:white;box-shadow:0 12px 28px rgba(93,183,238,.20)}.btn.primary:hover{background:#74c6f3}.btn.danger{border-color:rgba(220,38,38,.55);background:rgba(220,38,38,.16);color:var(--dangerText)}.btn:disabled{opacity:.48;cursor:not-allowed;transform:none}.list{display:grid;grid-template-columns:1fr;gap:12px}.item{display:grid;grid-template-columns:98px 1fr;gap:13px;align-items:center;padding:14px;border-radius:20px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(23,32,51,.92),rgba(17,24,39,.92));box-shadow:0 12px 32px rgba(0,0,0,.18);overflow:hidden}.thumb{width:98px;height:98px;border-radius:20px;background:var(--input);border:1px solid var(--border);overflow:hidden;display:grid;place-items:center}.thumb img{width:100%;height:100%;object-fit:contain;padding:8px;filter:drop-shadow(0 12px 16px rgba(0,0,0,.36))}.content{min-width:0;display:grid;grid-template-rows:auto auto auto;gap:10px;align-items:center}.name{margin:0;color:var(--text);font-size:15px;font-weight:900;line-height:1.18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qtyLine{display:flex;align-items:center;justify-content:center;gap:12px;width:100%}.qtyBtn{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:23px;font-weight:900;line-height:1;flex:0 0 auto}.qtyVal{min-width:72px;padding:11px 10px;border-radius:16px;border:1px solid var(--border);background:var(--input);color:var(--text);font-size:17px;font-weight:900;text-align:center;user-select:none}.bottomLine{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}.badge{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.badge.ok{border-color:rgba(22,163,74,.60);background:rgba(22,163,74,.16);color:var(--successText)}.badge.warn{border-color:rgba(93,183,238,.68);background:rgba(93,183,238,.16);color:#dff4ff}.badge.danger{border-color:rgba(220,38,38,.60);background:rgba(220,38,38,.16);color:var(--dangerText)}.price{margin:0;font-size:18px;font-weight:950;line-height:1;white-space:nowrap;color:var(--text);flex:0 0 auto}.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);padding:11px 14px;border-radius:16px;border:1px solid var(--border);background:rgba(17,24,39,.96);color:var(--text);box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:99;max-width:calc(100% - 18px);text-align:center;font-size:13px}.toast.show{opacity:1;transform:translateX(-50%) translateY(-2px)}.sheet{position:fixed;inset:0;display:none;z-index:50}.sheet.show{display:block}.sheet .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(6px)}.sheet .panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100% - 22px))}.sheet .panelHeader,.toolsPanelHeader{padding:15px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(180deg,rgba(93,183,238,.08),transparent)}.sheet .panelHeader h3{margin:0;font-size:15px;font-weight:900}.sheet .panelHeader button,.toolsPanelHeader button{border:1px solid var(--border);background:var(--input);color:var(--muted);width:38px;height:38px;border-radius:14px;cursor:pointer}.sheet .panelBody{padding:16px;display:grid;gap:13px}.field label{display:block;font-size:12px;color:var(--muted);font-weight:800;margin-bottom:7px}.field input{width:100%;padding:13px 14px;border-radius:16px;border:1px solid var(--border);background:var(--input);color:var(--text);outline:0;font-size:14px}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.12)}.hint{margin:0;font-size:12px;color:var(--muted);line-height:1.4}.panelActions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;padding:14px 16px;border-top:1px solid var(--border);background:rgba(15,23,42,.52)}.toolsPanel{width:min(560px,calc(100% - 22px))}.toolsPanelHeader .left{display:flex;align-items:center;gap:10px;min-width:0}.toolsDot{width:36px;height:36px;border-radius:14px;background:rgba(93,183,238,.16);border:1px solid rgba(93,183,238,.45);display:grid;place-items:center;box-shadow:0 10px 24px rgba(0,0,0,.28)}.toolsTitle{min-width:0}.toolsTitle h3{margin:0;font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.toolsTitle p{margin:4px 0 0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.toolsPanelHeader .year,.toolTag{font-size:12px;color:var(--muted);padding:7px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(15,23,42,.72);user-select:none}.toolsList{padding:14px;display:grid;gap:10px}.toolItem{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:18px;border:1px solid var(--border);background:var(--card2)}.toolItem:hover{border-color:rgba(93,183,238,.55);background:rgba(93,183,238,.10)}.toolItem .name{margin:0;font-size:16px;font-weight:900;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.toolsFoot{padding:14px 16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;line-height:1.35;background:rgba(15,23,42,.52);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.toolsFoot .miniBtn{padding:10px 12px;border-radius:14px;border:1px solid rgba(93,183,238,.45);background:rgba(93,183,238,.14);color:var(--text);cursor:pointer;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:8px}
 @media (max-width:640px){.wrap{padding:12px}.title h1{font-size:15px}.title p{font-size:11px}.pill{display:none}.cardHeader{flex-direction:column}.toolbar{display:grid}.actions{display:grid;grid-template-columns:1fr;width:100%}.btn{width:100%}.item{grid-template-columns:82px 1fr;padding:12px}.thumb{width:82px;height:82px}.qtyBtn{width:42px;height:42px}.qtyVal{min-width:62px}.price{font-size:16px}.toolItem .name{font-size:14px}}
 
+
+/* ===== MENU ADN66 — bouton en haut à droite, vrai menu déroulant ===== */
+.adn66-header-menu{
+  position:relative;
+  z-index:2000;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  flex:0 0 auto;
+}
+
+.adn66-menu-btn{
+  min-height:44px;
+  padding:0 14px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  font-size:14px;
+  font-weight:900;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  box-shadow:0 12px 28px rgba(0,0,0,.28);
+  cursor:pointer;
+}
+
+.adn66-menu-btn:hover{
+  border-color:rgba(93,183,238,.55);
+  background:var(--card2);
+}
+
+.adn66-menu-btn:active{
+  transform:translateY(1px);
+}
+
+.adn66-menu-burger{
+  display:inline-grid;
+  gap:4px;
+  width:18px;
+  flex:0 0 auto;
+}
+
+.adn66-menu-burger span{
+  display:block;
+  width:18px;
+  height:2px;
+  border-radius:999px;
+  background:var(--text);
+}
+
+.adn66-menu-panel{
+  position:fixed;
+  top:calc(env(safe-area-inset-top) + 72px);
+  right:max(12px, env(safe-area-inset-right));
+  width:min(360px, calc(100vw - 24px));
+  max-height:calc(100dvh - 88px);
+  overflow:auto;
+  display:none;
+  padding:10px;
+  border-radius:22px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(23,32,51,.98));
+  box-shadow:0 26px 60px rgba(0,0,0,.45);
+  overscroll-behavior:contain;
+}
+
+.adn66-menu-panel.is-open{
+  display:block;
+}
+
+.adn66-menu-head{
+  padding:10px 10px 12px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:10px;
+}
+
+.adn66-menu-kicker{
+  margin:0 0 4px;
+  color:var(--blue);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.adn66-menu-title{
+  margin:0;
+  color:var(--text);
+  font-size:18px;
+  line-height:1.1;
+  font-weight:900;
+}
+
+.adn66-menu-list{
+  display:grid;
+  gap:8px;
+}
+
+.adn66-menu-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:0;
+  padding:12px;
+  border-radius:17px;
+  border:1px solid var(--border);
+  background:var(--input);
+  color:var(--text);
+  text-decoration:none;
+  transition:.16s ease;
+  cursor:pointer;
+}
+
+.adn66-menu-item:hover{
+  background:rgba(93,183,238,.10);
+  border-color:rgba(93,183,238,.38);
+}
+
+.adn66-menu-item.is-current{
+  background:rgba(93,183,238,.16);
+  border-color:rgba(93,183,238,.48);
+}
+
+.adn66-menu-icon{
+  width:44px;
+  height:44px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
+  border:1px solid rgba(93,183,238,.24);
+  font-size:22px;
+  flex:0 0 auto;
+}
+
+.adn66-menu-text{
+  min-width:0;
+  flex:1 1 auto;
+  text-align:left;
+}
+
+.adn66-menu-text strong{
+  display:block;
+  color:var(--text);
+  font-size:15px;
+  line-height:1.1;
+  font-weight:900;
+  margin-bottom:4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.adn66-menu-text span{
+  display:block;
+  color:var(--soft);
+  font-size:12px;
+  line-height:1.35;
+  font-weight:700;
+}
+
+.adn66-menu-arrow{
+  color:var(--soft);
+  font-size:18px;
+  font-weight:900;
+  flex:0 0 auto;
+}
+
+@media (max-width:640px){
+  .adn66-menu-btn{
+    min-height:42px;
+    padding:0 12px;
+    border-radius:13px;
+    font-size:0;
+  }
+
+  .adn66-menu-btn::after{
+    content:"Menu";
+    font-size:13px;
+  }
+
+  .adn66-menu-panel{
+    top:calc(env(safe-area-inset-top) + 66px);
+    left:12px;
+    right:12px;
+    width:auto;
+    max-height:calc(100dvh - 78px);
+  }
+}
+
   </style>
-  <link rel="stylesheet" href="../../shared/menu.css">
-  <script src="../../shared/menu.js" defer></script>
 </head>
 
 <body>
@@ -92,8 +282,73 @@ main{padding:16px 14px 28px}.grid{max-width:980px;margin:0 auto;display:grid;gri
         <div class="pill" id="syncPill" title="Dernière synchronisation">
           <span>Sync</span> <b id="syncText">—</b>
         </div>
-        <!-- ✅ SEUL bouton Outils (celui en vert sur ta capture) -->
-        <button class="btnIcon" id="btnOpenToolsMenu" title="Outils">☰</button>
+        <div class="adn66-header-menu">
+          <button class="adn66-menu-btn" id="adn66TopMenuBtn" type="button" aria-expanded="false" aria-controls="adn66TopMenu">
+            <span class="adn66-menu-burger" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+            Menu
+          </button>
+
+          <nav class="adn66-menu-panel" id="adn66TopMenu" aria-label="Menu outils ADN66">
+            <div class="adn66-menu-head">
+              <p class="adn66-menu-kicker">ADN66</p>
+              <h2 class="adn66-menu-title">Outils internes</h2>
+            </div>
+
+            <div class="adn66-menu-list">
+              <a class="adn66-menu-item" href="../PUSH/">
+                <div class="adn66-menu-icon">🔔</div>
+                <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <a class="adn66-menu-item" href="../apero/">
+                <div class="adn66-menu-icon">🧮</div>
+                <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <a class="adn66-menu-item" href="../fidel/admin.html">
+                <div class="adn66-menu-icon">🎁</div>
+                <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <a class="adn66-menu-item" href="../gps/">
+                <div class="adn66-menu-icon">📍</div>
+                <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <a class="adn66-menu-item" href="../status/">
+                <div class="adn66-menu-icon">📢</div>
+                <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <a class="adn66-menu-item is-current" href="../stock/">
+                <div class="adn66-menu-icon">📦</div>
+                <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <a class="adn66-menu-item" href="../twilio/">
+                <div class="adn66-menu-icon">💬</div>
+                <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <button class="adn66-menu-item" id="btnOpenStockSettingsFromTopMenu" type="button">
+                <div class="adn66-menu-icon">⚙️</div>
+                <div class="adn66-menu-text"><strong>Paramètres Stock</strong><span>Code PIN et publication</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </button>
+            </div>
+          </nav>
+        </div>
       </div>
     </div>
   </div>
@@ -132,53 +387,6 @@ main{padding:16px 14px 28px}.grid{max-width:980px;margin:0 auto;display:grid;gri
 </main>
 
 <div class="toast" id="toast"></div>
-
-<!-- ✅ MENU OUTILS (navigation) -->
-<div class="sheet" id="toolsMenuSheet" aria-hidden="true">
-  <div class="backdrop" id="toolsMenuBackdrop"></div>
-
-  <div class="panel toolsPanel" role="dialog" aria-modal="true" aria-labelledby="toolsMenuTitle">
-    <div class="toolsPanelHeader">
-      <div class="left">
-        <div class="toolsDot" aria-hidden="true">🚦</div>
-        <div class="toolsTitle">
-          <h3 id="toolsMenuTitle">ADN66 • Outils</h3>
-          <p>Menu interne — bascule rapide entre outils.</p>
-        </div>
-      </div>
-      <div class="year" id="toolsYear">2026</div>
-      <button id="toolsMenuClose" aria-label="Fermer">✕</button>
-    </div>
-
-    <div class="toolsList">
-      <div class="toolItem">
-        <p class="name">Stock</p>
-        <span class="toolTag">Outil</span>
-      </div>
-
-      <a class="toolItem" id="linkApero" href="../apero/" style="text-decoration:none;color:inherit;">
-        <p class="name">Apéro de Nuit 66</p>
-        <span class="toolTag">Outil</span>
-      </a>
-
-      <a class="toolItem" id="linkStatus" href="../status/" style="text-decoration:none;color:inherit;">
-        <p class="name">Status</p>
-        <span class="toolTag">Pilotage</span>
-      </a>
-
-      <a class="toolItem" id="linkGps" href="../gps/" style="text-decoration:none;color:inherit;">
-        <p class="name">GPS Apéro 66</p>
-        <span class="toolTag">Outil</span>
-      </a>
-    </div>
-
-    <div class="toolsFoot">
-      <span>Accès rapide : navigation interne entre outils.</span>
-      <!-- ✅ Paramètres Stock UNIQUEMENT ici -->
-      <button class="miniBtn" id="btnOpenStockSettingsFromMenu">⚙️ Paramètres Stock</button>
-    </div>
-  </div>
-</div>
 
 <!-- ✅ PARAMÈTRES STOCK (Branch/Path/PIN) -->
 <div class="sheet" id="sheet">
@@ -275,13 +483,6 @@ const btnReset = $("#btnReset");
 const dirtyBadge = $("#dirtyBadge");
 const syncText = $("#syncText");
 
-/* ✅ Menu OUTILS (nav) */
-const toolsMenuSheet = $("#toolsMenuSheet");
-const toolsMenuBackdrop = $("#toolsMenuBackdrop");
-const toolsMenuClose = $("#toolsMenuClose");
-const btnOpenToolsMenu = $("#btnOpenToolsMenu");
-const toolsYear = $("#toolsYear");
-const btnOpenStockSettingsFromMenu = $("#btnOpenStockSettingsFromMenu");
 
 /* ✅ Paramètres Stock */
 const sheet = $("#sheet");
@@ -323,15 +524,6 @@ function getGH(){
 function snapshotPath(){
   const gh = getGH();
   return `${gh.stockPath}/_snapshot.json`;
-}
-
-/* ✅ MENU OUTILS */
-function openToolsMenu(){
-  try{ toolsYear.textContent = String(new Date().getFullYear()); }catch(e){}
-  toolsMenuSheet.classList.add("show");
-}
-function closeToolsMenu(){
-  toolsMenuSheet.classList.remove("show");
 }
 
 /* ✅ PARAM STOCK */
@@ -587,15 +779,47 @@ async function pushToRepo(){
   toastMsg("Publié ✅");
 }
 
-/* UI — MENU OUTILS */
-btnOpenToolsMenu.addEventListener("click", openToolsMenu);
-toolsMenuBackdrop.addEventListener("click", closeToolsMenu);
-toolsMenuClose.addEventListener("click", closeToolsMenu);
 
-btnOpenStockSettingsFromMenu.addEventListener("click", ()=>{
-  closeToolsMenu();
-  openSettings();
+/* ✅ MENU ADN66 — vrai menu en haut */
+const adn66TopMenuBtn = $("#adn66TopMenuBtn");
+const adn66TopMenu = $("#adn66TopMenu");
+const btnOpenStockSettingsFromTopMenu = $("#btnOpenStockSettingsFromTopMenu");
+
+function closeAdn66TopMenu(){
+  if(!adn66TopMenu || !adn66TopMenuBtn) return;
+  adn66TopMenu.classList.remove("is-open");
+  adn66TopMenuBtn.setAttribute("aria-expanded", "false");
+}
+
+function toggleAdn66TopMenu(){
+  if(!adn66TopMenu || !adn66TopMenuBtn) return;
+  const open = adn66TopMenu.classList.toggle("is-open");
+  adn66TopMenuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
+if(adn66TopMenuBtn){
+  adn66TopMenuBtn.addEventListener("click", (e)=>{
+    e.stopPropagation();
+    toggleAdn66TopMenu();
+  });
+}
+
+if(adn66TopMenu){
+  adn66TopMenu.addEventListener("click", (e)=>e.stopPropagation());
+}
+
+document.addEventListener("click", closeAdn66TopMenu);
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape") closeAdn66TopMenu();
 });
+
+if(btnOpenStockSettingsFromTopMenu){
+  btnOpenStockSettingsFromTopMenu.addEventListener("click", ()=>{
+    closeAdn66TopMenu();
+    openSettings();
+  });
+}
+
 
 /* UI — PARAM STOCK */
 sheetBackdrop.addEventListener("click", closeSettings);
