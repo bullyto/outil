@@ -23,12 +23,9 @@
       --success-soft:#86efac;
       --danger:#dc2626;
       --danger-soft:#fecaca;
-      --radius-xl:24px;
-      --radius-lg:18px;
-      --radius-md:14px;
       --shadow:0 24px 70px rgba(0,0,0,.42);
 
-      /* Compat ancien code */
+      /* compatibilité ancien style */
       --bg-old:var(--bg);
       --t:var(--text);
       --t2:var(--text-soft);
@@ -91,22 +88,17 @@
       backdrop-filter:blur(10px);
     }
 
-    .brand{
-      min-width:0;
-    }
-
+    .brand{min-width:0}
     .brand b{
       display:block;
       font-size:18px;
       line-height:1.15;
       font-weight:900;
       color:var(--text);
-      letter-spacing:-.01em;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
-
     .brand span{
       display:block;
       font-size:12px;
@@ -122,6 +114,10 @@
       font-size:12px;
       color:var(--text-soft);
       background:rgba(15,23,42,.72);
+    }
+
+    #envPill{
+      display:none;
     }
 
     .card{
@@ -193,10 +189,7 @@
       font-size:14px;
     }
 
-    input::placeholder{
-      color:var(--text-muted);
-    }
-
+    input::placeholder{color:var(--text-muted)}
     input:focus{
       border-color:var(--primary);
       box-shadow:0 0 0 3px rgba(93,183,238,.14);
@@ -222,13 +215,8 @@
       box-shadow:0 12px 28px rgba(93,183,238,.20);
     }
 
-    button:hover{
-      filter:brightness(1.05);
-    }
-
-    button:active{
-      transform:translateY(1px);
-    }
+    button:hover{filter:brightness(1.05)}
+    button:active{transform:translateY(1px)}
 
     button.secondary{
       background:rgba(15,23,42,.82);
@@ -304,13 +292,8 @@
       background:rgba(93,183,238,.06);
     }
 
-    td{
-      color:var(--text);
-    }
-
-    tr:hover td{
-      background:rgba(93,183,238,.06);
-    }
+    td{color:var(--text)}
+    tr:hover td{background:rgba(93,183,238,.06)}
 
     .scan{
       width:100%;
@@ -368,17 +351,15 @@
 
     .qrsvg{margin-top:10px}
 
-    /* ===== MENU ADN66 — bouton en haut à droite, vrai menu déroulant ===== */
-    .adn66-header-menu{
+    /* MENU SANS JS : ne peut pas casser admin.js */
+    .adn66-menu-wrap{
       position:relative;
       z-index:2000;
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
       flex:0 0 auto;
     }
 
-    .adn66-menu-btn{
+    .adn66-menu-wrap summary{
+      list-style:none;
       min-height:44px;
       padding:0 14px;
       border-radius:14px;
@@ -393,23 +374,23 @@
       gap:9px;
       box-shadow:0 12px 28px rgba(0,0,0,.28);
       cursor:pointer;
-      min-width:auto;
-      flex:0 0 auto;
+      user-select:none;
     }
 
-    .adn66-menu-btn:hover{
+    .adn66-menu-wrap summary::-webkit-details-marker{display:none}
+    .adn66-menu-wrap summary:hover{
       border-color:rgba(93,183,238,.45);
       background:var(--card-2);
     }
 
-    .adn66-menu-burger{
+    .adn66-burger{
       display:inline-grid;
       gap:4px;
       width:18px;
       flex:0 0 auto;
     }
 
-    .adn66-menu-burger span{
+    .adn66-burger span{
       display:block;
       width:18px;
       height:2px;
@@ -424,7 +405,6 @@
       width:min(360px, calc(100vw - 24px));
       max-height:calc(100dvh - 102px);
       overflow:auto;
-      display:none;
       padding:10px;
       border-radius:22px;
       border:1px solid var(--border);
@@ -432,8 +412,6 @@
       box-shadow:0 26px 60px rgba(0,0,0,.45);
       overscroll-behavior:contain;
     }
-
-    .adn66-menu-panel.is-open{display:block}
 
     .adn66-menu-head{
       padding:10px 10px 12px;
@@ -532,42 +510,21 @@
     }
 
     @media (max-width:640px){
-      body{
-        padding:12px;
-      }
+      body{padding:12px}
+      .top{align-items:flex-start}
+      .brand b{font-size:16px}
+      .card-h{align-items:flex-start;flex-direction:column}
+      .row{display:grid;grid-template-columns:1fr}
+      button{width:100%;min-width:0}
 
-      .top{
-        align-items:flex-start;
-      }
-
-      .brand b{
-        font-size:16px;
-      }
-
-      .card-h{
-        align-items:flex-start;
-        flex-direction:column;
-      }
-
-      .row{
-        display:grid;
-        grid-template-columns:1fr;
-      }
-
-      button{
-        width:100%;
-        min-width:0;
-      }
-
-      .adn66-menu-btn{
+      .adn66-menu-wrap summary{
         min-height:42px;
         padding:0 12px;
         border-radius:13px;
         font-size:0;
-        width:auto;
       }
 
-      .adn66-menu-btn::after{
+      .adn66-menu-wrap summary::after{
         content:"Menu";
         font-size:13px;
       }
@@ -589,17 +546,17 @@
         <b>ADN66 • Fidélité</b>
         <span>Page Livreur/Admin</span>
       </div>
-      <div class="adn66-header-menu">
-        <button class="adn66-menu-btn" id="adn66TopMenuBtn" type="button" aria-expanded="false" aria-controls="adn66TopMenu">
-          <span class="adn66-menu-burger" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
+      <div class="pill" id="envPill">Mode : <b>Démo</b></div>
+
+      <details class="adn66-menu-wrap">
+        <summary>
+          <span class="adn66-burger" aria-hidden="true">
+            <span></span><span></span><span></span>
           </span>
           Menu
-        </button>
+        </summary>
 
-        <nav class="adn66-menu-panel" id="adn66TopMenu" aria-label="Menu outils ADN66">
+        <nav class="adn66-menu-panel" aria-label="Menu outils ADN66">
           <div class="adn66-menu-head">
             <p class="adn66-menu-kicker">ADN66</p>
             <h2 class="adn66-menu-title">Outils internes</h2>
@@ -649,7 +606,7 @@
             </a>
           </div>
         </nav>
-      </div>
+      </details>
     </div>
 
     <div class="card">
@@ -712,40 +669,6 @@
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-  <script>
-    (function(){
-      const btn = document.getElementById('adn66TopMenuBtn');
-      const panel = document.getElementById('adn66TopMenu');
-      if(!btn || !panel) return;
-
-      function closeMenu(){
-        panel.classList.remove('is-open');
-        btn.setAttribute('aria-expanded', 'false');
-      }
-
-      function toggleMenu(){
-        const open = panel.classList.toggle('is-open');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      }
-
-      btn.addEventListener('click', function(e){
-        e.stopPropagation();
-        toggleMenu();
-      });
-
-      panel.addEventListener('click', function(e){
-        e.stopPropagation();
-      });
-
-      document.addEventListener('click', closeMenu);
-
-      document.addEventListener('keydown', function(e){
-        if(e.key === 'Escape') closeMenu();
-      });
-    })();
-  </script>
-
   <script src="./admin.js?v=20260130-sane"></script>
 </body>
 </html>
