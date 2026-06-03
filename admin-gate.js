@@ -289,7 +289,7 @@
           <form id="adnAdminGateForm" autocomplete="off">
             <div class="adnAdminGateField">
               <label for="${INPUT_ID}">Mot de passe</label>
-              <input id="${INPUT_ID}" type="password" inputmode="numeric" autocomplete="current-password" placeholder="••••" />
+              <input id="${INPUT_ID}" type="password" inputmode="text" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Mot de passe" />
             </div>
 
             <div class="adnAdminGateError" id="${ERROR_ID}">Mot de passe incorrect.</div>
