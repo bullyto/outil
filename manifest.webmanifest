@@ -1,1 +1,114 @@
-{"name":"Outils ADN66 — Apéro de Nuit 66","short_name":"Outils ADN66","start_url":"./index.html","scope":"./","display":"standalone","background_color":"#0b1c2d","theme_color":"#5db7ee","icons":[{"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png"},{"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png"}]}
+{
+  "name": "Outils ADN66 — Apéro de Nuit 66",
+  "short_name": "Outils ADN66",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#5db7ee",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "PUSH",
+      "short_name": "PUSH",
+      "description": "Notifications et abonnés ADN66",
+      "url": "./apps/PUSH/",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Calculateur",
+      "short_name": "Calculateur",
+      "description": "Calculateur courses Metro HT",
+      "url": "./apps/apero/",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Fidélité",
+      "short_name": "Fidélité",
+      "description": "Administration carte fidélité",
+      "url": "./apps/fidel/admin.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "GPS",
+      "short_name": "GPS",
+      "description": "Outil GPS et tournées",
+      "url": "./apps/gps/",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Status",
+      "short_name": "Status",
+      "description": "Pilotage des statuts et messages",
+      "url": "./apps/status/",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Stock",
+      "short_name": "Stock",
+      "description": "Gestion stock véhicule",
+      "url": "./apps/stock/",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Twilio SMS",
+      "short_name": "Twilio",
+      "description": "Marketing SMS ADN66",
+      "url": "./apps/twilio/",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
