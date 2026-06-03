@@ -12,92 +12,84 @@
   <link rel="stylesheet" href="styles.css?v=9" />
 
   <style>
-    /* ===== MENU FLOTTANT ADN66 — responsive, sans débordement ===== */
-    .adn66-fab{
-      position:fixed;
-      right:max(14px, env(safe-area-inset-right));
-      bottom:max(14px, env(safe-area-inset-bottom));
-      z-index:1000;
+    /* ===== MENU ADN66 — bouton en haut à droite, vrai menu déroulant ===== */
+    .adn66-header-menu{
+      position:relative;
+      z-index:2000;
       display:flex;
       align-items:center;
-      gap:10px;
-      min-height:56px;
-      padding:0 16px;
-      border:none;
-      border-radius:18px;
-      background:linear-gradient(180deg, #5db7ee, #4aa7df);
-      color:#fff;
-      font-size:15px;
+      justify-content:flex-end;
+      flex:0 0 auto;
+    }
+
+    .adn66-menu-btn{
+      min-height:44px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid #283447;
+      background:#111827;
+      color:#f8fafc;
+      font-size:14px;
       font-weight:900;
-      letter-spacing:.01em;
-      box-shadow:0 18px 34px rgba(93,183,238,.22), 0 10px 24px rgba(0,0,0,.35);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:9px;
+      box-shadow:0 12px 28px rgba(0,0,0,.28);
       cursor:pointer;
     }
 
-    .adn66-fab:hover{filter:brightness(1.04)}
-    .adn66-fab:active{transform:translateY(1px)}
-
-    .adn66-fab__icon{
-      width:24px;
-      height:24px;
-      display:inline-grid;
-      gap:4px;
-      align-content:center;
+    .adn66-menu-btn:hover{
+      border-color:rgba(93,183,238,.45);
+      background:#172033;
     }
 
-    .adn66-fab__icon span{
+    .adn66-menu-btn:active{
+      transform:translateY(1px);
+    }
+
+    .adn66-menu-burger{
+      display:inline-grid;
+      gap:4px;
+      width:18px;
+      flex:0 0 auto;
+    }
+
+    .adn66-menu-burger span{
       display:block;
       width:18px;
       height:2px;
       border-radius:999px;
-      background:#fff;
-      margin:0 auto;
+      background:#f8fafc;
     }
 
-    .adn66-menu{
+    .adn66-menu-panel{
       position:fixed;
-      inset:0;
-      z-index:1100;
+      top:calc(env(safe-area-inset-top) + 72px);
+      right:max(12px, env(safe-area-inset-right));
+      width:min(360px, calc(100vw - 24px));
+      max-height:calc(100dvh - 88px);
+      overflow:auto;
       display:none;
-    }
-
-    .adn66-menu.is-open{display:block}
-
-    .adn66-menu__backdrop{
-      position:absolute;
-      inset:0;
-      background:rgba(2,6,12,.64);
-      backdrop-filter:blur(6px);
-    }
-
-    .adn66-menu__panel{
-      position:absolute;
-      right:max(14px, env(safe-area-inset-right));
-      bottom:calc(max(14px, env(safe-area-inset-bottom)) + 68px);
-      width:min(380px, calc(100vw - 28px));
-      max-height:min(700px, calc(100vh - 96px));
-      display:flex;
-      flex-direction:column;
-      background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(23,32,51,.98));
+      padding:10px;
+      border-radius:22px;
       border:1px solid #283447;
-      border-radius:24px;
+      background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(23,32,51,.98));
       box-shadow:0 26px 60px rgba(0,0,0,.45);
-      overflow:hidden;
+      overscroll-behavior:contain;
     }
 
-    .adn66-menu__header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:16px;
+    .adn66-menu-panel.is-open{
+      display:block;
+    }
+
+    .adn66-menu-head{
+      padding:10px 10px 12px;
       border-bottom:1px solid #283447;
-      background:linear-gradient(180deg, rgba(93,183,238,.10), rgba(93,183,238,.02));
+      margin-bottom:10px;
     }
 
-    .adn66-menu__titlewrap{min-width:0}
-
-    .adn66-menu__kicker{
+    .adn66-menu-kicker{
       margin:0 0 4px;
       color:#5db7ee;
       font-size:11px;
@@ -106,7 +98,7 @@
       text-transform:uppercase;
     }
 
-    .adn66-menu__title{
+    .adn66-menu-title{
       margin:0;
       color:#f8fafc;
       font-size:18px;
@@ -114,78 +106,57 @@
       font-weight:900;
     }
 
-    .adn66-menu__sub{
-      margin:6px 0 0;
-      color:#94a3b8;
-      font-size:12px;
-      line-height:1.4;
-      font-weight:700;
-    }
-
-    .adn66-menu__close{
-      flex:0 0 auto;
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      border:1px solid #283447;
-      background:rgba(15,23,42,.88);
-      color:#f8fafc;
-      font-size:18px;
-      font-weight:900;
-      cursor:pointer;
-    }
-
-    .adn66-menu__body{
-      padding:14px;
-      overflow:auto;
+    .adn66-menu-list{
       display:grid;
-      gap:10px;
-      overscroll-behavior:contain;
+      gap:8px;
     }
 
-    .adn66-menu__item{
+    .adn66-menu-item{
       display:flex;
       align-items:center;
       gap:12px;
       min-width:0;
-      text-decoration:none;
-      color:#f8fafc;
-      background:rgba(15,23,42,.74);
-      border:1px solid #283447;
-      border-radius:18px;
       padding:12px;
-      transition:.18s ease;
+      border-radius:17px;
+      border:1px solid #283447;
+      background:#0f172a;
+      color:#f8fafc;
+      text-decoration:none;
+      transition:.16s ease;
     }
 
-    .adn66-menu__item:hover{
-      background:rgba(93,183,238,.08);
-      border-color:rgba(93,183,238,.34);
-      transform:translateY(-1px);
+    .adn66-menu-item:hover{
+      background:rgba(93,183,238,.10);
+      border-color:rgba(93,183,238,.38);
     }
 
-    .adn66-menu__itemicon{
-      width:50px;
-      height:50px;
-      border-radius:16px;
-      background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
-      border:1px solid rgba(93,183,238,.22);
-      box-shadow:0 10px 18px rgba(0,0,0,.18);
+    .adn66-menu-item.is-current{
+      background:rgba(93,183,238,.16);
+      border-color:rgba(93,183,238,.48);
+    }
+
+    .adn66-menu-icon{
+      width:44px;
+      height:44px;
+      border-radius:15px;
       display:grid;
       place-items:center;
-      font-size:24px;
+      background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
+      border:1px solid rgba(93,183,238,.24);
+      font-size:22px;
       flex:0 0 auto;
     }
 
-    .adn66-menu__itemtext{
+    .adn66-menu-text{
       min-width:0;
       flex:1 1 auto;
     }
 
-    .adn66-menu__itemtext strong{
+    .adn66-menu-text strong{
       display:block;
       color:#f8fafc;
-      font-size:16px;
-      line-height:1.15;
+      font-size:15px;
+      line-height:1.1;
       font-weight:900;
       margin-bottom:4px;
       white-space:nowrap;
@@ -193,7 +164,7 @@
       text-overflow:ellipsis;
     }
 
-    .adn66-menu__itemtext span{
+    .adn66-menu-text span{
       display:block;
       color:#94a3b8;
       font-size:12px;
@@ -201,46 +172,33 @@
       font-weight:700;
     }
 
-    .adn66-menu__arrow{
+    .adn66-menu-arrow{
       color:#94a3b8;
-      font-size:20px;
+      font-size:18px;
       font-weight:900;
       flex:0 0 auto;
     }
 
-    .adn66-menu__footer{
-      padding:14px 16px 16px;
-      border-top:1px solid #283447;
-      color:#94a3b8;
-      font-size:12px;
-      line-height:1.4;
-      font-weight:700;
-      background:rgba(11,18,32,.88);
-    }
-
-    @media (max-width: 640px){
-      .adn66-fab{
-        left:max(12px, env(safe-area-inset-left));
-        right:max(12px, env(safe-area-inset-right));
-        bottom:max(12px, env(safe-area-inset-bottom));
-        justify-content:center;
-        min-height:54px;
+    @media (max-width:640px){
+      .adn66-menu-btn{
+        min-height:42px;
+        padding:0 12px;
+        border-radius:13px;
+        font-size:0;
       }
 
-      .adn66-menu__panel{
-        left:max(12px, env(safe-area-inset-left));
-        right:max(12px, env(safe-area-inset-right));
-        bottom:calc(max(12px, env(safe-area-inset-bottom)) + 64px);
+      .adn66-menu-btn::after{
+        content:"Menu";
+        font-size:13px;
+      }
+
+      .adn66-menu-panel{
+        top:calc(env(safe-area-inset-top) + 66px);
+        left:12px;
+        right:12px;
         width:auto;
-        max-height:calc(100vh - 88px);
-        border-radius:22px;
+        max-height:calc(100dvh - 78px);
       }
-
-      .adn66-menu__header{padding:14px}
-      .adn66-menu__body{padding:12px}
-      .adn66-menu__item{padding:11px}
-      .adn66-menu__itemicon{width:46px;height:46px;font-size:22px}
-      .adn66-menu__itemtext strong{font-size:15px}
     }
   </style>
 
@@ -252,7 +210,70 @@
         <p class="eyebrow">Apéro de Nuit 66</p>
         <h1>Marketing SMS</h1>
       </div>
-      <button id="installBtn" class="ghost hidden">Installer</button>
+      <button id="installBtn" class="ghost hidden" type="button">Installer</button>
+
+      <div class="adn66-header-menu">
+        <button class="adn66-menu-btn" id="adn66TopMenuBtn" type="button" aria-expanded="false" aria-controls="adn66TopMenu">
+          <span class="adn66-menu-burger" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          Menu
+        </button>
+
+        <nav class="adn66-menu-panel" id="adn66TopMenu" aria-label="Menu outils ADN66">
+          <div class="adn66-menu-head">
+            <p class="adn66-menu-kicker">ADN66</p>
+            <h2 class="adn66-menu-title">Outils internes</h2>
+          </div>
+
+          <div class="adn66-menu-list">
+            <a class="adn66-menu-item" href="../PUSH/">
+              <div class="adn66-menu-icon">🔔</div>
+              <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+
+            <a class="adn66-menu-item" href="../apero/">
+              <div class="adn66-menu-icon">🧮</div>
+              <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+
+            <a class="adn66-menu-item" href="../fidel/admin.html">
+              <div class="adn66-menu-icon">🎁</div>
+              <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+
+            <a class="adn66-menu-item" href="../gps/">
+              <div class="adn66-menu-icon">📍</div>
+              <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+
+            <a class="adn66-menu-item" href="../status/">
+              <div class="adn66-menu-icon">📢</div>
+              <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+
+            <a class="adn66-menu-item" href="../stock/">
+              <div class="adn66-menu-icon">📦</div>
+              <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+
+            <a class="adn66-menu-item is-current" href="../twilio/">
+              <div class="adn66-menu-icon">💬</div>
+              <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+          </div>
+        </nav>
+      </div>
+
     </header>
 
     <nav class="tabs" aria-label="Navigation">
@@ -450,21 +471,40 @@
 
     <div id="toast" class="toast hidden"></div>
   </div>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('adn66TopMenuBtn');
+      const panel = document.getElementById('adn66TopMenu');
+      if(!btn || !panel) return;
+
+      function closeMenu(){
+        panel.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+
+      function toggleMenu(){
+        const open = panel.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        toggleMenu();
+      });
+
+      panel.addEventListener('click', function(e){
+        e.stopPropagation();
+      });
+
+      document.addEventListener('click', closeMenu);
+
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape') closeMenu();
+      });
+    })();
+  </script>
+
   <script src="app.js?v=9"></script>
-
-  <!-- Menu ADN66 fixe en haut -->
-  <nav class="adn66-topnav" aria-label="Navigation outils ADN66">
-    <div class="adn66-topnav__inner">
-      <a class="adn66-topnav__brand" href="../../index.html"><span>ADN66</span> Outils</a>
-      <a class="adn66-topnav__link" href="../PUSH/">🔔 PUSH</a>
-      <a class="adn66-topnav__link" href="../apero/">🧮 Calculateur</a>
-      <a class="adn66-topnav__link" href="../fidel/admin.html">🎁 Fidélité</a>
-      <a class="adn66-topnav__link" href="../gps/">📍 GPS</a>
-      <a class="adn66-topnav__link" href="../status/">📢 Status</a>
-      <a class="adn66-topnav__link" href="../stock/">📦 Stock</a>
-      <a class="adn66-topnav__link is-current" href="../twilio/">💬 Twilio SMS</a>
-    </div>
-  </nav>
-
 </body>
 </html>
