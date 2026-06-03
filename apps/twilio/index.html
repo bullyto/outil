@@ -10,6 +10,240 @@
   <title>ADN66 Marketing SMS</title>
   <link rel="manifest" href="manifest.json?v=9" />
   <link rel="stylesheet" href="styles.css?v=9" />
+
+  <style>
+    /* ===== MENU FLOTTANT ADN66 — responsive, sans débordement ===== */
+    .adn66-fab{
+      position:fixed;
+      right:max(14px, env(safe-area-inset-right));
+      bottom:max(14px, env(safe-area-inset-bottom));
+      z-index:1000;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-height:56px;
+      padding:0 16px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(180deg, #5db7ee, #4aa7df);
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:.01em;
+      box-shadow:0 18px 34px rgba(93,183,238,.22), 0 10px 24px rgba(0,0,0,.35);
+      cursor:pointer;
+    }
+
+    .adn66-fab:hover{filter:brightness(1.04)}
+    .adn66-fab:active{transform:translateY(1px)}
+
+    .adn66-fab__icon{
+      width:24px;
+      height:24px;
+      display:inline-grid;
+      gap:4px;
+      align-content:center;
+    }
+
+    .adn66-fab__icon span{
+      display:block;
+      width:18px;
+      height:2px;
+      border-radius:999px;
+      background:#fff;
+      margin:0 auto;
+    }
+
+    .adn66-menu{
+      position:fixed;
+      inset:0;
+      z-index:1100;
+      display:none;
+    }
+
+    .adn66-menu.is-open{display:block}
+
+    .adn66-menu__backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(2,6,12,.64);
+      backdrop-filter:blur(6px);
+    }
+
+    .adn66-menu__panel{
+      position:absolute;
+      right:max(14px, env(safe-area-inset-right));
+      bottom:calc(max(14px, env(safe-area-inset-bottom)) + 68px);
+      width:min(380px, calc(100vw - 28px));
+      max-height:min(700px, calc(100vh - 96px));
+      display:flex;
+      flex-direction:column;
+      background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(23,32,51,.98));
+      border:1px solid #283447;
+      border-radius:24px;
+      box-shadow:0 26px 60px rgba(0,0,0,.45);
+      overflow:hidden;
+    }
+
+    .adn66-menu__header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:16px;
+      border-bottom:1px solid #283447;
+      background:linear-gradient(180deg, rgba(93,183,238,.10), rgba(93,183,238,.02));
+    }
+
+    .adn66-menu__titlewrap{min-width:0}
+
+    .adn66-menu__kicker{
+      margin:0 0 4px;
+      color:#5db7ee;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .adn66-menu__title{
+      margin:0;
+      color:#f8fafc;
+      font-size:18px;
+      line-height:1.1;
+      font-weight:900;
+    }
+
+    .adn66-menu__sub{
+      margin:6px 0 0;
+      color:#94a3b8;
+      font-size:12px;
+      line-height:1.4;
+      font-weight:700;
+    }
+
+    .adn66-menu__close{
+      flex:0 0 auto;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      border:1px solid #283447;
+      background:rgba(15,23,42,.88);
+      color:#f8fafc;
+      font-size:18px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .adn66-menu__body{
+      padding:14px;
+      overflow:auto;
+      display:grid;
+      gap:10px;
+      overscroll-behavior:contain;
+    }
+
+    .adn66-menu__item{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+      text-decoration:none;
+      color:#f8fafc;
+      background:rgba(15,23,42,.74);
+      border:1px solid #283447;
+      border-radius:18px;
+      padding:12px;
+      transition:.18s ease;
+    }
+
+    .adn66-menu__item:hover{
+      background:rgba(93,183,238,.08);
+      border-color:rgba(93,183,238,.34);
+      transform:translateY(-1px);
+    }
+
+    .adn66-menu__itemicon{
+      width:50px;
+      height:50px;
+      border-radius:16px;
+      background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
+      border:1px solid rgba(93,183,238,.22);
+      box-shadow:0 10px 18px rgba(0,0,0,.18);
+      display:grid;
+      place-items:center;
+      font-size:24px;
+      flex:0 0 auto;
+    }
+
+    .adn66-menu__itemtext{
+      min-width:0;
+      flex:1 1 auto;
+    }
+
+    .adn66-menu__itemtext strong{
+      display:block;
+      color:#f8fafc;
+      font-size:16px;
+      line-height:1.15;
+      font-weight:900;
+      margin-bottom:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .adn66-menu__itemtext span{
+      display:block;
+      color:#94a3b8;
+      font-size:12px;
+      line-height:1.35;
+      font-weight:700;
+    }
+
+    .adn66-menu__arrow{
+      color:#94a3b8;
+      font-size:20px;
+      font-weight:900;
+      flex:0 0 auto;
+    }
+
+    .adn66-menu__footer{
+      padding:14px 16px 16px;
+      border-top:1px solid #283447;
+      color:#94a3b8;
+      font-size:12px;
+      line-height:1.4;
+      font-weight:700;
+      background:rgba(11,18,32,.88);
+    }
+
+    @media (max-width: 640px){
+      .adn66-fab{
+        left:max(12px, env(safe-area-inset-left));
+        right:max(12px, env(safe-area-inset-right));
+        bottom:max(12px, env(safe-area-inset-bottom));
+        justify-content:center;
+        min-height:54px;
+      }
+
+      .adn66-menu__panel{
+        left:max(12px, env(safe-area-inset-left));
+        right:max(12px, env(safe-area-inset-right));
+        bottom:calc(max(12px, env(safe-area-inset-bottom)) + 64px);
+        width:auto;
+        max-height:calc(100vh - 88px);
+        border-radius:22px;
+      }
+
+      .adn66-menu__header{padding:14px}
+      .adn66-menu__body{padding:12px}
+      .adn66-menu__item{padding:11px}
+      .adn66-menu__itemicon{width:46px;height:46px;font-size:22px}
+      .adn66-menu__itemtext strong{font-size:15px}
+    }
+  </style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -217,5 +451,132 @@
     <div id="toast" class="toast hidden"></div>
   </div>
   <script src="app.js?v=9"></script>
+
+  <!-- Menu flottant ADN66 -->
+  <button class="adn66-fab" id="adn66MenuOpen" type="button" aria-expanded="false" aria-controls="adn66Menu">
+    <span class="adn66-fab__icon" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+    Menu ADN66
+  </button>
+
+  <div class="adn66-menu" id="adn66Menu" aria-hidden="true">
+    <div class="adn66-menu__backdrop" id="adn66MenuBackdrop"></div>
+
+    <aside class="adn66-menu__panel" role="dialog" aria-modal="true" aria-labelledby="adn66MenuTitle">
+      <div class="adn66-menu__header">
+        <div class="adn66-menu__titlewrap">
+          <p class="adn66-menu__kicker">Navigation interne</p>
+          <h2 class="adn66-menu__title" id="adn66MenuTitle">Outils ADN66</h2>
+          
+        </div>
+        <button class="adn66-menu__close" id="adn66MenuClose" type="button" aria-label="Fermer le menu">✕</button>
+      </div>
+
+      <div class="adn66-menu__body">
+        <a class="adn66-menu__item" href="../PUSH/">
+          <div class="adn66-menu__itemicon">🔔</div>
+          <div class="adn66-menu__itemtext">
+            <strong>PUSH</strong>
+            <span>Notifications et abonnés</span>
+          </div>
+          <div class="adn66-menu__arrow">→</div>
+        </a>
+
+        <a class="adn66-menu__item" href="../apero/">
+          <div class="adn66-menu__itemicon">🧮</div>
+          <div class="adn66-menu__itemtext">
+            <strong>Calculateur</strong>
+            <span>Calculatrice métier et calculs rapides</span>
+          </div>
+          <div class="adn66-menu__arrow">→</div>
+        </a>
+
+        <a class="adn66-menu__item" href="../fidel/admin.html">
+          <div class="adn66-menu__itemicon">🎁</div>
+          <div class="adn66-menu__itemtext">
+            <strong>Fidélité</strong>
+            <span>Accès admin et gestion client</span>
+          </div>
+          <div class="adn66-menu__arrow">→</div>
+        </a>
+
+        <a class="adn66-menu__item" href="../gps/">
+          <div class="adn66-menu__itemicon">📍</div>
+          <div class="adn66-menu__itemtext">
+            <strong>GPS</strong>
+            <span>Livraisons, trajets et localisation</span>
+          </div>
+          <div class="adn66-menu__arrow">→</div>
+        </a>
+
+        <a class="adn66-menu__item" href="../status/">
+          <div class="adn66-menu__itemicon">📢</div>
+          <div class="adn66-menu__itemtext">
+            <strong>Status</strong>
+            <span>Messages et états des sites</span>
+          </div>
+          <div class="adn66-menu__arrow">→</div>
+        </a>
+
+        <a class="adn66-menu__item" href="../stock/">
+          <div class="adn66-menu__itemicon">📦</div>
+          <div class="adn66-menu__itemtext">
+            <strong>Stock</strong>
+            <span>Produits, disponibilité et tarifs</span>
+          </div>
+          <div class="adn66-menu__arrow">→</div>
+        </a>
+
+        <a class="adn66-menu__item" href="../twilio/">
+          <div class="adn66-menu__itemicon">💬</div>
+          <div class="adn66-menu__itemtext">
+            <strong>Twilio SMS</strong>
+            <span>Campagnes, contacts et historique</span>
+          </div>
+          <div class="adn66-menu__arrow">→</div>
+        </a>
+      </div>
+
+      <div class="adn66-menu__footer">
+        Accès rapide aux modules internes ADN66.
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    (function(){
+      const menuRoot = document.getElementById('adn66Menu');
+      const openBtn = document.getElementById('adn66MenuOpen');
+      const closeBtn = document.getElementById('adn66MenuClose');
+      const backdrop = document.getElementById('adn66MenuBackdrop');
+      if(!menuRoot || !openBtn || !closeBtn || !backdrop) return;
+
+      function openMenu(){
+        menuRoot.classList.add('is-open');
+        menuRoot.setAttribute('aria-hidden', 'false');
+        openBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMenu(){
+        menuRoot.classList.remove('is-open');
+        menuRoot.setAttribute('aria-hidden', 'true');
+        openBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+
+      openBtn.addEventListener('click', openMenu);
+      closeBtn.addEventListener('click', closeMenu);
+      backdrop.addEventListener('click', closeMenu);
+
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape' && menuRoot.classList.contains('is-open')) closeMenu();
+      });
+    })();
+  </script>
+
 </body>
 </html>
