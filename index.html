@@ -2,369 +2,1028 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Outils ADN66 — Modules</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <title>Apéro Status Admin</title>
+
   <meta name="theme-color" content="#5db7ee" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Outils ADN66" />
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="robots" content="noindex,nofollow" />
-  <link rel="icon" href="./icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
 
   <style>
-    :root{
-      --primary:#5db7ee;
-      --bg:#0b1220;
-      --bg-deep:#070b12;
-      --bg-mid:#111827;
-      --bg-soft:#1f2937;
-      --card:#111827;
-      --card-2:#172033;
-      --border:#283447;
-      --text:#f8fafc;
-      --text-soft:#cbd5e1;
-      --text-muted:#94a3b8;
-      --radius-xl:26px;
-      --radius-lg:20px;
-      --radius-md:16px;
-      --shadow:0 18px 40px rgba(0,0,0,.35);
-    }
-
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0;min-height:100%}
-
-    body{
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at top, rgba(93,183,238,.16) 0%, rgba(93,183,238,0) 28%),
-        linear-gradient(180deg,var(--bg-deep) 0%, var(--bg) 30%, var(--bg-mid) 72%, var(--bg-soft) 100%);
-      overflow-x:hidden;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-      background-size:24px 24px;
-      mask-image:linear-gradient(to bottom, rgba(0,0,0,.25), transparent 85%);
-      z-index:0;
-    }
-
-    .page{
+    /* ===== MENU ADN66 — bouton en haut à droite, vrai menu déroulant ===== */
+    .adn66-header-menu{
       position:relative;
-      z-index:1;
-      max-width:1180px;
-      margin:0 auto;
-      padding:18px 14px 34px;
-    }
-
-    .sr-only{
-      position:absolute;
-      width:1px;
-      height:1px;
-      padding:0;
-      margin:-1px;
-      overflow:hidden;
-      clip:rect(0,0,0,0);
-      white-space:nowrap;
-      border:0;
-    }
-
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:14px;
-    }
-
-    .card{
-      background:
-        radial-gradient(circle at top left, rgba(93,183,238,.13), transparent 34%),
-        linear-gradient(180deg, rgba(17,24,39,.96), rgba(23,32,51,.94));
-      border:1px solid var(--border);
-      border-radius:24px;
-      padding:18px;
-      box-shadow:var(--shadow);
+      z-index:2000;
       display:flex;
-      flex-direction:column;
-      min-height:260px;
-      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-
-    .card:hover{
-      transform:translateY(-2px);
-      border-color:rgba(93,183,238,.36);
-      box-shadow:0 22px 44px rgba(0,0,0,.40);
-    }
-
-    .card-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:14px;
-    }
-
-    .card-icon{
-      width:60px;
-      height:60px;
-      border-radius:20px;
-      display:grid;
-      place-items:center;
-      font-size:26px;
-      background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
-      border:1px solid rgba(93,183,238,.24);
-      box-shadow:0 10px 24px rgba(0,0,0,.28);
+      align-items:center;
+      justify-content:flex-end;
       flex:0 0 auto;
     }
 
-    .card-badge{
+    .adn66-menu-btn{
+      min-height:44px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid #283447;
+      background:#111827;
+      color:#f8fafc;
+      font-size:14px;
+      font-weight:900;
       display:inline-flex;
       align-items:center;
-      padding:7px 10px;
+      justify-content:center;
+      gap:9px;
+      box-shadow:0 12px 28px rgba(0,0,0,.28);
+      cursor:pointer;
+    }
+
+    .adn66-menu-btn:hover{
+      border-color:rgba(93,183,238,.45);
+      background:#172033;
+    }
+
+    .adn66-menu-btn:active{
+      transform:translateY(1px);
+    }
+
+    .adn66-menu-burger{
+      display:inline-grid;
+      gap:4px;
+      width:18px;
+      flex:0 0 auto;
+    }
+
+    .adn66-menu-burger span{
+      display:block;
+      width:18px;
+      height:2px;
       border-radius:999px;
-      background:rgba(93,183,238,.12);
-      border:1px solid rgba(93,183,238,.22);
-      color:var(--text);
+      background:#f8fafc;
+    }
+
+    .adn66-menu-panel{
+      position:fixed;
+      top:calc(env(safe-area-inset-top) + 72px);
+      right:max(12px, env(safe-area-inset-right));
+      width:min(360px, calc(100vw - 24px));
+      max-height:calc(100dvh - 88px);
+      overflow:auto;
+      display:none;
+      padding:10px;
+      border-radius:22px;
+      border:1px solid #283447;
+      background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(23,32,51,.98));
+      box-shadow:0 26px 60px rgba(0,0,0,.45);
+      overscroll-behavior:contain;
+    }
+
+    .adn66-menu-panel.is-open{
+      display:block;
+    }
+
+    .adn66-menu-head{
+      padding:10px 10px 12px;
+      border-bottom:1px solid #283447;
+      margin-bottom:10px;
+    }
+
+    .adn66-menu-kicker{
+      margin:0 0 4px;
+      color:#5db7ee;
       font-size:11px;
       font-weight:900;
-      letter-spacing:.08em;
+      letter-spacing:.12em;
       text-transform:uppercase;
-      white-space:nowrap;
     }
 
-    .card h2{
-      margin:0 0 8px;
-      font-size:22px;
+    .adn66-menu-title{
+      margin:0;
+      color:#f8fafc;
+      font-size:18px;
       line-height:1.1;
       font-weight:900;
-      letter-spacing:-.02em;
     }
 
-    .card p{
-      margin:0 0 16px;
-      color:var(--text-soft);
-      font-size:14px;
-      line-height:1.55;
-      font-weight:700;
-    }
-
-    .card ul{
-      margin:0 0 18px;
-      padding:0;
-      list-style:none;
+    .adn66-menu-list{
       display:grid;
       gap:8px;
     }
 
-    .card ul li{
-      display:flex;
-      gap:8px;
-      color:var(--text-muted);
-      font-size:13px;
-      line-height:1.4;
-      font-weight:700;
-    }
-
-    .card ul li::before{
-      content:"•";
-      color:var(--primary);
-      font-weight:900;
-    }
-
-    .card-footer{
-      margin-top:auto;
+    .adn66-menu-item{
       display:flex;
       align-items:center;
-      justify-content:space-between;
       gap:12px;
-    }
-
-    .card-link{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:48px;
-      padding:0 18px;
-      border-radius:14px;
+      min-width:0;
+      padding:12px;
+      border-radius:17px;
+      border:1px solid #283447;
+      background:#0f172a;
+      color:#f8fafc;
       text-decoration:none;
-      background:var(--primary);
-      color:#fff;
-      font-size:15px;
-      font-weight:900;
-      border:1px solid var(--primary);
-      box-shadow:0 10px 24px rgba(93,183,238,.22);
+      transition:.16s ease;
     }
 
-    .card-link:hover{ filter:brightness(1.05); }
+    .adn66-menu-item:hover{
+      background:rgba(93,183,238,.10);
+      border-color:rgba(93,183,238,.38);
+    }
 
-    .card-arrow{
-      color:var(--text-muted);
+    .adn66-menu-item.is-current{
+      background:rgba(93,183,238,.16);
+      border-color:rgba(93,183,238,.48);
+    }
+
+    .adn66-menu-icon{
+      width:44px;
+      height:44px;
+      border-radius:15px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
+      border:1px solid rgba(93,183,238,.24);
       font-size:22px;
+      flex:0 0 auto;
+    }
+
+    .adn66-menu-text{
+      min-width:0;
+      flex:1 1 auto;
+    }
+
+    .adn66-menu-text strong{
+      display:block;
+      color:#f8fafc;
+      font-size:15px;
+      line-height:1.1;
+      font-weight:900;
+      margin-bottom:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .adn66-menu-text span{
+      display:block;
+      color:#94a3b8;
+      font-size:12px;
+      line-height:1.35;
       font-weight:700;
     }
 
-    @media (max-width: 1060px){
-      .cards{grid-template-columns:repeat(2, minmax(0,1fr))}
+    .adn66-menu-arrow{
+      color:#94a3b8;
+      font-size:18px;
+      font-weight:900;
+      flex:0 0 auto;
     }
 
-    @media (max-width: 720px){
-      .page{padding:14px 12px 28px}
-      .cards{grid-template-columns:1fr}
-      .card{min-height:auto}
+    @media (max-width:640px){
+      .adn66-menu-btn{
+        min-height:42px;
+        padding:0 12px;
+        border-radius:13px;
+        font-size:0;
+      }
+
+      .adn66-menu-btn::after{
+        content:"Menu";
+        font-size:13px;
+      }
+
+      .adn66-menu-panel{
+        top:calc(env(safe-area-inset-top) + 66px);
+        left:12px;
+        right:12px;
+        width:auto;
+        max-height:calc(100dvh - 78px);
+      }
     }
+
+    /* ===== VERSION ALLÉGÉE + POPUPS PROPRES ===== */
+    .compact-subtitle{opacity:.75;font-size:12px}
+    .top{padding:12px 14px;border-radius:20px}
+    .brand img{width:44px!important;height:44px!important;border-radius:14px!important}
+    .brand h1{margin:0!important;font-size:20px!important;line-height:1.05!important}
+    .top > .badge{display:none}
+
+    .quick-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr 1.2fr;
+      gap:10px;
+      margin:0 0 14px;
+    }
+    .quick-actions button{min-height:46px;border-radius:16px;font-weight:900}
+
+    #publishedNow{display:none}
+    .preview .hd .small,.card .hd .small{display:none}
+    .grid{gap:14px}
+    .card{border-radius:22px}
+    .card .hd{padding:13px 14px}
+    .card .bd{padding:14px}
+    .published-grid{grid-template-columns:92px 1fr!important;gap:14px!important}
+    .published-grid img{max-height:92px!important;object-fit:cover;border-radius:16px}
+
+    .gh-zone{display:none}
+    .gh-zone.is-open{display:block}
+
+    /* cacher les détails techniques, garder les champs pour le JS */
+    .gh-zone .row:first-child,
+    .gh-zone > div:nth-of-type(2),
+    #ghOwner,
+    #ghRepo,
+    #ghBranch,
+    #ghPath,
+    #tokenStatus,
+    .gh-zone .hint br{
+      display:none!important;
+    }
+    .gh-zone .hint{display:none!important}
+    .gh-zone label{font-size:0!important;margin:0 0 8px!important}
+    .gh-zone label::after{content:"Mot de passe";font-size:12px;color:#cbd5e1;font-weight:900}
+    #ghToken{margin-top:0}
+    #btnSaveToken{font-size:0}
+    #btnSaveToken::after{content:"Enregistrer";font-size:15px}
+    #btnClearToken{font-size:0}
+    #btnClearToken::after{content:"Supprimer";font-size:15px}
+
+    .adn-lite-modal{
+      position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+      padding:14px;background:rgba(2,6,12,.72);backdrop-filter:blur(8px);z-index:5000;
+    }
+    .adn-lite-modal.is-open{display:flex}
+    .adn-lite-box{
+      width:min(680px,100%);max-height:calc(100dvh - 32px);overflow:auto;
+      border-radius:24px;border:1px solid #283447;
+      background:linear-gradient(180deg,rgba(17,24,39,.98),rgba(23,32,51,.98));
+      box-shadow:0 28px 70px rgba(0,0,0,.52);
+    }
+    .adn-lite-head{
+      display:flex;justify-content:space-between;align-items:center;gap:12px;
+      padding:14px 16px;border-bottom:1px solid #283447;
+      background:linear-gradient(180deg,rgba(93,183,238,.10),rgba(17,24,39,.12));
+    }
+    .adn-lite-title{margin:0;font-size:17px;line-height:1.15;font-weight:900;color:#f8fafc}
+    .adn-lite-close{
+      width:40px;height:40px;min-width:40px;padding:0;border-radius:14px;
+      border:1px solid #283447;background:#0f172a;color:#f8fafc;box-shadow:none;flex:0 0 auto;
+    }
+    .adn-lite-body{padding:16px}
+    .adn-lite-message{margin:0;color:#cbd5e1;font-size:14px;line-height:1.45;font-weight:700}
+    .adn-lite-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .adn-lite-actions button{min-width:0}
+    .adn-lite-inline-card{
+      border:1px solid #283447;background:#0f172a;border-radius:18px;padding:13px;margin-top:12px;
+    }
+    .adn-pulse{
+      display:inline-block;width:10px;height:10px;border-radius:999px;background:#5db7ee;
+      box-shadow:0 0 0 0 rgba(93,183,238,.55);animation:adnPulse 1.1s infinite;margin-right:8px;
+    }
+    @keyframes adnPulse{70%{box-shadow:0 0 0 10px rgba(93,183,238,0)}100%{box-shadow:0 0 0 0 rgba(93,183,238,0)}}
+    .toast{display:none!important}
+    @media (max-width:760px){
+      .quick-actions{grid-template-columns:1fr}
+      .top{gap:10px}
+      .top .brand{align-items:center}
+      .adn66-header-menu{margin-left:auto}
+    }
+
   </style>
+
 </head>
+
 <body>
-  <main class="page">
-    <h1 class="sr-only">Modules ADN66</h1>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <img src="icon-192.png" alt="Logo ADN66" />
+        <div>
+          <h1>Status Admin</h1>
+          <div class="small compact-subtitle">Publication du statut</div>
+          <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap">
+            <span class="pill">🕒 <b id="clock">—</b></span>
+            <span class="pill">📅 <b id="today">—</b></span>
+          </div>
+        </div>
+      </div>
 
-    <section class="cards" aria-label="Modules ADN66">
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">🔔</div>
-          <div class="card-badge">Notifications</div>
-        </div>
-        <h2>PUSH</h2>
-        <p>Gestion des notifications push, de la diffusion instantanée et des abonnés web.</p>
-        <ul>
-          <li>Envoi rapide</li>
-          <li>Campagnes push</li>
-          <li>Gestion des abonnés</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/PUSH/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
+      <div class="adn66-header-menu">
+        <button class="adn66-menu-btn" id="adn66TopMenuBtn" type="button" aria-expanded="false" aria-controls="adn66TopMenu">
+          <span class="adn66-menu-burger" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+          Menu
+        </button>
 
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">🧮</div>
-          <div class="card-badge">Calculatrice</div>
-        </div>
-        <h2>Calculateur</h2>
-        <p>Calculateur interne pour les opérations rapides Apéro de Nuit 66.</p>
-        <ul>
-          <li>Calculatrice métier</li>
-          <li>Calculs rapides</li>
-          <li>Interface interne ADN66</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/apero/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
+        <nav class="adn66-menu-panel" id="adn66TopMenu" aria-label="Menu outils ADN66">
+          <div class="adn66-menu-head">
+            <p class="adn66-menu-kicker">ADN66</p>
+            <h2 class="adn66-menu-title">Outils internes</h2>
+          </div>
 
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">🎁</div>
-          <div class="card-badge">Clients</div>
-        </div>
-        <h2>Fidélité</h2>
-        <p>Gestion de la fidélité client avec avantages, récompenses et administration dédiée.</p>
-        <ul>
-          <li>Carte de fidélité</li>
-          <li>Suivi des avantages</li>
-          <li>Gestion client</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/fidel/admin.html">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
+          <div class="adn66-menu-list">
+            <a class="adn66-menu-item" href="../PUSH/">
+              <div class="adn66-menu-icon">🔔</div>
+              <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
 
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">📍</div>
-          <div class="card-badge">Livraison</div>
-        </div>
-        <h2>GPS</h2>
-        <p>Outils terrain pour les trajets, la localisation et l’organisation des livraisons.</p>
-        <ul>
-          <li>Positionnement</li>
-          <li>Support tournée</li>
-          <li>Usage mobile terrain</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/gps/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
+            <a class="adn66-menu-item" href="../apero/">
+              <div class="adn66-menu-icon">🧮</div>
+              <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
 
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">📢</div>
-          <div class="card-badge">Pilotage</div>
-        </div>
-        <h2>Status</h2>
-        <p>Pilotage des statuts, annonces et messages visibles sur les différents sites.</p>
-        <ul>
-          <li>Pop-ups et états</li>
-          <li>Messages dynamiques</li>
-          <li>Contrôle centralisé</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/status/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
+            <a class="adn66-menu-item" href="../fidel/admin.html">
+              <div class="adn66-menu-icon">🎁</div>
+              <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
 
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">📦</div>
-          <div class="card-badge">Stock</div>
-        </div>
-        <h2>Stock</h2>
-        <p>Gestion des produits, disponibilité, tarifs et suivi opérationnel du stock.</p>
-        <ul>
-          <li>Gestion produits</li>
-          <li>Disponibilités</li>
-          <li>Suivi interne</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/stock/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
+            <a class="adn66-menu-item" href="../gps/">
+              <div class="adn66-menu-icon">📍</div>
+              <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
 
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">💬</div>
-          <div class="card-badge">SMS</div>
+            <a class="adn66-menu-item is-current" href="./">
+              <div class="adn66-menu-icon">📢</div>
+              <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+
+            <a class="adn66-menu-item" href="../stock/">
+              <div class="adn66-menu-icon">📦</div>
+              <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+
+            <a class="adn66-menu-item" href="../twilio/">
+              <div class="adn66-menu-icon">💬</div>
+              <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
+              <div class="adn66-menu-arrow">→</div>
+            </a>
+          </div>
+        </nav>
+      </div>
+
+
+      <div class="badge">
+        <span>État :</span> <b id="pActive">—</b>
+        <span style="opacity:.5">•</span>
+        <span>Mode :</span> <b id="pMode">—</b>
+      </div>
+    </div>
+
+
+    <div class="quick-actions">
+      <button id="btnOpenLiveModal" type="button" class="secondary">Voir publié</button>
+      <button id="btnOpenSettingsModal" type="button" class="secondary">Mot de passe</button>
+      <button id="btnPublishTop" type="button">Publier</button>
+    </div>
+
+    <section class="card fullwidth published-card" id="publishedNow">
+      <div class="hd">
+        <div class="section-title">
+          <div>
+            <div style="font-weight:900">État publié</div>
+            <div class="small">
+              État actuellement affiché sur les sites.
+            </div>
+          </div>
+
+          <div class="badge">
+            <span>État :</span> <b id="liveActive">—</b>
+            <span style="opacity:.5">•</span>
+            <span>Mode :</span> <b id="liveMode">—</b>
+            <span style="opacity:.5">•</span>
+            <span>Maj :</span> <b id="liveUpdated">—</b>
+          </div>
         </div>
-        <h2>Twilio / Marketing SMS</h2>
-        <p>Module marketing SMS pour campagnes, contacts, estimation, historique et suivi.</p>
-        <ul>
-          <li>Campagnes SMS</li>
-          <li>Gestion des contacts</li>
-          <li>Suivi et historique</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/twilio/">Ouvrir</a>
-          <div class="card-arrow">→</div>
+      </div>
+
+      <div class="bd">
+        <div class="published-grid">
+          <div>
+            <img id="liveImg" alt="Image publiée" src="./images/panne.png" />
+          </div>
+
+          <div>
+            <div id="liveTitle">—</div>
+            <div class="small" style="margin-top:8px" id="liveMsg">—</div>
+
+            <div class="kv" aria-label="Détails publication">
+              <div class="k">Création :</div> <div><b id="liveCreated">—</b></div>
+              <div class="k">Diffusion :</div> <div><b id="liveStarts">—</b> <span style="opacity:.6">→</span> <b id="liveEnds">—</b></div>
+              <div class="k">Mode :</div> <div><b id="liveSev">—</b></div>
+              <div class="k">Image :</div> <div><b id="liveImagePath">—</b></div>
+            </div>
+
+            <div id="liveExtra" class="small" style="margin-top:12px"></div>
+          </div>
         </div>
-      </article>
+      </div>
     </section>
-  </main>
+
+    <div class="grid">
+      <section class="card">
+        <div class="hd">
+          <div style="font-weight:900">Contrôle</div>
+          <div class="small">Brouillon avant publication.</div>
+        </div>
+
+        <div class="bd">
+          <div class="row">
+            <div>
+              <label>Statut global</label>
+              <select id="active">
+                <option value="false">Inactif : aucun pop-up</option>
+                <option value="true">Actif : pop-up affiché</option>
+              </select>
+            </div>
+            <div>
+              <label>Mode</label>
+              <select id="mode"></select>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="row">
+            <div>
+              <label>Titre</label>
+              <input id="title" placeholder="Ex : Info importante / Service indisponible" />
+            </div>
+
+            <div>
+              <label>Message pré-enregistré</label>
+              <select id="preset"></select>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Message</label>
+            <textarea id="message" placeholder="Texte affiché dans le pop-up..."></textarea>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Image</label>
+            <input id="image" placeholder="images/panne.png" />
+          </div>
+
+          <div class="hr"></div>
+
+          <div id="infoBox" class="card">
+            <div class="bd">
+              <div style="font-weight:900; margin-bottom:10px;">Mode information</div>
+              <div class="row">
+                <div>
+                  <label>Délai avant “OK j’ai compris”</label>
+                  <input id="okDelay" type="number" min="0" step="1" placeholder="5" />
+                </div>
+                <div>
+                  <label>Comportement</label>
+                  <input disabled value="Le pop-up se ferme ensuite. Commande possible." />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="warningBox" class="card ui-hide" style="margin-top:12px">
+            <div class="bd">
+              <div style="font-weight:900; margin-bottom:10px;">Mode warning / blocage</div>
+
+              <div class="row">
+                <div>
+                  <label>Activer un horaire</label>
+                  <select id="schedEnabled">
+                    <option value="false">Non : bloque tout le temps</option>
+                    <option value="true">Oui : plage horaire</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Message au clic</label>
+                  <input id="warningClickMsg" placeholder="Impossible de commander pour le moment." />
+                </div>
+              </div>
+
+              <div class="row" style="margin-top:12px">
+                <div>
+                  <label>Heure début</label>
+                  <input id="schedStart" class="hidden-time" type="time" value="19:00" />
+                  <div class="timepick">
+                    <select id="schedStartSel"></select>
+                    <span class="hint">Format 24h</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label>Heure fin</label>
+                  <input id="schedEnd" class="hidden-time" type="time" value="06:00" />
+                  <div class="timepick">
+                    <select id="schedEndSel"></select>
+                    <span class="hint">Format 24h</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:12px">
+                <label>Jours</label>
+                <div class="weekdays" id="schedDays">
+                  <label><input type="checkbox" value="1" />Lun</label>
+                  <label><input type="checkbox" value="2" />Mar</label>
+                  <label><input type="checkbox" value="3" />Mer</label>
+                  <label><input type="checkbox" value="4" />Jeu</label>
+                  <label><input type="checkbox" value="5" />Ven</label>
+                  <label><input type="checkbox" value="6" />Sam</label>
+                  <label><input type="checkbox" value="0" />Dim</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gh-zone" style="margin-top:14px">
+            <div class="row">
+              <div>
+                <label>Configuration</label>
+                <div style="display:flex;gap:10px">
+                  <input id="ghOwner" placeholder="bullyto" />
+                  <input id="ghRepo" placeholder="status" />
+                </div>
+              </div>
+              <div>
+                <label>Branch</label>
+                <input id="ghBranch" placeholder="main" />
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <label>Fichier</label>
+              <input id="ghPath" placeholder="status.json" />
+            </div>
+
+            <div style="margin-top:12px">
+              <label>Mot de passe</label>
+              <input id="ghToken" type="password" autocomplete="off" placeholder="Mot de passe" />
+              <div class="hint">
+                
+                <br><span id="tokenStatus">—</span>
+              </div>
+            </div>
+
+            <div class="btns" style="margin-top:12px">
+              <button class="secondary" id="btnSaveToken" type="button">Enregistrer</button>
+              <button class="danger" id="btnClearToken" type="button">Supprimer</button>
+            </div>
+
+            <div class="hr"></div>
+          </div>
+
+          <div class="btns" style="margin-top:14px">
+            <button id="btnPublish">Publier</button>
+            <button id="btnToggleGh" type="button" class="secondary">Mot de passe</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card preview">
+        <div class="hd">
+          <div class="section-title">
+            <div>
+              <div style="font-weight:900">Aperçu</div>
+              <div class="small">Rendu du brouillon avant publication.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bd">
+          <img id="pImg" alt="Aperçu image" src="./images/panne.png" />
+          <div class="badge" style="margin-top:12px">
+            <span>Dernière maj :</span> <b id="pUpdated">—</b>
+            <span style="opacity:.5">•</span>
+            <span>Mode :</span> <b id="pSev">—</b>
+          </div>
+          <div id="pTitle" style="margin-top:12px">—</div>
+          <div id="pMsg" style="margin-top:8px">—</div>
+          <div id="pExtra" class="small" style="margin-top:12px"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+
+  <div id="adnLiteModal" class="adn-lite-modal" aria-hidden="true">
+    <div class="adn-lite-box" role="dialog" aria-modal="true" aria-labelledby="adnLiteModalTitle">
+      <div class="adn-lite-head">
+        <h2 class="adn-lite-title" id="adnLiteModalTitle">—</h2>
+        <button id="adnLiteModalClose" class="adn-lite-close" type="button" aria-label="Fermer">✕</button>
+      </div>
+      <div class="adn-lite-body" id="adnLiteModalBody"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
 
   <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", function () {
-        navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function (error) {
-          console.warn("Service Worker non enregistré :", error);
-        });
+    (function(){
+      const btn = document.getElementById('adn66TopMenuBtn');
+      const panel = document.getElementById('adn66TopMenu');
+      if(!btn || !panel) return;
+
+      function closeMenu(){
+        panel.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+
+      function toggleMenu(){
+        const open = panel.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        toggleMenu();
       });
-    }
+
+      panel.addEventListener('click', function(e){
+        e.stopPropagation();
+      });
+
+      document.addEventListener('click', closeMenu);
+
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape') closeMenu();
+      });
+    })();
   </script>
 
+  <script src="./app.js"></script>
+
+  <script>
+  (function(){
+    const LS_KEY = "gh_token_v1";
+    const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 30 * 6;
+
+    function showToast(msg){
+      const el = document.getElementById("toast");
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    function readToken(){
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return null;
+        const obj = JSON.parse(raw);
+        if (!obj || typeof obj.token !== "string" || typeof obj.exp !== "number") return null;
+        if (Date.now() > obj.exp) {
+          localStorage.removeItem(LS_KEY);
+          return null;
+        }
+        return obj;
+      } catch(e){
+        return null;
+      }
+    }
+
+    function saveToken(token){
+      const obj = { token, exp: Date.now() + SIX_MONTHS_MS };
+      localStorage.setItem(LS_KEY, JSON.stringify(obj));
+      return obj;
+    }
+
+    function clearToken(){ localStorage.removeItem(LS_KEY); }
+
+    function setTokenStatus(obj){
+      const s = document.getElementById("tokenStatus");
+      if (!s) return;
+      if (!obj) s.textContent = "Aucun token enregistré.";
+      else s.textContent = "Token enregistré ✅ expire le " + new Date(obj.exp).toLocaleString("fr-FR");
+    }
+
+    function init(){
+      const btnToggle = document.getElementById("btnToggleGh");
+      const ghZone = document.querySelector(".gh-zone");
+      const input = document.getElementById("ghToken");
+      const btnSave = document.getElementById("btnSaveToken");
+      const btnClear = document.getElementById("btnClearToken");
+
+      if (btnToggle && ghZone) {
+        btnToggle.addEventListener("click", () => ghZone.classList.toggle("is-open"));
+      }
+
+      const stored = readToken();
+      if (input && stored) input.value = stored.token;
+      setTokenStatus(stored);
+
+      if (btnSave && input) {
+        btnSave.addEventListener("click", () => {
+          const val = (input.value || "").trim();
+          if (!val) return showToast("Token vide.");
+          const obj = saveToken(val);
+          setTokenStatus(obj);
+          showToast("Token enregistré ✅");
+        });
+      }
+
+      if (btnClear && input) {
+        btnClear.addEventListener("click", () => {
+          clearToken();
+          input.value = "";
+          setTokenStatus(null);
+          showToast("Token supprimé ✅");
+        });
+      }
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+  })();
+  </script>
+
+  <script>
+  (function(){
+    function pad(n){ return String(n).padStart(2,"0"); }
+
+    function buildTimes(stepMin){
+      const arr = [];
+      for (let h=0; h<24; h++){
+        for (let m=0; m<60; m+=stepMin){
+          arr.push(pad(h)+":"+pad(m));
+        }
+      }
+      return arr;
+    }
+
+    function fillSelect(sel, times){
+      sel.innerHTML = "";
+      for (const t of times){
+        const opt = document.createElement("option");
+        opt.value = t;
+        opt.textContent = t;
+        sel.appendChild(opt);
+      }
+    }
+
+    function sync(sel, input){
+      if (!sel || !input) return;
+      const v = input.value || "";
+      if (v) sel.value = v;
+
+      sel.addEventListener("change", () => {
+        input.value = sel.value;
+        input.dispatchEvent(new Event("input", { bubbles:true }));
+        input.dispatchEvent(new Event("change", { bubbles:true }));
+      });
+    }
+
+    function init(){
+      const startInput = document.getElementById("schedStart");
+      const endInput = document.getElementById("schedEnd");
+      const startSel = document.getElementById("schedStartSel");
+      const endSel = document.getElementById("schedEndSel");
+
+      if (!startInput || !endInput || !startSel || !endSel) return;
+
+      const times = buildTimes(5);
+      fillSelect(startSel, times);
+      fillSelect(endSel, times);
+
+      if (!startInput.value) startInput.value = "19:00";
+      if (!endInput.value) endInput.value = "06:00";
+
+      startSel.value = startInput.value;
+      endSel.value = endInput.value;
+
+      sync(startSel, startInput);
+      sync(endSel, endInput);
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+  })();
+  </script>
+
+
+  <script>
+  (function(){
+    const modal = document.getElementById("adnLiteModal");
+    const modalTitle = document.getElementById("adnLiteModalTitle");
+    const modalBody = document.getElementById("adnLiteModalBody");
+    const modalClose = document.getElementById("adnLiteModalClose");
+
+    const liveBlock = document.getElementById("publishedNow");
+    const ghZone = document.querySelector(".gh-zone");
+    let livePlaceholder = null;
+    let ghPlaceholder = null;
+
+    function cleanText(text){
+      return String(text || "")
+        .replace(/token/gi, "mot de passe")
+        .replace(/github/gi, "")
+        .replace(/ghp_[a-z0-9_]+/gi, "mot de passe")
+        .replace(/dépôt/gi, "configuration")
+        .replace(/chemin/gi, "fichier")
+        .replace(/status\.json/gi, "le fichier de statut");
+    }
+
+    function openModal(title, content, options){
+      if(!modal || !modalTitle || !modalBody) return;
+      modalTitle.textContent = cleanText(title || "");
+      modalBody.innerHTML = "";
+
+      if(typeof content === "string"){
+        const p = document.createElement("p");
+        p.className = "adn-lite-message";
+        p.innerHTML = cleanText(content);
+        modalBody.appendChild(p);
+      }else if(content){
+        modalBody.appendChild(content);
+      }
+
+      if(options && options.actions){
+        const row = document.createElement("div");
+        row.className = "adn-lite-actions";
+        options.actions.forEach(action => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = action.className || "";
+          btn.textContent = action.label;
+          btn.addEventListener("click", action.onClick || closeModal);
+          row.appendChild(btn);
+        });
+        modalBody.appendChild(row);
+      }
+
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal(){
+      if(!modal) return;
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+    }
+
+    if(modalClose) modalClose.addEventListener("click", closeModal);
+    if(modal) modal.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
+    document.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeModal(); });
+
+    function moveLiveToModal(){
+      if(!liveBlock) return document.createElement("div");
+      if(!livePlaceholder){
+        livePlaceholder = document.createComment("publishedNow-placeholder");
+        liveBlock.parentNode.insertBefore(livePlaceholder, liveBlock);
+      }
+      liveBlock.style.display = "block";
+      liveBlock.classList.add("adn-lite-inline-card");
+      return liveBlock;
+    }
+
+    function movePasswordToModal(){
+      if(!ghZone) return document.createElement("div");
+      if(!ghPlaceholder){
+        ghPlaceholder = document.createComment("password-placeholder");
+        ghZone.parentNode.insertBefore(ghPlaceholder, ghZone);
+      }
+      ghZone.classList.add("is-open");
+      ghZone.classList.add("adn-lite-inline-card");
+      return ghZone;
+    }
+
+    function readStoredPassword(){
+      try{
+        const raw = localStorage.getItem("gh_token_v1");
+        if(!raw) return "";
+        const obj = JSON.parse(raw);
+        if(!obj || !obj.token || !obj.exp || Date.now() > obj.exp) return "";
+        return String(obj.token || "").trim();
+      }catch(e){ return ""; }
+    }
+
+    function currentPassword(){
+      const input = document.getElementById("ghToken");
+      return String((input && input.value) || readStoredPassword() || "").trim();
+    }
+
+    function savePassword(){
+      const input = document.getElementById("ghToken");
+      const value = currentPassword();
+      if(!value) return false;
+
+      if(input) input.value = value;
+
+      const saveBtn = document.getElementById("btnSaveToken");
+      if(saveBtn) saveBtn.click();
+      else {
+        try{
+          localStorage.setItem("gh_token_v1", JSON.stringify({
+            token:value,
+            exp:Date.now() + (1000 * 60 * 60 * 24 * 30 * 6)
+          }));
+        }catch(e){}
+      }
+      return true;
+    }
+
+    function openPasswordModal(message){
+      const content = document.createElement("div");
+      if(message){
+        const warn = document.createElement("div");
+        warn.className = "adn-lite-inline-card";
+        warn.innerHTML = "<b>" + cleanText(message) + "</b>";
+        content.appendChild(warn);
+      }
+      content.appendChild(movePasswordToModal());
+      openModal("Mot de passe", content, {
+        actions:[
+          {label:"Enregistrer", onClick:function(){
+            if(!savePassword()){
+              openPasswordModal("Mot de passe vide.");
+              return;
+            }
+            closeModal();
+            openModal("Mot de passe enregistré", "Vous pouvez publier.", {
+              actions:[{label:"OK", onClick:closeModal}]
+            });
+          }},
+          {label:"Fermer", className:"secondary", onClick:closeModal}
+        ]
+      });
+      setTimeout(()=>document.getElementById("ghToken")?.focus(), 150);
+    }
+
+    document.getElementById("btnOpenLiveModal")?.addEventListener("click", () => {
+      openModal("État publié", moveLiveToModal(), {
+        actions:[{label:"Fermer", className:"secondary", onClick:closeModal}]
+      });
+    });
+
+    document.getElementById("btnOpenSettingsModal")?.addEventListener("click", () => openPasswordModal());
+
+    document.getElementById("btnToggleGh")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      openPasswordModal();
+    }, true);
+
+    const btnPublish = document.getElementById("btnPublish");
+    const btnPublishTop = document.getElementById("btnPublishTop");
+
+    if(btnPublishTop && btnPublish){
+      btnPublishTop.addEventListener("click", () => btnPublish.click());
+    }
+
+    if(btnPublish){
+      btnPublish.addEventListener("click", (e) => {
+        if(!savePassword()){
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          openPasswordModal("Mot de passe obligatoire avant publication.");
+          return;
+        }
+        openModal("Publication en cours", "<span class='adn-pulse'></span>Publication en cours…");
+      }, true);
+    }
+
+    const toast = document.getElementById("toast");
+    if(toast){
+      const observer = new MutationObserver(() => {
+        const visible = toast.classList.contains("show");
+        const text = cleanText((toast.textContent || "").trim());
+        if(!visible || !text) return;
+
+        const lower = text.toLowerCase();
+        let title = "Information";
+        if(lower.includes("publi") || lower.includes("enregistr")) title = "Action confirmée";
+        if(lower.includes("erreur") || lower.includes("impossible") || lower.includes("vide")) title = "Action impossible";
+        if(lower.includes("mot de passe")) title = "Mot de passe";
+
+        openModal(title, text, { actions:[{label:"OK", onClick:closeModal}] });
+      });
+      observer.observe(toast, {childList:true, characterData:true, subtree:true, attributes:true, attributeFilter:["class"]});
+    }
+
+    window.ADN_STATUS_MODAL = { open:openModal, close:closeModal, password:openPasswordModal };
+  })();
+  </script>
+
+  <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js"));
+  }
+  </script>
 </body>
 </html>
