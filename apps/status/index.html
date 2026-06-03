@@ -412,6 +412,54 @@
       }
     }
 
+
+    /* ===== Nettoyage interface mot de passe : aucune référence technique visible ===== */
+    .gh-zone .row:first-child,
+    .gh-zone > div:nth-of-type(2),
+    .gh-zone label[for],
+    .gh-zone .hint,
+    #tokenStatus{
+      display:none !important;
+    }
+
+    .gh-zone label{
+      font-size:0 !important;
+      margin:0 0 8px !important;
+    }
+
+    .gh-zone label::after{
+      content:"Mot de passe";
+      font-size:12px;
+      color:#cbd5e1;
+      font-weight:900;
+    }
+
+    #ghToken{
+      margin-top:0;
+    }
+
+    #btnSaveToken::before{
+      content:"";
+    }
+
+    #btnSaveToken{
+      font-size:0;
+    }
+
+    #btnSaveToken::after{
+      content:"Enregistrer";
+      font-size:15px;
+    }
+
+    #btnClearToken{
+      font-size:0;
+    }
+
+    #btnClearToken::after{
+      content:"Supprimer";
+      font-size:15px;
+    }
+
   </style>
 
 </head>
@@ -504,7 +552,7 @@
 
     <div class="quick-actions">
       <button id="btnOpenLiveModal" type="button" class="secondary">Voir publié</button>
-      <button id="btnOpenSettingsModal" type="button" class="secondary">Token / GitHub</button>
+      <button id="btnOpenSettingsModal" type="button" class="secondary">Mot de passe</button>
       <button id="btnPublishTop" type="button">Publier</button>
     </div>
 
@@ -671,7 +719,7 @@
           <div class="gh-zone" style="margin-top:14px">
             <div class="row">
               <div>
-                <label>Dépôt GitHub</label>
+                <label>Configuration</label>
                 <div style="display:flex;gap:10px">
                   <input id="ghOwner" placeholder="bullyto" />
                   <input id="ghRepo" placeholder="status" />
@@ -684,22 +732,22 @@
             </div>
 
             <div style="margin-top:12px">
-              <label>Chemin du fichier</label>
+              <label>Fichier</label>
               <input id="ghPath" placeholder="status.json" />
             </div>
 
             <div style="margin-top:12px">
-              <label>Token GitHub</label>
-              <input id="ghToken" type="password" autocomplete="off" placeholder="ghp_..." />
+              <label>Mot de passe</label>
+              <input id="ghMot de passe" type="password" autocomplete="off" placeholder="Mot de passe" />
               <div class="hint">
                 Stocké localement sur cet appareil avec expiration automatique.
-                <br><span id="tokenStatus">—</span>
+                <br><span id="mot de passeStatus">—</span>
               </div>
             </div>
 
             <div class="btns" style="margin-top:12px">
-              <button class="secondary" id="btnSaveToken" type="button">Enregistrer le token</button>
-              <button class="danger" id="btnClearToken" type="button">Supprimer le token</button>
+              <button class="secondary" id="btnSaveMot de passe" type="button">Enregistrer</button>
+              <button class="danger" id="btnClearMot de passe" type="button">Supprimer</button>
             </div>
 
             <div class="hr"></div>
@@ -707,7 +755,7 @@
 
           <div class="btns" style="margin-top:14px">
             <button id="btnPublish">Publier</button>
-            <button id="btnToggleGh" type="button" class="secondary">Token / GitHub</button>
+            <button id="btnToggleGh" type="button" class="secondary">Mot de passe</button>
           </div>
         </div>
       </section>
@@ -788,7 +836,7 @@
 
   <script>
   (function(){
-    const LS_KEY = "gh_token_v1";
+    const LS_KEY = "gh_mot de passe_v1";
     const SIX_MONTHS_MS = 1000 * 60 * 60 * 24 * 30 * 6;
 
     function showToast(msg){
@@ -800,12 +848,12 @@
       showToast._t = setTimeout(() => el.classList.remove("show"), 2200);
     }
 
-    function readToken(){
+    function readMot de passe(){
       try {
         const raw = localStorage.getItem(LS_KEY);
         if (!raw) return null;
         const obj = JSON.parse(raw);
-        if (!obj || typeof obj.token !== "string" || typeof obj.exp !== "number") return null;
+        if (!obj || typeof obj.mot de passe !== "string" || typeof obj.exp !== "number") return null;
         if (Date.now() > obj.exp) {
           localStorage.removeItem(LS_KEY);
           return null;
@@ -816,52 +864,52 @@
       }
     }
 
-    function saveToken(token){
-      const obj = { token, exp: Date.now() + SIX_MONTHS_MS };
+    function saveMot de passe(mot de passe){
+      const obj = { mot de passe, exp: Date.now() + SIX_MONTHS_MS };
       localStorage.setItem(LS_KEY, JSON.stringify(obj));
       return obj;
     }
 
-    function clearToken(){ localStorage.removeItem(LS_KEY); }
+    function clearMot de passe(){ localStorage.removeItem(LS_KEY); }
 
-    function setTokenStatus(obj){
-      const s = document.getElementById("tokenStatus");
+    function setMot de passeStatus(obj){
+      const s = document.getElementById("mot de passeStatus");
       if (!s) return;
-      if (!obj) s.textContent = "Aucun token enregistré.";
-      else s.textContent = "Token enregistré ✅ expire le " + new Date(obj.exp).toLocaleString("fr-FR");
+      if (!obj) s.textContent = "Mot de passe non enregistré.";
+      else s.textContent = "Mot de passe enregistré ✅ " + new Date(obj.exp).toLocaleString("fr-FR");
     }
 
     function init(){
       const btnToggle = document.getElementById("btnToggleGh");
       const ghZone = document.querySelector(".gh-zone");
-      const input = document.getElementById("ghToken");
-      const btnSave = document.getElementById("btnSaveToken");
-      const btnClear = document.getElementById("btnClearToken");
+      const input = document.getElementById("ghMot de passe");
+      const btnSave = document.getElementById("btnSaveMot de passe");
+      const btnClear = document.getElementById("btnClearMot de passe");
 
       if (btnToggle && ghZone) {
         btnToggle.addEventListener("click", () => ghZone.classList.toggle("is-open"));
       }
 
-      const stored = readToken();
-      if (input && stored) input.value = stored.token;
-      setTokenStatus(stored);
+      const stored = readMot de passe();
+      if (input && stored) input.value = stored.mot de passe;
+      setMot de passeStatus(stored);
 
       if (btnSave && input) {
         btnSave.addEventListener("click", () => {
           const val = (input.value || "").trim();
-          if (!val) return showToast("Token vide.");
-          const obj = saveToken(val);
-          setTokenStatus(obj);
-          showToast("Token enregistré ✅");
+          if (!val) return showToast("Mot de passe vide.");
+          const obj = saveMot de passe(val);
+          setMot de passeStatus(obj);
+          showToast("Mot de passe enregistré ✅");
         });
       }
 
       if (btnClear && input) {
         btnClear.addEventListener("click", () => {
-          clearToken();
+          clearMot de passe();
           input.value = "";
-          setTokenStatus(null);
-          showToast("Token supprimé ✅");
+          setMot de passeStatus(null);
+          showToast("Mot de passe supprimé ✅");
         });
       }
     }
@@ -935,6 +983,7 @@
   </script>
 
 
+  
   <script>
   (function(){
     const modal = document.getElementById("adnLiteModal");
@@ -1004,10 +1053,10 @@
       return liveBlock;
     }
 
-    function moveGhToModal(){
+    function movePasswordToModal(){
       if(!ghZone) return document.createElement("div");
       if(!ghPlaceholder){
-        ghPlaceholder = document.createComment("ghZone-placeholder");
+        ghPlaceholder = document.createComment("password-placeholder");
         ghZone.parentNode.insertBefore(ghPlaceholder, ghZone);
       }
       ghZone.classList.add("is-open");
@@ -1015,31 +1064,38 @@
       return ghZone;
     }
 
-    function hasSavedToken(){
-      const input = document.getElementById("ghToken");
-      if(input && input.value && input.value.trim()) return true;
+    function readStoredPassword(){
       try{
         const raw = localStorage.getItem("gh_token_v1");
-        if(!raw) return false;
+        if(!raw) return "";
         const obj = JSON.parse(raw);
-        return !!(obj && obj.token && obj.exp && Date.now() < obj.exp);
+        if(!obj || !obj.token || !obj.exp || Date.now() > obj.exp) return "";
+        return String(obj.token || "").trim();
       }catch(e){
-        return false;
+        return "";
       }
     }
 
-    const btnOpenLive = document.getElementById("btnOpenLiveModal");
-    if(btnOpenLive){
-      btnOpenLive.addEventListener("click", () => {
-        openModal("Publié actuellement", moveLiveToModal(), {
-          actions:[
-            {label:"Fermer", className:"secondary", onClick:closeModal}
-          ]
-        });
-      });
+    function currentPassword(){
+      const input = document.getElementById("ghToken");
+      return String((input && input.value) || readStoredPassword() || "").trim();
     }
 
-    function openSettingsModal(message){
+    function saveCurrentPasswordIfNeeded(){
+      const value = currentPassword();
+      if(!value) return false;
+      try{
+        localStorage.setItem("gh_token_v1", JSON.stringify({
+          token:value,
+          exp:Date.now() + (1000 * 60 * 60 * 24 * 30 * 6)
+        }));
+      }catch(e){}
+      const input = document.getElementById("ghToken");
+      if(input) input.value = value;
+      return true;
+    }
+
+    function openPasswordModal(message){
       const content = document.createElement("div");
       if(message){
         const warn = document.createElement("div");
@@ -1047,24 +1103,43 @@
         warn.innerHTML = "<b>" + message + "</b>";
         content.appendChild(warn);
       }
-      content.appendChild(moveGhToModal());
-      openModal("Token / GitHub", content, {
+      content.appendChild(movePasswordToModal());
+      openModal("Mot de passe", content, {
         actions:[
+          {label:"Enregistrer", onClick:function(){
+            if(!saveCurrentPasswordIfNeeded()){
+              openPasswordModal("Mot de passe vide.");
+              return;
+            }
+            closeModal();
+            openModal("Mot de passe enregistré", "Vous pouvez publier.", {
+              actions:[{label:"OK", onClick:closeModal}]
+            });
+          }},
           {label:"Fermer", className:"secondary", onClick:closeModal}
         ]
       });
       setTimeout(()=>document.getElementById("ghToken")?.focus(), 150);
     }
 
+    const btnOpenLive = document.getElementById("btnOpenLiveModal");
+    if(btnOpenLive){
+      btnOpenLive.addEventListener("click", () => {
+        openModal("Publié actuellement", moveLiveToModal(), {
+          actions:[{label:"Fermer", className:"secondary", onClick:closeModal}]
+        });
+      });
+    }
+
     const btnSettings = document.getElementById("btnOpenSettingsModal");
-    if(btnSettings) btnSettings.addEventListener("click", () => openSettingsModal());
+    if(btnSettings) btnSettings.addEventListener("click", () => openPasswordModal());
 
     const btnToggleGh = document.getElementById("btnToggleGh");
     if(btnToggleGh){
       btnToggleGh.addEventListener("click", (e) => {
         e.preventDefault();
-        openSettingsModal();
-      });
+        openPasswordModal();
+      }, true);
     }
 
     const btnPublish = document.getElementById("btnPublish");
@@ -1076,13 +1151,13 @@
 
     if(btnPublish){
       btnPublish.addEventListener("click", (e) => {
-        if(!hasSavedToken()){
+        if(!saveCurrentPasswordIfNeeded()){
           e.preventDefault();
           e.stopImmediatePropagation();
-          openSettingsModal("Token GitHub obligatoire avant publication.");
+          openPasswordModal("Mot de passe obligatoire avant publication.");
           return;
         }
-        openModal("Publication en cours", "<span class='adn-pulse'></span>Envoi vers GitHub…");
+        openModal("Publication en cours", "<span class='adn-pulse'></span>Publication en cours…");
       }, true);
     }
 
@@ -1090,19 +1165,23 @@
     if(toast){
       const observer = new MutationObserver(() => {
         const visible = toast.classList.contains("show");
-        const text = (toast.textContent || "").trim();
+        let text = (toast.textContent || "").trim();
         if(!visible || !text) return;
+
+        text = text
+          .replace(/token/gi, "mot de passe")
+          .replace(/github/gi, "")
+          .replace(/dépôt/gi, "configuration")
+          .replace(/chemin/gi, "fichier");
 
         const lower = text.toLowerCase();
         let title = "Information";
         if(lower.includes("publi") || lower.includes("enregistr")) title = "Action confirmée";
         if(lower.includes("erreur") || lower.includes("impossible") || lower.includes("vide")) title = "Action impossible";
-        if(lower.includes("token")) title = "Token GitHub";
+        if(lower.includes("mot de passe")) title = "Mot de passe";
 
         openModal(title, text, {
-          actions:[
-            {label:"OK", onClick:closeModal}
-          ]
+          actions:[{label:"OK", onClick:closeModal}]
         });
       });
       observer.observe(toast, {childList:true, characterData:true, subtree:true, attributes:true, attributeFilter:["class"]});
@@ -1111,10 +1190,11 @@
     window.ADN_STATUS_MODAL = {
       open: openModal,
       close: closeModal,
-      settings: openSettingsModal
+      password: openPasswordModal
     };
   })();
   </script>
+
 
   <script>
   if ("serviceWorker" in navigator) {
