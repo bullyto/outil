@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Outils ADN66 — Modules</title>
   <meta name="theme-color" content="#5db7ee" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Outils ADN66" />
+  <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="robots" content="noindex,nofollow" />
   <link rel="icon" href="./icons/icon-192.png" />
   <link rel="apple-touch-icon" href="./icons/icon-192.png" />
@@ -350,5 +355,16 @@
       </article>
     </section>
   </main>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function (error) {
+          console.warn("Service Worker non enregistré :", error);
+        });
+      });
+    }
+  </script>
+
 </body>
 </html>

@@ -1,7 +1,5 @@
-/* Outil - ADN66 | SW minimal (cache app-shell) */
-const VERSION = "v1.0.0";
-const CACHE = `adn66-outil-shell-${VERSION}`;
-
+/* ADN66 Outils — Service Worker racine pour installation PWA */
+const CACHE_VERSION = "adn66-outils-pwa-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -14,55 +12,53 @@ const APP_SHELL = [
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE);
-    await cache.addAll(APP_SHELL.map(u => new Request(u, { cache: "reload" })));
-  })());
+  event.waitUntil(
+    caches.open(CACHE_VERSION)
+      .then((cache) => cache.addAll(APP_SHELL.map((url) => new Request(url, { cache: "reload" }))))
+  );
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.map(k => (k.startsWith("adn66-outil-shell-") && k !== CACHE) ? caches.delete(k) : Promise.resolve()));
-    await self.clients.claim();
-  })());
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(
+        keys.map((key) => key !== CACHE_VERSION && key.startsWith("adn66-outils-pwa-") ? caches.delete(key) : null)
+      ))
+      .then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener("fetch", (event) => {
-  const req = event.request;
-  if (req.method !== "GET") return;
+  const request = event.request;
+  if (request.method !== "GET") return;
 
-  event.respondWith((async () => {
-    const url = new URL(req.url);
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
 
-    // Only handle same-origin
-    if (url.origin !== self.location.origin) {
-      return fetch(req).catch(() => caches.match(req));
-    }
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_VERSION).then((cache) => cache.put("./index.html", copy));
+          return response;
+        })
+        .catch(() => caches.match("./index.html").then((cached) => cached || caches.match("./")))
+    );
+    return;
+  }
 
-    // Navigation: network-first then cache fallback
-    if (req.mode === "navigate") {
-      try {
-        const fresh = await fetch(req);
-        const cache = await caches.open(CACHE);
-        cache.put("./index.html", fresh.clone());
-        return fresh;
-      } catch (e) {
-        return (await caches.match("./index.html")) || (await caches.match("./"));
-      }
-    }
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
 
-    // Static: cache-first, then network + put
-    const cached = await caches.match(req);
-    if (cached) return cached;
-
-    try {
-      const fresh = await fetch(req);
-      const cache = await caches.open(CACHE);
-      cache.put(req, fresh.clone());
-      return fresh;
-    } catch (e) {
-      return cached || Response.error();
-    }
-  })());
+      return fetch(request).then((response) => {
+        if (response && response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_VERSION).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      });
+    })
+  );
 });
