@@ -9,7 +9,7 @@
  *   <script>
  *     window.ADN_ADMIN_GATE = {
  *       passwordHash: "SHA256_DU_MOT_DE_PASSE",
- *       rememberHours: 12
+ *       rememberHours: 2160
  *     };
  *   </script>
  *
@@ -21,11 +21,11 @@
 (function(){
   "use strict";
 
-  const DEFAULT_PASSWORD_HASH = "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0";
+  const DEFAULT_PASSWORD_HASH = "c7c084318b6f1bece6f74ffce1ea53596070345272dee8040037497c7d4cbffe";
 
   const CFG = Object.assign({
     passwordHash: DEFAULT_PASSWORD_HASH,
-    rememberHours: 12,
+    rememberHours: 2160,
     title: "Accès admin",
     subtitle: "Espace réservé",
     storageKey: "adn66_admin_gate_until",
