@@ -452,131 +452,19 @@
   </div>
   <script src="app.js?v=9"></script>
 
-  <!-- Menu flottant ADN66 -->
-  <button class="adn66-fab" id="adn66MenuOpen" type="button" aria-expanded="false" aria-controls="adn66Menu">
-    <span class="adn66-fab__icon" aria-hidden="true">
-      <span></span>
-      <span></span>
-      <span></span>
-    </span>
-    Menu ADN66
-  </button>
-
-  <div class="adn66-menu" id="adn66Menu" aria-hidden="true">
-    <div class="adn66-menu__backdrop" id="adn66MenuBackdrop"></div>
-
-    <aside class="adn66-menu__panel" role="dialog" aria-modal="true" aria-labelledby="adn66MenuTitle">
-      <div class="adn66-menu__header">
-        <div class="adn66-menu__titlewrap">
-          <p class="adn66-menu__kicker">Navigation interne</p>
-          <h2 class="adn66-menu__title" id="adn66MenuTitle">Outils ADN66</h2>
-          
-        </div>
-        <button class="adn66-menu__close" id="adn66MenuClose" type="button" aria-label="Fermer le menu">✕</button>
-      </div>
-
-      <div class="adn66-menu__body">
-        <a class="adn66-menu__item" href="../PUSH/">
-          <div class="adn66-menu__itemicon">🔔</div>
-          <div class="adn66-menu__itemtext">
-            <strong>PUSH</strong>
-            <span>Notifications et abonnés</span>
-          </div>
-          <div class="adn66-menu__arrow">→</div>
-        </a>
-
-        <a class="adn66-menu__item" href="../apero/">
-          <div class="adn66-menu__itemicon">🧮</div>
-          <div class="adn66-menu__itemtext">
-            <strong>Calculateur</strong>
-            <span>Calculatrice métier et calculs rapides</span>
-          </div>
-          <div class="adn66-menu__arrow">→</div>
-        </a>
-
-        <a class="adn66-menu__item" href="../fidel/admin.html">
-          <div class="adn66-menu__itemicon">🎁</div>
-          <div class="adn66-menu__itemtext">
-            <strong>Fidélité</strong>
-            <span>Accès admin et gestion client</span>
-          </div>
-          <div class="adn66-menu__arrow">→</div>
-        </a>
-
-        <a class="adn66-menu__item" href="../gps/">
-          <div class="adn66-menu__itemicon">📍</div>
-          <div class="adn66-menu__itemtext">
-            <strong>GPS</strong>
-            <span>Livraisons, trajets et localisation</span>
-          </div>
-          <div class="adn66-menu__arrow">→</div>
-        </a>
-
-        <a class="adn66-menu__item" href="../status/">
-          <div class="adn66-menu__itemicon">📢</div>
-          <div class="adn66-menu__itemtext">
-            <strong>Status</strong>
-            <span>Messages et états des sites</span>
-          </div>
-          <div class="adn66-menu__arrow">→</div>
-        </a>
-
-        <a class="adn66-menu__item" href="../stock/">
-          <div class="adn66-menu__itemicon">📦</div>
-          <div class="adn66-menu__itemtext">
-            <strong>Stock</strong>
-            <span>Produits, disponibilité et tarifs</span>
-          </div>
-          <div class="adn66-menu__arrow">→</div>
-        </a>
-
-        <a class="adn66-menu__item" href="../twilio/">
-          <div class="adn66-menu__itemicon">💬</div>
-          <div class="adn66-menu__itemtext">
-            <strong>Twilio SMS</strong>
-            <span>Campagnes, contacts et historique</span>
-          </div>
-          <div class="adn66-menu__arrow">→</div>
-        </a>
-      </div>
-
-      <div class="adn66-menu__footer">
-        Accès rapide aux modules internes ADN66.
-      </div>
-    </aside>
-  </div>
-
-  <script>
-    (function(){
-      const menuRoot = document.getElementById('adn66Menu');
-      const openBtn = document.getElementById('adn66MenuOpen');
-      const closeBtn = document.getElementById('adn66MenuClose');
-      const backdrop = document.getElementById('adn66MenuBackdrop');
-      if(!menuRoot || !openBtn || !closeBtn || !backdrop) return;
-
-      function openMenu(){
-        menuRoot.classList.add('is-open');
-        menuRoot.setAttribute('aria-hidden', 'false');
-        openBtn.setAttribute('aria-expanded', 'true');
-        document.body.style.overflow = 'hidden';
-      }
-
-      function closeMenu(){
-        menuRoot.classList.remove('is-open');
-        menuRoot.setAttribute('aria-hidden', 'true');
-        openBtn.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-      }
-
-      openBtn.addEventListener('click', openMenu);
-      closeBtn.addEventListener('click', closeMenu);
-      backdrop.addEventListener('click', closeMenu);
-
-      document.addEventListener('keydown', function(e){
-        if(e.key === 'Escape' && menuRoot.classList.contains('is-open')) closeMenu();
-      });
-    })();
-  </script>
+  <!-- Menu ADN66 fixe en haut -->
+  <nav class="adn66-topnav" aria-label="Navigation outils ADN66">
+    <div class="adn66-topnav__inner">
+      <a class="adn66-topnav__brand" href="../../index.html"><span>ADN66</span> Outils</a>
+      <a class="adn66-topnav__link" href="../PUSH/">🔔 PUSH</a>
+      <a class="adn66-topnav__link" href="../apero/">🧮 Calculateur</a>
+      <a class="adn66-topnav__link" href="../fidel/admin.html">🎁 Fidélité</a>
+      <a class="adn66-topnav__link" href="../gps/">📍 GPS</a>
+      <a class="adn66-topnav__link" href="../status/">📢 Status</a>
+      <a class="adn66-topnav__link" href="../stock/">📦 Stock</a>
+      <a class="adn66-topnav__link is-current" href="../twilio/">💬 Twilio SMS</a>
+    </div>
+  </nav>
 
 </body>
 </html>
