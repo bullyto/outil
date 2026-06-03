@@ -3,672 +3,140 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>ADN66 • Fidélité (Livreur/Admin)</title>
+  <title>ADN66 • Fidélité</title>
   <meta name="theme-color" content="#5db7ee" />
   <style>
     :root{
-      --primary:#5db7ee;
-      --bg:#0b1220;
-      --bg-deep:#070b12;
-      --bg-mid:#111827;
-      --bg-soft:#1f2937;
-      --card:#111827;
-      --card-2:#172033;
-      --input:#0f172a;
-      --border:#283447;
-      --text:#f8fafc;
-      --text-soft:#cbd5e1;
-      --text-muted:#94a3b8;
-      --success:#16a34a;
-      --success-soft:#86efac;
-      --danger:#dc2626;
-      --danger-soft:#fecaca;
-      --shadow:0 24px 70px rgba(0,0,0,.42);
-
-      /* compatibilité ancien style */
-      --bg-old:var(--bg);
-      --t:var(--text);
-      --t2:var(--text-soft);
-      --b:var(--border);
-      --ok:var(--success);
-      --warn:var(--primary);
+      --blue:#5db7ee;--bg:#0b1220;--bg0:#070b12;--card:#111827;--card2:#172033;--input:#0f172a;--border:#283447;
+      --text:#f8fafc;--muted:#cbd5e1;--soft:#94a3b8;--green:#16a34a;--green2:#86efac;--red:#dc2626;--red2:#fecaca;
+      --shadow:0 18px 46px rgba(0,0,0,.36);
     }
-
-    *{box-sizing:border-box}
-
-    html,body{
-      margin:0;
-      padding:0;
-      min-height:100%;
-    }
-
-    body{
-      color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      min-height:100vh;
-      padding:16px;
-      display:flex;
-      justify-content:center;
-      background:
-        radial-gradient(circle at top, rgba(93,183,238,.16) 0%, rgba(93,183,238,0) 28%),
-        linear-gradient(180deg,var(--bg-deep) 0%, var(--bg) 30%, var(--bg-mid) 72%, var(--bg-soft) 100%);
-      overflow-x:hidden;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-      background-size:24px 24px;
-      mask-image:linear-gradient(to bottom, rgba(0,0,0,.25), transparent 85%);
-      z-index:0;
-    }
-
-    .wrap{
-      position:relative;
-      z-index:1;
-      width:min(980px,100%);
-    }
-
-    .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:14px;
-      padding:14px;
-      border:1px solid var(--border);
-      border-radius:22px;
-      background:rgba(17,24,39,.88);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(10px);
-    }
-
-    .brand{min-width:0}
-    .brand b{
-      display:block;
-      font-size:18px;
-      line-height:1.15;
-      font-weight:900;
-      color:var(--text);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .brand span{
-      display:block;
-      font-size:12px;
-      color:var(--text-soft);
-      margin-top:4px;
-      font-weight:700;
-    }
-
-    .pill{
-      border:1px solid var(--border);
-      padding:8px 10px;
-      border-radius:999px;
-      font-size:12px;
-      color:var(--text-soft);
-      background:rgba(15,23,42,.72);
-    }
-
-    #envPill{
-      display:none;
-    }
-
-    .card{
-      background:linear-gradient(180deg, rgba(17,24,39,.96), rgba(23,32,51,.94));
-      border:1px solid var(--border);
-      border-radius:24px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-    }
-
-    .card-h{
-      padding:16px;
-      border-bottom:1px solid var(--border);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      background:linear-gradient(180deg, rgba(93,183,238,.10), rgba(17,24,39,.22));
-    }
-
-    .card-h h1{
-      margin:0;
-      font-size:16px;
-      line-height:1.15;
-      font-weight:900;
-      color:var(--text);
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      padding:16px;
-    }
-
-    @media (max-width:980px){
-      .grid{grid-template-columns:1fr;}
-    }
-
-    .panel{
-      border:1px solid var(--border);
-      border-radius:20px;
-      background:rgba(15,23,42,.72);
-      padding:14px;
-      box-shadow:0 12px 32px rgba(0,0,0,.18);
-    }
-
-    .panel h1{
-      color:var(--text);
-      font-weight:900;
-    }
-
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--text-soft);
-      font-weight:800;
-      margin:12px 0 7px;
-    }
-
-    input{
-      width:100%;
-      padding:13px 14px;
-      border-radius:16px;
-      border:1px solid var(--border);
-      background:var(--input);
-      color:var(--text);
-      outline:none;
-      font-size:14px;
-    }
-
-    input::placeholder{color:var(--text-muted)}
-    input:focus{
-      border-color:var(--primary);
-      box-shadow:0 0 0 3px rgba(93,183,238,.14);
-    }
-
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:14px;
-    }
-
-    button{
-      flex:1;
-      min-width:160px;
-      padding:13px 14px;
-      border-radius:16px;
-      border:1px solid var(--primary);
-      background:var(--primary);
-      color:#fff;
-      font-weight:900;
-      cursor:pointer;
-      box-shadow:0 12px 28px rgba(93,183,238,.20);
-    }
-
-    button:hover{filter:brightness(1.05)}
-    button:active{transform:translateY(1px)}
-
-    button.secondary{
-      background:rgba(15,23,42,.82);
-      color:var(--text);
-      border-color:var(--border);
-      box-shadow:none;
-    }
-
-    button.secondary:hover{
-      border-color:rgba(93,183,238,.55);
-      background:rgba(93,183,238,.10);
-    }
-
-    .hint{
-      font-size:12px;
-      color:var(--text-soft);
-      line-height:1.45;
-      margin-top:8px;
-      font-weight:700;
-    }
-
-    .status{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      color:var(--text-soft);
-      margin-top:12px;
-      font-weight:700;
-    }
-
-    .dot{
-      width:10px;
-      height:10px;
-      border-radius:999px;
-      background:rgba(255,255,255,.18);
-    }
-
-    .dot.ok{
-      background:var(--success);
-      box-shadow:0 0 0 4px rgba(22,163,74,.16);
-    }
-
-    .dot.warn{
-      background:var(--primary);
-      box-shadow:0 0 0 4px rgba(93,183,238,.14);
-    }
-
-    .mono{
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
-      overflow:hidden;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:var(--input);
-    }
-
-    th,td{
-      text-align:left;
-      font-size:12px;
-      padding:10px;
-      border-bottom:1px solid var(--border);
-    }
-
-    th{
-      color:var(--text-soft);
-      font-weight:900;
-      background:rgba(93,183,238,.06);
-    }
-
-    td{color:var(--text)}
-    tr:hover td{background:rgba(93,183,238,.06)}
-
-    .scan{
-      width:100%;
-      border-radius:20px;
-      border:1px solid var(--border);
-      background:#000;
-      aspect-ratio:3/4;
-      overflow:hidden;
-      position:relative;
-      margin-top:12px;
-      box-shadow:0 12px 32px rgba(0,0,0,.22);
-    }
-
-    video{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .qrfull{
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.70);
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      z-index:9999;
-      backdrop-filter:blur(6px);
-    }
-
-    .qrfull.open{display:flex}
-
-    .qrbox{
-      width:min(520px,100%);
-      background:#fff;
-      border-radius:22px;
-      padding:16px;
-      box-shadow:var(--shadow);
-    }
-
-    .qrbox .title{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      color:#000;
-      font-weight:1000;
-    }
-
-    .qrbox .sub{
-      color:#333;
-      font-size:12px;
-      margin-top:6px;
-    }
-
-    .qrsvg{margin-top:10px}
-
-    /* MENU SANS JS : ne peut pas casser admin.js */
-    .adn66-menu-wrap{
-      position:relative;
-      z-index:2000;
-      flex:0 0 auto;
-    }
-
-    .adn66-menu-wrap summary{
-      list-style:none;
-      min-height:44px;
-      padding:0 14px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:var(--card);
-      color:var(--text);
-      font-size:14px;
-      font-weight:900;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:9px;
-      box-shadow:0 12px 28px rgba(0,0,0,.28);
-      cursor:pointer;
-      user-select:none;
-    }
-
-    .adn66-menu-wrap summary::-webkit-details-marker{display:none}
-    .adn66-menu-wrap summary:hover{
-      border-color:rgba(93,183,238,.45);
-      background:var(--card-2);
-    }
-
-    .adn66-burger{
-      display:inline-grid;
-      gap:4px;
-      width:18px;
-      flex:0 0 auto;
-    }
-
-    .adn66-burger span{
-      display:block;
-      width:18px;
-      height:2px;
-      border-radius:999px;
-      background:var(--text);
-    }
-
-    .adn66-menu-panel{
-      position:fixed;
-      top:calc(env(safe-area-inset-top) + 86px);
-      right:max(12px, env(safe-area-inset-right));
-      width:min(360px, calc(100vw - 24px));
-      max-height:calc(100dvh - 102px);
-      overflow:auto;
-      padding:10px;
-      border-radius:22px;
-      border:1px solid var(--border);
-      background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(23,32,51,.98));
-      box-shadow:0 26px 60px rgba(0,0,0,.45);
-      overscroll-behavior:contain;
-    }
-
-    .adn66-menu-head{
-      padding:10px 10px 12px;
-      border-bottom:1px solid var(--border);
-      margin-bottom:10px;
-    }
-
-    .adn66-menu-kicker{
-      margin:0 0 4px;
-      color:var(--primary);
-      font-size:11px;
-      font-weight:900;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-    }
-
-    .adn66-menu-title{
-      margin:0;
-      color:var(--text);
-      font-size:18px;
-      line-height:1.1;
-      font-weight:900;
-    }
-
-    .adn66-menu-list{
-      display:grid;
-      gap:8px;
-    }
-
-    .adn66-menu-item{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-      padding:12px;
-      border-radius:17px;
-      border:1px solid var(--border);
-      background:var(--input);
-      color:var(--text);
-      text-decoration:none;
-      transition:.16s ease;
-    }
-
-    .adn66-menu-item:hover{
-      background:rgba(93,183,238,.10);
-      border-color:rgba(93,183,238,.38);
-    }
-
-    .adn66-menu-item.is-current{
-      background:rgba(93,183,238,.16);
-      border-color:rgba(93,183,238,.48);
-    }
-
-    .adn66-menu-icon{
-      width:44px;
-      height:44px;
-      border-radius:15px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
-      border:1px solid rgba(93,183,238,.24);
-      font-size:22px;
-      flex:0 0 auto;
-    }
-
-    .adn66-menu-text{
-      min-width:0;
-      flex:1 1 auto;
-    }
-
-    .adn66-menu-text strong{
-      display:block;
-      color:var(--text);
-      font-size:15px;
-      line-height:1.1;
-      font-weight:900;
-      margin-bottom:4px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .adn66-menu-text span{
-      display:block;
-      color:var(--text-muted);
-      font-size:12px;
-      line-height:1.35;
-      font-weight:700;
-    }
-
-    .adn66-menu-arrow{
-      color:var(--text-muted);
-      font-size:18px;
-      font-weight:900;
-      flex:0 0 auto;
-    }
-
-    @media (max-width:640px){
-      body{padding:12px}
-      .top{align-items:flex-start}
-      .brand b{font-size:16px}
-      .card-h{align-items:flex-start;flex-direction:column}
-      .row{display:grid;grid-template-columns:1fr}
-      button{width:100%;min-width:0}
-
-      .adn66-menu-wrap summary{
-        min-height:42px;
-        padding:0 12px;
-        border-radius:13px;
-        font-size:0;
-      }
-
-      .adn66-menu-wrap summary::after{
-        content:"Menu";
-        font-size:13px;
-      }
-
-      .adn66-menu-panel{
-        top:calc(env(safe-area-inset-top) + 74px);
-        left:12px;
-        right:12px;
-        width:auto;
-        max-height:calc(100dvh - 86px);
-      }
-    }
+    *{box-sizing:border-box} html,body{margin:0;min-height:100%}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top,rgba(93,183,238,.16),transparent 30%),linear-gradient(180deg,var(--bg0),var(--bg) 42%,#111827);padding:12px;overflow-x:hidden}
+    .wrap{width:min(760px,100%);margin:0 auto;display:grid;gap:12px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(17,24,39,.90);border:1px solid var(--border);border-radius:20px;padding:12px;box-shadow:var(--shadow)}
+    .brand{min-width:0}.brand b{display:block;font-size:18px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand span{display:block;margin-top:3px;color:var(--muted);font-size:12px;font-weight:700}
+    .top-actions{display:flex;gap:8px;align-items:center;flex:0 0 auto}.pill{border:1px solid var(--border);border-radius:999px;padding:7px 10px;background:rgba(15,23,42,.72);color:var(--muted);font-size:12px;font-weight:800;white-space:nowrap}
+    details.menu{position:relative;z-index:20} details.menu summary{list-style:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 12px;border-radius:13px;border:1px solid var(--border);background:var(--card);font-weight:1000;cursor:pointer;box-shadow:0 12px 24px rgba(0,0,0,.25)} details.menu summary::-webkit-details-marker{display:none}
+    .burger{display:grid;gap:4px}.burger i{display:block;width:18px;height:2px;background:var(--text);border-radius:9px}.menu-panel{position:fixed;top:68px;right:12px;width:min(350px,calc(100vw - 24px));max-height:calc(100dvh - 82px);overflow:auto;padding:10px;border-radius:20px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(17,24,39,.98),rgba(23,32,51,.98));box-shadow:0 26px 60px rgba(0,0,0,.45)}
+    .menu-head{padding:8px 8px 10px;border-bottom:1px solid var(--border);margin-bottom:8px}.menu-head small{color:var(--blue);font-weight:1000;letter-spacing:.12em}.menu-head h2{margin:3px 0 0;font-size:17px}.menu-list{display:grid;gap:7px}.menu-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:15px;background:var(--input);color:var(--text);text-decoration:none}.menu-item.current{background:rgba(93,183,238,.15);border-color:rgba(93,183,238,.45)}.menu-ico{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:rgba(93,183,238,.13);border:1px solid rgba(93,183,238,.22);font-size:20px}.menu-txt strong{display:block;font-size:14px}.menu-txt span{display:block;color:var(--soft);font-size:11px;font-weight:700}
+    .card{background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(23,32,51,.94));border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;border-bottom:1px solid var(--border);background:rgba(93,183,238,.07)}.card-h h1{margin:0;font-size:16px}.card-body{padding:14px;display:grid;gap:12px}
+    .client-box{border:1px solid var(--border);background:rgba(15,23,42,.70);border-radius:18px;padding:12px;display:grid;gap:8px}.client-main{display:flex;align-items:center;justify-content:space-between;gap:10px}.client-main strong{font-size:15px}.client-main span{color:var(--soft);font-size:12px;font-weight:800}.client-id{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--soft);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    label{display:block;color:var(--muted);font-size:12px;font-weight:900;margin-bottom:7px} input{width:100%;border:1px solid var(--border);border-radius:15px;background:var(--input);color:var(--text);padding:13px 14px;outline:none} input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(93,183,238,.12)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}button{border:1px solid var(--blue);border-radius:15px;background:var(--blue);color:#fff;padding:12px 13px;font-weight:1000;cursor:pointer;box-shadow:0 12px 24px rgba(93,183,238,.18)}button.secondary{background:rgba(15,23,42,.85);border-color:var(--border);color:var(--text);box-shadow:none}button.danger{background:rgba(220,38,38,.15);border-color:rgba(220,38,38,.38);color:var(--red2);box-shadow:none}button.small{min-height:36px;padding:8px 10px;border-radius:12px;font-size:12px}button:active{transform:translateY(1px)}
+    .status{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12px;font-weight:800}.dot{width:10px;height:10px;border-radius:99px;background:var(--blue);box-shadow:0 0 0 4px rgba(93,183,238,.13)}.dot.ok{background:var(--green);box-shadow:0 0 0 4px rgba(22,163,74,.14)}.dot.warn{background:var(--blue)}
+    #clientId{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}.results{display:grid;gap:8px}.result-card{border:1px solid var(--border);background:rgba(15,23,42,.72);border-radius:17px;padding:11px;display:grid;gap:9px}.result-top{display:flex;justify-content:space-between;gap:10px}.result-name{font-weight:1000}.result-meta{color:var(--soft);font-size:12px;font-weight:800}.result-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+    .hint{color:var(--soft);font-size:12px;line-height:1.4;font-weight:700}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}.hidden{display:none!important}
+    .modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(0,0,0,.70);backdrop-filter:blur(5px)}.modal.open{display:flex}.modal-card{width:min(520px,100%);max-height:calc(100dvh - 28px);overflow:auto;border:1px solid var(--border);border-radius:22px;background:linear-gradient(180deg,rgba(17,24,39,.98),rgba(23,32,51,.98));box-shadow:0 26px 70px rgba(0,0,0,.55);padding:14px}.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}.modal-head h2{margin:0;font-size:18px}.modal-head p{margin:5px 0 0;color:var(--muted);font-size:13px}.scan-frame{width:100%;aspect-ratio:3/4;background:#000;border-radius:18px;border:1px solid var(--border);overflow:hidden}.scan-frame video{width:100%;height:100%;object-fit:cover}.modal-actions{display:grid;gap:9px;margin-top:12px}.modal-actions.two{grid-template-columns:1fr 1fr}.modal-actions.three{grid-template-columns:1fr 1fr 1fr}.smart-body{color:var(--muted);line-height:1.5;font-weight:700}.smart-body b{color:var(--text)}
+    .qrbox{background:#fff;border-radius:18px;padding:14px;color:#111}.qrbox .title{display:flex;justify-content:space-between;gap:10px;align-items:center;font-weight:1000}.qrbox .sub{font-size:12px;color:#333;margin-top:6px;overflow-wrap:anywhere}.qrsvg{margin-top:10px;text-align:center}.qr-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.qr-actions button{color:#fff}.qr-actions .secondary{color:var(--text)}
+    @media(max-width:640px){body{padding:10px}.top{padding:11px;border-radius:18px}.brand span{display:none}.pill{display:none}.row,.row3,.result-actions,.modal-actions.two,.modal-actions.three,.qr-actions{grid-template-columns:1fr}details.menu summary{font-size:0}details.menu summary::after{content:'Menu';font-size:13px}.menu-panel{top:62px;left:10px;right:10px;width:auto}.card-body{padding:12px}.modal{padding:10px}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="top">
-      <div class="brand">
-        <b>ADN66 • Fidélité</b>
-        <span>Page Livreur/Admin</span>
-      </div>
-      <div class="pill" id="envPill">Mode : <b>Démo</b></div>
-
-      <details class="adn66-menu-wrap">
-        <summary>
-          <span class="adn66-burger" aria-hidden="true">
-            <span></span><span></span><span></span>
-          </span>
-          Menu
-        </summary>
-
-        <nav class="adn66-menu-panel" aria-label="Menu outils ADN66">
-          <div class="adn66-menu-head">
-            <p class="adn66-menu-kicker">ADN66</p>
-            <h2 class="adn66-menu-title">Outils internes</h2>
-          </div>
-
-          <div class="adn66-menu-list">
-            <a class="adn66-menu-item" href="../PUSH/">
-              <div class="adn66-menu-icon">🔔</div>
-              <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-
-            <a class="adn66-menu-item" href="../apero/">
-              <div class="adn66-menu-icon">🧮</div>
-              <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-
-            <a class="adn66-menu-item is-current" href="./admin.html">
-              <div class="adn66-menu-icon">🎁</div>
-              <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-
-            <a class="adn66-menu-item" href="../gps/">
-              <div class="adn66-menu-icon">📍</div>
-              <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-
-            <a class="adn66-menu-item" href="../status/">
-              <div class="adn66-menu-icon">📢</div>
-              <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-
-            <a class="adn66-menu-item" href="../stock/">
-              <div class="adn66-menu-icon">📦</div>
-              <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-
-            <a class="adn66-menu-item" href="../twilio/">
-              <div class="adn66-menu-icon">💬</div>
-              <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-          </div>
-        </nav>
-      </details>
-    </div>
-
-    <div class="card">
-      <div class="card-h">
-        <h1>Scanner + Valider (+1 point)</h1>
-        <div class="mono" id="who">—</div>
-      </div>
-
-      <div class="grid">
-        <div class="panel">
-          <div class="hint">
-            • Scanne le QR du client puis “Valider”.<br>
-            • Sans SMS : si le client a perdu sa carte → Recherche téléphone → “Afficher QR” → il rescane.
-          </div>
-
-          <label>Clé admin (PIN)</label>
-          <input id="adminKey" class="mono" value="0000" />
-          <label>ID client (auto après scan)</label>
-          <input id="clientId" class="mono" placeholder="UUID..." />
-<div class="row">
-            <button id="btnScan">Scanner QR</button>
-            <button id="btnStamp">Valider (+1)</button>
-          </div>
-
-          <div class="status"><span class="dot ok" id="dot"></span><span id="apiState">Démo locale</span></div>
-
-          <div style="margin-top:14px;border-top:1px solid rgba(255,255,255,.06);padding-top:12px">
-            <h1 style="margin:0;font-size:14px">Récupération (client a perdu sa carte)</h1>
-            <label>Recherche par téléphone</label>
-            <input id="searchPhone" inputmode="tel" placeholder="06..." />
-            <div class="row">
-              <button class="secondary" id="btnSearch">Rechercher</button>
-              <button class="secondary" id="btnClear">Effacer</button>
+    <header class="top">
+      <div class="brand"><b>ADN66 • Fidélité</b><span>Scan, +1 point et récupération client</span></div>
+      <div class="top-actions">
+        <div class="pill" id="envPill">Mode : <b>Démo</b></div>
+        <details class="menu">
+          <summary><span class="burger"><i></i><i></i><i></i></span>Menu</summary>
+          <nav class="menu-panel" aria-label="Menu outils ADN66">
+            <div class="menu-head"><small>ADN66</small><h2>Outils internes</h2></div>
+            <div class="menu-list">
+              <a class="menu-item" href="../PUSH/"><span class="menu-ico">🔔</span><span class="menu-txt"><strong>PUSH</strong><span>Notifications</span></span></a>
+              <a class="menu-item" href="../apero/"><span class="menu-ico">🧮</span><span class="menu-txt"><strong>Calculateur</strong><span>Calculatrice métier</span></span></a>
+              <a class="menu-item current" href="./admin.html"><span class="menu-ico">🎁</span><span class="menu-txt"><strong>Fidélité</strong><span>Administration client</span></span></a>
+              <a class="menu-item" href="../gps/"><span class="menu-ico">📍</span><span class="menu-txt"><strong>GPS</strong><span>Livraisons</span></span></a>
+              <a class="menu-item" href="../status/"><span class="menu-ico">📢</span><span class="menu-txt"><strong>Status</strong><span>Messages sites</span></span></a>
+              <a class="menu-item" href="../stock/"><span class="menu-ico">📦</span><span class="menu-txt"><strong>Stock</strong><span>Produits</span></span></a>
+              <a class="menu-item" href="../twilio/"><span class="menu-ico">💬</span><span class="menu-txt"><strong>Twilio SMS</strong><span>Marketing SMS</span></span></a>
             </div>
-            <div id="results"></div>
-          </div>
+          </nav>
+        </details>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="card-h"><h1>Action rapide</h1><div class="mono hint" id="who">—</div></div>
+      <div class="card-body">
+        <div>
+          <label>Clé admin (PIN)</label>
+          <input id="adminKey" class="mono" value="0000" autocomplete="off" />
         </div>
 
-        <div class="panel">
-          <h1 style="margin:0;font-size:14px">Caméra</h1>
-          <div class="scan"><video id="video" playsinline></video></div>
-          <div class="hint" id="scanHint">Prêt.</div>
-          <div class="row">
-            <button class="secondary" id="btnStop">Stop</button>
-            <button class="secondary" id="btnCopy">Copier ID</button>
-          </div>
+        <input id="clientId" class="mono" placeholder="UUID..." />
+
+        <div class="client-box">
+          <div class="client-main"><strong id="currentClientTitle">Aucun client sélectionné</strong><span id="currentClientPoints">—</span></div>
+          <div class="client-id" id="currentClientId">Scanne une carte ou recherche par téléphone.</div>
         </div>
+
+        <div class="row">
+          <button id="btnScan" type="button">📷 Scanner une carte</button>
+          <button id="btnStamp" type="button">+1 point</button>
+        </div>
+
+        <div class="status"><span class="dot ok" id="dot"></span><span id="apiState">Démo locale</span></div>
+        <div id="mainStatus" class="hint">Prêt.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-h"><h1>Recherche client</h1></div>
+      <div class="card-body">
+        <div>
+          <label>Numéro de téléphone</label>
+          <input id="searchPhone" inputmode="tel" placeholder="06..." />
+        </div>
+        <div class="row">
+          <button class="secondary" id="btnSearch" type="button">Rechercher</button>
+          <button class="secondary" id="btnClear" type="button">Effacer</button>
+        </div>
+        <div id="results" class="results"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal" id="scanModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div><h2>Scanner une carte</h2><p id="scanHint">Prêt.</p></div>
+        <button class="secondary small" id="btnStop" type="button">Fermer</button>
+      </div>
+      <div class="scan-frame"><video id="video" playsinline></video></div>
+      <div class="modal-actions two">
+        <button class="secondary" id="btnCopy" type="button">Copier ID</button>
+        <button class="secondary" id="btnManualClose" type="button">Annuler</button>
       </div>
     </div>
   </div>
 
-  <div class="qrfull" id="qrFull">
-    <div class="qrbox">
-      <div class="title">
-        <span>QR de récupération</span>
-        <button class="secondary" id="btnCloseQr" style="border:1px solid #ddd;color:#000;background:#f3f3f3;min-width:auto;padding:8px 10px;border-radius:10px;font-weight:900">Fermer</button>
-      </div>
-      <div class="sub" id="qrSub">—</div>
-      <div class="qrsvg" id="qrSvg"></div>
+  <div class="modal" id="smartModal">
+    <div class="modal-card">
+      <div class="modal-head"><div><h2 id="smartTitle">—</h2><p id="smartSub">—</p></div></div>
+      <div class="smart-body" id="smartBody"></div>
+      <div class="modal-actions" id="smartActions"></div>
     </div>
   </div>
+
+  <div class="modal" id="qrFull">
+    <div class="modal-card">
+      <div class="qrbox">
+        <div class="title"><span>QR de récupération</span><button class="secondary small" id="btnCloseQr" type="button" style="border:1px solid #ddd;color:#000;background:#f3f3f3;box-shadow:none">Fermer</button></div>
+        <div class="sub" id="qrSub">—</div>
+        <div class="qrsvg" id="qrSvg"></div>
+      </div>
+      <div class="qr-actions">
+        <button id="btnQrStamp" type="button">+1 point</button>
+        <button class="secondary" id="btnCopyQrId" type="button">Copier ID</button>
+        <button class="secondary" id="btnCopyQrLink" type="button">Copier lien</button>
+        <button class="secondary" id="btnQrSelect" type="button">Sélectionner</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="./admin.js?v=20260130-sane"></script>
+  <script src="https://unpkg.com/@zxing/browser@latest/umd/index.min.js"></script>
+  <script src="./admin.js?v=20260130-smart"></script>
 </body>
 </html>

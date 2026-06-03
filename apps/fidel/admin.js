@@ -1,230 +1,162 @@
 function extractClientIdFromAny(raw){
-  // Nettoyage agressif (espaces, retours, caractères invisibles)
-  let s = String(raw || "");
-  s = s.replace(/[\u200B-\u200D\uFEFF]/g, ""); // zero-width
-  s = s.trim();
+  let s = String(raw || "").replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
   if(!s) return "";
-
-  // 0) Si on voit "id=" quelque part, on extrait direct (le plus robuste)
-  //    Ex: https://.../client.html?restore=1&id=UUID
   try{
     const mId = s.match(/[?&#]id=([^&#\s]+)/i) || s.match(/\bid=([^&#\s]+)/i);
-    if(mId && mId[1]){
-      const v = decodeURIComponent(mId[1]);
-      if(v) return String(v).trim();
-    }
+    if(mId && mId[1]) return decodeURIComponent(mId[1]).trim();
   }catch(_){}
-
-  // 1) URL -> ?id=...
   try{
     if(/^https?:\/\//i.test(s)){
       const u = new URL(s);
-      const id = (u.searchParams && u.searchParams.get("id")) ? u.searchParams.get("id") : "";
+      const id = u.searchParams.get("id") || u.searchParams.get("client_id");
       if(id) return String(id).trim();
     }
   }catch(_){}
-
-  // 2) JSON -> {cid:"..."} ou {id:"..."}
   try{
     if(s[0] === "{"){
       const o = JSON.parse(s);
-      const id = (o && (o.id || o.cid || o.client_id || o.clientId)) ? (o.id || o.cid || o.client_id || o.clientId) : "";
+      const id = o && (o.id || o.cid || o.client_id || o.clientId);
       if(id) return String(id).trim();
     }
   }catch(_){}
-
-  // 3) Fallback : extraire un UUID dans le texte (même si c'est une URL complète)
   const mm = s.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
   if(mm && mm[0]) return mm[0];
-
-  // 4) Sinon, renvoie le texte brut
   return s;
 }
 
-
-// === ADN66 AUTO-TRI (visuel URL + ID interne) ===
+const API_BASE = "https://carte-de-fideliter.apero-nuit-du-66.workers.dev";
+const ADMIN_LS = "adn66_loyalty_admin_key";
 const RESTORE_PREFIX = "https://www.aperos.net/fidel/client.html?restore=1&id=";
 
-function extractIdByPrefix(raw){
-  const s = String(raw || "").trim();
-  if(!s) return "";
-  if(s.startsWith(RESTORE_PREFIX)) return s.slice(RESTORE_PREFIX.length).trim();
-  // fallback: try URL param
-  try{
-    const u = new URL(s);
-    const id = u.searchParams.get("id");
-    if(id) return String(id).trim();
-  }catch(_){}
-  // fallback uuid
-  const m = s.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-  return m ? m[0] : s;
-}
+const $ = (id) => document.getElementById(id);
+const video = $("video");
+const scanHint = $("scanHint");
+const scanModal = $("scanModal");
+const smartModal = $("smartModal");
+const qrModal = $("qrFull");
 
-function setScanned(raw){
-  window.__adn66_last_scan_raw = String(raw || "").trim();
-  const id = extractIdByPrefix(raw);
-  const idEl = document.getElementById("clientId");
-  if(idEl) idEl.value = id;
-  return id;
-}
+let stream = null;
+let scanning = false;
+let currentClient = { id:"", name:"", phone:"", points:null };
+let currentQr = { id:"", url:"", meta:null };
+let zxingControls = null;
 
-// auto-tri si on colle dans le champ ID
-document.addEventListener("input", (e)=>{
-  const t = e.target;
-  if(t && t.id === "clientId"){
-    const v = t.value || "";
-    const id = extractIdByPrefix(v);
-    if(id && id !== v){
-      t.value = id;
-    }
-  }
-}, true);
-// ===============================================
-
-
-// PATH: /fidel/admin.js
-// CONFIG : URL Worker Cloudflare (ex: https://xxxx.workers.dev). Laisse vide = mode démo local.
-const API_BASE = "https://carte-de-fideliter.apero-nuit-du-66.workers.dev";
-
-function makeQrSvg(text, size){
-  // Supports both legacy `qrcode()` API and the bundled `QRCodeGenerator`.
-  size = Number(size || 220);
-  const margin = 2;
-  const cellSize = 4; // will scale via viewBox if needed
-
-  // --- Preferred: QRCodeGenerator (bundled in qr.min.js)
-  try{
-    if (typeof window !== "undefined" && typeof window.QRCodeGenerator === "function"){
-      // typeNumber=0 => auto
-      const q = new window.QRCodeGenerator(0);
-      q.addData(String(text));
-      q.make();
-      // createSvgTag(cellSize, fillColor?) returns <svg ...>
-      let svg = q.createSvgTag(cellSize, "#111");
-      // Normalize width/height to requested `size`
-      svg = svg
-        .replace(/width=\"\d+\"/i, 'width="' + size + '"')
-        .replace(/height=\"\d+\"/i, 'height="' + size + '"')
-        .replace(/<svg/i, '<svg style="display:block;margin:0 auto;"');
-      return svg;
-    }
-  }catch(e){ /* fall through */ }
-
-  // --- Fallback: qrcode(typeNumber, errorCorrectionLevel)
-  try{
-    if (typeof window !== "undefined" && typeof window.qrcode === "function"){
-      const qr = window.qrcode(0, "M");
-      qr.addData(String(text));
-      qr.make();
-      // createSvgTag(cellSize, margin)
-      const svg = qr.createSvgTag(Math.max(1, Math.floor(size / (qr.getModuleCount() + margin*2))), margin);
-      return svg;
-    }
-  }catch(e){ /* fall through */ }
-
-  throw new Error("QR library not available");
-}
-
-function isValidClientId(id) {
-  if (!id) return false;
-  const s = String(id).trim();
-  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s)) return true;
-  if (/^[0-9A-HJKMNP-TV-Z]{26}$/.test(s)) return true;
+function normalizePhone(raw){ return (raw||"").replace(/[^0-9+]/g,"").trim(); }
+function escapeHtml(s){ return String(s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function maskPhone(phone){ phone=(phone||"").replace(/\s+/g,""); return phone.length < 6 ? phone : phone.slice(0,2)+" ** ** "+phone.slice(-2); }
+function pointsLabel(points){ return points === null || points === undefined || points === "" ? "Points : ?" : `Points : ${Number(points||0)}/8`; }
+function clientName(meta){ return (meta && (meta.name || meta.prenom || meta.firstname)) || "Client"; }
+function isValidClientId(id){
+  const s = String(id||"").trim();
+  if(!s) return false;
+  if(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s)) return true;
+  if(/^[0-9A-HJKMNP-TV-Z]{26}$/.test(s)) return true;
   return s.length >= 8;
 }
 
-function extractClientIdFromAny(text) {
-  if (!text) return "";
-  const t = String(text).trim();
-  if (isValidClientId(t)) return t;
-  const m = t.match(/(?:adn66:loyalty:|cid:)([0-9a-zA-Z-]{8,})/i);
-  if (m) return m[1];
-  try {
-    const u = new URL(t);
-    const id = u.searchParams.get("id") || u.searchParams.get("client_id");
-    if (id && isValidClientId(id)) return id;
-  } catch {}
-  return "";
-}
-
-const ADMIN_LS = "adn66_loyalty_admin_key";
-
-function normalizePhone(raw){ return (raw||"").replace(/[^0-9+]/g,"").trim(); }
-function setEnvPill(){ document.getElementById("envPill").innerHTML = "Mode : <b>" + (API_BASE ? "Serveur" : "Démo") + "</b>"; }
-setEnvPill();
-
+function setEnvPill(){ const el=$("envPill"); if(el) el.innerHTML = "Mode : <b>" + (API_BASE ? "Serveur" : "Démo") + "</b>"; }
 function setApiState(ok, msg){
-  const dot = document.getElementById("dot");
-  dot.classList.remove("ok","warn","bad");
-  dot.classList.add(ok ? "ok" : "warn");
-  document.getElementById("apiState").textContent = msg || (ok ? "OK" : "Erreur");
+  const dot = $("dot"); if(dot){ dot.classList.remove("ok","warn","bad"); dot.classList.add(ok ? "ok" : "warn"); }
+  const apiState = $("apiState"); if(apiState) apiState.textContent = msg || (ok ? "OK" : "Erreur");
 }
+function setMainStatus(msg){ const el=$("mainStatus"); if(el) el.textContent = msg || ""; }
 
 async function api(path, opts={}){
   const url = API_BASE + path;
-  const res = await fetch(url, { headers: {"content-type":"application/json"}, ...opts });
-  const ct = res.headers.get("content-type")||"";
+  const res = await fetch(url, { headers:{"content-type":"application/json"}, ...opts });
+  const ct = res.headers.get("content-type") || "";
   const data = ct.includes("application/json") ? await res.json() : await res.text();
   if(!res.ok) throw new Error((data && data.error) ? data.error : ("HTTP "+res.status));
   return data;
 }
 
-function qrRender(payload){
-  const host = document.getElementById("qrSvg");
-  if(!host) return;
-
-  // payload = string (URL) ou objet -> JSON
-  const text = (typeof payload === "string") ? payload : JSON.stringify(payload);
-
-  host.innerHTML = "";
-
-  // Wrapper = vraie bordure blanche (quiet zone visuelle)
-  const wrap = document.createElement("div");
-  wrap.style.background = "#fff";
-  wrap.style.padding = "18px";
-  wrap.style.borderRadius = "18px";
-  wrap.style.display = "inline-block";
-  wrap.style.boxShadow = "0 12px 30px rgba(0,0,0,.25)";
-  host.appendChild(wrap);
-
-  try{
-    if(typeof window.QRCode !== "function"){
-      wrap.textContent = "QR indisponible";
-      return;
-    }
-    // qrcodejs génère canvas/img dans wrap
-    new QRCode(wrap, {
-      text: String(text || ""),
-      width: 260,
-      height: 260,
-      correctLevel: QRCode.CorrectLevel.M
-    });
-  }catch(e){
-    wrap.textContent = "QR indisponible";
-  }
+function setClient(id, meta={}){
+  const cleanId = String(id || "").trim();
+  currentClient = {
+    id: cleanId,
+    name: meta.name || currentClient.name || "",
+    phone: meta.phone || currentClient.phone || "",
+    points: meta.points !== undefined ? meta.points : currentClient.points
+  };
+  const idEl = $("clientId"); if(idEl) idEl.value = cleanId;
+  const title = $("currentClientTitle"); if(title) title.textContent = cleanId ? (currentClient.name || "Client sélectionné") : "Aucun client sélectionné";
+  const points = $("currentClientPoints"); if(points) points.textContent = cleanId ? pointsLabel(currentClient.points) : "—";
+  const small = $("currentClientId"); if(small) small.textContent = cleanId || "Scanne une carte ou recherche par téléphone.";
 }
 
-const video = document.getElementById("video");
-const scanHint = document.getElementById("scanHint");
-let stream = null;
-let scanning = false;
+function setScanned(raw){
+  window.__adn66_last_scan_raw = String(raw || "").trim();
+  const id = extractClientIdFromAny(raw);
+  setClient(id, {points:null});
+  return id;
+}
+
+document.addEventListener("input", (e)=>{
+  const t=e.target;
+  if(t && t.id === "clientId"){
+    const id = extractClientIdFromAny(t.value || "");
+    if(id && id !== t.value) t.value = id;
+    setClient(id, {points:currentClient.points});
+  }
+}, true);
+
+function openModal(el){ if(el) el.classList.add("open"); }
+function closeModal(el){ if(el) el.classList.remove("open"); }
+
+function showSmart({title="", sub="", body="", actions=[]}){
+  $("smartTitle").textContent = title;
+  $("smartSub").textContent = sub;
+  $("smartBody").innerHTML = body;
+  const host = $("smartActions");
+  host.className = "modal-actions" + (actions.length === 2 ? " two" : actions.length === 3 ? " three" : "");
+  host.innerHTML = "";
+  actions.forEach(a=>{
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = a.label;
+    btn.className = a.className || (a.secondary ? "secondary" : "");
+    btn.addEventListener("click", async ()=>{
+      if(a.close !== false) closeModal(smartModal);
+      if(a.onClick) await a.onClick();
+    });
+    host.appendChild(btn);
+  });
+  openModal(smartModal);
+}
+
+function showError(message){
+  showSmart({title:"Erreur", sub:"Action impossible", body:escapeHtml(message), actions:[{label:"OK", secondary:true}]});
+}
+
+function showScanConfirm(id){
+  showSmart({
+    title:"Carte détectée ✅",
+    sub:"Client prêt à être validé",
+    body:`<p><b>ID client :</b><br><span class="mono">${escapeHtml(id)}</span></p><p>${pointsLabel(currentClient.points)}</p>`,
+    actions:[
+      {label:"Ajouter +1 point", onClick:()=>confirmStampClient({client_id:id, points:currentClient.points})},
+      {label:"Afficher QR", secondary:true, onClick:()=>showRecoveryQr(id, currentClient)},
+      {label:"Annuler", secondary:true}
+    ]
+  });
+}
 
 async function startScan(){
   if(scanning) return;
   scanning = true;
+  openModal(scanModal);
   scanHint.textContent = "Ouverture caméra…";
-
-  // Toujours viser la caméra arrière
-  const constraints = { video: { facingMode: { ideal: "environment" } }, audio: false };
-
-  // Helper: extraire un clientId depuis n'importe quel contenu (URL, JSON, texte)
-  const pickCid = (raw) => {
+  const constraints = { video:{ facingMode:{ ideal:"environment" } }, audio:false };
+  const finish = async (raw)=>{
     const cid = extractClientIdFromAny(raw);
-    return cid || "";
+    if(!cid) return;
+    setScanned(raw || cid);
+    scanHint.textContent = "QR détecté ✅";
+    await stopScan(false);
+    closeModal(scanModal);
+    showScanConfirm(cid);
   };
-
   try{
-    // 1) Option rapide si supporté : BarcodeDetector (Chrome récent)
     if("BarcodeDetector" in window){
       const detector = new BarcodeDetector({formats:["qr_code"]});
       stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -235,84 +167,51 @@ async function startScan(){
         const barcodes = await detector.detect(video);
         if(barcodes && barcodes.length){
           const val = barcodes[0].rawValue || "";
-          const cid = pickCid(val);
-          if(cid){
-            setScanned(val || txt || cid);
-            scanHint.textContent = "QR détecté ✅";
-            await stopScan();
-            return;
-          }
+          if(extractClientIdFromAny(val)){ await finish(val); return; }
         }
         await new Promise(r=>setTimeout(r,200));
       }
       return;
     }
-
-    // 2) Fallback robuste : ZXing (@zxing/browser) via script UMD
-    if(!(window.ZXing && window.ZXing.BrowserQRCodeReader)){
-      scanHint.textContent = "Scan non supporté (ZXing manquant).";
-      scanning = false;
+    if(window.ZXing && window.ZXing.BrowserQRCodeReader){
+      const reader = new window.ZXing.BrowserQRCodeReader();
+      scanHint.textContent = "Scan en cours…";
+      zxingControls = await reader.decodeFromVideoDevice(undefined, video, (result, err, controls)=>{
+        if(!scanning) return;
+        if(result && result.getText){ finish(result.getText()); }
+      });
       return;
     }
-
-    stream = await navigator.mediaDevices.getUserMedia(constraints);
-    video.srcObject = stream;
-    await video.play();
-
-    scanHint.textContent = "Scan en cours…";
-
-    const codeReader = new window.ZXing.BrowserQRCodeReader();
-    // decodeFromVideoElementContinuously appelle un callback à chaque lecture
-    await codeReader.decodeFromVideoElementContinuously(video, (result, err) => {
-      if(!scanning) return;
-      if(result && result.getText){
-        const txt = result.getText();
-        const cid = pickCid(txt);
-        if(cid){
-          setScanned(val || txt || cid);
-          scanHint.textContent = "QR détecté ✅";
-          stopScan();
-        }
-      }
-    });
-
-  }catch(e){
-    scanHint.textContent = "Erreur caméra: " + (e && e.message ? e.message : String(e));
+    scanHint.textContent = "Scan non supporté sur ce navigateur.";
     scanning = false;
-    try{ await stopScan(); }catch(_){}
+  }catch(e){
+    scanning = false;
+    scanHint.textContent = "Erreur caméra : " + (e && e.message ? e.message : String(e));
+    try{ await stopScan(false); }catch(_){}
   }
 }
 
-async function stopScan(){
+async function stopScan(close=true){
   scanning = false;
+  try{ if(zxingControls && zxingControls.stop) zxingControls.stop(); }catch(_){}
+  zxingControls = null;
   try{ video.pause(); }catch(_){}
-  if(stream){
-    try{ stream.getTracks().forEach(t=>t.stop()); }catch(_){}
-    stream = null;
-  }
-  video.srcObject = null;
-  scanHint.textContent = "Arrêt.";
-}
-
-function maskPhone(phone){
-  phone = (phone||"").replace(/\\s+/g,"");
-  if(phone.length < 6) return phone;
-  return phone.slice(0,2) + " ** ** " + phone.slice(-2);
-}
-function escapeHtml(s){
-  return (s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  if(stream){ try{ stream.getTracks().forEach(t=>t.stop()); }catch(_){} stream = null; }
+  if(video) video.srcObject = null;
+  if(scanHint) scanHint.textContent = "Arrêt.";
+  if(close) closeModal(scanModal);
 }
 
 function demoSearchByPhone(phone){
-  const results = [];
+  const results=[];
   for(let i=0;i<localStorage.length;i++){
-    const k = localStorage.key(i);
+    const k=localStorage.key(i);
     if(k && k.startsWith("adn66_demo_profile_c_")){
-      const cid = k.replace("adn66_demo_profile_","");
-      const p = JSON.parse(localStorage.getItem(k) || "null");
+      const cid=k.replace("adn66_demo_profile_","");
+      const p=JSON.parse(localStorage.getItem(k)||"null");
       if(p && normalizePhone(p.phone) === phone){
-        const s = JSON.parse(localStorage.getItem("adn66_demo_state_"+cid) || "{}");
-        results.push({client_id: cid, name: p.name, phone: p.phone, points: s.points||0, completed_at: s.completed_at||null});
+        const s=JSON.parse(localStorage.getItem("adn66_demo_state_"+cid)||"{}");
+        results.push({client_id:cid,name:p.name,phone:p.phone,points:s.points||0,completed_at:s.completed_at||null});
       }
     }
   }
@@ -320,127 +219,182 @@ function demoSearchByPhone(phone){
 }
 
 function renderResults(items){
-  const host = document.getElementById("results");
+  const host=$("results");
   if(!items || !items.length){ host.innerHTML = "<div class='hint'>Aucun résultat.</div>"; return; }
-  let html = "<table><thead><tr><th>Prénom</th><th>Téléphone</th><th>Points</th><th>Action</th></tr></thead><tbody>";
-  for(const it of items){
-    html += "<tr>";
-    html += "<td><b>"+escapeHtml(it.name||"—")+"</b></td>";
-    html += "<td class='mono'>"+escapeHtml(maskPhone(it.phone||""))+"</td>";
-    html += "<td>"+Number(it.points||0)+"</td>";
-    html += "<td><button class='secondary' data-cid='"+escapeHtml(it.client_id)+"'>Afficher QR</button></td>";
-    html += "</tr>";
-  }
-  html += "</tbody></table>";
-  host.innerHTML = html;
-  host.querySelectorAll("button[data-cid]").forEach(btn=>{
-    btn.addEventListener("click", ()=>showRecoveryQr(btn.getAttribute("data-cid")));
+  host.innerHTML = "";
+  items.forEach((it, index)=>{
+    const cid = it.client_id || it.id || it.cid || "";
+    const card = document.createElement("article");
+    card.className = "result-card";
+    card.innerHTML = `
+      <div class="result-top">
+        <div>
+          <div class="result-name">${escapeHtml(it.name || "Client")}</div>
+          <div class="result-meta mono">${escapeHtml(maskPhone(it.phone || ""))}</div>
+        </div>
+        <div class="result-meta">${pointsLabel(it.points)}</div>
+      </div>
+      <div class="result-actions">
+        <button class="small" data-action="stamp">+1</button>
+        <button class="secondary small" data-action="qr">QR</button>
+        <button class="secondary small" data-action="select">Sélect.</button>
+        <button class="secondary small" data-action="copy">Copier</button>
+      </div>`;
+    card.querySelector('[data-action="stamp"]').addEventListener("click", ()=>confirmStampClient({...it, client_id:cid}));
+    card.querySelector('[data-action="qr"]').addEventListener("click", ()=>showRecoveryQr(cid, it));
+    card.querySelector('[data-action="select"]').addEventListener("click", ()=>{ setClient(cid, it); setMainStatus("Client sélectionné depuis la recherche."); });
+    card.querySelector('[data-action="copy"]').addEventListener("click", ()=>copyText(cid, "ID copié."));
+    host.appendChild(card);
   });
 }
 
-function showRecoveryQr(cid){
-  try{
-
-  // QR de récupération : URL http(s) que le client scanne
-  const id = String(cid || "").trim();
-
-  // page client (adapter si tu changes la route)
-  const restoreUrl = "https://www.aperos.net/fidel/client.html?restore=1&id=" + encodeURIComponent(id);
-
-  document.getElementById("qrSub").textContent =
-    "URL (scan) : " + restoreUrl;
-
-  qrRender(restoreUrl);
-  document.getElementById("qrFull").classList.add("open");
-  }catch(e){
-    console.error(e);
-    alert("Erreur QR: "+(e && e.message ? e.message : e));
-  }
+function confirmStampClient(client){
+  const cid = client.client_id || client.id || currentClient.id || $("clientId").value;
+  if(!cid) return showError("Aucun client sélectionné.");
+  showSmart({
+    title:"Confirmer +1 point ?",
+    sub:clientName(client),
+    body:`<p><b>Téléphone :</b> ${escapeHtml(maskPhone(client.phone || currentClient.phone || "—"))}</p><p><b>${pointsLabel(client.points ?? currentClient.points)}</b></p><p class="mono">${escapeHtml(cid)}</p>`,
+    actions:[
+      {label:"Confirmer +1", onClick:()=>stampClient(cid, client)},
+      {label:"Afficher QR", secondary:true, onClick:()=>showRecoveryQr(cid, client)},
+      {label:"Annuler", secondary:true}
+    ]
+  });
 }
 
-async function stamp(){
-  const key = (document.getElementById("adminKey").value||"").trim();
-  const cid = (document.getElementById("clientId").value||"").trim();
-  if(!key) return alert("Clé admin manquante");
-  if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cid)) return alert("ID client invalide");
-
+async function stampClient(cid, meta={}){
+  const key = ($("adminKey").value||"").trim();
+  cid = String(cid || "").trim();
+  if(!key) return showError("Clé admin manquante.");
+  if(!isValidClientId(cid)) return showError("ID client invalide.");
   localStorage.setItem(ADMIN_LS, key);
-  document.getElementById("who").textContent = "PIN: " + key;
-
+  $("who").textContent = "PIN: " + key;
+  setClient(cid, meta);
   if(!API_BASE){
     const stKey = "adn66_demo_state_"+cid;
     const state = JSON.parse(localStorage.getItem(stKey) || '{"points":0,"completed_at":null}');
     if(state.points >= 8 && state.completed_at){
-      alert("Carte déjà complétée. Attendre le reset auto.");
+      showPointResult(cid, meta, state.points, true, "Carte déjà complétée. Attendre le reset auto.");
       return;
     }
-    state.points = (state.points||0) + 1;
-    if(state.points >= 8){
-      state.points = 8;
-      state.completed_at = new Date().toISOString();
-      alert("8/8 ✅ Récompense à donner maintenant. Reset auto dans 24h (démo).");
-    }else{
-      alert("Point ajouté ✅ ("+state.points+"/8)");
-    }
+    state.points = (state.points || 0) + 1;
+    if(state.points >= 8){ state.points = 8; state.completed_at = new Date().toISOString(); }
     localStorage.setItem(stKey, JSON.stringify(state));
     setApiState(true, "Démo locale");
+    setClient(cid, {...meta, points:state.points});
+    showPointResult(cid, meta, state.points, state.points >= 8);
     return;
   }
-
   try{
-    const r = await api("/loyalty/stamp", {method:"POST", headers: {"content-type":"text/plain;charset=utf-8"}, body: JSON.stringify({admin_key:key, client_id:cid})});
+    const r = await api("/loyalty/stamp", {method:"POST", headers:{"content-type":"text/plain;charset=utf-8"}, body:JSON.stringify({admin_key:key, client_id:cid})});
+    const points = r.points ?? r.total_points ?? r.current_points ?? meta.points ?? null;
     setApiState(true, "Validé ✅");
-    alert("OK ✅ Points: " + (r.points ?? "?"));
+    setClient(cid, {...meta, points});
+    showPointResult(cid, meta, points, Number(points) >= 8);
   }catch(e){
     setApiState(false, "Erreur");
-    alert("Erreur: " + e.message);
+    showError("Erreur validation : " + e.message);
   }
 }
 
-async function search(){
-  const key = (document.getElementById("adminKey").value||"").trim();
-  const phone = normalizePhone(document.getElementById("searchPhone").value);
-  if(!key) return alert("Clé admin manquante");
-  if(!phone || phone.length < 10) return alert("Téléphone invalide");
-  localStorage.setItem(ADMIN_LS, key);
+function showPointResult(cid, meta={}, points=null, complete=false, custom=""){
+  const title = complete ? "Carte complète 🎁" : "Point ajouté ✅";
+  const body = custom ? escapeHtml(custom) : `<p><b>${clientName(meta)}</b></p><p>Le client a maintenant : <b>${pointsLabel(points).replace("Points : ","")}</b></p>`;
+  showSmart({
+    title,
+    sub: complete ? "Récompense à donner maintenant" : "Validation enregistrée",
+    body,
+    actions:[
+      {label:"Scanner un autre", onClick:()=>startScan()},
+      {label:"Afficher QR", secondary:true, onClick:()=>showRecoveryQr(cid, {...meta, points})},
+      {label:"Fermer", secondary:true}
+    ]
+  });
+}
 
+async function stamp(){
+  const cid = ($("clientId").value || currentClient.id || "").trim();
+  confirmStampClient({client_id:cid, ...currentClient});
+}
+
+async function search(){
+  const key = ($("adminKey").value||"").trim();
+  const phone = normalizePhone($("searchPhone").value);
+  if(!key) return showError("Clé admin manquante.");
+  if(!phone || phone.length < 10) return showError("Téléphone invalide.");
+  localStorage.setItem(ADMIN_LS, key);
+  setMainStatus("Recherche en cours…");
   if(!API_BASE){
     const items = demoSearchByPhone(phone);
     renderResults(items);
     setApiState(true, "Démo locale");
+    setMainStatus(items.length ? `${items.length} résultat(s).` : "Aucun résultat.");
     return;
   }
-
   try{
     const items = await api("/admin/loyalty/search?phone="+encodeURIComponent(phone)+"&admin_key="+encodeURIComponent(key), {method:"GET"});
-    renderResults(items.found && items.client ? [items.client] : (items.results || []));
+    const results = items.found && items.client ? [items.client] : (items.results || []);
+    renderResults(results);
     setApiState(true, "OK");
+    setMainStatus(results.length ? `${results.length} résultat(s).` : "Aucun résultat.");
   }catch(e){
     setApiState(false, "Erreur");
-    alert("Erreur recherche: " + e.message);
+    showError("Erreur recherche : " + e.message);
   }
 }
 
-function clearResults(){
-  document.getElementById("results").innerHTML = "";
-  document.getElementById("searchPhone").value = "";
+function clearResults(){ $("results").innerHTML = ""; $("searchPhone").value = ""; setMainStatus("Recherche effacée."); }
+
+function qrRender(payload){
+  const host = $("qrSvg"); if(!host) return;
+  const text = typeof payload === "string" ? payload : JSON.stringify(payload);
+  host.innerHTML = "";
+  const wrap = document.createElement("div");
+  wrap.style.background = "#fff"; wrap.style.padding = "18px"; wrap.style.borderRadius = "18px"; wrap.style.display = "inline-block";
+  host.appendChild(wrap);
+  try{
+    if(typeof window.QRCode !== "function"){ wrap.textContent = "QR indisponible"; return; }
+    new QRCode(wrap, {text:String(text||""), width:260, height:260, correctLevel:QRCode.CorrectLevel.M});
+  }catch(e){ wrap.textContent = "QR indisponible"; }
 }
 
-document.getElementById("btnScan").addEventListener("click", startScan);
-document.getElementById("btnStop").addEventListener("click", stopScan);
-document.getElementById("btnStamp").addEventListener("click", stamp);
-document.getElementById("btnSearch").addEventListener("click", search);
-document.getElementById("btnClear").addEventListener("click", clearResults);
-document.getElementById("btnCloseQr").addEventListener("click", ()=>document.getElementById("qrFull").classList.remove("open"));
-document.getElementById("btnCopy").addEventListener("click", ()=>{
-  const cid = (document.getElementById("clientId").value||"").trim();
-  if(!cid) return;
-  navigator.clipboard?.writeText(cid).then(()=>alert("ID copié")).catch(()=>alert(cid));
-});
+function showRecoveryQr(cid, meta={}){
+  try{
+    const id = String(cid || "").trim();
+    if(!id) return showError("ID client manquant pour le QR.");
+    const restoreUrl = RESTORE_PREFIX + encodeURIComponent(id);
+    currentQr = {id, url:restoreUrl, meta};
+    $("qrSub").textContent = `${clientName(meta)} • ${pointsLabel(meta.points)} • ${restoreUrl}`;
+    qrRender(restoreUrl);
+    openModal(qrModal);
+  }catch(e){ showError("Erreur QR : " + (e && e.message ? e.message : e)); }
+}
+
+function copyText(text, ok="Copié."){
+  if(!text) return;
+  if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>setMainStatus(ok)).catch(()=>showSmart({title:"Copie manuelle",sub:"Copie impossible",body:`<p class="mono">${escapeHtml(text)}</p>`,actions:[{label:"OK",secondary:true}]})); }
+  else showSmart({title:"Copie manuelle",sub:"Copie impossible",body:`<p class="mono">${escapeHtml(text)}</p>`,actions:[{label:"OK",secondary:true}]});
+}
+
+$("btnScan").addEventListener("click", startScan);
+$("btnStop").addEventListener("click", ()=>stopScan(true));
+$("btnManualClose").addEventListener("click", ()=>stopScan(true));
+$("btnStamp").addEventListener("click", stamp);
+$("btnSearch").addEventListener("click", search);
+$("btnClear").addEventListener("click", clearResults);
+$("btnCloseQr").addEventListener("click", ()=>closeModal(qrModal));
+$("btnCopy").addEventListener("click", ()=>copyText(($("clientId").value||"").trim(), "ID copié."));
+$("btnQrStamp").addEventListener("click", ()=>{ closeModal(qrModal); confirmStampClient({client_id:currentQr.id, ...currentQr.meta}); });
+$("btnCopyQrId").addEventListener("click", ()=>copyText(currentQr.id, "ID copié."));
+$("btnCopyQrLink").addEventListener("click", ()=>copyText(currentQr.url, "Lien QR copié."));
+$("btnQrSelect").addEventListener("click", ()=>{ setClient(currentQr.id, currentQr.meta||{}); closeModal(qrModal); setMainStatus("Client sélectionné depuis le QR."); });
+
+$("searchPhone").addEventListener("keydown", (e)=>{ if(e.key === "Enter"){ e.preventDefault(); search(); } });
 
 const saved = localStorage.getItem(ADMIN_LS);
-if(saved){
-  document.getElementById("adminKey").value = saved;
-  document.getElementById("who").textContent = "PIN: " + saved;
-}
+if(saved){ $("adminKey").value = saved; $("who").textContent = "PIN: " + saved; }
+setEnvPill();
 setApiState(true, API_BASE ? "Serveur" : "Démo locale");
+setClient("", {});
+setMainStatus("Prêt.");
