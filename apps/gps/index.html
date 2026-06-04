@@ -9,6 +9,8 @@
   <link rel="icon" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="styles.css?v=200"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
 
   <style>
     /* ===== MENU ADN66 — bouton en haut à droite, vrai menu déroulant ===== */
@@ -199,6 +201,154 @@
         max-height:calc(100dvh - 78px);
       }
     }
+
+    /* ===== HISTORIQUE POINTAGE GPS ===== */
+    .pointage-actions{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pointage-history{
+      margin-top:18px;
+      border:1px solid #283447;
+      background:linear-gradient(180deg, rgba(17,24,39,.94), rgba(15,23,42,.94));
+      border-radius:24px;
+      padding:16px;
+      color:#f8fafc;
+      box-shadow:0 18px 45px rgba(0,0,0,.28);
+    }
+    .pointage-history.hidden{display:none;}
+    .pointage-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .pointage-head h2{
+      margin:0;
+      font-size:22px;
+      font-weight:950;
+    }
+    .pointage-head p{
+      margin:5px 0 0;
+      color:#cbd5e1;
+      font-size:13px;
+      font-weight:700;
+    }
+    .pointage-grid{
+      display:grid;
+      grid-template-columns:minmax(220px, 330px) 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    .pointage-days,
+    .pointage-detail{
+      border:1px solid #283447;
+      background:#0f172a;
+      border-radius:20px;
+      padding:12px;
+      min-width:0;
+    }
+    .pointage-days h3,
+    .pointage-detail h3{
+      margin:0 0 10px;
+      font-size:16px;
+      font-weight:950;
+    }
+    .pointage-day-btn{
+      width:100%;
+      text-align:left;
+      border:1px solid #283447;
+      background:#111827;
+      color:#f8fafc;
+      border-radius:16px;
+      padding:11px 12px;
+      margin-bottom:8px;
+      cursor:pointer;
+      font-weight:850;
+    }
+    .pointage-day-btn:hover,
+    .pointage-day-btn.is-active{
+      border-color:rgba(93,183,238,.55);
+      background:rgba(93,183,238,.12);
+    }
+    .pointage-day-btn span{
+      display:block;
+      color:#94a3b8;
+      font-size:12px;
+      margin-top:4px;
+      font-weight:750;
+    }
+    #pointageMap{
+      height:360px;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid #283447;
+      background:#111827;
+      margin-bottom:12px;
+    }
+    .pointage-log-list{
+      display:grid;
+      gap:8px;
+      max-height:360px;
+      overflow:auto;
+      padding-right:3px;
+    }
+    .pointage-log{
+      border:1px solid #283447;
+      background:#111827;
+      border-radius:16px;
+      padding:10px 11px;
+      color:#f8fafc;
+      font-size:13px;
+      line-height:1.35;
+    }
+    .pointage-log strong{
+      color:#5db7ee;
+      font-weight:950;
+    }
+    .pointage-log small{
+      display:block;
+      margin-top:4px;
+      color:#94a3b8;
+      font-weight:750;
+    }
+    .pointage-marker{
+      width:28px;
+      height:28px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      color:white;
+      background:#5db7ee;
+      border:2px solid white;
+      box-shadow:0 6px 16px rgba(0,0,0,.35);
+      font-size:12px;
+      font-weight:950;
+    }
+    .pointage-marker.vehicle{
+      background:#16a34a;
+    }
+    .pointage-status{
+      color:#cbd5e1;
+      font-size:13px;
+      font-weight:750;
+      margin:8px 0 0;
+    }
+    @media (max-width:860px){
+      .pointage-grid{
+        grid-template-columns:1fr;
+      }
+      #pointageMap{
+        height:320px;
+      }
+      .pointage-head{
+        flex-direction:column;
+      }
+    }
+
   </style>
 
 </head>
@@ -338,6 +488,7 @@
         <button id="btnOptimize" class="btn btn-primary" type="button">Optimiser la tournée</button>
         <button id="btnAdd" class="btn" type="button">Ajouter une adresse</button>
         <button id="btnExportTxt" class="btn btn-soft" type="button">Exporter TXT</button>
+        <button id="btnPointageHistory" class="btn btn-secondary" type="button">🗺 Historique pointage</button>
       </div>
 
       <div class="status" id="status" role="status" aria-live="polite"></div>
@@ -356,6 +507,34 @@
       </div>
       <ul id="addrList" class="addrlist"></ul>
     </section>
+
+    <section id="pointageHistory" class="pointage-history hidden" aria-label="Historique pointage GPS">
+      <div class="pointage-head">
+        <div>
+          <h2>Historique pointage GPS</h2>
+          <p>30 derniers jours : clics Waze / Maps, position au clic, adresse cible, véhicule enregistré.</p>
+          <div id="pointageStatus" class="pointage-status">Historique non chargé.</div>
+        </div>
+        <div class="pointage-actions">
+          <button id="btnPointageRefresh" class="btn btn-secondary" type="button">Actualiser</button>
+          <button id="btnPointageClose" class="btn btn-soft" type="button">Fermer</button>
+        </div>
+      </div>
+
+      <div class="pointage-grid">
+        <aside class="pointage-days">
+          <h3>Jours</h3>
+          <div id="pointageDaysList"></div>
+        </aside>
+
+        <section class="pointage-detail">
+          <h3 id="pointageDayTitle">Sélectionne une journée</h3>
+          <div id="pointageMap"></div>
+          <div id="pointageLogsList" class="pointage-log-list"></div>
+        </section>
+      </div>
+    </section>
+
   </main>
 
   <div id="modalBackdrop" class="modal-backdrop hidden"></div>
@@ -431,7 +610,8 @@
     })();
   </script>
 
-  <script src="app.js?v=117"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="app.js?v=118"></script>
   <script src="./admin-gate.js"></script>
 </body>
 </html>

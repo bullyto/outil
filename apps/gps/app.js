@@ -51,6 +51,13 @@ function warnIfNoStorage(){
 const LS_NAV_APP = "tournee_v7_nav_app";
 
 const LS_SEED_VERSION = "tournee_v7_seed_version";
+
+// ===== Pointage GPS Cloudflare D1 =====
+const GPS_POINTAGE_WORKER = "https://apero-gps-control.apero-nuit-du-66.workers.dev";
+const LS_GPS_POINTAGE_TOKEN = "adn66_gps_pointage_token";
+const LS_GPS_POINTAGE_TOKEN_UNTIL = "adn66_gps_pointage_token_until";
+const GPS_POINTAGE_REMEMBER_DAYS = 90;
+
 const SEED_VERSION = "seed_2025-12-17_1";
 const SEED_URL = "./data/adresses.csv";
 
@@ -67,6 +74,18 @@ const btnExportTxt = document.getElementById("btnExportTxt");
 const btnSaveVehicle = document.getElementById("btnSaveVehicle");
 const btnFindVehicle = document.getElementById("btnFindVehicle");
 const vehicleHint = document.getElementById("vehicleHint");
+const btnPointageHistory = document.getElementById("btnPointageHistory");
+const pointageHistory = document.getElementById("pointageHistory");
+const btnPointageRefresh = document.getElementById("btnPointageRefresh");
+const btnPointageClose = document.getElementById("btnPointageClose");
+const pointageStatus = document.getElementById("pointageStatus");
+const pointageDaysList = document.getElementById("pointageDaysList");
+const pointageDayTitle = document.getElementById("pointageDayTitle");
+const pointageLogsList = document.getElementById("pointageLogsList");
+let pointageMap = null;
+let pointageMapLayer = null;
+let pointageSelectedDay = null;
+
 
 // Toggle navigation (en haut)
 const navWazeBtn = document.getElementById("navWaze");
@@ -610,6 +629,418 @@ function updateNavUI(){
 }
 
 
+
+
+// ======================================================
+// POINTAGE GPS — Worker Cloudflare + D1
+// ======================================================
+
+function pointageSetStatus(message, isError = false){
+  if(pointageStatus){
+    pointageStatus.textContent = message || "";
+    pointageStatus.style.color = isError ? "#fecaca" : "#cbd5e1";
+  }
+}
+
+function localDayKey(date = new Date()){
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function gpsTokenValid(){
+  const token = lsGet(LS_GPS_POINTAGE_TOKEN);
+  const until = Number(lsGet(LS_GPS_POINTAGE_TOKEN_UNTIL) || 0);
+  return !!(token && until > Date.now());
+}
+
+function getGpsToken(){
+  return gpsTokenValid() ? lsGet(LS_GPS_POINTAGE_TOKEN) : "";
+}
+
+function clearGpsToken(){
+  lsRemove(LS_GPS_POINTAGE_TOKEN);
+  lsRemove(LS_GPS_POINTAGE_TOKEN_UNTIL);
+}
+
+async function gpsApi(path, options = {}){
+  const token = getGpsToken();
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+
+  if(token){
+    headers.Authorization = "Bearer " + token;
+  }
+
+  const response = await fetch(GPS_POINTAGE_WORKER.replace(/\/+$/, "") + path, {
+    ...options,
+    cache: "no-store",
+    headers
+  });
+
+  const data = await response.json().catch(() => ({
+    success: false,
+    error: "Réponse Worker non JSON"
+  }));
+
+  if(response.status === 401 || response.status === 403){
+    clearGpsToken();
+  }
+
+  if(!response.ok && data.success !== false){
+    data.success = false;
+  }
+
+  return data;
+}
+
+async function ensureGpsAuth(){
+  if(gpsTokenValid()) return true;
+
+  const password = prompt("Mot de passe historique / pointage GPS");
+  if(!password){
+    pointageSetStatus("Mot de passe requis pour le pointage GPS.", true);
+    return false;
+  }
+
+  const data = await fetch(GPS_POINTAGE_WORKER.replace(/\/+$/, "") + "/auth/login", {
+    method: "POST",
+    cache: "no-store",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({password})
+  }).then(r => r.json()).catch(() => ({
+    success: false,
+    error: "Worker GPS inaccessible"
+  }));
+
+  if(!data.success || !data.authenticated || !data.token){
+    pointageSetStatus(data.error || "Mot de passe incorrect.", true);
+    alert(data.error || "Mot de passe incorrect.");
+    return false;
+  }
+
+  const until = Date.now() + GPS_POINTAGE_REMEMBER_DAYS * 24 * 60 * 60 * 1000;
+  lsSet(LS_GPS_POINTAGE_TOKEN, data.token);
+  lsSet(LS_GPS_POINTAGE_TOKEN_UNTIL, String(until));
+  pointageSetStatus("Accès pointage GPS autorisé.");
+  return true;
+}
+
+function getCurrentPositionPromise(){
+  return new Promise((resolve) => {
+    if(!("geolocation" in navigator)){
+      resolve(null);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve(pos),
+      () => resolve(null),
+      { enableHighAccuracy: true, timeout: 9000, maximumAge: 10000 }
+    );
+  });
+}
+
+function metersLabel(value){
+  const n = Number(value || 0);
+  if(!Number.isFinite(n) || n <= 0) return "—";
+  if(n < 1000) return `${Math.round(n)} m`;
+  return `${(n / 1000).toFixed(2).replace(".", ",")} km`;
+}
+
+function frDateLabel(dayKey){
+  try{
+    const [y,m,d] = String(dayKey).split("-").map(Number);
+    const dt = new Date(y, m - 1, d);
+    return dt.toLocaleDateString("fr-FR", {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    });
+  }catch(_){
+    return dayKey;
+  }
+}
+
+function timeLabel(value){
+  try{
+    return new Date(value).toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }catch(_){
+    return "—";
+  }
+}
+
+async function sendPointageLog(payload){
+  const ok = await ensureGpsAuth();
+  if(!ok) return null;
+
+  const data = await gpsApi("/logs/add", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+
+  if(!data.success){
+    pointageSetStatus(data.error || "Pointage non enregistré.", true);
+    return null;
+  }
+
+  pointageSetStatus(`Pointage enregistré ✅ ${data.distance_meters ? "• " + metersLabel(data.distance_meters) : ""}`);
+  return data;
+}
+
+async function recordNavigationPointage(a, idx, city, navApp){
+  const pos = await getCurrentPositionPromise();
+
+  const payload = {
+    type: "navigation",
+    day_key: localDayKey(),
+    nav_app: navApp,
+    route_city: city,
+    route_order: idx + 1,
+
+    target_label: formatLine(a),
+    target_street: a.street || "",
+    target_postcode: a.postcode || "",
+    target_city: a.city || city,
+    target_lat: typeof a.lat === "number" ? a.lat : null,
+    target_lng: typeof a.lon === "number" ? a.lon : null,
+
+    current_lat: pos ? pos.coords.latitude : null,
+    current_lng: pos ? pos.coords.longitude : null,
+    gps_accuracy: pos ? pos.coords.accuracy : null,
+
+    note: pos ? "Clic navigation avec position GPS." : "Clic navigation sans position GPS disponible."
+  };
+
+  return await sendPointageLog(payload);
+}
+
+async function recordVehiclePointage(lat, lon, accuracy){
+  const city = currentCity();
+
+  const payload = {
+    type: "vehicle",
+    day_key: localDayKey(),
+    route_city: city,
+
+    current_lat: lat,
+    current_lng: lon,
+    gps_accuracy: accuracy || null,
+
+    target_label: "Véhicule enregistré",
+    note: "Position véhicule enregistrée depuis Apéro GPS."
+  };
+
+  return await sendPointageLog(payload);
+}
+
+async function openAddressNavigation(a, idx, city){
+  a.done = true;
+  saveData();
+  render();
+
+  const mode = getNavApp();
+  await recordNavigationPointage(a, idx, city, mode);
+
+  if(mode === "maps"){
+    window.location.href = mapsWalkUrl(a);
+    return;
+  }
+
+  const url = wazeUrl(a);
+  window.location.href = url.deep;
+
+  setTimeout(()=>{
+    if(document.visibilityState === "visible"){
+      if(confirm("Waze ne s'est pas ouvert. Ouvrir la version web ?")) window.open(url.web, "_blank");
+    }
+  }, 900);
+}
+
+function ensurePointageMap(){
+  if(!window.L || !document.getElementById("pointageMap")) return null;
+
+  if(!pointageMap){
+    pointageMap = L.map("pointageMap", {
+      zoomControl: true
+    }).setView([42.6986, 2.8956], 12);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap"
+    }).addTo(pointageMap);
+  }
+
+  if(pointageMapLayer){
+    pointageMap.removeLayer(pointageMapLayer);
+  }
+
+  pointageMapLayer = L.layerGroup().addTo(pointageMap);
+
+  setTimeout(() => pointageMap.invalidateSize(), 120);
+  return pointageMapLayer;
+}
+
+function pointageIcon(number, type){
+  const label = type === "vehicle" ? "🚗" : String(number);
+  return L.divIcon({
+    className: "",
+    html: `<div class="pointage-marker ${type === "vehicle" ? "vehicle" : ""}">${label}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+}
+
+function renderDayMap(logs){
+  const layer = ensurePointageMap();
+  if(!layer) return;
+
+  const bounds = [];
+  const line = [];
+  let order = 0;
+
+  logs.forEach((log) => {
+    const lat = Number(log.current_lat);
+    const lng = Number(log.current_lng);
+    if(!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    order++;
+    const marker = L.marker([lat, lng], {
+      icon: pointageIcon(order, log.type)
+    });
+
+    const title = log.type === "vehicle" ? "Véhicule enregistré" : (log.target_label || log.target_street || "Pointage");
+    marker.bindPopup(`
+      <strong>${order}. ${title}</strong><br>
+      ${timeLabel(log.created_at)}<br>
+      ${log.nav_app ? "App : " + String(log.nav_app).toUpperCase() + "<br>" : ""}
+      ${log.distance_meters ? "Distance cible : " + metersLabel(log.distance_meters) + "<br>" : ""}
+      ${log.gps_accuracy ? "Précision GPS : " + Math.round(log.gps_accuracy) + " m" : ""}
+    `);
+
+    marker.addTo(layer);
+    bounds.push([lat, lng]);
+    line.push([lat, lng]);
+  });
+
+  if(line.length >= 2){
+    L.polyline(line, {
+      weight: 4,
+      opacity: 0.75
+    }).addTo(layer);
+  }
+
+  if(bounds.length){
+    pointageMap.fitBounds(bounds, { padding: [28, 28] });
+  }else{
+    pointageMap.setView([42.6986, 2.8956], 12);
+  }
+}
+
+function renderLogsList(logs){
+  if(!pointageLogsList) return;
+
+  if(!logs.length){
+    pointageLogsList.innerHTML = `<div class="pointage-log">Aucun pointage pour cette journée.</div>`;
+    return;
+  }
+
+  pointageLogsList.innerHTML = logs.map((log, i) => {
+    const title = log.type === "vehicle"
+      ? "🚗 Véhicule enregistré"
+      : `📍 ${escapeHtmlForPointage(log.target_label || log.target_street || "Adresse")}`;
+
+    const detail = log.type === "vehicle"
+      ? `Position véhicule • précision ${log.gps_accuracy ? Math.round(log.gps_accuracy) + " m" : "—"}`
+      : `${String(log.nav_app || "").toUpperCase()} • ${metersLabel(log.distance_meters)} • ordre ${log.route_order || "—"}`;
+
+    return `
+      <div class="pointage-log">
+        <strong>${i + 1}. ${timeLabel(log.created_at)} — ${title}</strong>
+        <small>${escapeHtmlForPointage(detail)}</small>
+        <small>${escapeHtmlForPointage(log.target_street || "")} ${escapeHtmlForPointage(log.target_postcode || "")} ${escapeHtmlForPointage(log.target_city || "")}</small>
+      </div>
+    `;
+  }).join("");
+}
+
+function escapeHtmlForPointage(value){
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+async function loadPointageDays(){
+  const ok = await ensureGpsAuth();
+  if(!ok) return;
+
+  if(pointageHistory) pointageHistory.classList.remove("hidden");
+  pointageSetStatus("Chargement des journées...");
+
+  const data = await gpsApi("/logs/days?limit=30");
+  if(!data.success){
+    pointageSetStatus(data.error || "Impossible de charger l'historique.", true);
+    return;
+  }
+
+  const days = data.days || [];
+
+  if(!pointageDaysList) return;
+  if(!days.length){
+    pointageDaysList.innerHTML = `<div class="pointage-log">Aucun pointage enregistré.</div>`;
+    pointageSetStatus("Aucun pointage pour le moment.");
+    return;
+  }
+
+  pointageDaysList.innerHTML = days.map((day) => `
+    <button class="pointage-day-btn" type="button" data-day="${escapeHtmlForPointage(day.day_key)}">
+      ${escapeHtmlForPointage(frDateLabel(day.day_key))}
+      <span>${day.total_logs || 0} pointage(s) • ${day.navigation_count || 0} navigation • ${day.vehicle_count || 0} véhicule • ${metersLabel(day.total_distance_meters)}</span>
+    </button>
+  `).join("");
+
+  pointageDaysList.querySelectorAll("[data-day]").forEach((button) => {
+    button.addEventListener("click", () => loadPointageDay(button.dataset.day));
+  });
+
+  pointageSetStatus("Historique chargé.");
+  await loadPointageDay(days[0].day_key);
+}
+
+async function loadPointageDay(dayKey){
+  pointageSelectedDay = dayKey;
+  if(pointageDayTitle) pointageDayTitle.textContent = frDateLabel(dayKey);
+  pointageSetStatus("Chargement de la journée...");
+
+  document.querySelectorAll(".pointage-day-btn").forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.day === dayKey);
+  });
+
+  const data = await gpsApi("/logs/day?day=" + encodeURIComponent(dayKey));
+  if(!data.success){
+    pointageSetStatus(data.error || "Impossible de charger la journée.", true);
+    return;
+  }
+
+  const logs = data.logs || [];
+  renderLogsList(logs);
+  renderDayMap(logs);
+
+  const total = data.summary?.total_logs || logs.length || 0;
+  const dist = data.summary?.total_distance_meters || 0;
+  pointageSetStatus(`${total} pointage(s) • distance estimée ${metersLabel(dist)}.`);
+}
+
 function exportAllTxt(){
   // Exporte toutes les villes + toutes les adresses dans l'ordre actuel (tri mairie si déjà appliqué)
   // Inclut aussi l'état 'fait' si présent.
@@ -728,28 +1159,9 @@ addrList.innerHTML = "";
     main.appendChild(l1);
     main.appendChild(l2);
 
-    main.addEventListener("click", ()=>{
-      // Ouvre l'adresse dans l'app choisie (Waze ou Google Maps en mode piéton)
-      a.done = true;
-      saveData();
-      render();
-
-      const mode = getNavApp();
-      if(mode === "maps"){
-        window.location.href = mapsWalkUrl(a);
-        return;
-      }
-
-      const url = wazeUrl(a);
-      // Try deep link; if blocked, user can still have Waze installed
-      window.location.href = url.deep;
-      // Ne pas ouvrir waze.com automatiquement (sinon au retour ça affiche la page waze.com)
-      // Fallback seulement si Waze ne s'est pas ouvert (page toujours visible)
-      setTimeout(()=>{
-        if(document.visibilityState === "visible"){
-          if(confirm("Waze ne s'est pas ouvert. Ouvrir la version web ?")) window.open(url.web, "_blank");
-        }
-      }, 900);
+    main.addEventListener("click", async ()=>{
+      // Pointage GPS + ouverture Waze ou Google Maps
+      await openAddressNavigation(a, idx, city);
     });
 
     const actions = document.createElement("div");
@@ -1132,6 +1544,7 @@ Remplacer cette position ?`;
   bindOnce(btnStartMairie, "boundStartMairie", ()=> setStartMode("mairie"));
   bindOnce(btnStartVehicle, "boundStartVehicle", ()=> setStartMode("vehicle"));
         setStatus("Véhicule enregistré ✅");
+        recordVehiclePointage(lat, lon, p.coords.accuracy).catch(console.error);
       }, (err)=>{
         console.error(err);
         const msg = (err && err.code === 1)
@@ -1194,6 +1607,13 @@ async function wire(){
 
   // Parking véhicule
   initVehicleUI();
+
+  // Historique pointage GPS
+  if(btnPointageHistory) btnPointageHistory.addEventListener("click", loadPointageDays);
+  if(btnPointageRefresh) btnPointageRefresh.addEventListener("click", loadPointageDays);
+  if(btnPointageClose) btnPointageClose.addEventListener("click", ()=>{
+    if(pointageHistory) pointageHistory.classList.add("hidden");
+  });
 
   modalClose.addEventListener("click", closeModal);
   modalCancel.addEventListener("click", closeModal);
