@@ -778,9 +778,10 @@ function timeLabel(value){
 }
 
 async function sendPointageLog(payload){
-  const ok = await ensureGpsAuth();
-  if(!ok) return null;
-
+  // IMPORTANT :
+  // L'enregistrement du pointage doit être invisible et ne doit jamais demander le mot de passe.
+  // Le Worker accepte /logs/add sans token.
+  // Le mot de passe sert uniquement à consulter la Cartographie admin+.
   const data = await gpsApi("/logs/add", {
     method: "POST",
     body: JSON.stringify(payload)
@@ -898,7 +899,67 @@ function pointageIcon(number, type){
   });
 }
 
+function hoursBetweenDates(a, b){
+  const da = new Date(a).getTime();
+  const db = new Date(b).getTime();
+  if(!Number.isFinite(da) || !Number.isFinite(db) || db <= da) return null;
+  return (db - da) / 3600000;
+}
+
+function durationBetweenLabel(a, b){
+  const da = new Date(a).getTime();
+  const db = new Date(b).getTime();
+  if(!Number.isFinite(da) || !Number.isFinite(db) || db <= da) return "—";
+  const minutes = Math.round((db - da) / 60000);
+  if(minutes < 60) return `${minutes} min`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m ? `${h} h ${m} min` : `${h} h`;
+}
+
+function kmhLabel(value){
+  const n = Number(value);
+  if(!Number.isFinite(n) || n <= 0) return "—";
+  if(n > 180) return `${Math.round(n)} km/h ⚠️`;
+  return `${n.toFixed(1).replace(".", ",")} km/h`;
+}
+
+function enrichLogsWithSpeed(logs){
+  const arr = Array.isArray(logs) ? logs.map((log) => ({...log})) : [];
+
+  for(let i = 0; i < arr.length; i++){
+    const log = arr[i];
+    const next = arr[i + 1];
+
+    log._duration_to_next = null;
+    log._speed_to_next_kmh = null;
+
+    if(!next) continue;
+    if(log.type !== "navigation") continue;
+
+    const distanceMeters = Number(log.distance_meters || 0);
+    const hours = hoursBetweenDates(log.created_at, next.created_at);
+
+    if(distanceMeters > 0 && hours && hours > 0){
+      log._duration_to_next = durationBetweenLabel(log.created_at, next.created_at);
+      log._speed_to_next_kmh = (distanceMeters / 1000) / hours;
+    }
+  }
+
+  return arr;
+}
+
+function speedLineForLog(log){
+  if(log.type !== "navigation") return "";
+  if(!log._speed_to_next_kmh){
+    return "Vitesse estimée : attente du point suivant";
+  }
+  return `Vitesse estimée vers le point suivant : ${kmhLabel(log._speed_to_next_kmh)} sur ${log._duration_to_next || "—"}`;
+}
+
 function renderDayMap(logs){
+  logs = enrichLogsWithSpeed(logs);
+
   const layer = ensurePointageMap();
   if(!layer) return;
 
@@ -922,6 +983,7 @@ function renderDayMap(logs){
       ${timeLabel(log.created_at)}<br>
       ${log.nav_app ? "App : " + String(log.nav_app).toUpperCase() + "<br>" : ""}
       ${log.distance_meters ? "Distance cible : " + metersLabel(log.distance_meters) + "<br>" : ""}
+      ${log.type === "navigation" ? speedLineForLog(log) + "<br>" : ""}
       ${log.gps_accuracy ? "Précision GPS : " + Math.round(log.gps_accuracy) + " m" : ""}
     `);
 
@@ -945,6 +1007,8 @@ function renderDayMap(logs){
 }
 
 function renderLogsList(logs){
+  logs = enrichLogsWithSpeed(logs);
+
   if(!pointageLogsList) return;
 
   if(!logs.length){
@@ -959,12 +1023,17 @@ function renderLogsList(logs){
 
     const detail = log.type === "vehicle"
       ? `Position véhicule • précision ${log.gps_accuracy ? Math.round(log.gps_accuracy) + " m" : "—"}`
-      : `${String(log.nav_app || "").toUpperCase()} • ${metersLabel(log.distance_meters)} • ordre ${log.route_order || "—"}`;
+      : `${String(log.nav_app || "").toUpperCase()} • distance cible ${metersLabel(log.distance_meters)} • ordre ${log.route_order || "—"}`;
+
+    const speedLine = log.type === "navigation"
+      ? `<small>${escapeHtmlForPointage(speedLineForLog(log))}</small>`
+      : "";
 
     return `
       <div class="pointage-log">
         <strong>${i + 1}. ${timeLabel(log.created_at)} — ${title}</strong>
         <small>${escapeHtmlForPointage(detail)}</small>
+        ${speedLine}
         <small>${escapeHtmlForPointage(log.target_street || "")} ${escapeHtmlForPointage(log.target_postcode || "")} ${escapeHtmlForPointage(log.target_city || "")}</small>
       </div>
     `;
@@ -1038,7 +1107,10 @@ async function loadPointageDay(dayKey){
 
   const total = data.summary?.total_logs || logs.length || 0;
   const dist = data.summary?.total_distance_meters || 0;
-  pointageSetStatus(`${total} pointage(s) • distance estimée ${metersLabel(dist)}.`);
+  const enriched = enrichLogsWithSpeed(logs);
+  const speeds = enriched.map((log) => Number(log._speed_to_next_kmh)).filter((n) => Number.isFinite(n) && n > 0 && n < 180);
+  const avgSpeed = speeds.length ? speeds.reduce((a,b) => a + b, 0) / speeds.length : null;
+  pointageSetStatus(`${total} pointage(s) • distance estimée ${metersLabel(dist)}${avgSpeed ? " • vitesse moyenne " + kmhLabel(avgSpeed) : ""}.`);
 }
 
 function exportAllTxt(){
