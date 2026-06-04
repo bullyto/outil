@@ -946,46 +946,57 @@ function enrichLogsWithSpeed(logs){
 
   for(let i = 0; i < arr.length; i++){
     const log = arr[i];
-    const next = arr[i + 1];
+    const previous = arr[i - 1];
 
-    log._duration_to_next = null;
-    log._speed_to_next_kmh = null;
-    log._movement_distance_meters = null;
+    log._duration_from_previous = null;
+    log._speed_from_previous_kmh = null;
+    log._movement_from_previous_meters = null;
     log._speed_note = "";
 
-    if(!next) continue;
+    // Le premier point de la journée est le point de départ : aucune vitesse à calculer.
+    if(!previous) continue;
 
-    const distanceMeters = distanceBetweenLogsMeters(log, next);
-    const hours = hoursBetweenDates(log.created_at, next.created_at);
+    // IMPORTANT : vitesse calculée UNIQUEMENT entre deux positions GPS enregistrées.
+    // Pas avec l'adresse cible, pas avec la destination Waze/Maps.
+    const distanceMeters = distanceBetweenLogsMeters(previous, log);
+    const hours = hoursBetweenDates(previous.created_at, log.created_at);
 
-    if(distanceMeters === null || !hours || hours <= 0) continue;
+    if(distanceMeters === null){
+      log._speed_note = "Vitesse non calculable : GPS manquant sur le point précédent ou actuel";
+      continue;
+    }
 
-    log._duration_to_next = durationBetweenLabel(log.created_at, next.created_at);
-    log._movement_distance_meters = distanceMeters;
+    if(!hours || hours <= 0){
+      log._speed_note = "Vitesse non calculable : durée invalide";
+      continue;
+    }
 
-    // Filtre anti-valeurs absurdes : trop proche ou durée trop courte = pas de vitesse affichée.
+    log._duration_from_previous = durationBetweenLabel(previous.created_at, log.created_at);
+    log._movement_from_previous_meters = distanceMeters;
+
     const seconds = hours * 3600;
     if(distanceMeters < 10){
       log._speed_note = "Déplacement trop court pour calcul fiable";
       continue;
     }
-    if(seconds < 30){
+
+    if(seconds < 20){
       log._speed_note = "Durée trop courte pour calcul fiable";
       continue;
     }
 
-    log._speed_to_next_kmh = (distanceMeters / 1000) / hours;
+    log._speed_from_previous_kmh = (distanceMeters / 1000) / hours;
   }
 
   return arr;
 }
 
 function speedLineForLog(log){
-  if(!log || !log._movement_distance_meters) return "";
-  if(!log._speed_to_next_kmh){
+  if(!log || !log._movement_from_previous_meters) return "";
+  if(!log._speed_from_previous_kmh){
     return log._speed_note || "";
   }
-  return `Vitesse moyenne jusqu'au point suivant : ${kmhLabel(log._speed_to_next_kmh)} sur ${metersLabel(log._movement_distance_meters)} en ${log._duration_to_next || "—"}`;
+  return `Depuis le point précédent : ${kmhLabel(log._speed_from_previous_kmh)} • ${metersLabel(log._movement_from_previous_meters)} en ${log._duration_from_previous || "—"}`;
 }
 
 function renderDayMap(logs){
@@ -1014,7 +1025,7 @@ function renderDayMap(logs){
       ${timeLabel(log.created_at)}<br>
       ${log.nav_app ? "App : " + String(log.nav_app).toUpperCase() + "<br>" : ""}
       ${log.distance_meters ? "Distance cible : " + metersLabel(log.distance_meters) + "<br>" : ""}
-      ${log.type === "navigation" ? speedLineForLog(log) + "<br>" : ""}
+      ${speedLineForLog(log) ? speedLineForLog(log) + "<br>" : ""}
       ${log.gps_accuracy ? "Précision GPS : " + Math.round(log.gps_accuracy) + " m" : ""}
     `);
 
@@ -1056,8 +1067,9 @@ function renderLogsList(logs){
       ? `Position véhicule • précision ${log.gps_accuracy ? Math.round(log.gps_accuracy) + " m" : "—"}`
       : `${String(log.nav_app || "").toUpperCase()} • distance cible ${metersLabel(log.distance_meters)} • ordre ${log.route_order || "—"}`;
 
-    const speedLine = log.type === "navigation"
-      ? `<small>${escapeHtmlForPointage(speedLineForLog(log))}</small>`
+    const speedText = speedLineForLog(log);
+    const speedLine = speedText
+      ? `<small>${escapeHtmlForPointage(speedText)}</small>`
       : "";
 
     return `
