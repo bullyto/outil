@@ -8,20 +8,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#111827" />
   <title>ADN66 Marketing SMS</title>
-  <script>document.documentElement.classList.add("adn66-locked");</script>
   <link rel="manifest" href="manifest.json?v=11" />
   <link rel="stylesheet" href="styles.css?v=11" />
 
   <style>
-    html.adn66-locked body{
-      background:#0b1220;
-    }
-
-    html.adn66-locked .app-shell{
-      display:none !important;
-    }
-
-
     /* ===== MENU ADN66 — bouton en haut à droite, vrai menu déroulant ===== */
     .adn66-header-menu{
       position:relative;
@@ -292,7 +282,6 @@
       <button class="tab" data-screen="clients">Clients</button>
       <button class="tab" data-screen="problems">Problèmes</button>
       <button class="tab" data-screen="history">Historique</button>
-      <button class="tab" data-screen="settings">Réglages</button>
     </nav>
 
     <main>
@@ -416,6 +405,29 @@
               <option value="all">Tous</option>
             </select>
           </div>
+
+          <div class="grid two">
+            <div>
+              <label>Recherche avancée</label>
+              <input id="clientSearch" placeholder="Nom ou numéro client" autocomplete="off" />
+            </div>
+            <div>
+              <label>Affichage</label>
+              <div class="quick-actions">
+                <button class="secondary" id="clientSearchBtn" type="button">Rechercher</button>
+                <button class="secondary" id="clearClientSearchBtn" type="button">Réinitialiser</button>
+              </div>
+            </div>
+          </div>
+
+          <p id="clientsSummary" class="hint">300 clients par page.</p>
+
+          <div class="quick-actions">
+            <button class="secondary" id="prevClientsPageBtn" type="button">← Page précédente</button>
+            <button class="secondary" id="nextClientsPageBtn" type="button">Page suivante →</button>
+          </div>
+          <p id="clientPageInfo" class="hint">Page 1</p>
+
           <div class="table-wrap"><table><thead><tr><th>Nom</th><th>Numéro</th><th>Statut</th><th>Envoyés</th><th>Erreur</th><th>Action</th></tr></thead><tbody id="clientsTable"></tbody></table></div>
         </div>
       </section>
@@ -459,21 +471,6 @@
         </div>
       </section>
 
-      <section id="settings" class="screen">
-        <div class="card">
-          <h2>Réglages API</h2>
-          <label>URL Worker Cloudflare</label>
-          <input id="workerUrl" placeholder="https://twillio-sms.apero-nuit-du-66.workers.dev" />
-          <label>Clé admin optionnelle</label>
-          <input id="adminKey" placeholder="Optionnel si tu ajoutes une sécurité Worker" />
-          <div class="quick-actions">
-            <button class="primary" id="saveSettingsBtn">Enregistrer</button>
-            <button class="secondary" id="testWorkerBtn">Tester Worker</button>
-          </div>
-          <div id="settingsResult" class="result-box hidden"></div>
-          <p class="hint">Les secrets Twilio ne vont jamais dans la PWA. Ils restent dans Cloudflare Worker.</p>
-        </div>
-      </section>
     </main>
 
 

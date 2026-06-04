@@ -2,8 +2,12 @@ const $ = (id) => document.getElementById(id);
 
 const state = {
   workerUrl: localStorage.getItem("adn66_worker_url") || "https://twillio-sms.apero-nuit-du-66.workers.dev",
-  adminToken: localStorage.getItem("adn66_admin_token") || localStorage.getItem("adn66_admin_key") || "",
-  deferredPrompt: null
+  adminKey: localStorage.getItem("adn66_admin_key") || "",
+  deferredPrompt: null,
+  clientsPage: 1,
+  clientsPageSize: 300,
+  clientsTotal: 0,
+  clientsSearch: ""
 };
 
 window.addEventListener("beforeinstallprompt", (e) => {
@@ -52,9 +56,8 @@ function apiBase() {
 }
 
 function headers() {
-  state.adminToken = localStorage.getItem("adn66_admin_token") || localStorage.getItem("adn66_admin_key") || state.adminToken || "";
   const result = { "Content-Type": "application/json" };
-  if (state.adminToken) result.Authorization = "Bearer " + state.adminToken;
+  if (state.adminKey) result.Authorization = "Bearer " + state.adminKey;
   return result;
 }
 
@@ -71,15 +74,6 @@ async function api(path, options = {}) {
   });
 
   const data = await response.json().catch(() => ({ success: false, error: "Réponse non JSON" }));
-
-  if (response.status === 401 || response.status === 403) {
-    data.success = false;
-    data.authenticated = false;
-    if (typeof window.ADN_ADMIN_LOCK === "function") {
-      window.ADN_ADMIN_LOCK();
-    }
-  }
-
   if (!response.ok && data.success !== false) data.success = false;
   return data;
 }
@@ -257,7 +251,7 @@ async function importCsvFileContacts() {
   );
 
   toast(finalResult.success ? `CSV importé : ${finalResult.added || 0} ajouté(s)` : (finalResult.error || "Erreur import CSV"));
-  await loadClients();
+  await resetClientsToFirstPage();
   await refreshDashboard();
 }
 
@@ -428,7 +422,7 @@ async function addSingleClient() {
     showNiceResult("addClientResult", `<div class="badline"><strong>Erreur :</strong> ${escapeHtml(data.error || "Ajout impossible")}</div>`);
   }
 
-  await loadClients();
+  await resetClientsToFirstPage();
   await refreshDashboard();
 }
 
@@ -450,7 +444,7 @@ async function importContacts() {
 
   showNiceResult("importResult", humanImportResult(finalResult));
   toast(finalResult.success ? `Import OK : ${finalResult.added || 0} ajouté(s), ${finalResult.duplicates || 0} doublon(s)` : (finalResult.error || "Erreur import"));
-  await loadClients();
+  await resetClientsToFirstPage();
   await refreshDashboard();
 }
 
@@ -458,24 +452,41 @@ async function loadClients() {
   const filter = $("clientFilter")?.value || "active";
   const tbody = $("clientsTable");
   if (!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="6">Chargement des clients...</td></tr>`;
 
-  let data = await api("/clients/list?filter=" + encodeURIComponent(filter));
-  if (data.success && (!data.clients || data.clients.length === 0) && filter === "active") {
-    const allData = await api("/clients/list?filter=all");
-    if (allData.success && Array.isArray(allData.clients) && allData.clients.length > 0) data = allData;
+  const pageSize = state.clientsPageSize || 300;
+  const page = Math.max(1, Number(state.clientsPage || 1));
+  const offset = (page - 1) * pageSize;
+  const search = String(state.clientsSearch || "").trim();
+
+  tbody.innerHTML = `<tr><td colspan="6">Chargement des clients...</td></tr>`;
+  setText("clientsSummary", search ? `Recherche : ${search} — chargement...` : "Chargement...");
+
+  let route = "/clients/list?filter=" + encodeURIComponent(filter)
+    + "&limit=" + encodeURIComponent(pageSize)
+    + "&offset=" + encodeURIComponent(offset);
+
+  if (search) {
+    route += "&search=" + encodeURIComponent(search);
   }
 
+  const data = await api(route);
   tbody.innerHTML = "";
 
   if (!data.success) {
     tbody.innerHTML = `<tr><td colspan="6">Erreur chargement clients : ${escapeHtml(data.error || "réponse Worker invalide")}</td></tr>`;
+    updateClientsPagination(0, page, pageSize, 0);
     return;
   }
 
   const clients = Array.isArray(data.clients) ? data.clients : [];
+  const total = Number(data.total ?? clients.length ?? 0);
+  state.clientsTotal = total;
+  state.clientsPage = Number(data.page || page);
+
+  updateClientsPagination(total, state.clientsPage, pageSize, clients.length);
+
   if (clients.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6">Aucun client à afficher.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6">Aucun client à afficher sur cette page.</td></tr>`;
     return;
   }
 
@@ -491,6 +502,33 @@ async function loadClients() {
     `;
     tbody.appendChild(tr);
   });
+}
+
+function updateClientsPagination(total, page, pageSize, displayed) {
+  const totalPages = Math.max(1, Math.ceil(Number(total || 0) / pageSize));
+  const safePage = Math.min(Math.max(1, Number(page || 1)), totalPages);
+  const start = total === 0 ? 0 : ((safePage - 1) * pageSize) + 1;
+  const end = total === 0 ? 0 : Math.min(start + Number(displayed || 0) - 1, total);
+  const search = String(state.clientsSearch || "").trim();
+
+  setText(
+    "clientsSummary",
+    search
+      ? `${total} résultat(s) pour “${search}” — affichage ${start} à ${end}`
+      : `${total} client(s) au total — affichage ${start} à ${end}`
+  );
+
+  setText("clientPageInfo", `Page ${safePage} / ${totalPages} — 300 clients par page`);
+
+  const prev = $("prevClientsPageBtn");
+  const next = $("nextClientsPageBtn");
+  if (prev) prev.disabled = safePage <= 1;
+  if (next) next.disabled = safePage >= totalPages;
+}
+
+function resetClientsToFirstPage() {
+  state.clientsPage = 1;
+  return loadClients();
 }
 
 function clientActions(client) {
@@ -664,11 +702,13 @@ async function resetSentTracking() {
 
 function initSettings() {
   if ($("workerUrl")) $("workerUrl").value = state.workerUrl;
-  if ($("adminKey")) $("adminKey").value = "";
+  if ($("adminKey")) $("adminKey").value = state.adminKey;
 
   $("saveSettingsBtn")?.addEventListener("click", () => {
     state.workerUrl = $("workerUrl")?.value.trim() || state.workerUrl;
+    state.adminKey = $("adminKey")?.value.trim() || "";
     localStorage.setItem("adn66_worker_url", state.workerUrl);
+    localStorage.setItem("adn66_admin_key", state.adminKey);
     toast("Réglages enregistrés");
   });
 
@@ -712,20 +752,49 @@ $("importCsvFile")?.addEventListener("change", () => {
 });
 $("clearImportBtn")?.addEventListener("click", () => { if ($("importNumbers")) $("importNumbers").value = ""; });
 $("loadClientsBtn")?.addEventListener("click", loadClients);
-$("clientFilter")?.addEventListener("change", loadClients);
+$("clientFilter")?.addEventListener("change", () => {
+  state.clientsPage = 1;
+  loadClients();
+});
+$("clientSearchBtn")?.addEventListener("click", () => {
+  state.clientsSearch = $("clientSearch")?.value.trim() || "";
+  state.clientsPage = 1;
+  loadClients();
+});
+$("clearClientSearchBtn")?.addEventListener("click", () => {
+  if ($("clientSearch")) $("clientSearch").value = "";
+  state.clientsSearch = "";
+  state.clientsPage = 1;
+  loadClients();
+});
+$("clientSearch")?.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    state.clientsSearch = $("clientSearch")?.value.trim() || "";
+    state.clientsPage = 1;
+    loadClients();
+  }
+});
+$("prevClientsPageBtn")?.addEventListener("click", () => {
+  if (state.clientsPage > 1) {
+    state.clientsPage -= 1;
+    loadClients();
+  }
+});
+$("nextClientsPageBtn")?.addEventListener("click", () => {
+  const totalPages = Math.max(1, Math.ceil(Number(state.clientsTotal || 0) / state.clientsPageSize));
+  if (state.clientsPage < totalPages) {
+    state.clientsPage += 1;
+    loadClients();
+  }
+});
 $("loadProblemsBtn")?.addEventListener("click", loadProblems);
 $("loadHistoryBtn")?.addEventListener("click", loadHistory);
 $("loadSentTrackingBtn")?.addEventListener("click", loadSentTracking);
 $("resetSentTrackingBtn")?.addEventListener("click", resetSentTracking);
 
-window.ADN_BOOT_APP = async function ADN_BOOT_APP() {
-  if (window.__adn66AppBooted) return;
-  window.__adn66AppBooted = true;
-
-  initSettings();
-  await refreshDashboard();
-  await loadClients();
-  await loadProblems();
-  await loadHistory();
-  await loadSentTracking();
-};
+initSettings();
+refreshDashboard();
+loadClients();
+loadProblems();
+loadHistory();
+loadSentTracking();
