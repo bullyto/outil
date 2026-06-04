@@ -20,7 +20,7 @@ $("installBtn")?.addEventListener("click", async () => {
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js?v=9").catch(() => {});
+  navigator.serviceWorker.register("sw.js?v=10").catch(() => {});
 }
 
 document.querySelectorAll(".tab").forEach((button) => {
@@ -91,6 +91,164 @@ function parseContactLine(line) {
 
 function splitContacts(rawText) {
   return String(rawText || "").split(/\n+/).map(parseContactLine).filter(Boolean);
+}
+
+function parseCsvLine(line) {
+  const cells = [];
+  let current = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    const nextChar = line[i + 1];
+
+    if (char === '"' && insideQuotes && nextChar === '"') {
+      current += '"';
+      i++;
+    } else if (char === '"') {
+      insideQuotes = !insideQuotes;
+    } else if ((char === "," || char === ";") && !insideQuotes) {
+      cells.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  cells.push(current.trim());
+  return cells;
+}
+
+function normalizeHeader(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9_]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function parseMarketingCsv(rawText) {
+  const lines = String(rawText || "")
+    .replace(/^\uFEFF/, "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (lines.length === 0) return [];
+
+  const firstLine = parseCsvLine(lines[0]).map(normalizeHeader);
+  const hasHeader = firstLine.some((header) =>
+    ["name", "nom", "client_name", "phone", "telephone", "numero", "source", "active"].includes(header)
+  );
+
+  const headers = hasHeader ? firstLine : ["name", "phone", "source", "active"];
+  const startIndex = hasHeader ? 1 : 0;
+
+  const contacts = [];
+
+  for (let i = startIndex; i < lines.length; i++) {
+    const cells = parseCsvLine(lines[i]);
+    const row = {};
+
+    headers.forEach((header, index) => {
+      row[header] = cells[index] || "";
+    });
+
+    const name = row.name || row.nom || row.client_name || row.client || "";
+    const phone = row.phone || row.telephone || row.numero || row.number || cells.find((cell) => /(\+33|0033|0)?[ .-]?[67](?:[ .-]?\d{2}){4}/.test(cell)) || "";
+    const active = String(row.active ?? row.actif ?? "1").trim().toLowerCase();
+
+    if (!phone) continue;
+    if (["0", "false", "non", "no", "inactive", "desactive"].includes(active)) continue;
+
+    contacts.push({
+      name: String(name || "").trim(),
+      phone: String(phone || "").trim(),
+      source: String(row.source || "android_sms_contacts").trim() || "android_sms_contacts"
+    });
+  }
+
+  return contacts;
+}
+
+async function importParsedContacts(contacts, defaultSource = "pwa_import_named") {
+  if (!Array.isArray(contacts) || contacts.length === 0) {
+    return { success: false, error: "Aucun contact à importer", totalRead: 0, added: 0, duplicates: 0, invalid: 0 };
+  }
+
+  const withNames = contacts.some((contact) => contact.name);
+
+  if (!withNames) {
+    return await api("/clients/import", {
+      method: "POST",
+      body: JSON.stringify({ phones: contacts.map((c) => c.phone), source: defaultSource })
+    });
+  }
+
+  let added = 0;
+  let duplicates = 0;
+  let invalid = 0;
+  const invalidNumbers = [];
+
+  for (const contact of contacts) {
+    const data = await api("/clients/add", {
+      method: "POST",
+      body: JSON.stringify({
+        name: contact.name || "",
+        phone: contact.phone,
+        source: contact.source || defaultSource
+      })
+    });
+
+    if (data.success && data.alreadyExists) {
+      duplicates++;
+    } else if (data.success) {
+      added++;
+    } else {
+      invalid++;
+      invalidNumbers.push(contact.phone);
+    }
+  }
+
+  return { success: true, totalRead: contacts.length, added, duplicates, invalid, invalidNumbers };
+}
+
+async function importCsvFileContacts() {
+  const input = $("importCsvFile");
+  const file = input?.files?.[0];
+
+  if (!file) {
+    toast("Choisis d’abord le fichier CSV Android");
+    showNiceResult("importResult", `<div class="badline"><strong>Erreur :</strong> Aucun fichier CSV sélectionné.</div>`);
+    return;
+  }
+
+  setText("importCsvStatus", `Lecture du fichier : ${file.name}`);
+  const rawText = await file.text();
+  const contacts = parseMarketingCsv(rawText);
+
+  if (contacts.length === 0) {
+    setText("importCsvStatus", "Aucun contact valide trouvé dans ce fichier.");
+    showNiceResult("importResult", `<div class="badline"><strong>Erreur :</strong> Aucun contact valide trouvé dans le CSV.</div>`);
+    return;
+  }
+
+  setText("importCsvStatus", `${contacts.length} contact(s) trouvé(s). Import dans D1 en cours...`);
+  const finalResult = await importParsedContacts(contacts, "android_sms_contacts");
+
+  showNiceResult("importResult", humanImportResult(finalResult));
+  setText(
+    "importCsvStatus",
+    finalResult.success
+      ? `Import CSV terminé : ${finalResult.added || 0} ajouté(s), ${finalResult.duplicates || 0} doublon(s), ${finalResult.invalid || 0} invalide(s).`
+      : `Erreur import CSV : ${finalResult.error || "import impossible"}`
+  );
+
+  toast(finalResult.success ? `CSV importé : ${finalResult.added || 0} ajouté(s)` : (finalResult.error || "Erreur import CSV"));
+  await loadClients();
+  await refreshDashboard();
 }
 
 function humanImportResult(data) {
@@ -265,34 +423,20 @@ async function addSingleClient() {
 }
 
 async function importContacts() {
-  const contacts = splitContacts($("importNumbers")?.value || "");
+  const rawText = $("importNumbers")?.value || "";
+  let contacts = parseMarketingCsv(rawText);
+
+  if (contacts.length === 0) {
+    contacts = splitContacts(rawText);
+  }
+
   if (contacts.length === 0) {
     toast("Aucun contact à importer");
     showNiceResult("importResult", `<div class="badline"><strong>Erreur :</strong> Aucun numéro fourni</div>`);
     return;
   }
 
-  const withNames = contacts.some((contact) => contact.name);
-  let finalResult;
-
-  if (!withNames) {
-    finalResult = await api("/clients/import", {
-      method: "POST",
-      body: JSON.stringify({ phones: contacts.map((c) => c.phone), source: "pwa_import" })
-    });
-  } else {
-    let added = 0, duplicates = 0, invalid = 0;
-    for (const contact of contacts) {
-      const data = await api("/clients/add", {
-        method: "POST",
-        body: JSON.stringify({ name: contact.name, phone: contact.phone, source: "pwa_import_named" })
-      });
-      if (data.success && data.alreadyExists) duplicates++;
-      else if (data.success) added++;
-      else invalid++;
-    }
-    finalResult = { success: true, totalRead: contacts.length, added, duplicates, invalid, invalidNumbers: [] };
-  }
+  const finalResult = await importParsedContacts(contacts, "pwa_import");
 
   showNiceResult("importResult", humanImportResult(finalResult));
   toast(finalResult.success ? `Import OK : ${finalResult.added || 0} ajouté(s), ${finalResult.duplicates || 0} doublon(s)` : (finalResult.error || "Erreur import"));
@@ -553,6 +697,11 @@ $("previewBtn")?.addEventListener("click", previewCampaign);
 $("sendCampaignBtn")?.addEventListener("click", sendCampaign);
 $("addClientBtn")?.addEventListener("click", addSingleClient);
 $("importBtn")?.addEventListener("click", importContacts);
+$("importCsvFileBtn")?.addEventListener("click", importCsvFileContacts);
+$("importCsvFile")?.addEventListener("change", () => {
+  const file = $("importCsvFile")?.files?.[0];
+  setText("importCsvStatus", file ? `Fichier sélectionné : ${file.name}` : "Compatible avec l’export Android : name, phone, source, active.");
+});
 $("clearImportBtn")?.addEventListener("click", () => { if ($("importNumbers")) $("importNumbers").value = ""; });
 $("loadClientsBtn")?.addEventListener("click", loadClients);
 $("clientFilter")?.addEventListener("change", loadClients);
