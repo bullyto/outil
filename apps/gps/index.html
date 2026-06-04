@@ -435,17 +435,6 @@
   </header>
 
   <main class="wrap">
-    <section class="hero-card" aria-labelledby="gpsTitle">
-      <div class="hero-card__content">
-        <div class="hero-icon">GPS</div>
-        <div>
-          <h2 id="gpsTitle">Préparer une tournée proprement</h2>
-          <p>Ajoute les adresses, géocode-les, puis ouvre la navigation dans l’ordre le plus logique.</p>
-        </div>
-      </div>
-      <div class="hero-card__badge">Mobile first</div>
-    </section>
-
     <section class="vehicle">
       <div class="section-title">
         <span class="section-title__dot"></span>
@@ -488,7 +477,7 @@
         <button id="btnOptimize" class="btn btn-primary" type="button">Optimiser la tournée</button>
         <button id="btnAdd" class="btn" type="button">Ajouter une adresse</button>
         <button id="btnExportTxt" class="btn btn-soft" type="button">Exporter TXT</button>
-        <button id="btnPointageHistory" class="btn btn-secondary" type="button">🗺 Historique pointage</button>
+        <button id="btnPointageHistory" class="btn btn-secondary" type="button">🗺 Cartographie admin+</button>
       </div>
 
       <div class="status" id="status" role="status" aria-live="polite"></div>
@@ -508,10 +497,10 @@
       <ul id="addrList" class="addrlist"></ul>
     </section>
 
-    <section id="pointageHistory" class="pointage-history hidden" aria-label="Historique pointage GPS">
+    <section id="pointageHistory" class="pointage-history hidden" aria-label="Cartographie admin">
       <div class="pointage-head">
         <div>
-          <h2>Historique pointage GPS</h2>
+          <h2>Cartographie admin+</h2>
           <p>30 derniers jours : clics Waze / Maps, position au clic, adresse cible, véhicule enregistré.</p>
           <div id="pointageStatus" class="pointage-status">Historique non chargé.</div>
         </div>
