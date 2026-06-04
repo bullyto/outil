@@ -29,7 +29,11 @@
     title: "Accès admin",
     subtitle: "Espace réservé",
     storageKey: "adn66_admin_gate_until",
-    lastTryKey: "adn66_admin_gate_last_try"
+    lastTryKey: "adn66_admin_gate_last_try",
+    requireCloudflareToken: true,
+    authUrl: "https://twillio-sms.apero-nuit-du-66.workers.dev/auth/login",
+    tokenStorageKey: "adn66_admin_key",
+    sharedTokenStorageKey: "adn66_admin_token"
   }, window.ADN_ADMIN_GATE || {});
 
   const STYLE_ID = "adn-admin-gate-style";
@@ -92,8 +96,48 @@
     cookieDel(key);
   }
 
+  function getStoredAdminToken(){
+    let token = "";
+    if(CAN_LS){
+      try{
+        token = localStorage.getItem(CFG.tokenStorageKey) || localStorage.getItem(CFG.sharedTokenStorageKey) || "";
+      }catch(e){ token = ""; }
+    }
+    if(!token) token = cookieGet(CFG.tokenStorageKey) || cookieGet(CFG.sharedTokenStorageKey) || "";
+    return String(token || "").trim();
+  }
+
+  function storeAdminToken(token){
+    const cleanToken = String(token || "").trim();
+    if(!cleanToken) return;
+    if(CAN_LS){
+      try{
+        localStorage.setItem(CFG.tokenStorageKey, cleanToken);
+        localStorage.setItem(CFG.sharedTokenStorageKey, cleanToken);
+        return;
+      }catch(e){}
+    }
+    const ttl = Math.max(1, Number(CFG.rememberHours || 12)) * 60 * 60;
+    cookieSet(CFG.tokenStorageKey, cleanToken, ttl);
+    cookieSet(CFG.sharedTokenStorageKey, cleanToken, ttl);
+  }
+
+  function clearAdminToken(){
+    if(CAN_LS){
+      try{
+        localStorage.removeItem(CFG.tokenStorageKey);
+        localStorage.removeItem(CFG.sharedTokenStorageKey);
+      }catch(e){}
+    }
+    cookieDel(CFG.tokenStorageKey);
+    cookieDel(CFG.sharedTokenStorageKey);
+  }
+
   function isUnlocked(){
-    return storeGetInt(CFG.storageKey) > now();
+    const gateOk = storeGetInt(CFG.storageKey) > now();
+    if(!gateOk) return false;
+    if(CFG.requireCloudflareToken !== true) return true;
+    return !!getStoredAdminToken();
   }
 
   function unlock(){
@@ -103,6 +147,7 @@
 
   function lock(){
     storeDel(CFG.storageKey);
+    clearAdminToken();
   }
 
   async function sha256(text){
@@ -353,6 +398,39 @@
     return expected && got === expected;
   }
 
+async function verifyCloudflareAccess(password){
+    if(CFG.requireCloudflareToken !== true) return true;
+
+    const authUrl = String(CFG.authUrl || "").trim();
+    if(!authUrl){
+      throw new Error("URL d'authentification Cloudflare manquante.");
+    }
+
+    const response = await fetch(authUrl, {
+      method: "POST",
+      cache: "no-store",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: String(password || "") })
+    });
+
+    const data = await response.json().catch(() => ({ success:false, error:"Réponse Cloudflare invalide" }));
+
+    if(!response.ok || data.success !== true || data.authenticated !== true || !data.token){
+      throw new Error(data.error || "Cloudflare refuse l'accès.");
+    }
+
+    storeAdminToken(data.token);
+    return true;
+  }
+
+  function notifyUnlocked(){
+    try{
+      window.dispatchEvent(new CustomEvent("adn66:admin-unlocked", {
+        detail: { token: getStoredAdminToken() }
+      }));
+    }catch(e){}
+  }
+
   function wire(){
     const form = document.getElementById("adnAdminGateForm");
     const input = document.getElementById(INPUT_ID);
@@ -377,9 +455,19 @@
             if(input) input.select();
             return;
           }
+
+          try{
+            await verifyCloudflareAccess(value);
+          }catch(authErr){
+            setError(authErr && authErr.message ? authErr.message : "Cloudflare refuse l'accès.");
+            if(input) input.select();
+            return;
+          }
+
           unlock();
           if(input) input.value = "";
           hideGate();
+          notifyUnlocked();
 
           if(typeof window.__adnAdminGatePending === "function"){
             const fn = window.__adnAdminGatePending;
@@ -443,7 +531,10 @@
       unlock();
       CFG.rememberHours = old;
       hideGate();
+      notifyUnlocked();
     };
+
+    window.adnAdminGateGetToken = getStoredAdminToken;
 
     if(!isUnlocked()) showGate();
   }

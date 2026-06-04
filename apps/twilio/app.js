@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 
 const state = {
   workerUrl: localStorage.getItem("adn66_worker_url") || "https://twillio-sms.apero-nuit-du-66.workers.dev",
-  adminKey: localStorage.getItem("adn66_admin_key") || "",
+  adminKey: localStorage.getItem("adn66_admin_key") || localStorage.getItem("adn66_admin_token") || "",
   deferredPrompt: null,
   clientsPage: 1,
   clientsPageSize: 300,
@@ -55,9 +55,20 @@ function apiBase() {
   return state.workerUrl.replace(/\/+$/, "");
 }
 
+function getAdminToken() {
+  const token =
+    localStorage.getItem("adn66_admin_key") ||
+    localStorage.getItem("adn66_admin_token") ||
+    state.adminKey ||
+    "";
+  state.adminKey = String(token || "").trim();
+  return state.adminKey;
+}
+
 function headers() {
   const result = { "Content-Type": "application/json" };
-  if (state.adminKey) result.Authorization = "Bearer " + state.adminKey;
+  const token = getAdminToken();
+  if (token) result.Authorization = "Bearer " + token;
   return result;
 }
 
@@ -75,6 +86,16 @@ async function api(path, options = {}) {
 
   const data = await response.json().catch(() => ({ success: false, error: "Réponse non JSON" }));
   if (!response.ok && data.success !== false) data.success = false;
+
+  if (response.status === 401 || response.status === 403 || data.authenticated === false) {
+    localStorage.removeItem("adn66_admin_key");
+    localStorage.removeItem("adn66_admin_token");
+    state.adminKey = "";
+    if (typeof window.adnAdminGateLock === "function") {
+      window.adnAdminGateLock();
+    }
+  }
+
   return data;
 }
 
@@ -792,9 +813,25 @@ $("loadHistoryBtn")?.addEventListener("click", loadHistory);
 $("loadSentTrackingBtn")?.addEventListener("click", loadSentTracking);
 $("resetSentTrackingBtn")?.addEventListener("click", resetSentTracking);
 
-initSettings();
-refreshDashboard();
-loadClients();
-loadProblems();
-loadHistory();
-loadSentTracking();
+let appBooted = false;
+
+function bootAppAfterAdminUnlock() {
+  if (appBooted) return;
+  if (!getAdminToken()) return;
+
+  appBooted = true;
+  initSettings();
+  refreshDashboard();
+  loadClients();
+  loadProblems();
+  loadHistory();
+  loadSentTracking();
+}
+
+window.addEventListener("adn66:admin-unlocked", () => {
+  bootAppAfterAdminUnlock();
+});
+
+setTimeout(() => {
+  bootAppAfterAdminUnlock();
+}, 250);
