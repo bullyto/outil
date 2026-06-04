@@ -924,6 +924,23 @@ function kmhLabel(value){
   return `${n.toFixed(1).replace(".", ",")} km/h`;
 }
 
+function logHasGps(log){
+  const lat = Number(log && log.current_lat);
+  const lng = Number(log && log.current_lng);
+  return Number.isFinite(lat) && Number.isFinite(lng);
+}
+
+function distanceBetweenLogsMeters(a, b){
+  if(!logHasGps(a) || !logHasGps(b)) return null;
+  const km = haversineKm(
+    Number(a.current_lat),
+    Number(a.current_lng),
+    Number(b.current_lat),
+    Number(b.current_lng)
+  );
+  return Number.isFinite(km) ? Math.round(km * 1000) : null;
+}
+
 function enrichLogsWithSpeed(logs){
   const arr = Array.isArray(logs) ? logs.map((log) => ({...log})) : [];
 
@@ -933,28 +950,42 @@ function enrichLogsWithSpeed(logs){
 
     log._duration_to_next = null;
     log._speed_to_next_kmh = null;
+    log._movement_distance_meters = null;
+    log._speed_note = "";
 
     if(!next) continue;
-    if(log.type !== "navigation") continue;
 
-    const distanceMeters = Number(log.distance_meters || 0);
+    const distanceMeters = distanceBetweenLogsMeters(log, next);
     const hours = hoursBetweenDates(log.created_at, next.created_at);
 
-    if(distanceMeters > 0 && hours && hours > 0){
-      log._duration_to_next = durationBetweenLabel(log.created_at, next.created_at);
-      log._speed_to_next_kmh = (distanceMeters / 1000) / hours;
+    if(distanceMeters === null || !hours || hours <= 0) continue;
+
+    log._duration_to_next = durationBetweenLabel(log.created_at, next.created_at);
+    log._movement_distance_meters = distanceMeters;
+
+    // Filtre anti-valeurs absurdes : trop proche ou durée trop courte = pas de vitesse affichée.
+    const seconds = hours * 3600;
+    if(distanceMeters < 10){
+      log._speed_note = "Déplacement trop court pour calcul fiable";
+      continue;
     }
+    if(seconds < 30){
+      log._speed_note = "Durée trop courte pour calcul fiable";
+      continue;
+    }
+
+    log._speed_to_next_kmh = (distanceMeters / 1000) / hours;
   }
 
   return arr;
 }
 
 function speedLineForLog(log){
-  if(log.type !== "navigation") return "";
+  if(!log || !log._movement_distance_meters) return "";
   if(!log._speed_to_next_kmh){
-    return "Vitesse estimée : attente du point suivant";
+    return log._speed_note || "";
   }
-  return `Vitesse estimée vers le point suivant : ${kmhLabel(log._speed_to_next_kmh)} sur ${log._duration_to_next || "—"}`;
+  return `Vitesse moyenne jusqu'au point suivant : ${kmhLabel(log._speed_to_next_kmh)} sur ${metersLabel(log._movement_distance_meters)} en ${log._duration_to_next || "—"}`;
 }
 
 function renderDayMap(logs){
