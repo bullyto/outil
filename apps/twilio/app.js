@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 
 const state = {
   workerUrl: localStorage.getItem("adn66_worker_url") || "https://twillio-sms.apero-nuit-du-66.workers.dev",
-  adminKey: localStorage.getItem("adn66_admin_key") || "",
+  adminToken: localStorage.getItem("adn66_admin_token") || localStorage.getItem("adn66_admin_key") || "",
   deferredPrompt: null
 };
 
@@ -20,7 +20,7 @@ $("installBtn")?.addEventListener("click", async () => {
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js?v=10").catch(() => {});
+  navigator.serviceWorker.register("sw.js?v=11").catch(() => {});
 }
 
 document.querySelectorAll(".tab").forEach((button) => {
@@ -52,8 +52,9 @@ function apiBase() {
 }
 
 function headers() {
+  state.adminToken = localStorage.getItem("adn66_admin_token") || localStorage.getItem("adn66_admin_key") || state.adminToken || "";
   const result = { "Content-Type": "application/json" };
-  if (state.adminKey) result.Authorization = "Bearer " + state.adminKey;
+  if (state.adminToken) result.Authorization = "Bearer " + state.adminToken;
   return result;
 }
 
@@ -70,6 +71,15 @@ async function api(path, options = {}) {
   });
 
   const data = await response.json().catch(() => ({ success: false, error: "Réponse non JSON" }));
+
+  if (response.status === 401 || response.status === 403) {
+    data.success = false;
+    data.authenticated = false;
+    if (typeof window.ADN_ADMIN_LOCK === "function") {
+      window.ADN_ADMIN_LOCK();
+    }
+  }
+
   if (!response.ok && data.success !== false) data.success = false;
   return data;
 }
@@ -654,13 +664,11 @@ async function resetSentTracking() {
 
 function initSettings() {
   if ($("workerUrl")) $("workerUrl").value = state.workerUrl;
-  if ($("adminKey")) $("adminKey").value = state.adminKey;
+  if ($("adminKey")) $("adminKey").value = "";
 
   $("saveSettingsBtn")?.addEventListener("click", () => {
     state.workerUrl = $("workerUrl")?.value.trim() || state.workerUrl;
-    state.adminKey = $("adminKey")?.value.trim() || "";
     localStorage.setItem("adn66_worker_url", state.workerUrl);
-    localStorage.setItem("adn66_admin_key", state.adminKey);
     toast("Réglages enregistrés");
   });
 
@@ -710,9 +718,14 @@ $("loadHistoryBtn")?.addEventListener("click", loadHistory);
 $("loadSentTrackingBtn")?.addEventListener("click", loadSentTracking);
 $("resetSentTrackingBtn")?.addEventListener("click", resetSentTracking);
 
-initSettings();
-refreshDashboard();
-loadClients();
-loadProblems();
-loadHistory();
-loadSentTracking();
+window.ADN_BOOT_APP = async function ADN_BOOT_APP() {
+  if (window.__adn66AppBooted) return;
+  window.__adn66AppBooted = true;
+
+  initSettings();
+  await refreshDashboard();
+  await loadClients();
+  await loadProblems();
+  await loadHistory();
+  await loadSentTracking();
+};
