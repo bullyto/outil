@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#0b1220" />
-  <title>Stock véhicule — Apéro de Nuit 66</title>
+  <title>Stock ADN66 — Véhicule, Local & Caméra IA bêta</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./icon-192.svg" type="image/svg+xml" />
@@ -28,6 +28,8 @@
   --successText:#86efac;
   --danger:#dc2626;
   --dangerText:#fecaca;
+  --warn:#f59e0b;
+  --warnText:#fde68a;
   --radius:22px;
   --shadow:0 24px 70px rgba(0,0,0,.42);
 }
@@ -38,847 +40,1007 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;
   color:var(--text);
   background:
-    radial-gradient(760px 420px at 18% -10%, rgba(93,183,238,.20), transparent 62%),
-    radial-gradient(760px 520px at 92% 6%, rgba(93,183,238,.10), transparent 60%),
-    linear-gradient(180deg,var(--bg0) 0%,var(--bg1) 48%,var(--bg2) 100%);
+    radial-gradient(circle at top left, rgba(93,183,238,.20), transparent 34%),
+    linear-gradient(135deg,var(--bg0),var(--bg),var(--bg2));
+  overflow-x:hidden;
 }
-button,input{font:inherit}
-a{color:inherit}
-header{
-  position:sticky;top:0;z-index:10;
-  background:linear-gradient(180deg,rgba(11,18,32,.96),rgba(11,18,32,.78));
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--border);
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:1180px;margin:0 auto;padding:14px 14px 90px}
+.topbar{
+  position:sticky;top:0;z-index:50;
+  padding:12px 0 10px;
+  background:linear-gradient(180deg,rgba(7,11,18,.96),rgba(7,11,18,.78),rgba(7,11,18,0));
+  backdrop-filter:blur(10px);
 }
-.wrap{max-width:980px;margin:0 auto;padding:14px 14px 12px}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{display:flex;align-items:center;gap:12px;min-width:0}
-.logo{
-  width:46px;height:46px;border-radius:16px;
-  display:grid;place-items:center;flex:0 0 auto;
-  background:linear-gradient(145deg,rgba(93,183,238,.24),rgba(17,24,39,.92));
-  border:1px solid rgba(93,183,238,.48);
-  box-shadow:0 16px 40px rgba(0,0,0,.35),0 0 0 4px rgba(93,183,238,.06);
-}
-.logo svg path{stroke:var(--blue)!important}
-.title{min-width:0}.title h1{margin:0;font-size:17px;line-height:1.15;font-weight:900;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.title p{margin:4px 0 0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.topRight{display:flex;align-items:center;gap:10px}.pill,.badge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;border:1px solid var(--border);background:rgba(15,23,42,.72);color:var(--muted);font-size:12px;line-height:1;padding:8px 10px;user-select:none}.pill b{color:var(--text);font-weight:800}.btnIcon,.qtyBtn{border:1px solid var(--border);background:rgba(15,23,42,.86);color:var(--text);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}.btnIcon{width:42px;height:42px;border-radius:15px;display:grid;place-items:center;font-size:20px}.btnIcon:hover,.qtyBtn:hover{border-color:rgba(93,183,238,.55);background:rgba(93,183,238,.12)}.btnIcon:active,.btn:active,.qtyBtn:active{transform:translateY(1px)}
-main{padding:16px 14px 28px}.grid{max-width:980px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:16px}.card,.sheet .panel,.toolsPanel{background:rgba(17,24,39,.88);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.cardHeader{padding:16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(93,183,238,.09),rgba(17,24,39,.20));display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.cardHeader h2{margin:0;font-size:15px;font-weight:900;letter-spacing:.2px}.cardHeader p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.35}.cardBody{padding:14px 16px 16px}.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}.search{display:flex;align-items:center;gap:10px;flex:1 1 320px;min-width:230px;padding:12px 14px;border-radius:16px;border:1px solid var(--border);background:var(--input)}.search:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.12)}.search input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:14px}.search input::placeholder{color:var(--soft)}.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);background:rgba(15,23,42,.82);color:var(--text);border-radius:14px;padding:11px 13px;font-size:13px;font-weight:800;cursor:pointer}.btn:hover{border-color:rgba(93,183,238,.55);background:rgba(93,183,238,.10)}.btn.primary{background:var(--blue);border-color:var(--blue);color:white;box-shadow:0 12px 28px rgba(93,183,238,.20)}.btn.primary:hover{background:#74c6f3}.btn.danger{border-color:rgba(220,38,38,.55);background:rgba(220,38,38,.16);color:var(--dangerText)}.btn:disabled{opacity:.48;cursor:not-allowed;transform:none}.list{display:grid;grid-template-columns:1fr;gap:12px}.item{display:grid;grid-template-columns:98px 1fr;gap:13px;align-items:center;padding:14px;border-radius:20px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(23,32,51,.92),rgba(17,24,39,.92));box-shadow:0 12px 32px rgba(0,0,0,.18);overflow:hidden}.thumb{width:98px;height:98px;border-radius:20px;background:var(--input);border:1px solid var(--border);overflow:hidden;display:grid;place-items:center}.thumb img{width:100%;height:100%;object-fit:contain;padding:8px;filter:drop-shadow(0 12px 16px rgba(0,0,0,.36))}.content{min-width:0;display:grid;grid-template-rows:auto auto auto;gap:10px;align-items:center}.name{margin:0;color:var(--text);font-size:15px;font-weight:900;line-height:1.18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qtyLine{display:flex;align-items:center;justify-content:center;gap:12px;width:100%}.qtyBtn{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:23px;font-weight:900;line-height:1;flex:0 0 auto}.qtyVal{min-width:72px;padding:11px 10px;border-radius:16px;border:1px solid var(--border);background:var(--input);color:var(--text);font-size:17px;font-weight:900;text-align:center;user-select:none}.bottomLine{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}.badge{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.badge.ok{border-color:rgba(22,163,74,.60);background:rgba(22,163,74,.16);color:var(--successText)}.badge.warn{border-color:rgba(93,183,238,.68);background:rgba(93,183,238,.16);color:#dff4ff}.badge.danger{border-color:rgba(220,38,38,.60);background:rgba(220,38,38,.16);color:var(--dangerText)}.price{margin:0;font-size:18px;font-weight:950;line-height:1;white-space:nowrap;color:var(--text);flex:0 0 auto}.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);padding:11px 14px;border-radius:16px;border:1px solid var(--border);background:rgba(17,24,39,.96);color:var(--text);box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;z-index:99;max-width:calc(100% - 18px);text-align:center;font-size:13px}.toast.show{opacity:1;transform:translateX(-50%) translateY(-2px)}.sheet{position:fixed;inset:0;display:none;z-index:50}.sheet.show{display:block}.sheet .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(6px)}.sheet .panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,calc(100% - 22px))}.sheet .panelHeader,.toolsPanelHeader{padding:15px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(180deg,rgba(93,183,238,.08),transparent)}.sheet .panelHeader h3{margin:0;font-size:15px;font-weight:900}.sheet .panelHeader button,.toolsPanelHeader button{border:1px solid var(--border);background:var(--input);color:var(--muted);width:38px;height:38px;border-radius:14px;cursor:pointer}.sheet .panelBody{padding:16px;display:grid;gap:13px}.field label{display:block;font-size:12px;color:var(--muted);font-weight:800;margin-bottom:7px}.field input{width:100%;padding:13px 14px;border-radius:16px;border:1px solid var(--border);background:var(--input);color:var(--text);outline:0;font-size:14px}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.12)}.hint{margin:0;font-size:12px;color:var(--muted);line-height:1.4}.panelActions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;padding:14px 16px;border-top:1px solid var(--border);background:rgba(15,23,42,.52)}.toolsPanel{width:min(560px,calc(100% - 22px))}.toolsPanelHeader .left{display:flex;align-items:center;gap:10px;min-width:0}.toolsDot{width:36px;height:36px;border-radius:14px;background:rgba(93,183,238,.16);border:1px solid rgba(93,183,238,.45);display:grid;place-items:center;box-shadow:0 10px 24px rgba(0,0,0,.28)}.toolsTitle{min-width:0}.toolsTitle h3{margin:0;font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.toolsTitle p{margin:4px 0 0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.toolsPanelHeader .year,.toolTag{font-size:12px;color:var(--muted);padding:7px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(15,23,42,.72);user-select:none}.toolsList{padding:14px;display:grid;gap:10px}.toolItem{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:18px;border:1px solid var(--border);background:var(--card2)}.toolItem:hover{border-color:rgba(93,183,238,.55);background:rgba(93,183,238,.10)}.toolItem .name{margin:0;font-size:16px;font-weight:900;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.toolsFoot{padding:14px 16px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;line-height:1.35;background:rgba(15,23,42,.52);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.toolsFoot .miniBtn{padding:10px 12px;border-radius:14px;border:1px solid rgba(93,183,238,.45);background:rgba(93,183,238,.14);color:var(--text);cursor:pointer;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:8px}
-@media (max-width:640px){.wrap{padding:12px}.title h1{font-size:15px}.title p{font-size:11px}.pill{display:none}.cardHeader{flex-direction:column}.toolbar{display:grid}.actions{display:grid;grid-template-columns:1fr;width:100%}.btn{width:100%}.item{grid-template-columns:82px 1fr;padding:12px}.thumb{width:82px;height:82px}.qtyBtn{width:42px;height:42px}.qtyVal{min-width:62px}.price{font-size:16px}.toolItem .name{font-size:14px}}
-
-
-/* ===== MENU ADN66 — bouton en haut à droite, vrai menu déroulant ===== */
-.adn66-header-menu{
-  position:relative;
-  z-index:2000;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  flex:0 0 auto;
-}
-
-.adn66-menu-btn{
-  min-height:44px;
-  padding:0 14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text);
-  font-size:14px;
-  font-weight:900;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
-  box-shadow:0 12px 28px rgba(0,0,0,.28);
-  cursor:pointer;
-}
-
-.adn66-menu-btn:hover{
-  border-color:rgba(93,183,238,.55);
-  background:var(--card2);
-}
-
-.adn66-menu-btn:active{
-  transform:translateY(1px);
-}
-
-.adn66-menu-burger{
-  display:inline-grid;
-  gap:4px;
-  width:18px;
-  flex:0 0 auto;
-}
-
-.adn66-menu-burger span{
-  display:block;
-  width:18px;
-  height:2px;
-  border-radius:999px;
-  background:var(--text);
-}
-
-.adn66-menu-panel{
-  position:fixed;
-  top:calc(env(safe-area-inset-top) + 72px);
-  right:max(12px, env(safe-area-inset-right));
-  width:min(360px, calc(100vw - 24px));
-  max-height:calc(100dvh - 88px);
-  overflow:auto;
-  display:none;
-  padding:10px;
-  border-radius:22px;
-  border:1px solid var(--border);
-  background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(23,32,51,.98));
-  box-shadow:0 26px 60px rgba(0,0,0,.45);
-  overscroll-behavior:contain;
-}
-
-.adn66-menu-panel.is-open{
-  display:block;
-}
-
-.adn66-menu-head{
-  padding:10px 10px 12px;
-  border-bottom:1px solid var(--border);
-  margin-bottom:10px;
-}
-
-.adn66-menu-kicker{
-  margin:0 0 4px;
-  color:var(--blue);
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-}
-
-.adn66-menu-title{
-  margin:0;
-  color:var(--text);
-  font-size:18px;
-  line-height:1.1;
-  font-weight:900;
-}
-
-.adn66-menu-list{
-  display:grid;
-  gap:8px;
-}
-
-.adn66-menu-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-width:0;
-  padding:12px;
-  border-radius:17px;
-  border:1px solid var(--border);
-  background:var(--input);
-  color:var(--text);
-  text-decoration:none;
-  transition:.16s ease;
-  cursor:pointer;
-}
-
-.adn66-menu-item:hover{
-  background:rgba(93,183,238,.10);
-  border-color:rgba(93,183,238,.38);
-}
-
-.adn66-menu-item.is-current{
-  background:rgba(93,183,238,.16);
-  border-color:rgba(93,183,238,.48);
-}
-
-.adn66-menu-icon{
-  width:44px;
-  height:44px;
-  border-radius:15px;
-  display:grid;
-  place-items:center;
-  background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
+.hero{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:16px;
   border:1px solid rgba(93,183,238,.24);
-  font-size:22px;
-  flex:0 0 auto;
+  border-radius:var(--radius);
+  background:linear-gradient(135deg,rgba(17,24,39,.94),rgba(15,23,42,.88));
+  box-shadow:var(--shadow);
 }
-
-.adn66-menu-text{
-  min-width:0;
-  flex:1 1 auto;
-  text-align:left;
-}
-
-.adn66-menu-text strong{
-  display:block;
+.brand{min-width:0}
+.brand small{display:block;color:var(--blue);font-weight:950;letter-spacing:.15em;text-transform:uppercase;font-size:11px}
+.brand h1{margin:4px 0 0;font-size:clamp(22px,5vw,38px);line-height:1.05}
+.brand p{margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.3}
+.heroActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{
+  border:1px solid rgba(93,183,238,.28);
+  background:rgba(93,183,238,.12);
   color:var(--text);
-  font-size:15px;
-  line-height:1.1;
-  font-weight:900;
-  margin-bottom:4px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  border-radius:14px;
+  padding:11px 13px;
+  font-weight:950;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;
 }
-
-.adn66-menu-text span{
-  display:block;
-  color:var(--soft);
-  font-size:12px;
-  line-height:1.35;
-  font-weight:700;
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 12px 28px rgba(93,183,238,.22)}
+.btn.danger{background:rgba(220,38,38,.14);border-color:rgba(220,38,38,.45);color:#fecaca}
+.btn.success{background:rgba(22,163,74,.16);border-color:rgba(22,163,74,.45);color:#bbf7d0}
+.btn.warn{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.45);color:#fde68a}
+.btn.ghost{background:rgba(15,23,42,.55);border-color:var(--border);color:var(--muted)}
+.tabs{
+  margin:12px 0 10px;
+  display:flex;gap:10px;overflow-x:auto;padding:2px 0 6px;
+  scrollbar-width:thin;
 }
-
-.adn66-menu-arrow{
-  color:var(--soft);
-  font-size:18px;
-  font-weight:900;
-  flex:0 0 auto;
+.tab{
+  flex:0 0 auto;border:1px solid var(--border);background:rgba(15,23,42,.74);
+  color:var(--muted);border-radius:999px;padding:11px 15px;font-weight:950;
 }
-
-@media (max-width:640px){
-  .adn66-menu-btn{
-    min-height:42px;
-    padding:0 12px;
-    border-radius:13px;
-    font-size:0;
-  }
-
-  .adn66-menu-btn::after{
-    content:"Menu";
-    font-size:13px;
-  }
-
-  .adn66-menu-panel{
-    top:calc(env(safe-area-inset-top) + 66px);
-    left:12px;
-    right:12px;
-    width:auto;
-    max-height:calc(100dvh - 78px);
-  }
+.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.card{
+  grid-column:span 12;
+  border:1px solid var(--border);
+  background:rgba(17,24,39,.88);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:14px;
 }
-
+.card.soft{background:rgba(23,32,51,.82)}
+.card h2,.card h3{margin:0 0 8px;line-height:1.15}
+.card p{color:var(--muted);margin:6px 0 0;line-height:1.38}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{
+  border:1px solid var(--border);background:rgba(15,23,42,.72);border-radius:18px;padding:12px;
+}
+.kpi b{display:block;font-size:24px;line-height:1;color:var(--blue)}
+.kpi span{display:block;margin-top:6px;color:var(--muted);font-size:12px;font-weight:800}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.search,.select,.num,.textarea{
+  width:100%;border:1px solid var(--border);background:var(--input);color:var(--text);
+  border-radius:14px;padding:12px 13px;font-weight:800;outline:none;
+}
+.search{min-width:220px;flex:1}
+.select{min-width:160px;flex:0 0 auto}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
+.product{
+  border:1px solid var(--border);background:rgba(15,23,42,.70);border-radius:18px;padding:10px;
+  display:flex;flex-direction:column;gap:8px;min-height:210px;
+}
+.product img{width:100%;height:92px;object-fit:contain;display:block;border-radius:12px;background:rgba(255,255,255,.03)}
+.pname{font-weight:950;line-height:1.15;min-height:36px}
+.pmeta{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;font-weight:900}
+.qtyline{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.qty{font-size:28px;font-weight:1000;color:var(--text)}
+.stepper{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stepper button{border-radius:13px;border:1px solid var(--border);background:rgba(93,183,238,.12);color:#fff;padding:10px;font-weight:950}
+.stepper button.minus{background:rgba(220,38,38,.12);border-color:rgba(220,38,38,.35)}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;
+  font-size:12px;font-weight:950;border:1px solid var(--border);color:var(--muted);background:rgba(15,23,42,.7)
+}
+.badge.ok{color:var(--successText);border-color:rgba(22,163,74,.35);background:rgba(22,163,74,.12)}
+.badge.err{color:var(--dangerText);border-color:rgba(220,38,38,.35);background:rgba(220,38,38,.12)}
+.badge.warn{color:var(--warnText);border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.12)}
+.tableWrap{overflow:auto;border:1px solid var(--border);border-radius:18px;background:rgba(15,23,42,.5)}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{padding:12px;border-bottom:1px solid rgba(40,52,71,.75);text-align:left;vertical-align:middle}
+th{color:var(--soft);font-size:12px;text-transform:uppercase;letter-spacing:.08em;background:rgba(15,23,42,.75)}
+td{color:var(--muted);font-weight:800}
+td strong{color:var(--text)}
+.panel{display:none}
+.panel.active{display:block}
+.cameraLayout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:12px;align-items:start}
+.preview{
+  position:relative;border:1px solid var(--border);background:#060a12;border-radius:22px;overflow:hidden;min-height:340px;
+  display:grid;place-items:center;
+}
+.preview img{width:100%;height:auto;display:block;max-height:620px;object-fit:contain}
+.preview .empty{padding:30px;text-align:center;color:var(--soft);font-weight:900}
+.zoneOverlay{position:absolute;border:2px solid rgba(93,183,238,.9);background:rgba(93,183,238,.12);border-radius:14px;color:white;font-weight:950;padding:6px 8px;text-shadow:0 2px 8px #000;display:none}
+.preview.hasImage .zoneOverlay{display:block}
+.z1{left:5%;top:8%;width:28%;height:38%}
+.z2{left:36%;top:8%;width:28%;height:38%}
+.z3{left:67%;top:8%;width:28%;height:38%}
+.z4{left:5%;top:54%;width:28%;height:34%}
+.z5{left:36%;top:54%;width:28%;height:34%}
+.z6{left:67%;top:54%;width:28%;height:34%}
+.zoneList{display:grid;gap:10px}
+.zoneCard{border:1px solid var(--border);background:rgba(15,23,42,.72);border-radius:18px;padding:12px}
+.zoneTop{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}
+.zoneTop b{font-size:15px}
+.zoneRows{display:grid;gap:8px}
+.zoneRow{display:grid;grid-template-columns:1fr 78px;gap:8px;align-items:center}
+.zoneRow label{font-size:13px;color:var(--muted);font-weight:900;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.small{font-size:12px;color:var(--soft);font-weight:800;line-height:1.35}
+.note{border:1px dashed rgba(93,183,238,.45);background:rgba(93,183,238,.08);border-radius:18px;padding:12px;color:var(--muted);font-weight:800;line-height:1.4}
+.footerNav{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  display:none;grid-template-columns:repeat(5,1fr);gap:4px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+  background:rgba(7,11,18,.86);backdrop-filter:blur(12px);border-top:1px solid var(--border)
+}
+.footerNav button{border:0;background:transparent;color:var(--soft);font-size:11px;font-weight:950;padding:8px 4px;border-radius:12px}
+.footerNav button.active{background:rgba(93,183,238,.18);color:#fff}
+.toast{
+  position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+  background:rgba(15,23,42,.96);border:1px solid var(--border);color:#fff;border-radius:16px;padding:12px 14px;
+  box-shadow:var(--shadow);z-index:90;font-weight:900;max-width:min(520px,92vw);text-align:center;
+  transition:.22s ease;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;padding:14px;z-index:100}
+.modal.open{display:flex}
+.sheet{width:min(680px,96vw);max-height:88vh;overflow:auto;border:1px solid var(--border);background:#111827;border-radius:24px;padding:16px;box-shadow:var(--shadow)}
+.sheetHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.close{border:1px solid var(--border);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;width:42px;height:42px;font-size:22px;font-weight:950}
+@media(min-width:760px){
+  .half{grid-column:span 6}
+  .third{grid-column:span 4}
+}
+@media(max-width:720px){
+  .hero{display:block}
+  .heroActions{justify-content:flex-start;margin-top:12px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .cameraLayout{grid-template-columns:1fr}
+  .preview{min-height:260px}
+  .footerNav{display:grid}
+  .app{padding-bottom:96px}
+  .topbar{padding-top:8px}
+  .products{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .product{min-height:190px}
+  .product img{height:78px}
+}
+@media(max-width:380px){
+  .products{grid-template-columns:1fr}
+}
   </style>
 </head>
-
 <body>
-<header>
-  <div class="wrap">
-    <div class="row">
+<div class="app">
+  <div class="topbar">
+    <section class="hero">
       <div class="brand">
-        <div class="logo" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2c5.3 0 9.6 4.3 9.6 9.6S17.3 21.2 12 21.2 2.4 16.9 2.4 11.6 6.7 2 12 2Z" stroke="rgba(93,183,238,.95)" stroke-width="1.4"/>
-            <path d="M7.2 12.4c1.4 2.2 3 3.2 4.8 3.2s3.4-1 4.8-3.2" stroke="rgba(93,183,238,.95)" stroke-width="1.4" stroke-linecap="round"/>
-            <path d="M9.1 9.7h.01M14.9 9.7h.01" stroke="rgba(93,183,238,.95)" stroke-width="2.4" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="title">
-          <h1>Stock véhicule</h1>
-          <p>Synchronisé avec l’outil interne — Apéro de Nuit 66</p>
-        </div>
+        <small>APÉRO DE NUIT 66 · MODULE STOCK</small>
+        <h1>Stock véhicule, local & contrôle caméra</h1>
+        <p>Version GitHub Pages 100% statique. Bêta caméra sur image fixe : RTSP et cloud seront ajoutés plus tard.</p>
       </div>
-
-      <div class="topRight">
-        <div class="pill" id="syncPill" title="Dernière synchronisation">
-          <span>Sync</span> <b id="syncText">—</b>
-        </div>
-        <div class="adn66-header-menu">
-          <button class="adn66-menu-btn" id="adn66TopMenuBtn" type="button" aria-expanded="false" aria-controls="adn66TopMenu">
-            <span class="adn66-menu-burger" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-            Menu
-          </button>
-
-          <nav class="adn66-menu-panel" id="adn66TopMenu" aria-label="Menu outils ADN66">
-            <div class="adn66-menu-head">
-              <p class="adn66-menu-kicker">ADN66</p>
-              <h2 class="adn66-menu-title">Outils internes</h2>
-            </div>
-
-            <div class="adn66-menu-list">
-              <a class="adn66-menu-item" href="../PUSH/">
-                <div class="adn66-menu-icon">🔔</div>
-                <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </a>
-
-              <a class="adn66-menu-item" href="../apero/">
-                <div class="adn66-menu-icon">🧮</div>
-                <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </a>
-
-              <a class="adn66-menu-item" href="../fidel/admin.html">
-                <div class="adn66-menu-icon">🎁</div>
-                <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </a>
-
-              <a class="adn66-menu-item" href="../gps/">
-                <div class="adn66-menu-icon">📍</div>
-                <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </a>
-
-              <a class="adn66-menu-item" href="../status/">
-                <div class="adn66-menu-icon">📢</div>
-                <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </a>
-
-              <a class="adn66-menu-item is-current" href="../stock/">
-                <div class="adn66-menu-icon">📦</div>
-                <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </a>
-
-              <a class="adn66-menu-item" href="../twilio/">
-                <div class="adn66-menu-icon">💬</div>
-                <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </a>
-
-              <button class="adn66-menu-item" id="btnOpenStockSettingsFromTopMenu" type="button">
-                <div class="adn66-menu-icon">⚙️</div>
-                <div class="adn66-menu-text"><strong>Paramètres Stock</strong><span>Code PIN et publication</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </button>
-            </div>
-          </nav>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
-
-<main>
-  <div class="grid">
-    <section class="card">
-      <div class="cardHeader">
-        <div>
-          <h2>Stock en direct : synchronisé avec le véhicule</h2>
-          <p>Affichage indicatif (mise à jour ~3 minutes). Un produit peut être temporairement indisponible.</p>
-        </div>
-        <span class="badge ok" id="dirtyBadge">OK</span>
-      </div>
-
-      <div class="cardBody">
-        <div class="toolbar">
-          <div class="search">
-            <span style="opacity:.7">🔎</span>
-            <input id="q" type="search" placeholder="Rechercher un produit…" autocomplete="off" />
-          </div>
-
-          <div class="actions">
-            <button class="btn" id="btnReload" title="Recharger depuis GitHub (public)">⟲ Recharger</button>
-            <button class="btn primary" id="btnSaveRepo" title="Publier via Cloudflare (PIN)">Publier</button>
-            <!-- ✅ SUPPRIMÉ: le bouton Param ici (tu l'as déjà dans le menu Outils) -->
-            <button class="btn danger" id="btnReset" title="Annuler les modifications locales">Annuler</button>
-          </div>
-        </div>
-
-        <div class="list" id="list"></div>
+      <div class="heroActions">
+        <button class="btn ghost" id="backupBtn">Exporter</button>
+        <button class="btn ghost" id="importBtn">Importer</button>
+        <button class="btn primary" id="saveBtn">Sauvegarder</button>
       </div>
     </section>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="dashboard">Vue d’ensemble</button>
+      <button class="tab" data-tab="vehicle">Stock véhicule</button>
+      <button class="tab" data-tab="local">Stock local</button>
+      <button class="tab" data-tab="camera">Contrôle caméra</button>
+      <button class="tab" data-tab="alerts">Écarts</button>
+      <button class="tab" data-tab="history">Historique</button>
+      <button class="tab" data-tab="settings">Réglages</button>
+    </nav>
   </div>
-</main>
+
+  <main>
+    <section class="panel active" id="panel-dashboard">
+      <div class="grid">
+        <div class="card">
+          <h2>Vue d’ensemble</h2>
+          <p>Le module sépare clairement le stock du véhicule, le stock du local, et le contrôle caméra bêta.</p>
+          <div class="kpis" style="margin-top:12px">
+            <div class="kpi"><b id="kpiVehicle">0</b><span>Articles véhicule</span></div>
+            <div class="kpi"><b id="kpiLocal">0</b><span>Articles local</span></div>
+            <div class="kpi"><b id="kpiAlerts">0</b><span>Écarts ouverts</span></div>
+            <div class="kpi"><b id="kpiScans">0</b><span>Analyses caméra</span></div>
+          </div>
+        </div>
+        <div class="card half">
+          <h3>Flux conseillé</h3>
+          <p>1. Vous ajustez le stock local. 2. Vous chargez une photo d’étagère. 3. Vous indiquez le comptage détecté par zone. 4. Le module compare et vous propose les écarts à valider.</p>
+        </div>
+        <div class="card half soft">
+          <h3>Mode bêta sans RTSP</h3>
+          <p>Pour l’instant, le contrôle caméra fonctionne avec une image importée depuis votre téléphone ou PC. La caméra en direct remplacera cette source plus tard sans changer la logique métier.</p>
+        </div>
+        <div class="card">
+          <h3>Écarts récents</h3>
+          <div id="recentAlerts" class="tableWrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-vehicle">
+      <div class="card">
+        <h2>Stock véhicule</h2>
+        <p>Stock du véhicule / livraison. C’est le stock terrain, séparé du stock local.</p>
+        <div class="toolbar">
+          <input class="search" id="vehicleSearch" placeholder="Rechercher un produit..." />
+          <select class="select" id="vehicleFilter">
+            <option value="all">Tous</option>
+            <option value="empty">Rupture</option>
+            <option value="low">Faible ≤ 1</option>
+            <option value="available">Disponible</option>
+          </select>
+          <button class="btn ghost" data-reset="vehicle">Remettre véhicule à zéro</button>
+        </div>
+        <div class="products" id="vehicleProducts"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-local">
+      <div class="card">
+        <h2>Stock local</h2>
+        <p>Stock de réserve dans le local. Le contrôle caméra compare ses résultats avec ce stock attendu.</p>
+        <div class="toolbar">
+          <input class="search" id="localSearch" placeholder="Rechercher un produit..." />
+          <select class="select" id="localFilter">
+            <option value="all">Tous</option>
+            <option value="empty">Rupture</option>
+            <option value="low">Faible ≤ 2</option>
+            <option value="available">Disponible</option>
+          </select>
+          <button class="btn ghost" id="copyVehicleToLocal">Copier véhicule ×3 vers local</button>
+        </div>
+        <div class="products" id="localProducts"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-camera">
+      <div class="grid">
+        <div class="card">
+          <h2>Contrôle caméra · bêta image fixe</h2>
+          <p>Importez une photo de l’étagère. En bêta, le comptage est assisté : vous saisissez les quantités détectées par zones. Plus tard, l’IA remplira ces quantités automatiquement.</p>
+          <div class="toolbar">
+            <input type="file" id="cameraFile" accept="image/*" hidden />
+            <button class="btn primary" id="pickImage">Importer une image</button>
+            <button class="btn ghost" id="useDemo">Image de test</button>
+            <button class="btn warn" id="runCompare">Comparer avec stock local</button>
+            <button class="btn success" id="validateScan">Valider le contrôle</button>
+          </div>
+          <div class="note">Aucune donnée cloud, aucun RTSP, aucune API externe. Tout reste dans le navigateur et peut être publié sur GitHub Pages.</div>
+        </div>
+        <div class="card">
+          <div class="cameraLayout">
+            <div class="preview" id="cameraPreview">
+              <div class="empty">Aucune image chargée<br><span class="small">Importez une photo d’étagère pour commencer.</span></div>
+              <img id="cameraImg" alt="" style="display:none">
+              <div class="zoneOverlay z1">Vodka</div>
+              <div class="zoneOverlay z2">Whisky</div>
+              <div class="zoneOverlay z3">Rhum</div>
+              <div class="zoneOverlay z4">Gin / Tequila</div>
+              <div class="zoneOverlay z5">Vins / Apéritifs</div>
+              <div class="zoneOverlay z6">Softs</div>
+            </div>
+            <div>
+              <h3>Zones de comptage</h3>
+              <p class="small">Choisissez les produits que vous voulez contrôler dans chaque zone et saisissez la quantité vue sur l’image.</p>
+              <div class="zoneList" id="zoneList"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Résultat comparaison caméra</h3>
+          <div id="cameraResults" class="tableWrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-alerts">
+      <div class="card">
+        <h2>Écarts stock local / caméra</h2>
+        <p>Les écarts sont des propositions. Rien ne modifie le stock local sans validation humaine.</p>
+        <div class="toolbar">
+          <button class="btn success" id="applyAllAlerts">Appliquer les écarts validés au stock local</button>
+          <button class="btn ghost" id="clearResolved">Nettoyer les écarts résolus</button>
+        </div>
+        <div id="alertsTable" class="tableWrap"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-history">
+      <div class="card">
+        <h2>Historique</h2>
+        <p>Historique local des modifications et contrôles. Exportable en JSON.</p>
+        <div class="toolbar">
+          <button class="btn ghost" id="clearHistory">Vider historique</button>
+        </div>
+        <div id="historyTable" class="tableWrap"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-settings">
+      <div class="grid">
+        <div class="card half">
+          <h2>Réglages GitHub</h2>
+          <p>Cette version est entièrement statique : HTML, CSS, JS, localStorage. Elle ne modifie pas les fichiers GitHub automatiquement.</p>
+          <div class="note" style="margin-top:10px">Pour publier un état durable, utilisez Exporter puis remplacez plus tard vos JSON de stock avec une version admin ou un worker. Cloudflare n’est volontairement pas intégré ici.</div>
+        </div>
+        <div class="card half">
+          <h2>Caméra future</h2>
+          <p>Le futur RTSP remplacera seulement l’image importée. Les onglets, zones, écarts, validation et stock local restent les mêmes.</p>
+          <div class="toolbar">
+            <button class="btn ghost" id="resetAll">Réinitialiser toutes les données locales</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="footerNav" id="footerNav">
+  <button class="active" data-tab="dashboard">Accueil</button>
+  <button data-tab="vehicle">Véhicule</button>
+  <button data-tab="local">Local</button>
+  <button data-tab="camera">Caméra</button>
+  <button data-tab="alerts">Écarts</button>
+</nav>
 
 <div class="toast" id="toast"></div>
 
-<!-- ✅ PARAMÈTRES STOCK (Branch/Path/PIN) -->
-<div class="sheet" id="sheet">
-  <div class="backdrop" id="sheetBackdrop"></div>
-  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-    <div class="panelHeader">
-      <h3 id="settingsTitle">Paramètres Stock</h3>
-      <button id="sheetClose" aria-label="Fermer">✕</button>
+<div class="modal" id="jsonModal">
+  <div class="sheet">
+    <div class="sheetHead">
+      <div>
+        <h2 id="modalTitle">Export JSON</h2>
+        <p id="modalIntro">Copiez ou importez une sauvegarde.</p>
+      </div>
+      <button class="close" id="modalClose">×</button>
     </div>
-
-    <div class="panelBody">
-      <div class="field">
-        <label>Branch</label>
-        <input id="ghBranch" value="main" readonly />
-      </div>
-
-      <div class="field">
-        <label>Chemin du fichier</label>
-        <input id="ghPath" value="apps/stock/stock/_snapshot.json" readonly />
-      </div>
-
-      <div class="field">
-        <label>Code admin (PIN)</label>
-        <input id="tokenInput" type="password" placeholder="0000" inputmode="numeric" />
-      </div>
-
-      <p class="hint" id="tokenHint">
-        Stocké en local sur ce téléphone (6 mois).
-        <span id="tokenState"></span>
-      </p>
-    </div>
-
-    <div class="panelActions">
-      <button class="btn" id="btnSaveToken">Enregistrer le code</button>
-      <button class="btn danger" id="btnClearToken">Supprimer le code</button>
+    <textarea class="textarea" id="jsonBox" rows="14"></textarea>
+    <div class="toolbar">
+      <button class="btn primary" id="copyJson">Copier</button>
+      <button class="btn success" id="applyImport">Importer cette sauvegarde</button>
     </div>
   </div>
 </div>
 
 <script>
-const IMG_DIR = "./stock/";
-const WORKER_BASE = "https://quiet-sunset-9161.apero-nuit-du-66.workers.dev";
-const OK_THRESHOLD = 3;
-
-const BASE_PRODUCTS = [
-  { id:"poliakov", name:"Poliakov Vodka", price:29, img:"poliakov.png" },
-  { id:"absolut", name:"Absolut Vodka", price:34, img:"absolut.png" },
-  { id:"ciroc_pomme", name:"Cîroc Pomme", price:49, img:"ciroc_pomme.png" },
-  { id:"ciroc_classic", name:"Cîroc Classic", price:49, img:"ciroc_classic.png" },
-  { id:"ciroc_redberry", name:"Cîroc Red Berry", price:49, img:"ciroc_redberry.png" },
-
-  { id:"william_peel", name:"William Peel", price:29, img:"william_peel.png" },
-  { id:"label_5", name:"Label 5 Classic Black", price:32, img:"label_5.png" },
-  { id:"ballantines", name:"Ballantine’s Finest", price:36, img:"ballantines.png" },
-  { id:"jack_old7", name:"Jack Daniel’s Old No.7", price:40, img:"jack_old7.png" },
-  { id:"jack_honey", name:"Jack Daniel’s Tennessee Honey", price:42, img:"jack_honey.png" },
-
-  { id:"old_nick_darkwood", name:"Old Nick Dark Wood", price:29, img:"old_nick_darkwood.png" },
-  { id:"captain_morgan", name:"Captain Morgan Spiced Gold", price:34, img:"captain_morgan.png" },
-  { id:"havana_especial", name:"Havana Club Especial", price:38, img:"havana_especial.png" },
-
-  { id:"old_nick_blanc", name:"Old Nick Rhum Blanc", price:27, img:"old_nick_blanc.png" },
-  { id:"saint_james_blanc", name:"Saint James Rhum Blanc", price:32, img:"saint_james_blanc.png" },
-  { id:"trois_rivieres", name:"Trois Rivières Rhum Blanc", price:33, img:"trois_rivieres.png" },
-  { id:"havana_3ans", name:"Havana Club 3 ans", price:37, img:"havana_3ans.png" },
-
-  { id:"gibsons_gin", name:"Gibson’s Gin", price:34, img:"gibsons_gin.png" },
-  { id:"gordons_gin", name:"Gordon’s Gin", price:34, img:"gordons_gin.png" },
-
-  { id:"ricard", name:"Ricard", price:35, img:"ricard.png" },
-  { id:"pastis_51", name:"Pastis 51", price:35, img:"pastis_51.png" },
-
-  { id:"get_27", name:"GET 27", price:32, img:"get_27.png" },
-  { id:"jagermeister", name:"Jägermeister", price:35, img:"jagermeister.png" },
-  { id:"tequila_sanjose", name:"Tequila San José", price:28, img:"tequila_sanjose.png" },
-
-  { id:"xv_catalan_rose", name:"XV Catalan Rosé", price:19, img:"xv_catalan_rose.png" },
-  { id:"xv_catalan_blanc", name:"XV Catalan Blanc", price:19, img:"xv_catalan_blanc.png" },
-  { id:"xv_catalan_rouge", name:"XV Catalan Rouge", price:19, img:"xv_catalan_rouge.png" },
-
-  { id:"muscat", name:"Muscat", price:25, img:"muscat.png" }
+const PRODUCTS = [
+  {
+    "id": "absolut",
+    "name": "Absolut",
+    "image": "stock/absolut.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "ballantines",
+    "name": "Ballantine’s",
+    "image": "stock/ballantines.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "captain_morgan",
+    "name": "Captain Morgan",
+    "image": "stock/captain_morgan.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "ciroc_classic",
+    "name": "Cîroc Classic",
+    "image": "stock/ciroc_classic.png",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "ciroc_pomme",
+    "name": "Cîroc Pomme",
+    "image": "stock/ciroc_pomme.png",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "ciroc_redberry",
+    "name": "Cîroc Red Berry",
+    "image": "stock/ciroc_redberry.png",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "clan_campbell",
+    "name": "Clan Campbell",
+    "image": "",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "get_27",
+    "name": "Get 27",
+    "image": "stock/get_27.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "gibsons_gin",
+    "name": "Gibson’s Gin",
+    "image": "stock/gibsons_gin.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "gordons_gin",
+    "name": "Gordon’s Gin",
+    "image": "stock/gordons_gin.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "havana_3ans",
+    "name": "Havana 3 ans",
+    "image": "stock/havana_3ans.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "havana_especial",
+    "name": "Havana Especial",
+    "image": "stock/havana_especial.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "jack_honey",
+    "name": "Jack Daniel’s Honey",
+    "image": "stock/jack_honey.png",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "jack_old7",
+    "name": "Jack Daniel’s Old N°7",
+    "image": "stock/jack_old7.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "jagermeister",
+    "name": "Jägermeister",
+    "image": "stock/jagermeister.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "label_5",
+    "name": "Label 5",
+    "image": "stock/label_5.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "liqueur_cassis",
+    "name": "Liqueur de cassis",
+    "image": "",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "muscat",
+    "name": "Muscat",
+    "image": "",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "old_nick_blanc",
+    "name": "Old Nick Blanc",
+    "image": "stock/old_nick_blanc.png",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "old_nick_darkwood",
+    "name": "Old Nick Darkwood",
+    "image": "stock/old_nick_darkwood.png",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "pastis_51",
+    "name": "Pastis 51",
+    "image": "stock/pastis_51.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "perrier",
+    "name": "Perrier",
+    "image": "stock/perrier.png",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "poliakov",
+    "name": "Poliakov",
+    "image": "stock/poliakov.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "ricard",
+    "name": "Ricard",
+    "image": "stock/ricard.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "saint_james_blanc",
+    "name": "Saint James Blanc",
+    "image": "stock/saint_james_blanc.png",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "tequila_sanjose",
+    "name": "Tequila San José",
+    "image": "stock/tequila_sanjose.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "trois_rivieres",
+    "name": "Trois Rivières",
+    "image": "stock/trois_rivieres.png",
+    "vehicleQty": 0,
+    "localQty": 0
+  },
+  {
+    "id": "william_peel",
+    "name": "William Peel",
+    "image": "stock/william_peel.png",
+    "vehicleQty": 11,
+    "localQty": 33
+  },
+  {
+    "id": "xv_catalan_blanc",
+    "name": "XV Catalan Blanc",
+    "image": "stock/xv_catalan_blanc.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "xv_catalan_rose",
+    "name": "XV Catalan Rosé",
+    "image": "stock/xv_catalan_rose.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  },
+  {
+    "id": "xv_catalan_rouge",
+    "name": "XV Catalan Rouge",
+    "image": "stock/xv_catalan_rouge.png",
+    "vehicleQty": 1,
+    "localQty": 3
+  }
 ];
 
-let PRODUCTS = [...BASE_PRODUCTS];
+const STORAGE_KEY = "adn66_stock_refonte_v1";
 
-function $(sel){ return document.querySelector(sel); }
-function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+const DEFAULT_ZONES = [
+  { id:"vodka", name:"Vodka", products:["absolut","poliakov","ciroc_classic","ciroc_pomme","ciroc_redberry"] },
+  { id:"whisky", name:"Whisky", products:["jack_old7","jack_honey","ballantines","label_5","william_peel","clan_campbell"] },
+  { id:"rhum", name:"Rhum", products:["captain_morgan","havana_3ans","havana_especial","old_nick_blanc","old_nick_darkwood","saint_james_blanc","trois_rivieres"] },
+  { id:"gin", name:"Gin / Tequila", products:["gibsons_gin","gordons_gin","tequila_sanjose"] },
+  { id:"aperitifs", name:"Vins / Apéritifs", products:["ricard","pastis_51","get_27","muscat","xv_catalan_blanc","xv_catalan_rose","xv_catalan_rouge"] },
+  { id:"softs", name:"Softs", products:["perrier"] }
+];
 
-const listEl = $("#list");
-const qEl = $("#q");
-const btnReload = $("#btnReload");
-const btnSaveRepo = $("#btnSaveRepo");
-const btnReset = $("#btnReset");
-const dirtyBadge = $("#dirtyBadge");
-const syncText = $("#syncText");
+function nowIso(){ return new Date().toISOString(); }
+function byId(id){ return document.getElementById(id); }
+function productName(id){ return (PRODUCTS.find(p=>p.id===id)||{name:id}).name; }
+function productImg(id){ return (PRODUCTS.find(p=>p.id===id)||{image:""}).image; }
 
+let state = loadState();
 
-/* ✅ Paramètres Stock */
-const sheet = $("#sheet");
-const sheetBackdrop = $("#sheetBackdrop");
-const sheetClose = $("#sheetClose");
-const tokenInput = $("#tokenInput");
-const tokenState = $("#tokenState");
-const btnSaveToken = $("#btnSaveToken");
-const btnClearToken = $("#btnClearToken");
-
-const SETTINGS_KEY = "adn66_stock_settings_v3";
-
-const state = {
-  pin: "",
-  stock: {},
-  dirty: new Set(),
-  lastSync: null
-};
-
-function toastMsg(msg){
-  const t = $("#toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(window.__toast);
-  window.__toast = setTimeout(()=> t.classList.remove("show"), 2200);
-}
-
-function getGH(){
+function defaultState(){
+  const vehicle={}, local={};
+  PRODUCTS.forEach(p=>{ vehicle[p.id]=Number(p.vehicleQty||0); local[p.id]=Number(p.localQty||0); });
   return {
-    owner: "bullyto",
-    repo: "outil",
-    branch: "main",
-    stockPath: "apps/stock/stock",
-    ext: ".json",
-    pin: String(state.pin||"").trim()
+    vehicle, local,
+    camera: { image:null, detections:{}, lastScanAt:null, scans:0 },
+    alerts: [],
+    history: [{ at:nowIso(), type:"init", text:"Initialisation du module Stock ADN66 refonte." }],
+    settings: { betaMode:true }
   };
 }
 
-function snapshotPath(){
-  const gh = getGH();
-  return `${gh.stockPath}/_snapshot.json`;
-}
-
-/* ✅ PARAM STOCK */
-function openSettings(){
-  sheet.classList.add("show");
-  tokenInput.value = state.pin || "";
-  updateTokenHint();
-}
-function closeSettings(){
-  sheet.classList.remove("show");
-}
-
-function updateTokenHint(){
-  tokenState.textContent = state.pin ? "Code enregistré ✅" : "";
-}
-
-function saveToken(pin){
-  const exp = Date.now() + (1000 * 60 * 60 * 24 * 30 * 6);
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ v: 3, pin: String(pin||"").trim(), exp }));
-  state.pin = String(pin||"").trim();
-  updateSaveButtonsState();
-}
-
-function clearToken(){
-  localStorage.removeItem(SETTINGS_KEY);
-  state.pin = "";
-  updateSaveButtonsState();
-}
-
-function loadSettings(){
-  const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
-  if (raw.exp && Date.now() > raw.exp) localStorage.removeItem(SETTINGS_KEY);
-  state.pin = String(raw.pin ?? "").trim();
-}
-
-function updateSaveButtonsState(){
-  const hasPin = !!String(getGH().pin||"").trim();
-  btnSaveRepo.disabled = !hasPin;
-}
-
-function updateDirtyBadge(){
-  const n = state.dirty.size;
-  if(n === 0){
-    dirtyBadge.textContent = "OK";
-    dirtyBadge.className = "badge ok";
-  }else{
-    dirtyBadge.textContent = `${n} modif.`;
-    dirtyBadge.className = "badge warn";
-  }
-}
-
-function setSync(ts){
-  state.lastSync = ts;
-  syncText.textContent = ts ? new Date(ts).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "—";
-}
-
-function clampQty(v){
-  const n = Number(v);
-  if(!Number.isFinite(n)) return 0;
-  return Math.max(0, Math.min(999, Math.round(n)));
-}
-
-function fmtNameFromId(id){
-  return String(id||"")
-    .replace(/[_-]+/g, " ")
-    .trim()
-    .replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function qtyTag(qty){
-  if(qty <= 0) return { cls:"danger", txt:"Rupture" };
-  if(qty >= OK_THRESHOLD) return { cls:"ok", txt:"OK" };
-  return { cls:"warn", txt:"Faible" };
-}
-
-function getImgForProduct(p){
-  if(p && p.img) return IMG_DIR + String(p.img);
-  const id = p?.id ? String(p.id) : "";
-  return IMG_DIR + id + ".png";
-}
-
-function adjustQty(id, delta){
-  const cur = Number(state.stock[id] ?? 0);
-  const nv = clampQty(cur + delta);
-  state.stock[id] = nv;
-  state.dirty.add(id);
-  updateDirtyBadge();
-
-  const row = listEl.querySelector(`.item[data-id="${CSS.escape(id)}"]`);
-  if(row){
-    const vEl = row.querySelector(".qtyVal");
-    if(vEl) vEl.textContent = String(nv);
-    const badge = row.querySelector(".badge");
-    if(badge){
-      const t = qtyTag(nv);
-      badge.className = `badge ${t.cls}`;
-      badge.textContent = `${t.txt}${state.dirty.has(id) ? " • modifié" : ""}`;
-    }
-  }
-}
-
-function renderList(){
-  const q = (qEl.value || "").trim().toLowerCase();
-
-  const rows = PRODUCTS
-    .filter(p => {
-      if(!q) return true;
-      const name = (p.name||"").toLowerCase();
-      const id = (p.id||"").toLowerCase();
-      return name.includes(q) || id.includes(q);
-    })
-    .map(p => {
-      const id = p.id;
-      const qty = Number(state.stock[id] ?? 0);
-      const isDirty = state.dirty.has(id);
-      const t = qtyTag(qty);
-      const price = Number(p.price ?? 0);
-      const imgSrc = getImgForProduct(p);
-
-      return `
-        <div class="item" data-id="${esc(id)}">
-          <div class="thumb">
-            <img src="${esc(imgSrc)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none';" />
-          </div>
-
-          <div class="content">
-            <p class="name">${esc(p.name)}</p>
-
-            <div class="qtyLine">
-              <button class="qtyBtn minus" type="button" aria-label="Retirer 1">−</button>
-              <div class="qtyVal" aria-label="Quantité">${esc(qty)}</div>
-              <button class="qtyBtn plus" type="button" aria-label="Ajouter 1">+</button>
-            </div>
-
-            <div class="bottomLine">
-              <span class="badge ${t.cls}">${t.txt}${isDirty ? " • modifié" : ""}</span>
-              <p class="price">${price ? esc(price) + "€" : "—"}</p>
-            </div>
-          </div>
-        </div>
-      `;
-    })
-    .join("");
-
-  listEl.innerHTML = rows || `<div class="badge" style="padding:12px 14px;border-radius:16px;">Aucun résultat</div>`;
-
-  listEl.querySelectorAll(".item").forEach(el => {
-    const id = el.getAttribute("data-id");
-    const btnMinus = el.querySelector(".qtyBtn.minus");
-    const btnPlus = el.querySelector(".qtyBtn.plus");
-    if(btnMinus) btnMinus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, -1); });
-    if(btnPlus) btnPlus.addEventListener("click", (e)=>{ e.preventDefault(); e.stopPropagation(); adjustQty(id, +1); });
-  });
-
-  updateDirtyBadge();
-}
-
-async function pullFromRepo(){
-  const s = getGH();
-  toastMsg("Chargement dépôt…");
-
-  const snapFile = snapshotPath();
-  let snap = null;
-
+function loadState(){
   try{
-    const rawUrl = `https://raw.githubusercontent.com/${s.owner}/${s.repo}/${s.branch}/${snapFile}?t=${Date.now()}`;
-    const res = await fetch(rawUrl, { cache:"no-store" });
-    if(res.ok) snap = await res.json();
-  }catch(e){
-    console.warn("pullFromRepo snapshot failed", e);
-  }
-
-  const snapshotIds = new Set();
-
-  if(snap && Array.isArray(snap.items)){
-    for(const it of snap.items){
-      if(!it || !it.id) continue;
-      const id = String(it.id);
-      snapshotIds.add(id);
-
-      const q = Number(it.qty);
-      if(Number.isFinite(q)) state.stock[id] = clampQty(q);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const data = JSON.parse(raw);
+      const base = defaultState();
+      return {
+        ...base,
+        ...data,
+        vehicle: {...base.vehicle, ...(data.vehicle||{})},
+        local: {...base.local, ...(data.local||{})},
+        camera: {...base.camera, ...(data.camera||{})},
+        alerts: Array.isArray(data.alerts) ? data.alerts : [],
+        history: Array.isArray(data.history) ? data.history : base.history
+      };
     }
-  }
+  }catch(e){ console.warn(e); }
+  return defaultState();
+}
 
-  const known = new Set(PRODUCTS.map(p=>p.id));
-  const extra = [];
-  snapshotIds.forEach(id => {
-    if(!known.has(id)){
-      extra.push({ id, name: fmtNameFromId(id), price: 0, img: null });
-      known.add(id);
-    }
+function saveState(silent=false){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  if(!silent) toast("Sauvegarde locale effectuée.");
+  renderAll();
+}
+
+function addHistory(type,text, extra={}){
+  state.history.unshift({ at:nowIso(), type, text, ...extra });
+  state.history = state.history.slice(0,300);
+}
+
+function toast(msg){
+  const el=byId("toast");
+  el.textContent=msg;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>el.classList.remove("show"),2600);
+}
+
+function setTab(tab){
+  document.querySelectorAll(".tab,.footerNav button").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active", p.id==="panel-"+tab));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>setTab(btn.dataset.tab)));
+
+function total(obj){ return Object.values(obj).reduce((a,b)=>a+Number(b||0),0); }
+function openAlerts(){ return state.alerts.filter(a=>a.status!=="resolved").length; }
+
+function renderKpis(){
+  byId("kpiVehicle").textContent = total(state.vehicle);
+  byId("kpiLocal").textContent = total(state.local);
+  byId("kpiAlerts").textContent = openAlerts();
+  byId("kpiScans").textContent = state.camera.scans||0;
+}
+
+function productCard(p, type){
+  const qty = Number(state[type][p.id]||0);
+  const status = qty<=0 ? '<span class="badge err">Rupture</span>' : qty<= (type==="local"?2:1) ? '<span class="badge warn">Faible</span>' : '<span class="badge ok">OK</span>';
+  const img = p.image ? `<img src="${p.image}" alt="">` : `<img alt="">`;
+  return `<article class="product">
+    ${img}
+    <div class="pname">${escapeHtml(p.name)}</div>
+    <div class="pmeta"><span>${type==="vehicle"?"Véhicule":"Local"}</span>${status}</div>
+    <div class="qtyline"><span class="small">Quantité</span><span class="qty">${qty}</span></div>
+    <div class="stepper">
+      <button class="minus" data-step="${type}" data-id="${p.id}" data-delta="-1">−</button>
+      <button data-step="${type}" data-id="${p.id}" data-delta="1">+</button>
+    </div>
+  </article>`;
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[s]));
+}
+
+function filteredProducts(type){
+  const q = (byId(type+"Search")?.value||"").toLowerCase().trim();
+  const f = byId(type+"Filter")?.value||"all";
+  return PRODUCTS.filter(p=>{
+    const qty=Number(state[type][p.id]||0);
+    if(q && !p.name.toLowerCase().includes(q) && !p.id.includes(q)) return false;
+    if(f==="empty" && qty!==0) return false;
+    if(f==="low" && !(qty>0 && qty <= (type==="local"?2:1))) return false;
+    if(f==="available" && qty<=0) return false;
+    return true;
   });
-
-  PRODUCTS = [...BASE_PRODUCTS, ...extra];
-
-  updateStockUI();
-  toastMsg("Chargé ✅");
 }
 
-function updateStockUI(){
-  renderList();
-  updateSaveButtonsState();
+function renderProducts(type){
+  const container = byId(type+"Products");
+  if(!container) return;
+  container.innerHTML = filteredProducts(type).map(p=>productCard(p,type)).join("");
 }
 
-async function pushToRepo(){
-  const s = getGH();
-  const pin = String(s.pin||"").trim();
-
-  if(!pin){
-    toastMsg("Entre le code admin (0000).");
-    openSettings();
-    return;
+document.addEventListener("click", e=>{
+  const step=e.target.closest("[data-step]");
+  if(step){
+    const type=step.dataset.step, id=step.dataset.id, delta=Number(step.dataset.delta);
+    const before=Number(state[type][id]||0);
+    const after=Math.max(0,before+delta);
+    state[type][id]=after;
+    addHistory("stock", `${type==="vehicle"?"Véhicule":"Local"} · ${productName(id)} : ${before} → ${after}`);
+    saveState(true);
   }
-  if(pin !== "0000"){
-    toastMsg("Code invalide.");
-    return;
+});
+
+["vehicle","local"].forEach(type=>{
+  ["Search","Filter"].forEach(s=>byId(type+s)?.addEventListener(s==="Search"?"input":"change",()=>renderProducts(type)));
+});
+
+function renderZones(){
+  const zoneList=byId("zoneList");
+  zoneList.innerHTML = DEFAULT_ZONES.map((z,idx)=>{
+    const rows = z.products.filter(id=>PRODUCTS.some(p=>p.id===id)).map(id=>{
+      const val = state.camera.detections[id] ?? "";
+      return `<div class="zoneRow">
+        <label>${escapeHtml(productName(id))}</label>
+        <input class="num" type="number" min="0" inputmode="numeric" data-detect="${id}" value="${val}" placeholder="0">
+      </div>`;
+    }).join("");
+    return `<div class="zoneCard">
+      <div class="zoneTop"><b>${idx+1}. ${escapeHtml(z.name)}</b><span class="badge">zone</span></div>
+      <div class="zoneRows">${rows || '<span class="small">Aucun produit lié.</span>'}</div>
+    </div>`;
+  }).join("");
+}
+
+document.addEventListener("input", e=>{
+  const inp=e.target.closest("[data-detect]");
+  if(inp){
+    const val = inp.value === "" ? "" : Math.max(0, Number(inp.value||0));
+    state.camera.detections[inp.dataset.detect] = val;
+    saveState(true);
   }
+});
 
-  toastMsg("Publication via Cloudflare…");
-
-  const idsToPush = Object.keys(state.stock).filter(id => state.dirty.has(id));
-
-  const payload = {
-    pin,
-    owner: s.owner,
-    repo: s.repo,
-    branch: s.branch,
-    stockPath: s.stockPath,
-    ext: s.ext,
-    ids: idsToPush,
-    stock: state.stock,
-    updated_at: new Date().toISOString()
+byId("pickImage").addEventListener("click",()=>byId("cameraFile").click());
+byId("cameraFile").addEventListener("change", e=>{
+  const file=e.target.files && e.target.files[0];
+  if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    state.camera.image = r.result;
+    state.camera.lastScanAt = nowIso();
+    addHistory("camera","Image caméra importée pour contrôle bêta.");
+    saveState();
   };
+  r.readAsDataURL(file);
+});
 
-  const r = await fetch(`${WORKER_BASE}/api/stock/publish`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+byId("useDemo").addEventListener("click",()=>{
+  state.camera.image = makeDemoShelfSvg();
+  state.camera.lastScanAt = nowIso();
+  addHistory("camera","Image de test chargée.");
+  saveState();
+});
 
-  const txt = await r.text();
-  let j = null;
-  try{ j = JSON.parse(txt); }catch(e){ j = null; }
-
-  if(!r.ok || !j || j.ok !== true){
-    const msg = (j && j.error) ? String(j.error) : `HTTP ${r.status}`;
-    throw new Error(msg);
+function makeDemoShelfSvg(){
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b1220"/><stop offset="1" stop-color="#1f2937"/></linearGradient></defs>
+  <rect width="1200" height="760" fill="url(#g)"/>
+  <g stroke="#5db7ee" stroke-opacity=".45" stroke-width="8"><line x1="80" y1="350" x2="1120" y2="350"/><line x1="80" y1="655" x2="1120" y2="655"/></g>
+  ${demoBottles(140,150,7,"#93c5fd")}${demoBottles(500,145,6,"#fbbf24")}${demoBottles(860,150,5,"#f87171")}
+  ${demoBottles(145,465,4,"#86efac")}${demoBottles(505,465,6,"#c4b5fd")}${demoBottles(865,465,8,"#67e8f9")}
+  <text x="60" y="55" fill="#f8fafc" font-size="34" font-family="Arial" font-weight="800">Image de test · étagère local</text>
+  <text x="60" y="100" fill="#cbd5e1" font-size="20" font-family="Arial">Mode bêta : remplacer par photo réelle, puis RTSP plus tard.</text>
+  </svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+function demoBottles(x,y,count,color){
+  let s="";
+  for(let i=0;i<count;i++){
+    const bx=x+i*42;
+    s+=`<g><rect x="${bx+10}" y="${y-45}" width="16" height="45" rx="5" fill="${color}" opacity=".9"/><rect x="${bx}" y="${y}" width="36" height="145" rx="12" fill="${color}" opacity=".78"/><rect x="${bx+6}" y="${y+55}" width="24" height="44" rx="6" fill="#0b1220" opacity=".55"/></g>`;
   }
-
-  idsToPush.forEach(id => state.dirty.delete(id));
-  updateStockUI();
-  toastMsg("Publié ✅");
+  return s;
 }
 
-
-/* ✅ MENU ADN66 — vrai menu en haut */
-const adn66TopMenuBtn = $("#adn66TopMenuBtn");
-const adn66TopMenu = $("#adn66TopMenu");
-const btnOpenStockSettingsFromTopMenu = $("#btnOpenStockSettingsFromTopMenu");
-
-function closeAdn66TopMenu(){
-  if(!adn66TopMenu || !adn66TopMenuBtn) return;
-  adn66TopMenu.classList.remove("is-open");
-  adn66TopMenuBtn.setAttribute("aria-expanded", "false");
+function renderCameraImage(){
+  const prev=byId("cameraPreview"), img=byId("cameraImg");
+  if(state.camera.image){
+    prev.classList.add("hasImage");
+    img.src=state.camera.image;
+    img.style.display="block";
+    const empty=prev.querySelector(".empty"); if(empty) empty.style.display="none";
+  } else {
+    prev.classList.remove("hasImage");
+    img.removeAttribute("src");
+    img.style.display="none";
+    const empty=prev.querySelector(".empty"); if(empty) empty.style.display="block";
+  }
 }
 
-function toggleAdn66TopMenu(){
-  if(!adn66TopMenu || !adn66TopMenuBtn) return;
-  const open = adn66TopMenu.classList.toggle("is-open");
-  adn66TopMenuBtn.setAttribute("aria-expanded", open ? "true" : "false");
-}
-
-if(adn66TopMenuBtn){
-  adn66TopMenuBtn.addEventListener("click", (e)=>{
-    e.stopPropagation();
-    toggleAdn66TopMenu();
+function compareCamera(){
+  const rows=[];
+  Object.entries(state.camera.detections||{}).forEach(([id,val])=>{
+    if(val==="" || val===null || typeof val==="undefined") return;
+    const detected=Number(val||0);
+    const expected=Number(state.local[id]||0);
+    const diff=detected-expected;
+    if(diff!==0){
+      rows.push({ id, detected, expected, diff });
+    }
   });
-}
-
-if(adn66TopMenu){
-  adn66TopMenu.addEventListener("click", (e)=>e.stopPropagation());
-}
-
-document.addEventListener("click", closeAdn66TopMenu);
-document.addEventListener("keydown", (e)=>{
-  if(e.key === "Escape") closeAdn66TopMenu();
-});
-
-if(btnOpenStockSettingsFromTopMenu){
-  btnOpenStockSettingsFromTopMenu.addEventListener("click", ()=>{
-    closeAdn66TopMenu();
-    openSettings();
+  state.alerts = state.alerts.filter(a=>a.source!=="camera-beta" || a.status==="resolved");
+  rows.forEach(r=>{
+    state.alerts.unshift({
+      id:"alert_"+Date.now()+"_"+r.id,
+      at:nowIso(),
+      source:"camera-beta",
+      productId:r.id,
+      expected:r.expected,
+      detected:r.detected,
+      diff:r.diff,
+      status:"open"
+    });
   });
+  state.camera.scans = Number(state.camera.scans||0)+1;
+  state.camera.lastScanAt = nowIso();
+  addHistory("camera", `Comparaison caméra : ${rows.length} écart(s) détecté(s).`);
+  saveState();
+  setTab("alerts");
 }
 
-
-/* UI — PARAM STOCK */
-sheetBackdrop.addEventListener("click", closeSettings);
-sheetClose.addEventListener("click", closeSettings);
-
-btnSaveToken.addEventListener("click", ()=>{
-  const pin = String(tokenInput.value||"").trim();
-  if(!pin){ toastMsg("Code vide."); return; }
-  saveToken(pin);
-  updateTokenHint();
-  toastMsg("Code enregistré ✅");
+byId("runCompare").addEventListener("click", compareCamera);
+byId("validateScan").addEventListener("click",()=>{
+  state.camera.scans=Number(state.camera.scans||0)+1;
+  state.camera.lastScanAt=nowIso();
+  addHistory("camera","Contrôle caméra validé sans application automatique au stock.");
+  saveState();
+  toast("Contrôle caméra enregistré.");
 });
 
-btnClearToken.addEventListener("click", ()=>{
-  clearToken();
-  tokenInput.value = "";
-  updateTokenHint();
-  toastMsg("Code supprimé.");
+function renderCameraResults(){
+  const ids=Object.keys(state.camera.detections||{}).filter(id=>state.camera.detections[id]!=="" && state.camera.detections[id]!==null);
+  if(!ids.length){ byId("cameraResults").innerHTML = `<div class="note">Aucune quantité détectée saisie pour l’instant.</div>`; return; }
+  byId("cameraResults").innerHTML = `<table><thead><tr><th>Produit</th><th>Stock local attendu</th><th>Détecté image</th><th>Écart</th></tr></thead><tbody>
+    ${ids.map(id=>{
+      const exp=Number(state.local[id]||0), det=Number(state.camera.detections[id]||0), diff=det-exp;
+      const cls=diff===0?"ok":diff<0?"err":"warn";
+      return `<tr><td><strong>${escapeHtml(productName(id))}</strong></td><td>${exp}</td><td>${det}</td><td><span class="badge ${cls}">${diff>0?"+":""}${diff}</span></td></tr>`;
+    }).join("")}
+  </tbody></table>`;
+}
+
+function alertsTable(limit){
+  const alerts = state.alerts.filter(a=>a.status!=="resolved").slice(0, limit||999);
+  if(!alerts.length) return `<div class="note">Aucun écart ouvert. Le stock local et le contrôle caméra sont cohérents ou aucun scan n’a été lancé.</div>`;
+  return `<table><thead><tr><th>Date</th><th>Produit</th><th>Attendu</th><th>Détecté</th><th>Écart</th><th>Statut</th><th>Action</th></tr></thead><tbody>
+    ${alerts.map(a=>`<tr>
+      <td>${new Date(a.at).toLocaleString("fr-FR")}</td>
+      <td><strong>${escapeHtml(productName(a.productId))}</strong></td>
+      <td>${a.expected}</td><td>${a.detected}</td>
+      <td><span class="badge ${a.diff<0?"err":"warn"}">${a.diff>0?"+":""}${a.diff}</span></td>
+      <td><span class="badge warn">${a.status}</span></td>
+      <td>
+        <button class="btn success" data-apply-alert="${a.id}">Appliquer</button>
+        <button class="btn ghost" data-resolve-alert="${a.id}">Ignorer</button>
+      </td>
+    </tr>`).join("")}
+  </tbody></table>`;
+}
+
+function renderAlerts(){
+  byId("alertsTable").innerHTML = alertsTable();
+  byId("recentAlerts").innerHTML = alertsTable(6);
+}
+
+document.addEventListener("click", e=>{
+  const apply=e.target.closest("[data-apply-alert]");
+  const resolve=e.target.closest("[data-resolve-alert]");
+  if(apply) applyAlert(apply.dataset.applyAlert);
+  if(resolve) resolveAlert(resolve.dataset.resolveAlert);
 });
 
-btnReload.addEventListener("click", async ()=>{
+function applyAlert(id){
+  const a=state.alerts.find(x=>x.id===id);
+  if(!a) return;
+  const before=Number(state.local[a.productId]||0);
+  state.local[a.productId]=Math.max(0,Number(a.detected||0));
+  a.status="resolved";
+  a.resolvedAt=nowIso();
+  addHistory("alert", `Écart appliqué · ${productName(a.productId)} : local ${before} → ${state.local[a.productId]}`);
+  saveState();
+}
+
+function resolveAlert(id){
+  const a=state.alerts.find(x=>x.id===id);
+  if(!a) return;
+  a.status="resolved"; a.resolvedAt=nowIso();
+  addHistory("alert", `Écart ignoré · ${productName(a.productId)}.`);
+  saveState();
+}
+
+byId("applyAllAlerts").addEventListener("click",()=>{
+  state.alerts.filter(a=>a.status!=="resolved").forEach(a=>{
+    const before=Number(state.local[a.productId]||0);
+    state.local[a.productId]=Math.max(0,Number(a.detected||0));
+    a.status="resolved"; a.resolvedAt=nowIso();
+    addHistory("alert", `Écart appliqué · ${productName(a.productId)} : local ${before} → ${state.local[a.productId]}`);
+  });
+  saveState();
+});
+
+byId("clearResolved").addEventListener("click",()=>{
+  state.alerts=state.alerts.filter(a=>a.status!=="resolved");
+  saveState();
+});
+
+function renderHistory(){
+  if(!state.history.length){ byId("historyTable").innerHTML = `<div class="note">Historique vide.</div>`; return; }
+  byId("historyTable").innerHTML = `<table><thead><tr><th>Date</th><th>Type</th><th>Action</th></tr></thead><tbody>
+    ${state.history.map(h=>`<tr><td>${new Date(h.at).toLocaleString("fr-FR")}</td><td><span class="badge">${escapeHtml(h.type)}</span></td><td>${escapeHtml(h.text)}</td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+function exportData(){
+  return JSON.stringify({ exported_at:nowIso(), app:"adn66-stock-refonte", version:1, state }, null, 2);
+}
+
+function openModal(mode){
+  byId("jsonModal").classList.add("open");
+  byId("modalTitle").textContent = mode==="import" ? "Importer une sauvegarde" : "Exporter la sauvegarde";
+  byId("modalIntro").textContent = mode==="import" ? "Collez ici une sauvegarde JSON exportée depuis ce module." : "Copiez ce JSON pour garder une sauvegarde ou préparer une future synchronisation.";
+  byId("jsonBox").value = mode==="import" ? "" : exportData();
+  byId("applyImport").style.display = mode==="import" ? "inline-flex" : "none";
+}
+byId("backupBtn").addEventListener("click",()=>openModal("export"));
+byId("importBtn").addEventListener("click",()=>openModal("import"));
+byId("modalClose").addEventListener("click",()=>byId("jsonModal").classList.remove("open"));
+byId("copyJson").addEventListener("click",async()=>{ await navigator.clipboard.writeText(byId("jsonBox").value); toast("JSON copié."); });
+byId("applyImport").addEventListener("click",()=>{
   try{
-    await pullFromRepo();
-    setSync(Date.now());
-  }catch(e){
-    console.error(e);
-    toastMsg("Erreur rechargement.");
+    const data=JSON.parse(byId("jsonBox").value);
+    if(!data.state) throw new Error("Format invalide");
+    state=data.state;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    byId("jsonModal").classList.remove("open");
+    renderAll();
+    toast("Sauvegarde importée.");
+  }catch(e){ toast("Import impossible : JSON invalide."); }
+});
+
+byId("saveBtn").addEventListener("click",()=>saveState());
+byId("copyVehicleToLocal").addEventListener("click",()=>{
+  PRODUCTS.forEach(p=>state.local[p.id]=Number(state.vehicle[p.id]||0)*3);
+  addHistory("stock","Stock local recalculé depuis le véhicule ×3.");
+  saveState();
+});
+document.querySelectorAll("[data-reset]").forEach(btn=>btn.addEventListener("click",()=>{
+  const type=btn.dataset.reset;
+  PRODUCTS.forEach(p=>state[type][p.id]=0);
+  addHistory("stock",`Stock ${type} remis à zéro.`);
+  saveState();
+}));
+byId("clearHistory").addEventListener("click",()=>{ state.history=[]; saveState(); });
+byId("resetAll").addEventListener("click",()=>{
+  if(confirm("Réinitialiser toutes les données locales de ce module ?")){
+    localStorage.removeItem(STORAGE_KEY);
+    state=defaultState();
+    saveState();
   }
 });
 
-btnSaveRepo.addEventListener("click", async ()=>{
-  try{
-    await pushToRepo();
-    setSync(Date.now());
-  }catch(e){
-    console.error(e);
-    toastMsg("Erreur : " + (e?.message || e));
-  }
-});
+function renderAll(){
+  renderKpis();
+  renderProducts("vehicle");
+  renderProducts("local");
+  renderZones();
+  renderCameraImage();
+  renderCameraResults();
+  renderAlerts();
+  renderHistory();
+}
 
-btnReset.addEventListener("click", ()=>{
-  state.dirty.clear();
-  pullFromRepo().then(()=>toastMsg("Annulé ✅")).catch(()=>toastMsg("Erreur annulation."));
-});
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
 
-qEl.addEventListener("input", renderList);
-
-(async function init(){
-  loadSettings();
-  updateTokenHint();
-  updateSaveButtonsState();
-  await pullFromRepo();
-  setSync(Date.now());
-
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  }
-})();
+renderAll();
 </script>
-  <script src="./admin-gate.js"></script>
 </body>
 </html>

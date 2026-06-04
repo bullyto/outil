@@ -1,11 +1,11 @@
 {
-  "name": "Stock Véhicule",
-  "short_name": "Stock",
+  "name": "Stock ADN66",
+  "short_name": "Stock ADN66",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#05070b",
-  "theme_color": "#05070b",
-  "description": "Gestion du stock du véhicule en temps réel (offline).",
+  "background_color": "#070b12",
+  "theme_color": "#0b1220",
+  "description": "Stock véhicule, stock local et contrôle caméra bêta pour Apéro de Nuit 66.",
   "icons": [
     {
       "src": "icon-192.svg",
