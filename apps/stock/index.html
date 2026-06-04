@@ -1,450 +1,83 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>ADN66 — Stock véhicule, local et caméra</title>
-  <meta name="theme-color" content="#0b1220">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <style>
-    :root{
-      --bg:#0b1220;
-      --bg2:#070b12;
-      --card:#111827;
-      --card2:#172033;
-      --input:#0f172a;
-      --line:#283447;
-      --sky:#5db7ee;
-      --txt:#f8fafc;
-      --muted:#cbd5e1;
-      --soft:#94a3b8;
-      --green:#16a34a;
-      --greenTxt:#86efac;
-      --red:#dc2626;
-      --redTxt:#fecaca;
-      --yellow:#eab308;
-      --shadow: 0 20px 70px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;background:linear-gradient(160deg,#070b12,#111827 55%,#1f2937);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    body{padding:0 0 calc(18px + env(safe-area-inset-bottom));}
-    .top{
-      position:sticky;top:0;z-index:100;
-      background:rgba(7,11,18,.92);
-      backdrop-filter: blur(14px);
-      border-bottom:1px solid var(--line);
-      box-shadow:0 12px 40px rgba(0,0,0,.22);
-    }
-    .head{padding:14px 14px 10px;display:flex;align-items:center;gap:12px;justify-content:space-between}
-    .brand{min-width:0}
-    .brand h1{margin:0;font-size:18px;letter-spacing:.02em;font-weight:950}
-    .brand p{margin:3px 0 0;color:var(--soft);font-size:12px;font-weight:800}
-    .liveBadge{display:flex;align-items:center;gap:7px;border:1px solid rgba(93,183,238,.35);background:rgba(93,183,238,.10);color:#d9f1ff;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:900;white-space:nowrap}
-    .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 6px rgba(22,163,74,.14)}
-    .tabs{display:flex;gap:8px;padding:0 12px 12px;overflow:auto;-webkit-overflow-scrolling:touch}
-    .tab{
-      border:1px solid var(--line);background:#0f172a;color:var(--muted);
-      border-radius:999px;padding:10px 13px;font-weight:950;font-size:13px;white-space:nowrap;cursor:pointer
-    }
-    .tab.active{background:var(--sky);border-color:var(--sky);color:#fff}
-    main{width:min(1180px,100%);margin:0 auto;padding:14px}
-    .panel{display:none}
-    .panel.active{display:block}
-    .grid{display:grid;gap:14px}
-    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-    @media(max-width:860px){.grid.two,.grid.three{grid-template-columns:1fr}}
-    .card{background:rgba(17,24,39,.88);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:14px}
-    .card h2,.card h3{margin:0 0 10px}
-    .card h2{font-size:20px}
-    .card h3{font-size:16px;color:#eaf6ff}
-    .sub{color:var(--soft);font-size:13px;line-height:1.35;margin:0 0 12px;font-weight:700}
-    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-    @media(max-width:720px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    .stat{background:var(--card2);border:1px solid var(--line);border-radius:18px;padding:12px}
-    .stat b{display:block;font-size:22px}
-    .stat span{display:block;margin-top:3px;color:var(--soft);font-size:12px;font-weight:800}
-    .toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:0 0 12px}
-    .search{flex:1;min-width:180px}
-    input,select{width:100%;background:var(--input);border:1px solid var(--line);color:var(--txt);border-radius:14px;padding:12px;font-weight:800;outline:none}
-    input:focus,select:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(93,183,238,.16)}
-    .btn{border:0;border-radius:14px;background:var(--sky);color:white;padding:12px 14px;font-weight:950;cursor:pointer}
-    .btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}
-    .btn.red{background:var(--red)}
-    .btn.green{background:var(--green)}
-    .btn:active{transform:translateY(1px)}
-    .tableWrap{overflow:auto;border:1px solid var(--line);border-radius:18px}
-    table{width:100%;border-collapse:collapse;min-width:760px}
-    th,td{padding:12px;text-align:left;border-bottom:1px solid rgba(40,52,71,.75);font-size:13px}
-    th{color:var(--muted);background:#0f172a;position:sticky;top:0;z-index:1}
-    td{font-weight:750}
-    tr:last-child td{border-bottom:0}
-    .qty{display:flex;align-items:center;gap:8px}
-    .mini{width:34px;height:34px;border-radius:12px;border:1px solid var(--line);background:#0f172a;color:#fff;font-weight:950;cursor:pointer}
-    .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:950}
-    .pill.ok{background:rgba(22,163,74,.14);color:var(--greenTxt);border:1px solid rgba(22,163,74,.28)}
-    .pill.warn{background:rgba(234,179,8,.14);color:#fde68a;border:1px solid rgba(234,179,8,.30)}
-    .pill.bad{background:rgba(220,38,38,.14);color:var(--redTxt);border:1px solid rgba(220,38,38,.30)}
-    .cameraLayout{display:grid;grid-template-columns:1.4fr .9fr;gap:14px}
-    @media(max-width:980px){.cameraLayout{grid-template-columns:1fr}}
-    .cameraBox{position:relative;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#050914;min-height:280px}
-    video,.fallbackCam{display:block;width:100%;height:auto;min-height:280px;object-fit:cover;background:#050914}
-    .fallbackCam{background-image:url('./assets/camera-beta.svg');background-size:cover;background-position:center}
-    .overlayZones{position:absolute;inset:0;pointer-events:none}
-    .zone{position:absolute;border:2px solid rgba(93,183,238,.9);background:rgba(93,183,238,.08);border-radius:14px}
-    .zone span{position:absolute;left:8px;top:8px;background:rgba(7,11,18,.75);color:#fff;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:950}
-    .z1{left:3%;top:14%;width:30%;height:34%}.z2{left:35%;top:14%;width:30%;height:34%}.z3{left:67%;top:14%;width:30%;height:34%}
-    .z4{left:3%;top:52%;width:30%;height:34%}.z5{left:35%;top:52%;width:30%;height:34%}.z6{left:67%;top:52%;width:30%;height:34%}
-    .cameraControls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .zoneList{display:grid;gap:9px}
-    .zoneRow{display:grid;grid-template-columns:1fr 100px 80px;gap:8px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:10px}
-    .zoneRow b{font-size:13px}.zoneRow span{font-size:11px;color:var(--soft);font-weight:800}
-    .historyList{display:grid;gap:10px}
-    .hist{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px}
-    .hist b{display:block}.hist span{display:block;color:var(--soft);font-size:12px;margin-top:3px;font-weight:800}
-    .empty{padding:18px;text-align:center;color:var(--soft);font-weight:850}
-    .note{border:1px dashed rgba(93,183,238,.45);background:rgba(93,183,238,.08);border-radius:18px;padding:12px;color:#d9f1ff;font-size:13px;font-weight:800;line-height:1.35}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>ADN66 — Stock véhicule / local / caméra</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<style>
+:root{--blue:#5db7ee;--bg:#0b1220;--bg0:#070b12;--bg1:#111827;--bg2:#1f2937;--card:#111827;--card2:#172033;--field:#0f172a;--border:#283447;--text:#f8fafc;--muted:#cbd5e1;--soft:#94a3b8;--success:#16a34a;--successText:#86efac;--danger:#dc2626;--dangerText:#fecaca;--warn:#f59e0b;--warnText:#fde68a;--shadow:0 22px 70px rgba(0,0,0,.42);--r:22px}
+*{box-sizing:border-box}html,body{min-height:100%}
+body{margin:0;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(760px 420px at 18% -10%,rgba(93,183,238,.20),transparent 62%),radial-gradient(760px 520px at 92% 6%,rgba(93,183,238,.10),transparent 60%),linear-gradient(180deg,var(--bg0),var(--bg1) 48%,var(--bg2));padding-bottom:calc(82px + env(safe-area-inset-bottom));overflow-x:hidden}
+button,input{font:inherit}.header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,rgba(7,11,18,.97),rgba(7,11,18,.82));backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 14px 10px;max-width:1120px;margin:0 auto}.brand{min-width:0}.brand h1{font-size:17px;margin:0;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand p{font-size:12px;color:var(--soft);margin:4px 0 0;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status{display:flex;gap:7px;align-items:center;border:1px solid rgba(93,183,238,.34);background:rgba(93,183,238,.10);border-radius:999px;padding:8px 10px;font-size:12px;font-weight:950;color:#dff4ff;white-space:nowrap}.statusDot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 0 6px rgba(22,163,74,.14)}
+.tabs{display:flex;gap:8px;overflow:auto;padding:0 12px 12px;max-width:1120px;margin:0 auto;-webkit-overflow-scrolling:touch}.tab{border:1px solid var(--border);background:var(--field);color:var(--muted);border-radius:999px;padding:10px 12px;font-size:12.5px;font-weight:950;white-space:nowrap;cursor:pointer}.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+main{max-width:1120px;margin:0 auto;padding:14px}.panel{display:none}.panel.active{display:block}
+.card{background:linear-gradient(180deg,rgba(17,24,39,.92),rgba(15,23,42,.88));border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}.cardHd{padding:14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(93,183,238,.09),rgba(93,183,238,.02));display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.cardHd h2{font-size:16px;margin:0;font-weight:950}.cardHd p{font-size:12px;color:var(--muted);margin:5px 0 0;line-height:1.35;font-weight:750}.cardBd{padding:12px}
+.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.search{flex:1;min-width:170px;background:var(--field);border:1px solid var(--border);border-radius:15px;padding:11px 12px;color:var(--text);outline:0;font-weight:800}.search:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.12)}
+.btn{border:1px solid var(--border);background:rgba(15,23,42,.84);color:var(--text);border-radius:14px;padding:11px 12px;font-size:12.5px;font-weight:950;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.green{background:var(--success);border-color:var(--success);color:#fff}.btn.danger{background:rgba(220,38,38,.16);border-color:rgba(220,38,38,.5);color:var(--dangerText)}.btn:active,.qtyBtn:active{transform:translateY(1px)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:12px}.stat{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:10px;min-width:0}.stat b{display:block;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stat span{display:block;color:var(--soft);font-size:11px;font-weight:850;margin-top:3px}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media(min-width:720px){.products{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}}@media(min-width:1040px){.products{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}}
+.prod{min-width:0;background:linear-gradient(180deg,rgba(23,32,51,.94),rgba(17,24,39,.94));border:1px solid var(--border);border-radius:20px;padding:10px;display:flex;flex-direction:column;gap:8px;box-shadow:0 12px 32px rgba(0,0,0,.18)}.prodImg{height:116px;border-radius:16px;background:#0b1220;border:1px solid var(--border);display:grid;place-items:center;overflow:hidden}.prodImg img{width:100%;height:100%;object-fit:contain;padding:8px;filter:drop-shadow(0 12px 14px rgba(0,0,0,.36))}.prod h3{font-size:13px;line-height:1.15;margin:0;font-weight:950;min-height:31px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.meta{display:flex;justify-content:space-between;gap:6px;align-items:center;color:var(--soft);font-size:11px;font-weight:900}.price{color:#d9f1ff}
+.qtyLine{display:grid;grid-template-columns:36px 1fr 36px;gap:6px;align-items:center;margin-top:auto}.qtyBtn{height:38px;border-radius:13px;border:1px solid var(--border);background:#0f172a;color:#fff;font-size:20px;font-weight:950;cursor:pointer}.qtyVal{height:38px;border-radius:13px;border:1px solid var(--border);background:#0f172a;color:#fff;display:grid;place-items:center;font-weight:950;font-size:15px}
+.pill{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;font-size:10.5px;font-weight:950;border:1px solid var(--border);white-space:nowrap}.pill.ok{background:rgba(22,163,74,.16);border-color:rgba(22,163,74,.34);color:var(--successText)}.pill.warn{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.30);color:var(--warnText)}.pill.bad{background:rgba(220,38,38,.16);border-color:rgba(220,38,38,.34);color:var(--dangerText)}
+.overviewList{display:grid;gap:9px}.over{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;background:var(--card2);border:1px solid var(--border);border-radius:18px;padding:9px}.over img{width:58px;height:70px;object-fit:contain;background:#0b1220;border-radius:14px;padding:5px;border:1px solid var(--border)}.over h3{margin:0;font-size:13px;font-weight:950}.over p{margin:4px 0 0;color:var(--soft);font-size:11px;font-weight:850}.total{text-align:right}.total b{font-size:19px;display:block}.total span{font-size:10.5px;color:var(--soft);font-weight:900}
+.camGrid{display:grid;gap:12px}@media(min-width:900px){.camGrid{grid-template-columns:1.35fr .9fr}}.cameraBox{position:relative;border:1px solid var(--border);border-radius:22px;overflow:hidden;background:#050914;min-height:250px}.cameraBox video,.fallback{display:block;width:100%;min-height:250px;object-fit:cover;background:#050914}.fallback{background:url('./assets/camera-beta.svg') center/cover no-repeat}.zoneOverlay{position:absolute;inset:0;pointer-events:none}.zone{position:absolute;border:2px solid rgba(93,183,238,.90);background:rgba(93,183,238,.08);border-radius:12px}.zone span{position:absolute;left:6px;top:6px;background:rgba(7,11,18,.74);border-radius:999px;padding:4px 7px;font-size:10px;font-weight:950}.z1{left:3%;top:16%;width:30%;height:32%}.z2{left:35%;top:16%;width:30%;height:32%}.z3{left:67%;top:16%;width:30%;height:32%}.z4{left:3%;top:52%;width:30%;height:32%}.z5{left:35%;top:52%;width:30%;height:32%}.z6{left:67%;top:52%;width:30%;height:32%}
+.zoneRows{display:grid;gap:8px}.zoneRow{display:grid;grid-template-columns:1fr 76px;gap:8px;align-items:center;background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:10px}.zoneRow b{font-size:13px}.zoneRow span{display:block;color:var(--soft);font-size:11px;font-weight:850;margin-top:2px}.zoneRow input{width:100%;background:var(--field);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:9px;font-weight:950;text-align:center}
+.histList{display:grid;gap:8px}.hist{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:10px;display:flex;justify-content:space-between;gap:10px}.hist b{font-size:13px}.hist p{margin:4px 0 0;color:var(--soft);font-size:11px;font-weight:800}.hist time{font-size:10.5px;color:var(--soft);font-weight:900;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#06101f;border:1px solid rgba(93,183,238,.35);border-radius:15px;color:#fff;padding:11px 13px;font-size:13px;font-weight:950;z-index:999;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 18px 50px rgba(0,0,0,.35);width:min(520px,90vw);text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.sheet{position:fixed;inset:0;z-index:500;display:none;place-items:center;padding:18px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px)}.sheet.show{display:grid}.modal{width:min(520px,94vw);background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:14px}.modal h3{margin:0 0 8px}.modal p{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.35}.modal input{width:100%;background:var(--field);border:1px solid var(--border);border-radius:14px;color:#fff;padding:12px;font-weight:850;margin:8px 0 12px}.modalActions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}.smallNote{color:var(--soft);font-size:11px;font-weight:800;line-height:1.35;margin-top:8px}
+</style>
 </head>
 <body>
-  <header class="top">
-    <div class="head">
-      <div class="brand">
-        <h1>ADN66 — Stock</h1>
-        <p>Véhicule • Local • Vue d’ensemble • Caméra • Historique</p>
-      </div>
-      <div class="liveBadge"><i class="dot"></i><span id="saveState">Sauvegarde locale</span></div>
-    </div>
-    <nav class="tabs" aria-label="Onglets stock">
-      <button class="tab active" data-tab="vehicule">Stock véhicule</button>
-      <button class="tab" data-tab="local">Stock local</button>
-      <button class="tab" data-tab="overview">Vue d’ensemble</button>
-      <button class="tab" data-tab="camera">Caméra</button>
-      <button class="tab" data-tab="history">Historique</button>
-    </nav>
-  </header>
-
-  <main>
-    <section id="vehicule" class="panel active">
-      <div class="grid">
-        <div class="card">
-          <div class="toolbar">
-            <div>
-              <h2>Stock véhicule</h2>
-              <p class="sub">Stock disponible dans le véhicule de livraison. Les corrections sont enregistrées dans l’historique.</p>
-            </div>
-            <input class="search" id="searchVehicule" placeholder="Rechercher un article">
-          </div>
-          <div class="stats" id="vehiculeStats"></div>
-        </div>
-        <div class="card"><div class="tableWrap"><table id="vehiculeTable"></table></div></div>
-      </div>
-    </section>
-
-    <section id="local" class="panel">
-      <div class="grid">
-        <div class="card">
-          <div class="toolbar">
-            <div>
-              <h2>Stock local</h2>
-              <p class="sub">Réserve du local. La caméra pourra mettre à jour ces quantités après validation ou en mode temps réel.</p>
-            </div>
-            <input class="search" id="searchLocal" placeholder="Rechercher un article">
-          </div>
-          <div class="stats" id="localStats"></div>
-        </div>
-        <div class="card"><div class="tableWrap"><table id="localTable"></table></div></div>
-      </div>
-    </section>
-
-    <section id="overview" class="panel">
-      <div class="grid">
-        <div class="card">
-          <h2>Vue d’ensemble</h2>
-          <p class="sub">Chaque article avec son total, le stock véhicule, le stock local et l’état global.</p>
-          <div class="stats" id="overviewStats"></div>
-        </div>
-        <div class="card"><div class="tableWrap"><table id="overviewTable"></table></div></div>
-      </div>
-    </section>
-
-    <section id="camera" class="panel">
-      <div class="grid">
-        <div class="card">
-          <h2>Caméra — contrôle du stock local</h2>
-          <p class="sub">Version GitHub sans Cloudflare et sans RTSP. Ici on utilise la caméra du navigateur si disponible. Plus tard, le flux direct remplacera cette partie.</p>
-          <div class="note">Mode cible : flux caméra en direct + analyse en temps réel + mise à jour du stock local. En bêta, les quantités détectées sont simulées/ajustables pour préparer toute l’interface sans casser le module.</div>
-        </div>
-        <div class="cameraLayout">
-          <div class="card">
-            <div class="cameraBox">
-              <video id="cameraVideo" autoplay playsinline muted style="display:none"></video>
-              <div id="fallbackCam" class="fallbackCam"></div>
-              <div class="overlayZones">
-                <div class="zone z1"><span>Vodka</span></div>
-                <div class="zone z2"><span>Whisky</span></div>
-                <div class="zone z3"><span>Rhum</span></div>
-                <div class="zone z4"><span>Champagne</span></div>
-                <div class="zone z5"><span>Softs</span></div>
-                <div class="zone z6"><span>Autres</span></div>
-              </div>
-            </div>
-            <div class="cameraControls">
-              <button class="btn" id="startCamera">Lancer caméra</button>
-              <button class="btn ghost" id="stopCamera">Stop</button>
-              <button class="btn green" id="toggleRealtime">Temps réel : ON</button>
-              <button class="btn ghost" id="simulateScan">Simuler analyse</button>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Comptage caméra</h3>
-            <p class="sub">Les quantités détectées mettent à jour le stock local quand le mode temps réel est actif.</p>
-            <div class="zoneList" id="cameraZones"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="history" class="panel">
-      <div class="grid">
-        <div class="card">
-          <div class="toolbar">
-            <div>
-              <h2>Historique</h2>
-              <p class="sub">Dernières actions : modifications manuelles, analyses caméra et mises à jour locales.</p>
-            </div>
-            <button class="btn red" id="clearHistory">Vider historique</button>
-          </div>
-          <div class="historyList" id="historyList"></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
+<header class="header">
+ <div class="head"><div class="brand"><h1>ADN66 — Stock</h1><p>Véhicule • Local • Vue d’ensemble • Caméra • Historique</p></div><button class="status" id="openPublishSettings" type="button"><i class="statusDot"></i><span id="syncLabel">GitHub</span></button></div>
+ <nav class="tabs"><button class="tab active" data-tab="vehicule">Stock véhicule</button><button class="tab" data-tab="local">Stock local</button><button class="tab" data-tab="overview">Vue d’ensemble</button><button class="tab" data-tab="camera">Caméra</button><button class="tab" data-tab="history">Historique</button></nav>
+</header>
+<main>
+<section id="vehicule" class="panel active"><div class="card"><div class="cardHd"><div><h2>Stock véhicule</h2><p>Quantités du véhicule. Sauvegarde dans <b>stock/_snapshot.json</b>.</p></div></div><div class="cardBd"><div class="toolbar"><input id="searchVehicule" class="search" placeholder="Rechercher…"><button class="btn" id="reloadAll">⟲ Recharger</button><button class="btn primary" data-publish="vehicle">Publier véhicule</button></div><div class="stats" id="statsVehicle"></div><div class="products" id="vehicleProducts"></div></div></div></section>
+<section id="local" class="panel"><div class="card"><div class="cardHd"><div><h2>Stock local</h2><p>Quantités du local. Sauvegarde séparée dans <b>stock/_snapshot_local.json</b>.</p></div></div><div class="cardBd"><div class="toolbar"><input id="searchLocal" class="search" placeholder="Rechercher…"><button class="btn" id="reloadAll2">⟲ Recharger</button><button class="btn primary" data-publish="local">Publier local</button></div><div class="stats" id="statsLocal"></div><div class="products" id="localProducts"></div></div></div></section>
+<section id="overview" class="panel"><div class="card"><div class="cardHd"><div><h2>Vue d’ensemble</h2><p>Chaque article : véhicule + local = total en stock.</p></div><button class="btn primary" data-publish="all">Publier tout</button></div><div class="cardBd"><div class="toolbar"><input id="searchOverview" class="search" placeholder="Rechercher…"></div><div class="stats" id="statsOverview"></div><div class="overviewList" id="overviewList"></div></div></div></section>
+<section id="camera" class="panel"><div class="card"><div class="cardHd"><div><h2>Caméra</h2><p>Vue caméra directe si autorisée. En bêta, le comptage peut être simulé en attendant la vraie IA.</p></div></div><div class="cardBd"><div class="camGrid"><div><div class="cameraBox"><video id="cameraVideo" autoplay playsinline muted style="display:none"></video><div class="fallback" id="cameraFallback"></div><div class="zoneOverlay"><div class="zone z1"><span>Vodka</span></div><div class="zone z2"><span>Whisky</span></div><div class="zone z3"><span>Rhum</span></div><div class="zone z4"><span>Vin/Pastis</span></div><div class="zone z5"><span>Softs</span></div><div class="zone z6"><span>Autres</span></div></div></div><div class="toolbar" style="margin-top:10px"><button class="btn primary" id="startCamera">Lancer caméra</button><button class="btn" id="stopCamera">Stop</button><button class="btn green" id="toggleRealtime">Temps réel ON</button><button class="btn" id="simulateScan">Simuler comptage</button></div></div><div><div class="zoneRows" id="cameraRows"></div></div></div></div></div></section>
+<section id="history" class="panel"><div class="card"><div class="cardHd"><div><h2>Historique</h2><p>Actions locales, publications et comptages caméra.</p></div><button class="btn danger" id="clearHistory">Vider</button></div><div class="cardBd"><div class="histList" id="historyList"></div></div></div></section>
+</main>
+<div class="toast" id="toast"></div>
+<div class="sheet" id="publishSheet"><div class="modal"><h3>Publication GitHub</h3><p>Sans Cloudflare, la publication écrit directement dans GitHub. Le code est conservé localement sur cet appareil.</p><input id="publishKey" type="password" placeholder="Clé de publication GitHub"><div class="modalActions"><button class="btn" id="closePublish">Fermer</button><button class="btn danger" id="clearPublishKey">Effacer</button><button class="btn primary" id="savePublishKey">Enregistrer</button></div><div class="smallNote">Fichiers utilisés : <b>apps/stock/stock/_snapshot.json</b> pour le véhicule et <b>apps/stock/stock/_snapshot_local.json</b> pour le local.</div></div></div>
 <script>
-const DEFAULT_PRODUCTS = [
-  {id:'vodka_absolut', name:'Vodka Absolut', cat:'Vodka', vehicle:4, local:12, min:4},
-  {id:'vodka_poliakov', name:'Vodka Poliakov', cat:'Vodka', vehicle:6, local:18, min:5},
-  {id:'whisky_jb', name:'Whisky J&B', cat:'Whisky', vehicle:3, local:10, min:3},
-  {id:'whisky_jack', name:'Jack Daniel’s', cat:'Whisky', vehicle:2, local:8, min:2},
-  {id:'rhum_bacardi', name:'Rhum Bacardi', cat:'Rhum', vehicle:2, local:9, min:2},
-  {id:'rhum_3rivieres', name:'Rhum Trois Rivières', cat:'Rhum', vehicle:2, local:7, min:2},
-  {id:'champ_moet', name:'Champagne Moët', cat:'Champagne', vehicle:1, local:5, min:1},
-  {id:'champ_mumm', name:'Champagne Mumm', cat:'Champagne', vehicle:1, local:6, min:1},
-  {id:'coca', name:'Coca-Cola', cat:'Softs', vehicle:12, local:30, min:10},
-  {id:'redbull', name:'Red Bull', cat:'Softs', vehicle:10, local:28, min:8},
-  {id:'ice', name:'Glaçons', cat:'Autres', vehicle:8, local:22, min:6},
-  {id:'verres', name:'Gobelets', cat:'Autres', vehicle:30, local:120, min:20}
-];
-
-const CAMERA_MAP = {
-  'Vodka':['vodka_absolut','vodka_poliakov'],
-  'Whisky':['whisky_jb','whisky_jack'],
-  'Rhum':['rhum_bacardi','rhum_3rivieres'],
-  'Champagne':['champ_moet','champ_mumm'],
-  'Softs':['coca','redbull'],
-  'Autres':['ice','verres']
-};
-
-let state = load();
-let realtime = true;
-let scanTimer = null;
-let stream = null;
-
-function load(){
-  try{
-    const raw = localStorage.getItem('adn66_stock_5tabs_state');
-    if(raw) return JSON.parse(raw);
-  }catch(e){}
-  return {
-    products: DEFAULT_PRODUCTS,
-    history: [{ts:Date.now(), type:'init', label:'Module Stock initialisé', detail:'Structure 5 onglets prête pour GitHub'}],
-    camera: {lastScan:null, zones:{}}
-  };
-}
-function save(){
-  localStorage.setItem('adn66_stock_5tabs_state', JSON.stringify(state));
-  const s=document.getElementById('saveState');
-  if(s){s.textContent='Sauvegardé '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
-}
-function addHistory(type,label,detail){
-  state.history.unshift({ts:Date.now(),type,label,detail});
-  state.history=state.history.slice(0,80);
-  save();
-  renderHistory();
-}
-function product(id){return state.products.find(p=>p.id===id)}
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function statusPill(total,min){
-  if(total<=0) return '<span class="pill bad">Rupture</span>';
-  if(total<=min) return '<span class="pill warn">Bas</span>';
-  return '<span class="pill ok">OK</span>';
-}
-function totals(){
-  const vehicle = state.products.reduce((s,p)=>s+p.vehicle,0);
-  const local = state.products.reduce((s,p)=>s+p.local,0);
-  const total = vehicle+local;
-  const low = state.products.filter(p=>p.vehicle+p.local<=p.min).length;
-  return {vehicle,local,total,low,articles:state.products.length};
-}
-function statsHtml(kind){
-  const t=totals();
-  const vals = kind==='vehicule'
-    ? [[t.vehicle,'Total véhicule'],[state.products.filter(p=>p.vehicle<=p.min).length,'Alertes véhicule'],[t.articles,'Articles'],[new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),'Mise à jour']]
-    : kind==='local'
-      ? [[t.local,'Total local'],[state.products.filter(p=>p.local<=p.min).length,'Alertes local'],[t.articles,'Articles'],[state.camera.lastScan?new Date(state.camera.lastScan).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'—','Dernière caméra']]
-      : [[t.total,'Total général'],[t.vehicle,'Véhicule'],[t.local,'Local'],[t.low,'Alertes']];
-  return vals.map(v=>`<div class="stat"><b>${v[0]}</b><span>${v[1]}</span></div>`).join('');
-}
-function renderStockTable(target, field, search=''){
-  const rows = state.products
-    .filter(p=>!search || (p.name+p.cat).toLowerCase().includes(search.toLowerCase()))
-    .map(p=>`<tr>
-      <td>${esc(p.name)}</td><td>${esc(p.cat)}</td>
-      <td><div class="qty"><button class="mini" data-dec="${p.id}" data-field="${field}">−</button><b>${p[field]}</b><button class="mini" data-inc="${p.id}" data-field="${field}">+</button></div></td>
-      <td>${p.min}</td><td>${statusPill(p[field],p.min)}</td>
-    </tr>`).join('');
-  document.getElementById(target).innerHTML = `<thead><tr><th>Article</th><th>Famille</th><th>Quantité</th><th>Seuil</th><th>État</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="empty">Aucun article</td></tr>'}</tbody>`;
-}
-function renderOverview(){
-  document.getElementById('overviewStats').innerHTML=statsHtml('overview');
-  const rows=state.products.map(p=>{
-    const total=p.vehicle+p.local;
-    return `<tr><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${p.vehicle}</td><td>${p.local}</td><td><b>${total}</b></td><td>${statusPill(total,p.min)}</td></tr>`
-  }).join('');
-  document.getElementById('overviewTable').innerHTML=`<thead><tr><th>Article</th><th>Famille</th><th>Véhicule</th><th>Local</th><th>Total en stock</th><th>État</th></tr></thead><tbody>${rows}</tbody>`;
-}
-function renderAll(){
-  document.getElementById('vehiculeStats').innerHTML=statsHtml('vehicule');
-  document.getElementById('localStats').innerHTML=statsHtml('local');
-  renderStockTable('vehiculeTable','vehicle',document.getElementById('searchVehicule')?.value||'');
-  renderStockTable('localTable','local',document.getElementById('searchLocal')?.value||'');
-  renderOverview();
-  renderCameraZones();
-  renderHistory();
-}
-function renderHistory(){
-  const box=document.getElementById('historyList');
-  if(!box) return;
-  if(!state.history.length){box.innerHTML='<div class="empty">Historique vide</div>';return;}
-  box.innerHTML=state.history.map(h=>`<div class="hist"><div><b>${esc(h.label)}</b><span>${esc(h.detail||'')}</span></div><span>${new Date(h.ts).toLocaleString('fr-FR')}</span></div>`).join('');
-}
-function renderCameraZones(){
-  const box=document.getElementById('cameraZones');
-  if(!box) return;
-  box.innerHTML=Object.keys(CAMERA_MAP).map(zone=>{
-    const ids=CAMERA_MAP[zone];
-    const localTotal=ids.reduce((s,id)=>s+(product(id)?.local||0),0);
-    const detected=state.camera.zones[zone] ?? localTotal;
-    const diff=detected-localTotal;
-    return `<div class="zoneRow">
-      <div><b>${zone}</b><span>Local actuel : ${localTotal}</span></div>
-      <input type="number" min="0" value="${detected}" data-zone-count="${zone}">
-      <span class="${diff===0?'pill ok':diff<0?'pill bad':'pill warn'}">${diff===0?'OK':(diff>0?'+':'')+diff}</span>
-    </div>`;
-  }).join('');
-}
-function adjust(id,field,delta){
-  const p=product(id); if(!p) return;
-  const old=p[field];
-  p[field]=Math.max(0,old+delta);
-  addHistory('manual',`Stock ${field==='vehicle'?'véhicule':'local'} modifié`,`${p.name} : ${old} → ${p[field]}`);
-  renderAll();
-}
-async function startCamera(){
-  const video=document.getElementById('cameraVideo'), fallback=document.getElementById('fallbackCam');
-  try{
-    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
-    video.srcObject=stream;
-    video.style.display='block';
-    fallback.style.display='none';
-    addHistory('camera','Caméra lancée','Flux navigateur actif');
-  }catch(e){
-    video.style.display='none';
-    fallback.style.display='block';
-    addHistory('camera','Caméra indisponible','Mode image bêta affiché');
-    alert("Caméra indisponible ou permission refusée. Le mode image bêta reste affiché.");
-  }
-}
-function stopCamera(){
-  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
-  document.getElementById('cameraVideo').style.display='none';
-  document.getElementById('fallbackCam').style.display='block';
-  addHistory('camera','Caméra arrêtée','Retour au mode image bêta');
-}
-function simulateScan(){
-  Object.keys(CAMERA_MAP).forEach(zone=>{
-    const ids=CAMERA_MAP[zone];
-    const localTotal=ids.reduce((s,id)=>s+(product(id)?.local||0),0);
-    const variance = Math.floor(Math.random()*3)-1;
-    state.camera.zones[zone]=Math.max(0,localTotal+variance);
-  });
-  state.camera.lastScan=Date.now();
-  if(realtime) applyCameraToLocal(false);
-  addHistory('camera','Analyse caméra',realtime?'Stock local mis à jour en temps réel':'Comptage détecté sans mise à jour');
-  save(); renderAll();
-}
-function applyCameraToLocal(log=true){
-  Object.keys(CAMERA_MAP).forEach(zone=>{
-    const ids=CAMERA_MAP[zone];
-    const detected=Number(state.camera.zones[zone] || 0);
-    const current=ids.reduce((s,id)=>s+(product(id)?.local||0),0);
-    if(current===0 || ids.length===0) return;
-    let remaining=detected;
-    ids.forEach((id,idx)=>{
-      const p=product(id); if(!p) return;
-      if(idx===ids.length-1){p.local=Math.max(0,remaining);}
-      else{
-        const share=Math.round(detected*(p.local/current));
-        p.local=Math.max(0,share); remaining-=p.local;
-      }
-    });
-  });
-  if(log) addHistory('camera','Stock local actualisé','Mise à jour depuis le comptage caméra');
-  save();
-}
-document.addEventListener('click',e=>{
-  const tab=e.target.closest('.tab');
-  if(tab){
-    document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-    tab.classList.add('active'); document.getElementById(tab.dataset.tab).classList.add('active');
-  }
-  const inc=e.target.closest('[data-inc]');
-  const dec=e.target.closest('[data-dec]');
-  if(inc) adjust(inc.dataset.inc,inc.dataset.field,1);
-  if(dec) adjust(dec.dataset.dec,dec.dataset.field,-1);
-});
-document.addEventListener('input',e=>{
-  if(e.target.id==='searchVehicule') renderStockTable('vehiculeTable','vehicle',e.target.value);
-  if(e.target.id==='searchLocal') renderStockTable('localTable','local',e.target.value);
-  if(e.target.matches('[data-zone-count]')){
-    const zone=e.target.dataset.zoneCount;
-    state.camera.zones[zone]=Math.max(0,Number(e.target.value||0));
-    state.camera.lastScan=Date.now();
-    if(realtime){ applyCameraToLocal(false); }
-    save(); renderAll();
-  }
-});
-document.getElementById('startCamera').addEventListener('click',startCamera);
-document.getElementById('stopCamera').addEventListener('click',stopCamera);
-document.getElementById('simulateScan').addEventListener('click',simulateScan);
-document.getElementById('toggleRealtime').addEventListener('click',()=>{
-  realtime=!realtime;
-  const b=document.getElementById('toggleRealtime');
-  b.textContent='Temps réel : '+(realtime?'ON':'OFF');
-  b.className='btn '+(realtime?'green':'ghost');
-  addHistory('camera','Mode temps réel '+(realtime?'activé':'désactivé'),'Onglet caméra');
-});
-document.getElementById('clearHistory').addEventListener('click',()=>{
-  if(confirm('Vider l’historique ?')){
-    state.history=[];
-    save(); renderHistory();
-  }
-});
-setInterval(()=>{ if(document.getElementById('camera').classList.contains('active') && realtime) simulateScan(); }, 18000);
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
-renderAll();
+const PRODUCTS_BY_CAT = {"snacks": [{"id": "cacahuette", "name": "Cacahuète", "price": 2.5}, {"id": "bretzel", "name": "Bretzel", "price": 2.5}, {"id": "curly", "name": "Curly", "price": 2.5}, {"id": "chips", "name": "Chips", "price": 2.5}, {"id": "monster_munch", "name": "Monster Munch", "price": 2.5}, {"id": "dragibus", "name": "Dragibus", "price": 2.5}, {"id": "fraise_tagada", "name": "Fraise Tagada", "price": 2.5}], "vodka": [{"id": "poliakov", "name": "Poliakov", "price": 29.0}, {"id": "absolut", "name": "Absolut Vodka", "price": 34.0}, {"id": "ciroc_classic", "name": "Cîroc Classic", "price": 49.0}, {"id": "ciroc_redberry", "name": "Cîroc Red Berry", "price": 49.0}, {"id": "ciroc_pomme", "name": "Cîroc Pomme", "price": 49.0}], "whisky": [{"id": "william_peel", "name": "William Peel", "price": 29.0}, {"id": "label_5", "name": "Label 5", "price": 32.0}, {"id": "ballantines", "name": "Ballantine's", "price": 36.0}, {"id": "jack_old7", "name": "Jack Daniel's", "price": 40.0}, {"id": "jack_honey", "name": "Jack Daniel's Honey", "price": 42.0}], "rhum": [{"id": "old_nick_darkwood", "name": "Old Nick Dark Wood", "price": 29.0}, {"id": "captain_morgan", "name": "Captain Morgan", "price": 34.0}, {"id": "havana_especial", "name": "Havana Club Especial", "price": 38.0}, {"id": "saint_james_blanc", "name": "Saint James Rhum blanc", "price": 32.0}, {"id": "trois_rivieres", "name": "Trois Rivières", "price": 33.0}, {"id": "havana_3ans", "name": "Havana Club 3 ans", "price": 37.0}], "liqueurs": [{"id": "get_27", "name": "GET 27", "price": 32.0}, {"id": "jagermeister", "name": "Jägermeister", "price": 35.0}], "gin": [{"id": "gibsons_gin", "name": "Gibson's Gin", "price": 34.0}, {"id": "gordons_gin", "name": "Gordon's Gin", "price": 34.0}], "tequila": [{"id": "tequila_sanjose", "name": "Tequila San José", "price": 28.0}], "pastis": [{"id": "ricard", "name": "Ricard", "price": 35.0}, {"id": "pastis_51", "name": "Pastis 51", "price": 35.0}], "vin": [{"id": "xv_catalan_rose", "name": "XV catalan rosé", "price": 19.0}, {"id": "xv_catalan_blanc", "name": "XV catalan blanc", "price": 19.0}, {"id": "xv_catalan_rouge", "name": "XV catalan rouge", "price": 19.0}, {"id": "muscat", "name": "Muscat", "price": 25.0}], "softs": [{"id": "oasis_tropical", "name": "Oasis (tropical)", "price": 3.5}, {"id": "schweppes_tonic", "name": "Schweppes tonic", "price": 3.5}, {"id": "perrier", "name": "Perrier", "price": 2.5}, {"id": "perrier_citron", "name": "Perrier citron", "price": 2.5}, {"id": "crazy_tiger", "name": "Crazy Tiger", "price": 5.0}, {"id": "jus_pomme", "name": "Jus de pommes", "price": 4.5}, {"id": "jus_orange", "name": "Jus d'oranges", "price": 4.5}, {"id": "jus_ananas", "name": "Jus d'ananas", "price": 4.5}], "accessoires": [{"id": "verre_whisky", "name": "Verre à whisky-soda incassable 35 cl", "price": 0.5}]};
+const CAT_LABELS = {snacks:'Apéro & bonbons',vodka:'Vodka',whisky:'Whisky',rhum:'Rhum',liqueurs:'Liqueurs',gin:'Gin',tequila:'Tequila',pastis:'Pastis',vin:'Vin',softs:'Softs',accessoires:'Accessoires'};
+const IMG_BASE_REMOTE = "https://bullyto.github.io/outil/apps/stock/stock/";
+const GITHUB = {owner:'bullyto', repo:'outil', branch:'main', vehiclePath:'apps/stock/stock/_snapshot.json', localPath:'apps/stock/stock/_snapshot_local.json', stockDir:'apps/stock/stock'};
+const KEY_STORE='adn66_stock_publish_key_v1', LEGACY_KEY='adn66_stock_settings_v3';
+let products=[]; Object.entries(PRODUCTS_BY_CAT).forEach(([category,list])=>list.forEach(p=>products.push({...p,category,img:p.id+'.png'})));
+let state={vehicle:Object.fromEntries(products.map(p=>[p.id,0])),local:Object.fromEntries(products.map(p=>[p.id,0])),dirtyVehicle:new Set(),dirtyLocal:new Set(),history:JSON.parse(localStorage.getItem('adn66_stock_history_v2')||'[]'),realtime:true,stream:null};
+function $(s){return document.querySelector(s)} function $all(s){return [...document.querySelectorAll(s)]} function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function imgUrl(id){return IMG_BASE_REMOTE+encodeURIComponent(id)+'.png'} function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),2300)}
+function addHistory(title,detail){state.history.unshift({ts:Date.now(),title,detail});state.history=state.history.slice(0,80);localStorage.setItem('adn66_stock_history_v2',JSON.stringify(state.history));renderHistory()}
+function qty(scope,id){return Number(state[scope][id]||0)} function setQty(scope,id,val,log=true){const old=qty(scope,id);const n=Math.max(0,Math.min(999,Math.round(Number(val)||0)));state[scope][id]=n;if(scope==='vehicle')state.dirtyVehicle.add(id);else state.dirtyLocal.add(id);if(log&&old!==n)addHistory((scope==='vehicle'?'Véhicule':'Local')+' modifié',id+' : '+old+' → '+n);persistLocal();renderAll()}
+function persistLocal(){localStorage.setItem('adn66_stock_work_v2',JSON.stringify({vehicle:state.vehicle,local:state.local}))} function loadLocalWork(){try{const w=JSON.parse(localStorage.getItem('adn66_stock_work_v2')||'{}');if(w.vehicle)state.vehicle={...state.vehicle,...w.vehicle};if(w.local)state.local={...state.local,...w.local}}catch(e){}}
+function stockStatus(q){if(q<=0)return '<span class="pill bad">Rupture</span>';if(q<3)return '<span class="pill warn">Faible</span>';return '<span class="pill ok">OK</span>'} function imgTag(p){return `<img src="${imgUrl(p.id)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='./assets/placeholder.svg'">`}
+function stats(scope){const vals=products.map(p=>qty(scope,p.id));const total=vals.reduce((a,b)=>a+b,0),low=vals.filter(v=>v>0&&v<3).length,zero=vals.filter(v=>v<=0).length;return `<div class="stat"><b>${total}</b><span>Total</span></div><div class="stat"><b>${low}</b><span>Faible</span></div><div class="stat"><b>${zero}</b><span>Rupture</span></div>`}
+function renderProductGrid(elId,scope,term=''){const t=term.trim().toLowerCase();const list=products.filter(p=>!t||(p.name+' '+p.category).toLowerCase().includes(t));$('#'+elId).innerHTML=list.map(p=>`<article class="prod"><div class="prodImg">${imgTag(p)}</div><h3>${esc(p.name)}</h3><div class="meta"><span>${CAT_LABELS[p.category]||p.category}</span><span class="price">${p.price} €</span></div><div class="meta"><span>${stockStatus(qty(scope,p.id))}</span><span>${scope==='vehicle'?'Véhicule':'Local'}</span></div><div class="qtyLine"><button class="qtyBtn" data-scope="${scope}" data-id="${p.id}" data-delta="-1">−</button><div class="qtyVal">${qty(scope,p.id)}</div><button class="qtyBtn" data-scope="${scope}" data-id="${p.id}" data-delta="1">+</button></div></article>`).join('')||'<div class="empty">Aucun produit</div>'}
+function renderOverview(){const term=$('#searchOverview')?.value?.trim().toLowerCase()||'';const list=products.filter(p=>!term||(p.name+' '+p.category).toLowerCase().includes(term));const totalAll=products.reduce((s,p)=>s+qty('vehicle',p.id)+qty('local',p.id),0);$('#statsOverview').innerHTML=`<div class="stat"><b>${totalAll}</b><span>Total général</span></div><div class="stat"><b>${products.reduce((s,p)=>s+qty('vehicle',p.id),0)}</b><span>Véhicule</span></div><div class="stat"><b>${products.reduce((s,p)=>s+qty('local',p.id),0)}</b><span>Local</span></div>`;$('#overviewList').innerHTML=list.map(p=>{const v=qty('vehicle',p.id),l=qty('local',p.id),tot=v+l;return `<div class="over"><div>${imgTag(p)}</div><div><h3>${esc(p.name)}</h3><p>${CAT_LABELS[p.category]} • Véhicule ${v} • Local ${l}</p></div><div class="total"><b>${tot}</b><span>total</span>${stockStatus(tot)}</div></div>`}).join('')}
+function renderCameraRows(){const zones=[['Vodka',['poliakov','absolut','ciroc_classic','ciroc_redberry','ciroc_pomme']],['Whisky',['william_peel','label_5','ballantines','jack_old7','jack_honey']],['Rhum',['old_nick_darkwood','captain_morgan','havana_especial','saint_james_blanc','trois_rivieres','havana_3ans']],['Vin / Pastis',['xv_catalan_rose','xv_catalan_blanc','xv_catalan_rouge','muscat','ricard','pastis_51']],['Softs',['oasis_tropical','schweppes_tonic','perrier','perrier_citron','crazy_tiger','jus_pomme','jus_orange','jus_ananas']],['Autres',['get_27','jagermeister','gibsons_gin','gordons_gin','tequila_sanjose','verre_whisky']]];$('#cameraRows').innerHTML=zones.map(([name,ids])=>{const total=ids.reduce((s,id)=>s+qty('local',id),0);return `<div class="zoneRow"><div><b>${name}</b><span>Stock local actuel : ${total}</span></div><input type="number" min="0" value="${total}" data-zone="${esc(name)}" data-zone-ids="${ids.join(',')}"></div>`}).join('')}
+function renderHistory(){$('#historyList').innerHTML=state.history.length?state.history.map(h=>`<div class="hist"><div><b>${esc(h.title)}</b><p>${esc(h.detail||'')}</p></div><time>${new Date(h.ts).toLocaleString('fr-FR')}</time></div>`).join(''):'<div class="hist"><div><b>Historique vide</b><p>Aucune action enregistrée.</p></div></div>'}
+function renderAll(){$('#statsVehicle').innerHTML=stats('vehicle');$('#statsLocal').innerHTML=stats('local');renderProductGrid('vehicleProducts','vehicle',$('#searchVehicule')?.value||'');renderProductGrid('localProducts','local',$('#searchLocal')?.value||'');renderOverview();renderCameraRows();renderHistory();updateSyncLabel()}
+function updateSyncLabel(){const n=state.dirtyVehicle.size+state.dirtyLocal.size;$('#syncLabel').textContent=n?`${n} modif.`:'GitHub'}
+function snapshot(scope){return {version:1,scope:scope==='vehicle'?'vehicule':'local',updatedAt:new Date().toISOString(),items:products.map(p=>({id:p.id,qty:qty(scope,p.id)}))}}
+async function loadSnapshot(path,scope){try{const res=await fetch('./'+path+'?t='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('missing');const j=await res.json();if(Array.isArray(j.items))j.items.forEach(it=>{if(it&&it.id!==undefined)state[scope][String(it.id)]=Math.max(0,Number(it.qty)||0)})}catch(e){try{const url='https://bullyto.github.io/outil/apps/stock/'+path+'?t='+Date.now();const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('remote missing');const j=await r.json();if(Array.isArray(j.items))j.items.forEach(it=>{if(it&&it.id!==undefined)state[scope][String(it.id)]=Math.max(0,Number(it.qty)||0)})}catch(_e){}}}
+async function reloadAll(){await loadSnapshot('stock/_snapshot.json','vehicle');await loadSnapshot('stock/_snapshot_local.json','local');state.dirtyVehicle.clear();state.dirtyLocal.clear();persistLocal();addHistory('Rechargement stock','Snapshots véhicule et local rechargés.');renderAll();toast('Stock rechargé ✅')}
+function getPublishKey(){try{const k=localStorage.getItem(KEY_STORE);if(k)return k;const legacy=JSON.parse(localStorage.getItem(LEGACY_KEY)||'{}');return legacy.pin||''}catch(e){return ''}} function setPublishKey(k){localStorage.setItem(KEY_STORE,String(k||'').trim())}
+function openPublishSheet(){$('#publishKey').value=getPublishKey();$('#publishSheet').classList.add('show')} function closePublishSheet(){$('#publishSheet').classList.remove('show')}
+async function githubGetSha(path,key){const url=`https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/${path}?ref=${GITHUB.branch}`;const r=await fetch(url,{headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+key}});if(r.status===404)return null;if(!r.ok)throw new Error('GitHub lecture '+r.status);const j=await r.json();return j.sha||null}
+function toBase64Unicode(obj){const str=JSON.stringify(obj,null,2);return btoa(unescape(encodeURIComponent(str)))} async function githubPut(path,obj,key,msg){const sha=await githubGetSha(path,key);const body={message:msg,content:toBase64Unicode(obj),branch:GITHUB.branch};if(sha)body.sha=sha;const r=await fetch(`https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/${path}`,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});if(!r.ok){const tx=await r.text();throw new Error('GitHub écriture '+r.status+' '+tx.slice(0,120))}return r.json()}
+async function publish(scope){let key=getPublishKey();if(!key){openPublishSheet();toast('Enregistrez la clé de publication.');return}try{if(scope==='vehicle'||scope==='all'){const snap=snapshot('vehicle');await githubPut(GITHUB.vehiclePath,snap,key,'ADN66 stock véhicule');for(const p of products){await githubPut(`${GITHUB.stockDir}/${p.id}.json`,{id:p.id,qty:qty('vehicle',p.id),updatedAt:snap.updatedAt},key,`ADN66 stock ${p.id}`)}state.dirtyVehicle.clear()}if(scope==='local'||scope==='all'){await githubPut(GITHUB.localPath,snapshot('local'),key,'ADN66 stock local');state.dirtyLocal.clear()}persistLocal();addHistory('Publication GitHub',scope==='all'?'Véhicule + local publiés.':(scope==='vehicle'?'Véhicule publié.':'Local publié.'));renderAll();toast('Publié sur GitHub ✅')}catch(e){console.error(e);toast('Erreur publication : '+(e.message||e))}}
+document.addEventListener('click',e=>{const tab=e.target.closest('.tab');if(tab){$all('.tab').forEach(b=>b.classList.remove('active'));$all('.panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');$('#'+tab.dataset.tab).classList.add('active')}const q=e.target.closest('.qtyBtn');if(q){setQty(q.dataset.scope,q.dataset.id,qty(q.dataset.scope,q.dataset.id)+Number(q.dataset.delta||0))}const pub=e.target.closest('[data-publish]');if(pub)publish(pub.dataset.publish)})
+$('#searchVehicule').addEventListener('input',()=>renderProductGrid('vehicleProducts','vehicle',$('#searchVehicule').value));$('#searchLocal').addEventListener('input',()=>renderProductGrid('localProducts','local',$('#searchLocal').value));$('#searchOverview').addEventListener('input',renderOverview);$('#reloadAll').addEventListener('click',reloadAll);$('#reloadAll2').addEventListener('click',reloadAll);$('#openPublishSettings').addEventListener('click',openPublishSheet);$('#closePublish').addEventListener('click',closePublishSheet);$('#savePublishKey').addEventListener('click',()=>{setPublishKey($('#publishKey').value);closePublishSheet();toast('Clé enregistrée ✅')});$('#clearPublishKey').addEventListener('click',()=>{localStorage.removeItem(KEY_STORE);$('#publishKey').value='';toast('Clé effacée.')});$('#clearHistory').addEventListener('click',()=>{if(confirm('Vider l’historique ?')){state.history=[];localStorage.setItem('adn66_stock_history_v2','[]');renderHistory()}})
+let cameraStream=null;$('#startCamera').addEventListener('click',async()=>{try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});$('#cameraVideo').srcObject=cameraStream;$('#cameraVideo').style.display='block';$('#cameraFallback').style.display='none';addHistory('Caméra lancée','Flux navigateur actif.')}catch(e){toast('Caméra indisponible : mode image bêta.');addHistory('Caméra indisponible','Image bêta affichée.')}});$('#stopCamera').addEventListener('click',()=>{if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;$('#cameraVideo').style.display='none';$('#cameraFallback').style.display='block';addHistory('Caméra arrêtée','Retour image bêta.')});$('#toggleRealtime').addEventListener('click',()=>{state.realtime=!state.realtime;$('#toggleRealtime').textContent='Temps réel '+(state.realtime?'ON':'OFF');$('#toggleRealtime').className='btn '+(state.realtime?'green':'');addHistory('Temps réel '+(state.realtime?'activé':'désactivé'),'Caméra')});$('#simulateScan').addEventListener('click',()=>{document.querySelectorAll('[data-zone-ids]').forEach(inp=>{const ids=inp.dataset.zoneIds.split(',');const detected=Math.max(0,Number(inp.value||0)+Math.floor(Math.random()*3)-1);inp.value=detected;applyZone(ids,detected)});addHistory('Comptage caméra simulé','Stock local mis à jour.');renderAll()});document.addEventListener('input',e=>{const inp=e.target.closest('[data-zone-ids]');if(inp&&state.realtime){applyZone(inp.dataset.zoneIds.split(','),Number(inp.value||0));addHistory('Comptage caméra','Zone '+inp.dataset.zone+' mise à jour.');renderAll()}});function applyZone(ids,detected){detected=Math.max(0,Math.round(Number(detected)||0));const current=ids.reduce((s,id)=>s+qty('local',id),0);if(!ids.length)return;let remain=detected;ids.forEach((id,i)=>{let val=i===ids.length-1?remain:Math.round(detected*((qty('local',id)||1)/(current||ids.length)));remain-=val;state.local[id]=Math.max(0,val);state.dirtyLocal.add(id)});persistLocal()}
+loadLocalWork();reloadAll().finally(()=>renderAll());if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 </body>
 </html>
