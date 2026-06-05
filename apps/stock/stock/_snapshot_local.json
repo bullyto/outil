@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "scope": "local",
+  "updatedAt": "2026-06-05T03:19:03.030Z",
+  "items": [
+    {
+      "id": "cacahuette",
+      "qty": 2
+    },
+    {
+      "id": "bretzel",
+      "qty": 2
+    },
+    {
+      "id": "curly",
+      "qty": 0
+    },
+    {
+      "id": "chips",
+      "qty": 0
+    },
+    {
+      "id": "monster_munch",
+      "qty": 0
+    },
+    {
+      "id": "dragibus",
+      "qty": 0
+    },
+    {
+      "id": "fraise_tagada",
+      "qty": 0
+    },
+    {
+      "id": "poliakov",
+      "qty": 0
+    },
+    {
+      "id": "absolut",
+      "qty": 0
+    },
+    {
+      "id": "ciroc_classic",
+      "qty": 0
+    },
+    {
+      "id": "ciroc_redberry",
+      "qty": 0
+    },
+    {
+      "id": "ciroc_pomme",
+      "qty": 0
+    },
+    {
+      "id": "william_peel",
+      "qty": 0
+    },
+    {
+      "id": "label_5",
+      "qty": 0
+    },
+    {
+      "id": "ballantines",
+      "qty": 0
+    },
+    {
+      "id": "jack_old7",
+      "qty": 0
+    },
+    {
+      "id": "jack_honey",
+      "qty": 0
+    },
+    {
+      "id": "old_nick_darkwood",
+      "qty": 0
+    },
+    {
+      "id": "captain_morgan",
+      "qty": 0
+    },
+    {
+      "id": "havana_especial",
+      "qty": 0
+    },
+    {
+      "id": "saint_james_blanc",
+      "qty": 0
+    },
+    {
+      "id": "trois_rivieres",
+      "qty": 0
+    },
+    {
+      "id": "havana_3ans",
+      "qty": 0
+    },
+    {
+      "id": "get_27",
+      "qty": 0
+    },
+    {
+      "id": "jagermeister",
+      "qty": 0
+    },
+    {
+      "id": "gibsons_gin",
+      "qty": 0
+    },
+    {
+      "id": "gordons_gin",
+      "qty": 0
+    },
+    {
+      "id": "tequila_sanjose",
+      "qty": 0
+    },
+    {
+      "id": "ricard",
+      "qty": 0
+    },
+    {
+      "id": "pastis_51",
+      "qty": 0
+    },
+    {
+      "id": "xv_catalan_rose",
+      "qty": 0
+    },
+    {
+      "id": "xv_catalan_blanc",
+      "qty": 0
+    },
+    {
+      "id": "xv_catalan_rouge",
+      "qty": 0
+    },
+    {
+      "id": "muscat",
+      "qty": 0
+    },
+    {
+      "id": "oasis_tropical",
+      "qty": 0
+    },
+    {
+      "id": "schweppes_tonic",
+      "qty": 0
+    },
+    {
+      "id": "perrier",
+      "qty": 0
+    },
+    {
+      "id": "perrier_citron",
+      "qty": 0
+    },
+    {
+      "id": "crazy_tiger",
+      "qty": 0
+    },
+    {
+      "id": "jus_pomme",
+      "qty": 0
+    },
+    {
+      "id": "jus_orange",
+      "qty": 0
+    },
+    {
+      "id": "jus_ananas",
+      "qty": 0
+    },
+    {
+      "id": "verre_whisky",
+      "qty": 0
+    }
+  ]
+}
