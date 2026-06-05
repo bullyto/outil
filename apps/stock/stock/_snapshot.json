@@ -1,59 +1,59 @@
 {
   "version": 1,
   "scope": "vehicule",
-  "updatedAt": "2026-06-05T03:21:12.578Z",
+  "updatedAt": "2026-06-05T03:27:13.331Z",
   "items": [
     {
       "id": "cacahuette",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "bretzel",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "curly",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "chips",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "monster_munch",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "dragibus",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "fraise_tagada",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "poliakov",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "absolut",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "ciroc_classic",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "ciroc_redberry",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "ciroc_pomme",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "william_peel",
-      "qty": 11
+      "qty": 1
     },
     {
       "id": "label_5",
