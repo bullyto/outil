@@ -1,16 +1,42 @@
 {
-  "updated_at": "2026-06-03T02:25:42.377Z",
+  "version": 1,
+  "scope": "vehicule",
+  "updatedAt": "2026-06-05T02:19:36.031Z",
   "items": [
     {
+      "id": "cacahuette",
+      "qty": 1
+    },
+    {
+      "id": "bretzel",
+      "qty": 1
+    },
+    {
+      "id": "curly",
+      "qty": 0
+    },
+    {
+      "id": "chips",
+      "qty": 0
+    },
+    {
+      "id": "monster_munch",
+      "qty": 0
+    },
+    {
+      "id": "dragibus",
+      "qty": 0
+    },
+    {
+      "id": "fraise_tagada",
+      "qty": 0
+    },
+    {
+      "id": "poliakov",
+      "qty": 1
+    },
+    {
       "id": "absolut",
-      "qty": 1
-    },
-    {
-      "id": "ballantines",
-      "qty": 1
-    },
-    {
-      "id": "captain_morgan",
       "qty": 1
     },
     {
@@ -18,15 +44,63 @@
       "qty": 0
     },
     {
-      "id": "ciroc_pomme",
-      "qty": 0
-    },
-    {
       "id": "ciroc_redberry",
       "qty": 0
     },
     {
+      "id": "ciroc_pomme",
+      "qty": 0
+    },
+    {
+      "id": "william_peel",
+      "qty": 11
+    },
+    {
+      "id": "label_5",
+      "qty": 1
+    },
+    {
+      "id": "ballantines",
+      "qty": 1
+    },
+    {
+      "id": "jack_old7",
+      "qty": 1
+    },
+    {
+      "id": "jack_honey",
+      "qty": 0
+    },
+    {
+      "id": "old_nick_darkwood",
+      "qty": 0
+    },
+    {
+      "id": "captain_morgan",
+      "qty": 1
+    },
+    {
+      "id": "havana_especial",
+      "qty": 1
+    },
+    {
+      "id": "saint_james_blanc",
+      "qty": 0
+    },
+    {
+      "id": "trois_rivieres",
+      "qty": 0
+    },
+    {
+      "id": "havana_3ans",
+      "qty": 1
+    },
+    {
       "id": "get_27",
+      "qty": 1
+    },
+    {
+      "id": "jagermeister",
       "qty": 1
     },
     {
@@ -38,47 +112,7 @@
       "qty": 1
     },
     {
-      "id": "havana_3ans",
-      "qty": 1
-    },
-    {
-      "id": "havana_especial",
-      "qty": 1
-    },
-    {
-      "id": "jack_honey",
-      "qty": 0
-    },
-    {
-      "id": "jack_old7",
-      "qty": 1
-    },
-    {
-      "id": "jagermeister",
-      "qty": 1
-    },
-    {
-      "id": "label_5",
-      "qty": 1
-    },
-    {
-      "id": "muscat",
-      "qty": 1
-    },
-    {
-      "id": "old_nick_blanc",
-      "qty": 0
-    },
-    {
-      "id": "old_nick_darkwood",
-      "qty": 0
-    },
-    {
-      "id": "pastis_51",
-      "qty": 1
-    },
-    {
-      "id": "poliakov",
+      "id": "tequila_sanjose",
       "qty": 1
     },
     {
@@ -86,23 +120,7 @@
       "qty": 1
     },
     {
-      "id": "saint_james_blanc",
-      "qty": 0
-    },
-    {
-      "id": "tequila_sanjose",
-      "qty": 1
-    },
-    {
-      "id": "trois_rivieres",
-      "qty": 0
-    },
-    {
-      "id": "william_peel",
-      "qty": 11
-    },
-    {
-      "id": "xv_catalan_blanc",
+      "id": "pastis_51",
       "qty": 1
     },
     {
@@ -110,8 +128,52 @@
       "qty": 1
     },
     {
+      "id": "xv_catalan_blanc",
+      "qty": 1
+    },
+    {
       "id": "xv_catalan_rouge",
       "qty": 1
+    },
+    {
+      "id": "muscat",
+      "qty": 1
+    },
+    {
+      "id": "oasis_tropical",
+      "qty": 0
+    },
+    {
+      "id": "schweppes_tonic",
+      "qty": 0
+    },
+    {
+      "id": "perrier",
+      "qty": 0
+    },
+    {
+      "id": "perrier_citron",
+      "qty": 0
+    },
+    {
+      "id": "crazy_tiger",
+      "qty": 0
+    },
+    {
+      "id": "jus_pomme",
+      "qty": 0
+    },
+    {
+      "id": "jus_orange",
+      "qty": 0
+    },
+    {
+      "id": "jus_ananas",
+      "qty": 0
+    },
+    {
+      "id": "verre_whisky",
+      "qty": 0
     }
   ]
 }
