@@ -1,23 +1,23 @@
 {
   "version": 1,
   "scope": "vehicule",
-  "updatedAt": "2026-06-05T03:20:44.962Z",
+  "updatedAt": "2026-06-05T03:21:12.578Z",
   "items": [
     {
       "id": "cacahuette",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "bretzel",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "curly",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "chips",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "monster_munch",
@@ -33,11 +33,11 @@
     },
     {
       "id": "poliakov",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "absolut",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "ciroc_classic",
