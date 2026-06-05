@@ -1,15 +1,15 @@
 {
   "version": 1,
   "scope": "vehicule",
-  "updatedAt": "2026-06-05T03:18:53.849Z",
+  "updatedAt": "2026-06-05T03:18:58.369Z",
   "items": [
     {
       "id": "cacahuette",
-      "qty": 1
+      "qty": 3
     },
     {
       "id": "bretzel",
-      "qty": 1
+      "qty": 4
     },
     {
       "id": "curly",
