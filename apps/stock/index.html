@@ -128,7 +128,11 @@ async function workerPublish(scope){
   try{ j = JSON.parse(txt); }catch(e){}
 
   if(!r.ok || !j || j.ok !== true){
-    throw new Error((j && (j.error || j.message)) || ('HTTP '+r.status));
+    throw new Error(
+    ((j && j.error) ? String(j.error) : '') +
+    ((j && j.message) ? ' — ' + String(j.message) : '') ||
+    ('HTTP ' + r.status)
+  );
   }
   return j;
 }
@@ -149,7 +153,7 @@ async function publish(scope){
     console.error(e);
     const msg = String(e.message || e);
     if(msg.includes('PIN_INVALID') || msg.includes('401')) openPublishSheet();
-    toast('Erreur publication : '+msg);
+    toast('Erreur publication : ' + msg);
   }
 }
 document.addEventListener('click',e=>{const tab=e.target.closest('.tab');if(tab){$all('.tab').forEach(b=>b.classList.remove('active'));$all('.panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');$('#'+tab.dataset.tab).classList.add('active')}const q=e.target.closest('.qtyBtn');if(q){setQty(q.dataset.scope,q.dataset.id,qty(q.dataset.scope,q.dataset.id)+Number(q.dataset.delta||0))}const pub=e.target.closest('[data-publish]');if(pub)publish(pub.dataset.publish)})
