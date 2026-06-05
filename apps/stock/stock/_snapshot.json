@@ -1,23 +1,23 @@
 {
   "version": 1,
   "scope": "vehicule",
-  "updatedAt": "2026-06-05T03:45:27.359Z",
+  "updatedAt": "2026-06-05T03:45:40.325Z",
   "items": [
     {
       "id": "cacahuette",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "bretzel",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "curly",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "chips",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "monster_munch",
