@@ -29,6 +29,15 @@ main{max-width:1120px;margin:0 auto;padding:14px}.panel{display:none}.panel.acti
 .histList{display:grid;gap:8px}.hist{background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:10px;display:flex;justify-content:space-between;gap:10px}.hist b{font-size:13px}.hist p{margin:4px 0 0;color:var(--soft);font-size:11px;font-weight:800}.hist time{font-size:10.5px;color:var(--soft);font-weight:900;white-space:nowrap}
 .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);background:#06101f;border:1px solid rgba(93,183,238,.35);border-radius:15px;color:#fff;padding:11px 13px;font-size:13px;font-weight:950;z-index:999;opacity:0;pointer-events:none;transition:.2s;box-shadow:0 18px 50px rgba(0,0,0,.35);width:min(520px,90vw);text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .sheet{position:fixed;inset:0;z-index:500;display:none;place-items:center;padding:18px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px)}.sheet.show{display:grid}.modal{width:min(520px,94vw);background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:14px}.modal h3{margin:0 0 8px}.modal p{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.35}.modal input{width:100%;background:var(--field);border:1px solid var(--border);border-radius:14px;color:#fff;padding:12px;font-weight:850;margin:8px 0 12px}.modalActions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}.smallNote{color:var(--soft);font-size:11px;font-weight:800;line-height:1.35;margin-top:8px}
+
+.publishOverlay{position:fixed;inset:0;z-index:900;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,6,12,.72);backdrop-filter:blur(8px)}
+.publishOverlay.show{display:flex}
+.publishBox{width:min(430px,92vw);background:linear-gradient(180deg,rgba(17,24,39,.98),rgba(23,32,51,.98));border:1px solid #283447;border-radius:24px;padding:18px;box-shadow:0 28px 70px rgba(0,0,0,.52);text-align:center}
+.spinner{width:52px;height:52px;border-radius:50%;border:5px solid rgba(93,183,238,.20);border-top-color:#5db7ee;margin:0 auto 14px;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.publishBox h3{margin:0 0 8px;font-size:20px;font-weight:950;color:#f8fafc}
+.publishBox p{margin:0;color:#cbd5e1;font-size:14px;line-height:1.35;font-weight:800}
+
 </style>
 </head>
 <body>
@@ -44,13 +53,22 @@ main{max-width:1120px;margin:0 auto;padding:14px}.panel{display:none}.panel.acti
 <section id="history" class="panel"><div class="card"><div class="cardHd"><div><h2>Historique</h2><p>Actions locales, publications et comptages caméra.</p></div><button class="btn danger" id="clearHistory">Vider</button></div><div class="cardBd"><div class="histList" id="historyList"></div></div></div></section>
 </main>
 <div class="toast" id="toast"></div>
-<div class="sheet" id="publishSheet"><div class="modal"><h3>Publication Stock</h3><p>Le module publie via le Worker Cloudflare <b>adn66-stock-worker</b>. Le token GitHub reste en secret côté Cloudflare.</p><input id="publishKey" type="password" placeholder="Mot de passe"><div class="modalActions"><button class="btn" id="closePublish">Fermer</button><button class="btn danger" id="clearPublishKey">Effacer</button><button class="btn primary" id="savePublishKey">Enregistrer</button></div><div class="smallNote">Fichiers utilisés : <b>apps/stock/stock/_snapshot.json</b> pour le véhicule et <b>apps/stock/stock/_snapshot_local.json</b> pour le local.</div></div></div>
+
+<div class="publishOverlay" id="publishOverlay" aria-hidden="true">
+  <div class="publishBox" role="status" aria-live="polite">
+    <div class="spinner"></div>
+    <h3 id="publishOverlayTitle">Publication en cours</h3>
+    <p id="publishOverlayText">Veuillez patienter, le stock est envoyé vers Cloudflare puis GitHub.</p>
+  </div>
+</div>
+
+<div class="sheet" id="publishSheet"><div class="modal"><h3>Publication GitHub</h3><p>Sans Cloudflare, la publication écrit directement dans GitHub. Le code est conservé localement sur cet appareil.</p><input id="publishKey" type="password" placeholder="Clé de publication GitHub"><div class="modalActions"><button class="btn" id="closePublish">Fermer</button><button class="btn danger" id="clearPublishKey">Effacer</button><button class="btn primary" id="savePublishKey">Enregistrer</button></div><div class="smallNote">Fichiers utilisés : <b>apps/stock/stock/_snapshot.json</b> pour le véhicule et <b>apps/stock/stock/_snapshot_local.json</b> pour le local.</div></div></div>
 <script>
 const PRODUCTS_BY_CAT = {"snacks": [{"id": "cacahuette", "name": "Cacahuète", "price": 2.5}, {"id": "bretzel", "name": "Bretzel", "price": 2.5}, {"id": "curly", "name": "Curly", "price": 2.5}, {"id": "chips", "name": "Chips", "price": 2.5}, {"id": "monster_munch", "name": "Monster Munch", "price": 2.5}, {"id": "dragibus", "name": "Dragibus", "price": 2.5}, {"id": "fraise_tagada", "name": "Fraise Tagada", "price": 2.5}], "vodka": [{"id": "poliakov", "name": "Poliakov", "price": 29.0}, {"id": "absolut", "name": "Absolut Vodka", "price": 34.0}, {"id": "ciroc_classic", "name": "Cîroc Classic", "price": 49.0}, {"id": "ciroc_redberry", "name": "Cîroc Red Berry", "price": 49.0}, {"id": "ciroc_pomme", "name": "Cîroc Pomme", "price": 49.0}], "whisky": [{"id": "william_peel", "name": "William Peel", "price": 29.0}, {"id": "label_5", "name": "Label 5", "price": 32.0}, {"id": "ballantines", "name": "Ballantine's", "price": 36.0}, {"id": "jack_old7", "name": "Jack Daniel's", "price": 40.0}, {"id": "jack_honey", "name": "Jack Daniel's Honey", "price": 42.0}], "rhum": [{"id": "old_nick_darkwood", "name": "Old Nick Dark Wood", "price": 29.0}, {"id": "captain_morgan", "name": "Captain Morgan", "price": 34.0}, {"id": "havana_especial", "name": "Havana Club Especial", "price": 38.0}, {"id": "saint_james_blanc", "name": "Saint James Rhum blanc", "price": 32.0}, {"id": "trois_rivieres", "name": "Trois Rivières", "price": 33.0}, {"id": "havana_3ans", "name": "Havana Club 3 ans", "price": 37.0}], "liqueurs": [{"id": "get_27", "name": "GET 27", "price": 32.0}, {"id": "jagermeister", "name": "Jägermeister", "price": 35.0}], "gin": [{"id": "gibsons_gin", "name": "Gibson's Gin", "price": 34.0}, {"id": "gordons_gin", "name": "Gordon's Gin", "price": 34.0}], "tequila": [{"id": "tequila_sanjose", "name": "Tequila San José", "price": 28.0}], "pastis": [{"id": "ricard", "name": "Ricard", "price": 35.0}, {"id": "pastis_51", "name": "Pastis 51", "price": 35.0}], "vin": [{"id": "xv_catalan_rose", "name": "XV catalan rosé", "price": 19.0}, {"id": "xv_catalan_blanc", "name": "XV catalan blanc", "price": 19.0}, {"id": "xv_catalan_rouge", "name": "XV catalan rouge", "price": 19.0}, {"id": "muscat", "name": "Muscat", "price": 25.0}], "softs": [{"id": "oasis_tropical", "name": "Oasis (tropical)", "price": 3.5}, {"id": "schweppes_tonic", "name": "Schweppes tonic", "price": 3.5}, {"id": "perrier", "name": "Perrier", "price": 2.5}, {"id": "perrier_citron", "name": "Perrier citron", "price": 2.5}, {"id": "crazy_tiger", "name": "Crazy Tiger", "price": 5.0}, {"id": "jus_pomme", "name": "Jus de pommes", "price": 4.5}, {"id": "jus_orange", "name": "Jus d'oranges", "price": 4.5}, {"id": "jus_ananas", "name": "Jus d'ananas", "price": 4.5}], "accessoires": [{"id": "verre_whisky", "name": "Verre à whisky-soda incassable 35 cl", "price": 0.5}]};
 const CAT_LABELS = {snacks:'Apéro & bonbons',vodka:'Vodka',whisky:'Whisky',rhum:'Rhum',liqueurs:'Liqueurs',gin:'Gin',tequila:'Tequila',pastis:'Pastis',vin:'Vin',softs:'Softs',accessoires:'Accessoires'};
 const IMG_BASE_REMOTE = "https://bullyto.github.io/outil/apps/stock/stock/";
-const STOCK_WORKER_URL = "https://adn66-stock-worker.apero-nuit-du-66.workers.dev";
-const KEY_STORE='adn66_stock_admin_pin_v1', LEGACY_KEY='adn66_stock_settings_v3';
+const GITHUB = {owner:'bullyto', repo:'outil', branch:'main', vehiclePath:'apps/stock/stock/_snapshot.json', localPath:'apps/stock/stock/_snapshot_local.json', stockDir:'apps/stock/stock'};
+const KEY_STORE='adn66_stock_publish_key_v1', LEGACY_KEY='adn66_stock_settings_v3';
 let products=[]; Object.entries(PRODUCTS_BY_CAT).forEach(([category,list])=>list.forEach(p=>products.push({...p,category,img:p.id+'.png'})));
 let state={vehicle:Object.fromEntries(products.map(p=>[p.id,0])),local:Object.fromEntries(products.map(p=>[p.id,0])),dirtyVehicle:new Set(),dirtyLocal:new Set(),history:JSON.parse(localStorage.getItem('adn66_stock_history_v2')||'[]'),realtime:true,stream:null};
 function $(s){return document.querySelector(s)} function $all(s){return [...document.querySelectorAll(s)]} function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -68,94 +86,26 @@ function renderAll(){$('#statsVehicle').innerHTML=stats('vehicle');$('#statsLoca
 function updateSyncLabel(){const n=state.dirtyVehicle.size+state.dirtyLocal.size;$('#syncLabel').textContent=n?`${n} modif.`:'GitHub'}
 function snapshot(scope){return {version:1,scope:scope==='vehicle'?'vehicule':'local',updatedAt:new Date().toISOString(),items:products.map(p=>({id:p.id,qty:qty(scope,p.id)}))}}
 async function loadSnapshot(path,scope){try{const res=await fetch('./'+path+'?t='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('missing');const j=await res.json();if(Array.isArray(j.items))j.items.forEach(it=>{if(it&&it.id!==undefined)state[scope][String(it.id)]=Math.max(0,Number(it.qty)||0)})}catch(e){try{const url='https://bullyto.github.io/outil/apps/stock/'+path+'?t='+Date.now();const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('remote missing');const j=await r.json();if(Array.isArray(j.items))j.items.forEach(it=>{if(it&&it.id!==undefined)state[scope][String(it.id)]=Math.max(0,Number(it.qty)||0)})}catch(_e){}}}
-async function reloadAll(){
-  try{
-    const data = await workerLoad();
-    if(data.vehicle && Array.isArray(data.vehicle.items)){
-      data.vehicle.items.forEach(it=>{ if(it&&it.id!==undefined) state.vehicle[String(it.id)] = Math.max(0, Number(it.qty)||0); });
-    }
-    if(data.local && Array.isArray(data.local.items)){
-      data.local.items.forEach(it=>{ if(it&&it.id!==undefined) state.local[String(it.id)] = Math.max(0, Number(it.qty)||0); });
-    }
-    state.dirtyVehicle.clear();
-    state.dirtyLocal.clear();
-    persistLocal();
-    addHistory('Rechargement Cloudflare','Stock véhicule et local rechargés via Worker.');
-    renderAll();
-    toast('Stock rechargé via Worker ✅');
-  }catch(e){
-    console.warn('Worker load failed, fallback snapshots', e);
-    await loadSnapshot('stock/_snapshot.json','vehicle');
-    await loadSnapshot('stock/_snapshot_local.json','local');
-    state.dirtyVehicle.clear();
-    state.dirtyLocal.clear();
-    persistLocal();
-    addHistory('Rechargement stock','Fallback snapshots véhicule et local.');
-    renderAll();
-    toast('Stock rechargé ✅');
-  }
-}
-function getPublishKey(){try{const k=localStorage.getItem(KEY_STORE);if(k)return k;const legacy=JSON.parse(localStorage.getItem(LEGACY_KEY)||'{}');return legacy.pin||''}catch(e){return ''}}
-function setPublishKey(k){localStorage.setItem(KEY_STORE,String(k||'').trim())}
-function openPublishSheet(){$('#publishKey').value=getPublishKey();$('#publishSheet').classList.add('show')}
-function closePublishSheet(){$('#publishSheet').classList.remove('show')}
+async function reloadAll(){await loadSnapshot('stock/_snapshot.json','vehicle');await loadSnapshot('stock/_snapshot_local.json','local');state.dirtyVehicle.clear();state.dirtyLocal.clear();persistLocal();addHistory('Rechargement stock','Snapshots véhicule et local rechargés.');renderAll();toast('Stock rechargé ✅')}
+function getPublishKey(){try{const k=localStorage.getItem(KEY_STORE);if(k)return k;const legacy=JSON.parse(localStorage.getItem(LEGACY_KEY)||'{}');return legacy.pin||''}catch(e){return ''}} function setPublishKey(k){localStorage.setItem(KEY_STORE,String(k||'').trim())}
+function openPublishSheet(){$('#publishKey').value=getPublishKey();$('#publishSheet').classList.add('show')} function closePublishSheet(){$('#publishSheet').classList.remove('show')}
+async function githubGetSha(path,key){const url=`https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/${path}?ref=${GITHUB.branch}`;const r=await fetch(url,{headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+key}});if(r.status===404)return null;if(!r.ok)throw new Error('GitHub lecture '+r.status);const j=await r.json();return j.sha||null}
+function toBase64Unicode(obj){const str=JSON.stringify(obj,null,2);return btoa(unescape(encodeURIComponent(str)))} async function githubPut(path,obj,key,msg){const sha=await githubGetSha(path,key);const body={message:msg,content:toBase64Unicode(obj),branch:GITHUB.branch};if(sha)body.sha=sha;const r=await fetch(`https://api.github.com/repos/${GITHUB.owner}/${GITHUB.repo}/contents/${path}`,{method:'PUT',headers:{'Accept':'application/vnd.github+json','Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify(body)});if(!r.ok){const tx=await r.text();throw new Error('GitHub écriture '+r.status+' '+tx.slice(0,120))}return r.json()}
 
-async function workerLoad(){
-  const r = await fetch(STOCK_WORKER_URL + '/api/stock/load?t=' + Date.now(), {cache:'no-store'});
-  const txt = await r.text();
-  let j = null;
-  try{ j = JSON.parse(txt); }catch(e){}
-  if(!r.ok || !j || j.ok !== true) throw new Error((j&&j.error)||('HTTP '+r.status));
-  return j;
+function showPublishLoading(title='Publication en cours', text='Veuillez patienter, le stock est envoyé vers Cloudflare puis GitHub.'){
+  const box = document.getElementById('publishOverlay');
+  const t = document.getElementById('publishOverlayTitle');
+  const p = document.getElementById('publishOverlayText');
+  if(t) t.textContent = title;
+  if(p) p.textContent = text;
+  if(box){ box.classList.add('show'); box.setAttribute('aria-hidden','false'); }
+}
+function hidePublishLoading(){
+  const box = document.getElementById('publishOverlay');
+  if(box){ box.classList.remove('show'); box.setAttribute('aria-hidden','true'); }
 }
 
-async function workerPublish(scope){
-  const pin = getPublishKey();
-  if(!pin){openPublishSheet();toast('Mot de passe obligatoire.');return null;}
-
-  const content = {};
-  if(scope==='vehicle' || scope==='all') content.vehicle = snapshot('vehicle');
-  if(scope==='local' || scope==='all') content.local = snapshot('local');
-
-  const r = await fetch(STOCK_WORKER_URL + '/api/stock/publish', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({pin, scope, content})
-  });
-
-  const txt = await r.text();
-  let j = null;
-  try{ j = JSON.parse(txt); }catch(e){}
-
-  if(!r.ok || !j || j.ok !== true){
-    throw new Error(
-    ((j && j.error) ? String(j.error) : '') +
-    ((j && j.message) ? ' — ' + String(j.message) : '') ||
-    ('HTTP ' + r.status)
-  );
-  }
-  return j;
-}
-
-async function publish(scope){
-  try{
-    const result = await workerPublish(scope);
-    if(!result) return;
-
-    if(scope==='vehicle'||scope==='all') state.dirtyVehicle.clear();
-    if(scope==='local'||scope==='all') state.dirtyLocal.clear();
-
-    persistLocal();
-    addHistory('Publication Cloudflare', scope==='all'?'Véhicule + local publiés via Worker.':(scope==='vehicle'?'Véhicule publié via Worker.':'Local publié via Worker.'));
-    renderAll();
-    toast('Publié via Cloudflare ✅');
-  }catch(e){
-    console.error(e);
-    const msg = String(e.message || e);
-    if(msg.includes('PIN_INVALID') || msg.includes('401')) openPublishSheet();
-    toast('Erreur publication : ' + msg);
-  }
-}
+async function publish(scope){let key=getPublishKey();if(!key){openPublishSheet();toast('Enregistrez la clé de publication.');return}try{if(scope==='vehicle'||scope==='all'){const snap=snapshot('vehicle');await githubPut(GITHUB.vehiclePath,snap,key,'ADN66 stock véhicule');for(const p of products){await githubPut(`${GITHUB.stockDir}/${p.id}.json`,{id:p.id,qty:qty('vehicle',p.id),updatedAt:snap.updatedAt},key,`ADN66 stock ${p.id}`)}state.dirtyVehicle.clear()}if(scope==='local'||scope==='all'){await githubPut(GITHUB.localPath,snapshot('local'),key,'ADN66 stock local');state.dirtyLocal.clear()}persistLocal();addHistory('Publication GitHub',scope==='all'?'Véhicule + local publiés.':(scope==='vehicle'?'Véhicule publié.':'Local publié.'));renderAll();toast('Publié sur GitHub ✅')}catch(e){console.error(e);toast('Erreur publication : '+(e.message||e))}}
 document.addEventListener('click',e=>{const tab=e.target.closest('.tab');if(tab){$all('.tab').forEach(b=>b.classList.remove('active'));$all('.panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');$('#'+tab.dataset.tab).classList.add('active')}const q=e.target.closest('.qtyBtn');if(q){setQty(q.dataset.scope,q.dataset.id,qty(q.dataset.scope,q.dataset.id)+Number(q.dataset.delta||0))}const pub=e.target.closest('[data-publish]');if(pub)publish(pub.dataset.publish)})
 $('#searchVehicule').addEventListener('input',()=>renderProductGrid('vehicleProducts','vehicle',$('#searchVehicule').value));$('#searchLocal').addEventListener('input',()=>renderProductGrid('localProducts','local',$('#searchLocal').value));$('#searchOverview').addEventListener('input',renderOverview);$('#reloadAll').addEventListener('click',reloadAll);$('#reloadAll2').addEventListener('click',reloadAll);$('#openPublishSettings').addEventListener('click',openPublishSheet);$('#closePublish').addEventListener('click',closePublishSheet);$('#savePublishKey').addEventListener('click',()=>{setPublishKey($('#publishKey').value);closePublishSheet();toast('Clé enregistrée ✅')});$('#clearPublishKey').addEventListener('click',()=>{localStorage.removeItem(KEY_STORE);$('#publishKey').value='';toast('Clé effacée.')});$('#clearHistory').addEventListener('click',()=>{if(confirm('Vider l’historique ?')){state.history=[];localStorage.setItem('adn66_stock_history_v2','[]');renderHistory()}})
 let cameraStream=null;$('#startCamera').addEventListener('click',async()=>{try{cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});$('#cameraVideo').srcObject=cameraStream;$('#cameraVideo').style.display='block';$('#cameraFallback').style.display='none';addHistory('Caméra lancée','Flux navigateur actif.')}catch(e){toast('Caméra indisponible : mode image bêta.');addHistory('Caméra indisponible','Image bêta affichée.')}});$('#stopCamera').addEventListener('click',()=>{if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;$('#cameraVideo').style.display='none';$('#cameraFallback').style.display='block';addHistory('Caméra arrêtée','Retour image bêta.')});$('#toggleRealtime').addEventListener('click',()=>{state.realtime=!state.realtime;$('#toggleRealtime').textContent='Temps réel '+(state.realtime?'ON':'OFF');$('#toggleRealtime').className='btn '+(state.realtime?'green':'');addHistory('Temps réel '+(state.realtime?'activé':'désactivé'),'Caméra')});$('#simulateScan').addEventListener('click',()=>{document.querySelectorAll('[data-zone-ids]').forEach(inp=>{const ids=inp.dataset.zoneIds.split(',');const detected=Math.max(0,Number(inp.value||0)+Math.floor(Math.random()*3)-1);inp.value=detected;applyZone(ids,detected)});addHistory('Comptage caméra simulé','Stock local mis à jour.');renderAll()});document.addEventListener('input',e=>{const inp=e.target.closest('[data-zone-ids]');if(inp&&state.realtime){applyZone(inp.dataset.zoneIds.split(','),Number(inp.value||0));addHistory('Comptage caméra','Zone '+inp.dataset.zone+' mise à jour.');renderAll()}});function applyZone(ids,detected){detected=Math.max(0,Math.round(Number(detected)||0));const current=ids.reduce((s,id)=>s+qty('local',id),0);if(!ids.length)return;let remain=detected;ids.forEach((id,i)=>{let val=i===ids.length-1?remain:Math.round(detected*((qty('local',id)||1)/(current||ids.length)));remain-=val;state.local[id]=Math.max(0,val);state.dirtyLocal.add(id)});persistLocal()}
