@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scope": "local",
-  "updatedAt": "2026-06-05T03:19:03.030Z",
+  "updatedAt": "2026-06-05T03:19:46.945Z",
   "items": [
     {
       "id": "cacahuette",
@@ -13,27 +13,27 @@
     },
     {
       "id": "curly",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "chips",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "monster_munch",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "dragibus",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "fraise_tagada",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "poliakov",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "absolut",
