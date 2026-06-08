@@ -1,7 +1,7 @@
 {
   "active": false,
   "mode": "none",
-  "last_update": "2026-06-05T01:25:07.227+02:00",
+  "last_update": "2026-06-08T21:37:52.225+02:00",
   "modes": {
     "info": {
       "title": "Panne",
@@ -60,14 +60,14 @@
       "severity": "info"
     },
     "ouverture_2230": {
-      "title": "Ouverture exceptionnelle",
-      "message": "Le service ouvrira exceptionnellement à partir de 00h00 ce soir. Merci de votre compréhension.",
-      "image": "apps/stock/stock/_snapshot.json",
+      "title": "Beaucoup de rupture",
+      "message": "Il est préférable d'appeler pour commander",
+      "image": "",
       "severity": "info"
     }
   },
   "created_at": "2026-01-01T19:53:43.073+01:00",
-  "published_at": "2026-06-05T01:25:07.227+02:00",
+  "published_at": "2026-06-08T21:37:52.225+02:00",
   "ends_at": "",
   "starts_at": "2026-01-01T19:56:27.600+01:00"
 }
