@@ -449,28 +449,60 @@ async function sendNotification(e) {
 }
 
 const DAYS = [
-  ["1", "Lundi"], ["2", "Mardi"], ["3", "Mercredi"], ["4", "Jeudi"],
-  ["5", "Vendredi"], ["6", "Samedi"], ["0", "Dimanche"]
+  ["1", "Lun"], ["2", "Mar"], ["3", "Mer"], ["4", "Jeu"],
+  ["5", "Ven"], ["6", "Sam"], ["0", "Dim"]
 ];
+
+function normalizeSlotDays(slot) {
+  if (Array.isArray(slot?.days)) {
+    return slot.days.map(String);
+  }
+  if (slot?.day !== undefined && slot?.day !== null) {
+    return [String(slot.day)];
+  }
+  return ["1"];
+}
 
 function createSlot(slot = { days: ["1"], time: "19:30" }) {
   if (!scheduleSlots) return;
+
+  const selectedDays = normalizeSlotDays(slot);
   const row = document.createElement("div");
   row.className = "slot-row";
+
   row.innerHTML = `
-    <select class="slot-day" multiple size="3">${DAYS.map(([v,l]) => `<option value="${v}" ${slot.days?.includes(v) ? "selected" : ""}>${l}</option>`).join("")}</select>
-    <input class="slot-time" type="time" value="${slot.time || "19:30"}">
+    <div class="day-picker" role="group" aria-label="Jours programmés">
+      ${DAYS.map(([value, label]) => `
+        <label class="day-chip">
+          <input type="checkbox" class="slot-day" value="${value}" ${selectedDays.includes(value) ? "checked" : ""}>
+          <span>${label}</span>
+        </label>
+      `).join("")}
+    </div>
+    <input class="slot-time" type="time" value="${slot.time || "19:30"}" aria-label="Heure programmée">
     <button class="secondary-btn danger-mini" type="button">Supprimer</button>
   `;
+
   row.querySelector("button").addEventListener("click", () => row.remove());
   scheduleSlots.appendChild(row);
 }
 
 function getSlots() {
-  return [...document.querySelectorAll(".slot-row")].map(row => ({
-    days: [...row.querySelector(".slot-day").selectedOptions].map(o => o.value),
-    time: row.querySelector(".slot-time").value || "19:30"
-  })).filter(s => s.days.length && s.time);
+  const rows = [...document.querySelectorAll(".slot-row")];
+  const slots = [];
+
+  for (const row of rows) {
+    const time = row.querySelector(".slot-time")?.value || "19:30";
+    const days = [...row.querySelectorAll(".slot-day:checked")].map(input => Number(input.value));
+
+    for (const day of days) {
+      if (Number.isInteger(day) && day >= 0 && day <= 6 && /^\d{2}:\d{2}$/.test(time)) {
+        slots.push({ day, time });
+      }
+    }
+  }
+
+  return slots;
 }
 
 function updateScheduleText() {
@@ -503,6 +535,7 @@ async function saveSchedule(e) {
     });
     if (!res.ok) throw new Error(await res.text() || "HTTP " + res.status);
     setStatus(payload.enabled ? "Programmation enregistrée." : "Programmation désactivée.", "success");
+    await loadSchedule();
   } catch (err) {
     setStatus("Erreur programmation : " + err.message, "error");
   }
