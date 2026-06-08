@@ -200,15 +200,66 @@
         max-height:calc(100dvh - 78px);
       }
     }
+
+    /* ===== LOGOS MODULES ADN66 ===== */
+    .topbar .module-brand{
+      display:flex;
+      align-items:center;
+      gap:13px;
+      min-width:0;
+    }
+    .topbar .module-logo{
+      width:64px;
+      height:64px;
+      border-radius:20px;
+      object-fit:contain;
+      background:#0f172a;
+      border:1px solid rgba(93,183,238,.38);
+      box-shadow:0 14px 32px rgba(0,0,0,.38);
+      padding:3px;
+      flex:0 0 auto;
+    }
+    .topbar .module-company{
+      display:block;
+      color:#5db7ee;
+      font-weight:1000;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size:11px;
+      margin-bottom:4px;
+    }
+    .adn66-menu-icon{
+      overflow:hidden;
+      padding:3px;
+      font-size:0!important;
+    }
+    .adn66-menu-icon img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      border-radius:12px;
+    }
+    @media (max-width:640px){
+      .topbar .module-logo{
+        width:56px;
+        height:56px;
+      }
+    }
+
   </style>
 
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div>
-        <p class="eyebrow">Apéro de Nuit 66</p>
-        <h1>Marketing SMS</h1>
+      <div class="module-brand">
+        <img class="module-logo" src="./ADN66_SMS.png" alt="Logo SMS ADN66" onerror="this.onerror=null;this.style.display='none';" />
+        <div>
+          <span class="module-company">APÉRO DE NUIT 66</span>
+          <h1>Module Twilio SMS</h1>
+          <p class="eyebrow">Marketing SMS</p>
+        </div>
       </div>
       <button id="installBtn" class="ghost hidden" type="button">Installer</button>
 
@@ -230,43 +281,43 @@
 
           <div class="adn66-menu-list">
             <a class="adn66-menu-item" href="../PUSH/">
-              <div class="adn66-menu-icon">🔔</div>
+              <div class="adn66-menu-icon"><img src="../PUSH/ADN66_PUSH.png" alt="PUSH"></div>
               <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
               <div class="adn66-menu-arrow">→</div>
             </a>
 
             <a class="adn66-menu-item" href="../apero/">
-              <div class="adn66-menu-icon">🧮</div>
+              <div class="adn66-menu-icon"><img src="../apero/ADN66_CALCUL.png" alt="Calculateur"></div>
               <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
               <div class="adn66-menu-arrow">→</div>
             </a>
 
             <a class="adn66-menu-item" href="../fidel/admin.html">
-              <div class="adn66-menu-icon">🎁</div>
+              <div class="adn66-menu-icon"><img src="../fidel/ADN66_FIDELITE.png" alt="Fidélité"></div>
               <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
               <div class="adn66-menu-arrow">→</div>
             </a>
 
             <a class="adn66-menu-item" href="../gps/">
-              <div class="adn66-menu-icon">📍</div>
+              <div class="adn66-menu-icon"><img src="../gps/ADN66_GPS.png" alt="GPS"></div>
               <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
               <div class="adn66-menu-arrow">→</div>
             </a>
 
             <a class="adn66-menu-item" href="../status/">
-              <div class="adn66-menu-icon">📢</div>
+              <div class="adn66-menu-icon"><img src="../status/ADN66_STATUS.png" alt="Status"></div>
               <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
               <div class="adn66-menu-arrow">→</div>
             </a>
 
             <a class="adn66-menu-item" href="../stock/">
-              <div class="adn66-menu-icon">📦</div>
+              <div class="adn66-menu-icon"><img src="../stock/ADN66_STOCK.png" alt="Stock"></div>
               <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
               <div class="adn66-menu-arrow">→</div>
             </a>
 
             <a class="adn66-menu-item is-current" href="../twilio/">
-              <div class="adn66-menu-icon">💬</div>
+              <div class="adn66-menu-icon"><img src="./ADN66_SMS.png" alt="Twilio SMS"></div>
               <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
               <div class="adn66-menu-arrow">→</div>
             </a>
