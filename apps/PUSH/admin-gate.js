@@ -29,7 +29,8 @@
     title: "Accès admin",
     subtitle: "Espace réservé",
     storageKey: "adn66_admin_gate_until",
-    lastTryKey: "adn66_admin_gate_last_try"
+    lastTryKey: "adn66_admin_gate_last_try",
+    adminKeyStorageKey: "adn66_admin_key"
   }, window.ADN_ADMIN_GATE || {});
 
   const STYLE_ID = "adn-admin-gate-style";
@@ -103,6 +104,7 @@
 
   function lock(){
     storeDel(CFG.storageKey);
+    storeDel(CFG.adminKeyStorageKey);
   }
 
   async function sha256(text){
@@ -378,6 +380,9 @@
             return;
           }
           unlock();
+          storeSetInt(CFG.lastTryKey, now(), Math.floor(Math.max(1, Number(CFG.rememberHours || 12)) * 60 * 60));
+          try { localStorage.setItem(CFG.adminKeyStorageKey, value); } catch(e) {}
+          window.dispatchEvent(new CustomEvent("adn66-admin-unlocked"));
           if(input) input.value = "";
           hideGate();
 
@@ -437,6 +442,10 @@
       lock();
       showGate();
     };
+    window.adnAdminGateGetKey = function(){
+      try { return localStorage.getItem(CFG.adminKeyStorageKey) || ""; } catch(e) { return ""; }
+    };
+
     window.adnAdminGateUnlockUntil = function(hours){
       const old = CFG.rememberHours;
       CFG.rememberHours = Number(hours || old);

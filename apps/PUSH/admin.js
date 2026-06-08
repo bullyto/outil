@@ -1,973 +1,358 @@
 /*
-  ADN66 Push - admin.js complet
-  Emplacement GitHub :
-  /apps/PUSH/admin.js
-
-  Modifications :
-  - image grande séparée de l’icône ; elle n’est plus remplacée par l’icône par défaut ;
-  - choix des liens boutons : Apéro de Nuit 66 ou Apéro Catalan ;
-  - choix de l’icône : automatique, Apéro de Nuit 66 ou Apéro Catalan ;
-  - galerie automatique des images depuis GitHub API (/apps/PUSH/images/) ;
-  - aperçu, URL, copie et sélection de l’image grande ;
-  - notification forte par défaut ;
-  - envoi des champs utiles uniquement pour l’affichage et les clics.
+  ADN66 Push — admin refonte une page
+  Admin prioritaire, mot de passe mémorisé localStorage, stats auto-refresh,
+  historique prêt pour route Worker /admin/push/history.
 */
+const cfg = window.ADN_PUSH_CONFIG || {};
 
-const cfg = window.ADN_PUSH_CONFIG;
+const ADMIN_KEY_STORAGE = "adn66_admin_key";
+const IMAGE_API = "https://api.github.com/repos/bullyto/outil/contents/apps/PUSH/images";
+const IMAGE_BASE = "https://bullyto.github.io/outil/apps/PUSH/images/";
+const IMAGE_EXT = /\.(png|jpe?g|webp|gif)$/i;
 
-const sendForm = document.getElementById("sendForm");
-const scheduleForm = document.getElementById("scheduleForm");
-const adminStatus = document.getElementById("adminStatus");
+const $ = (id) => document.getElementById(id);
 
-const statTotal = document.getElementById("statTotal");
-const statApero = document.getElementById("statApero");
-const statCatalan = document.getElementById("statCatalan");
-const statX = document.getElementById("statX");
+const adminStatus = $("adminStatus");
+const statTotal = $("statTotal");
+const statApero = $("statApero");
+const statCatalan = $("statCatalan");
+const statX = $("statX");
+const statsUpdatedAt = $("statsUpdatedAt");
+const historyList = $("historyList");
+const historyStatus = $("historyStatus");
+const imageSelect = $("imageGallerySelect");
+const imageUrl = $("imageUrl");
+const imagePreview = $("imagePreview");
+const imagePreviewBox = $("imagePreviewBox");
+const imageStatus = $("imageGalleryStatus");
+const scheduleEnabled = $("scheduleEnabled");
+const scheduleSlots = $("scheduleSlots");
+const scheduleStateText = $("scheduleStateText");
 
-const instantTabBtn = document.getElementById("instantTabBtn");
-const scheduledTabBtn = document.getElementById("scheduledTabBtn");
-const instantPanel = document.getElementById("instantPanel");
-const scheduledPanel = document.getElementById("scheduledPanel");
-
-const adminKeyInput = document.getElementById("adminKey");
-const scheduleAdminKeyInput = document.getElementById("scheduleAdminKey");
-const refreshProgramListBtn = document.getElementById("refreshProgramList");
-const programListStatus = document.getElementById("programListStatus");
-const programList = document.getElementById("programList");
-
-const scheduleEnabledInput = document.getElementById("scheduleEnabled");
-const scheduleStateText = document.getElementById("scheduleStateText");
-const scheduleSlotsContainer = document.getElementById("scheduleSlots");
-const addScheduleSlotBtn = document.getElementById("addScheduleSlot");
-
-const imageGallerySelect = document.getElementById("imageGallerySelect");
-const scheduleImageGallerySelect = document.getElementById("scheduleImageGallerySelect");
-const refreshImageGalleryBtn = document.getElementById("refreshImageGallery");
-const scheduleRefreshImageGalleryBtn = document.getElementById("scheduleRefreshImageGallery");
-const imageGalleryStatus = document.getElementById("imageGalleryStatus");
-const scheduleImageGalleryStatus = document.getElementById("scheduleImageGalleryStatus");
-const copyImageUrlBtn = document.getElementById("copyImageUrl");
-const scheduleCopyImageUrlBtn = document.getElementById("scheduleCopyImageUrl");
-
-const DEFAULT_BRAND_KEY = "apero";
-const DEFAULT_TAG = "adn66-alerte";
-const DEFAULT_VIBRATE = [500, 150, 500, 150, 800];
-const DEFAULT_ACTIONS = [
-  {
-    action: "open_site",
-    title: "Voir le site"
-  },
-  {
-    action: "install_app",
-    title: "Télécharger l’app"
-  }
-];
-
-const GITHUB_IMAGES_API_URL = "https://api.github.com/repos/bullyto/outil/contents/apps/PUSH/images";
-const GITHUB_PROGRAMMATION_URL = "https://bullyto.github.io/outil/apps/PUSH/admin-programmation.json";
-const GITHUB_PAGES_IMAGES_BASE_URL = "https://bullyto.github.io/outil/apps/PUSH/images/";
-const SUPPORTED_IMAGE_EXTENSIONS = /\.(png|jpe?g|webp|gif)$/i;
-
-const WEEK_DAYS = [
-  { value: "1", label: "Lundi" },
-  { value: "2", label: "Mardi" },
-  { value: "3", label: "Mercredi" },
-  { value: "4", label: "Jeudi" },
-  { value: "5", label: "Vendredi" },
-  { value: "6", label: "Samedi" },
-  { value: "0", label: "Dimanche" }
-];
 let imageCatalog = [];
-let imageCatalogLoaded = false;
+let statsTimer = null;
+let historyTimer = null;
 
-const FALLBACK_BRANDS = {
-  apero: {
-    label: "Apéro de Nuit 66",
-    siteUrl: "https://aperos.net/",
-    playstoreUrl: "https://play.google.com/store/apps/details?id=fr.aperos.nuit66",
-    iconUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png",
-    badgeUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/badge-adn66-96.png"
-  },
-  catalan: {
-    label: "Apéro Catalan",
-    siteUrl: "https://catalan.aperos.net/",
-    playstoreUrl: "https://play.google.com/store/apps/details?id=net.aperos.catalan",
-    iconUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/icon-catalan-192.png",
-    badgeUrl: "https://bullyto.github.io/outil/apps/PUSH/icons/badge-catalan-96.png"
-  }
-};
-
-function getBrands() {
-  return {
-    ...FALLBACK_BRANDS,
-    ...(cfg?.BRANDS || {})
-  };
-}
-
-function getBrand(brandKey) {
-  const brands = getBrands();
-  return brands[brandKey] || brands[DEFAULT_BRAND_KEY] || FALLBACK_BRANDS.apero;
-}
-
-function setAdminStatus(message, type = "") {
+function setStatus(message, type = "") {
   if (!adminStatus) return;
   adminStatus.textContent = message;
-  adminStatus.className = "status " + type;
+  adminStatus.className = "status" + (type ? " " + type : "");
 }
 
-function isWorkerConfigured() {
-  return cfg && cfg.WORKER_BASE_URL && !cfg.WORKER_BASE_URL.includes("VOTRE-WORKER");
+function setMiniStatus(el, message, type = "") {
+  if (!el) return;
+  el.textContent = message;
+  el.dataset.type = type;
 }
 
-function setActiveTab(tabName) {
-  const isInstant = tabName === "instant";
-
-  if (refreshProgramListBtn) {
-  refreshProgramListBtn.addEventListener("click", loadProgramList);
+function isWorkerReady() {
+  return cfg.WORKER_BASE_URL && !String(cfg.WORKER_BASE_URL).includes("VOTRE-WORKER");
 }
 
-if (instantTabBtn) {
-    instantTabBtn.classList.toggle("active", isInstant);
-    instantTabBtn.setAttribute("aria-selected", isInstant ? "true" : "false");
+function getAdminKey() {
+  if (typeof window.adnAdminGateGetKey === "function") {
+    const fromGate = window.adnAdminGateGetKey();
+    if (fromGate) return fromGate;
   }
-
-  if (scheduledTabBtn) {
-    scheduledTabBtn.classList.toggle("active", !isInstant);
-    scheduledTabBtn.setAttribute("aria-selected", !isInstant ? "true" : "false");
-  }
-
-  if (instantPanel) {
-    instantPanel.classList.toggle("active", isInstant);
-    instantPanel.hidden = !isInstant;
-  }
-
-  if (scheduledPanel) {
-    scheduledPanel.classList.toggle("active", !isInstant);
-    scheduledPanel.hidden = isInstant;
-  }
-
-  setAdminStatus(
-    isInstant
-      ? "Mode notification instantanée."
-      : "Mode notification programmée : activation, jours et horaires hebdomadaires.",
-    isInstant ? "success" : "warn"
-  );
+  try { return localStorage.getItem(ADMIN_KEY_STORAGE) || ""; } catch { return ""; }
 }
 
-function syncAdminKeys(source) {
-  if (!adminKeyInput || !scheduleAdminKeyInput) return;
-
-  if (source === "instant") {
-    scheduleAdminKeyInput.value = adminKeyInput.value;
-  } else {
-    adminKeyInput.value = scheduleAdminKeyInput.value;
-  }
+function requireKey() {
+  const key = getAdminKey().trim();
+  if (!key) throw new Error("Mot de passe admin non mémorisé. Rechargez la page et reconnectez-vous.");
+  return key;
 }
 
-function normalizeHttpsUrl(value, allowEmpty = true) {
-  const raw = String(value || "").trim();
-
-  if (!raw) {
-    return allowEmpty ? "" : null;
-  }
-
-  try {
-    const url = new URL(raw, window.location.href);
-
-    if (url.protocol !== "https:") {
-      return null;
-    }
-
-    return url.toString();
-  } catch {
-    return null;
-  }
+function headers(json = false) {
+  const h = { "X-Admin-Key": requireKey() };
+  if (json) h["Content-Type"] = "application/json";
+  return h;
 }
 
-function buildGithubPagesImageUrl(fileName) {
-  return GITHUB_PAGES_IMAGES_BASE_URL + encodeURIComponent(fileName).replace(/%20/g, "%20");
+function targetLabel(value) {
+  return cfg.TARGETS?.[value]?.label || cfg.BRANDS?.[value]?.label || value || "Tous";
 }
 
-function getImageElements(prefix = "") {
-  const schedule = prefix === "schedule";
-
-  return {
-    select: document.getElementById(schedule ? "scheduleImageGallerySelect" : "imageGallerySelect"),
-    hiddenInput: document.getElementById(schedule ? "scheduleImageUrl" : "imageUrl"),
-    previewBox: document.getElementById(schedule ? "scheduleImagePreviewBox" : "imagePreviewBox"),
-    preview: document.getElementById(schedule ? "scheduleImagePreview" : "imagePreview"),
-    name: document.getElementById(schedule ? "scheduleImagePreviewName" : "imagePreviewName"),
-    url: document.getElementById(schedule ? "scheduleImagePreviewUrl" : "imagePreviewUrl"),
-    open: document.getElementById(schedule ? "scheduleOpenImageUrl" : "openImageUrl"),
-    status: document.getElementById(schedule ? "scheduleImageGalleryStatus" : "imageGalleryStatus")
-  };
+function formatDateTime(value) {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value);
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "long", day: "2-digit", month: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit", second: "2-digit"
+  }).format(d);
 }
 
-function setImageGalleryStatus(message, type = "") {
-  for (const element of [imageGalleryStatus, scheduleImageGalleryStatus]) {
-    if (!element) continue;
-    element.textContent = message;
-    element.dataset.type = type;
-  }
+function endpointShort(endpoint) {
+  const raw = String(endpoint || "");
+  if (!raw) return "—";
+  return raw.length > 28 ? raw.slice(0, 16) + "…" + raw.slice(-8) : raw;
 }
 
-async function loadImageCatalog(force = false) {
-  if (imageCatalogLoaded && !force) {
-    return imageCatalog;
-  }
-
-  setImageGalleryStatus("Chargement des images depuis GitHub...", "loading");
-
-  const response = await fetch(GITHUB_IMAGES_API_URL, {
-    cache: "no-store",
-    headers: {
-      "Accept": "application/vnd.github+json"
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error("Impossible de lire le dossier images GitHub : " + response.status);
-  }
-
-  const files = await response.json();
-
-  imageCatalog = (Array.isArray(files) ? files : [])
-    .filter(file => file && file.type === "file" && SUPPORTED_IMAGE_EXTENSIONS.test(file.name || ""))
-    .map(file => ({
-      name: file.name,
-      url: buildGithubPagesImageUrl(file.name),
-      apiUrl: file.download_url || ""
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" }));
-
-  imageCatalogLoaded = true;
-  return imageCatalog;
-}
-
-function renderImageSelector(prefix = "") {
-  const elements = getImageElements(prefix);
-
-  if (!elements.select) {
-    return;
-  }
-
-  const previousValue = elements.select.value;
-  elements.select.innerHTML = "";
-
-  const emptyOption = document.createElement("option");
-  emptyOption.value = "";
-  emptyOption.textContent = "Aucune image grande";
-  elements.select.appendChild(emptyOption);
-
-  for (const image of imageCatalog) {
-    const option = document.createElement("option");
-    option.value = image.url;
-    option.textContent = image.name;
-    option.dataset.name = image.name;
-    elements.select.appendChild(option);
-  }
-
-  if (previousValue && imageCatalog.some(image => image.url === previousValue)) {
-    elements.select.value = previousValue;
-  }
-
-  updateSelectedImage(prefix);
-}
-
-function renderImageSelectors() {
-  renderImageSelector("");
-  renderImageSelector("schedule");
-
-  const count = imageCatalog.length;
-  setImageGalleryStatus(
-    count
-      ? `${count} image${count > 1 ? "s" : ""} disponible${count > 1 ? "s" : ""}.`
-      : "Aucune image trouvée dans /apps/PUSH/images/.",
-    count ? "success" : "warn"
-  );
-}
-
-function updateSelectedImage(prefix = "") {
-  const elements = getImageElements(prefix);
-
-  if (!elements.select || !elements.hiddenInput) {
-    return;
-  }
-
-  const selectedUrl = elements.select.value || "";
-  const selectedImage = imageCatalog.find(image => image.url === selectedUrl);
-
-  elements.hiddenInput.value = selectedUrl;
-
-  if (!selectedUrl || !selectedImage) {
-    if (elements.previewBox) elements.previewBox.hidden = true;
-    if (elements.preview) elements.preview.removeAttribute("src");
-    if (elements.name) elements.name.textContent = "—";
-    if (elements.url) elements.url.textContent = "—";
-    if (elements.open) elements.open.href = "#";
-    return;
-  }
-
-  if (elements.previewBox) elements.previewBox.hidden = false;
-  if (elements.preview) elements.preview.src = selectedUrl;
-  if (elements.name) elements.name.textContent = selectedImage.name;
-  if (elements.url) elements.url.textContent = selectedUrl;
-  if (elements.open) elements.open.href = selectedUrl;
-}
-
-async function refreshImageGallery(force = false) {
-  try {
-    await loadImageCatalog(force);
-    renderImageSelectors();
-  } catch (error) {
-    console.error(error);
-    setImageGalleryStatus(error.message, "error");
-
-    for (const prefix of ["", "schedule"]) {
-      const elements = getImageElements(prefix);
-      if (elements.select && !elements.select.options.length) {
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = "Erreur chargement images";
-        elements.select.appendChild(option);
-      }
-    }
-  }
-}
-
-async function copySelectedImageUrl(prefix = "") {
-  const elements = getImageElements(prefix);
-  const value = elements.hiddenInput?.value || "";
-
-  if (!value) {
-    setAdminStatus("Aucune image sélectionnée à copier.", "warn");
+async function loadStats({ silent = false } = {}) {
+  if (!isWorkerReady()) {
+    if (!silent) setStatus("Worker Cloudflare non configuré.", "warn");
     return;
   }
 
   try {
-    await navigator.clipboard.writeText(value);
-    setAdminStatus("URL de l’image copiée.", "success");
-  } catch {
-    setAdminStatus("Copie impossible automatiquement. URL : " + value, "warn");
-  }
-}
-
-function getSelectedBrand(prefix = "") {
-  const elementId = prefix ? `${prefix}BrandChoice` : "brandChoice";
-  const brandKey = document.getElementById(elementId)?.value || DEFAULT_BRAND_KEY;
-  return getBrand(brandKey);
-}
-
-function getSelectedIconBrand(prefix = "") {
-  const brand = getSelectedBrand(prefix);
-  const elementId = prefix ? `${prefix}IconChoice` : "iconChoice";
-  const choice = document.getElementById(elementId)?.value || "auto";
-
-  if (choice === "auto") {
-    return brand;
-  }
-
-  return getBrand(choice);
-}
-
-function getImageUrl(inputId) {
-  const raw = document.getElementById(inputId)?.value?.trim() || "";
-
-  if (!raw) {
-    return "";
-  }
-
-  const imageUrl = normalizeHttpsUrl(raw);
-
-  if (!imageUrl) {
-    throw new Error("URL de l’image grande invalide. Elle doit commencer par https:// et ouvrir directement une image.");
-  }
-
-  return imageUrl;
-}
-
-function buildNotificationPayload({ target, title, body, brand, iconBrand, imageUrl }) {
-  const siteUrl = normalizeHttpsUrl(brand.siteUrl, false) || FALLBACK_BRANDS.apero.siteUrl;
-  const playstoreUrl = normalizeHttpsUrl(brand.playstoreUrl, false) || FALLBACK_BRANDS.apero.playstoreUrl;
-  const iconUrl = normalizeHttpsUrl(iconBrand.iconUrl, false) || FALLBACK_BRANDS.apero.iconUrl;
-  const badgeUrl = normalizeHttpsUrl(iconBrand.badgeUrl, true) || "";
-
-  const finalImageUrl = imageUrl || "";
-
-  return {
-    target,
-    title,
-    body,
-
-    // Clic normal + bouton "Voir le site"
-    url: siteUrl,
-    site_url: siteUrl,
-
-    // Bouton "Télécharger l’app"
-    install_url: playstoreUrl,
-    playstore_url: playstoreUrl,
-
-    // Icône + badge choisis depuis l’admin
-    icon_url: iconUrl,
-    badge_url: badgeUrl,
-
-    // Grande image choisie depuis l’admin.
-    // Plusieurs alias sont envoyés pour rester compatible avec le Worker actuel
-    // et avec les futures versions.
-    image_url: finalImageUrl,
-    image: finalImageUrl,
-    imageUrl: finalImageUrl,
-    big_image_url: finalImageUrl,
-    large_image_url: finalImageUrl,
-
-    tag: DEFAULT_TAG,
-    renotify: true,
-    require_interaction: true,
-    silent: false,
-    vibrate: DEFAULT_VIBRATE,
-    actions: DEFAULT_ACTIONS
-  };
-}
-
-async function loadStats() {
-  if (!isWorkerConfigured()) {
-    setAdminStatus("Page admin prête. Les statistiques fonctionneront après ajout du Worker Cloudflare.", "warn");
-    return;
-  }
-
-  try {
-    const adminKey = (adminKeyInput?.value || scheduleAdminKeyInput?.value || "").trim();
-
-    const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/stats`, {
-      headers: {
-        "X-Admin-Key": adminKey
-      }
+    const res = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/stats`, {
+      cache: "no-store",
+      headers: headers(false)
     });
-
-    if (!response.ok) {
-      throw new Error("Stats indisponibles : " + response.status);
-    }
-
-    const data = await response.json();
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
 
     if (statTotal) statTotal.textContent = data.total ?? 0;
     if (statApero) statApero.textContent = data.targets?.apero ?? 0;
     if (statCatalan) statCatalan.textContent = data.targets?.catalan ?? 0;
     if (statX) statX.textContent = data.targets?.x ?? 0;
-
-    setAdminStatus("Statistiques chargées.", "success");
-  } catch (error) {
-    console.error(error);
-    setAdminStatus("Erreur stats : " + error.message, "error");
+    if (statsUpdatedAt) statsUpdatedAt.textContent = "MAJ " + new Intl.DateTimeFormat("fr-FR", {hour:"2-digit", minute:"2-digit", second:"2-digit"}).format(new Date());
+    if (!silent) setStatus("Statistiques à jour.", "success");
+  } catch (err) {
+    if (!silent) setStatus("Stats indisponibles : " + err.message, "error");
   }
 }
 
-async function sendNotification(event) {
-  event.preventDefault();
-
-  const adminKey = adminKeyInput.value.trim();
-  const target = document.getElementById("target").value;
-  const title = document.getElementById("title").value.trim();
-  const body = document.getElementById("body").value.trim();
-  const brand = getSelectedBrand("");
-  const iconBrand = getSelectedIconBrand("");
-
-  let imageUrl = "";
+async function loadHistory({ silent = false } = {}) {
+  if (!historyList || !isWorkerReady()) return;
 
   try {
-    imageUrl = getImageUrl("imageUrl");
-  } catch (error) {
-    setAdminStatus(error.message, "error");
-    return;
-  }
-
-  if (!adminKey) {
-    setAdminStatus("Code admin obligatoire.", "warn");
-    return;
-  }
-
-  if (!title || !body) {
-    setAdminStatus("Titre et message obligatoires.", "warn");
-    return;
-  }
-
-  if (!isWorkerConfigured()) {
-    setAdminStatus("Impossible d’envoyer : l’URL du Worker Cloudflare n’est pas encore configurée.", "warn");
-    return;
-  }
-
-  try {
-    const payload = buildNotificationPayload({
-      target,
-      title,
-      body,
-      brand,
-      iconBrand,
-      imageUrl
+    const res = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/history?limit=50`, {
+      cache: "no-store",
+      headers: headers(false)
     });
-
-    const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/send`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Admin-Key": adminKey
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(text || "Erreur Worker : " + response.status);
+    if (!res.ok) {
+      if (res.status === 404) throw new Error("Route /admin/push/history à ajouter au Worker.");
+      throw new Error("HTTP " + res.status);
     }
+    const data = await res.json();
+    const rows = data.history || data.items || data.rows || [];
 
-    const result = await response.json();
-
-    setAdminStatus(
-      `Notification envoyée. Succès : ${result.sent_count ?? 0}, échecs : ${result.failed_count ?? 0}. Site : ${payload.site_url}. Image : ${payload.image_url || "aucune image grande"}`,
-      "success"
-    );
-
-    await loadStats();
-  } catch (error) {
-    console.error(error);
-    setAdminStatus("Erreur envoi : " + error.message, "error");
-  }
-}
-
-
-
-function setProgramListStatus(message, type = "") {
-  if (!programListStatus) return;
-  programListStatus.textContent = message;
-  programListStatus.dataset.type = type;
-}
-
-function normalizeProgramItems(value) {
-  const items = Array.isArray(value) ? value : [];
-  return items
-    .filter(item => item && item.title && item.body)
-    .map((item, index) => ({
-      id: String(item.id || `item_${index + 1}`),
-      position: index + 1,
-      brand: String(item.brand || "apero"),
-      target: String(item.target || "all"),
-      title: String(item.title || "").trim(),
-      body: String(item.body || "").trim(),
-      image_mode: String(item.image_mode || "random")
-    }));
-}
-
-async function loadProgramList() {
-  if (!programList) return;
-
-  setProgramListStatus("Chargement de admin-programmation.json...", "loading");
-  programList.innerHTML = "";
-
-  try {
-    const response = await fetch(GITHUB_PROGRAMMATION_URL, { cache: "no-store" });
-
-    if (!response.ok) {
-      throw new Error("Impossible de lire admin-programmation.json : " + response.status);
-    }
-
-    const data = await response.json();
-    const items = normalizeProgramItems(data);
-
-    if (!items.length) {
-      setProgramListStatus("Aucune notification trouvée dans admin-programmation.json.", "warn");
-      return;
-    }
-
-    for (const item of items) {
-      const card = document.createElement("article");
-      card.className = "program-item";
-
-      const title = document.createElement("strong");
-      title.textContent = `${item.position}. ${item.title}`;
-
-      const body = document.createElement("p");
-      body.textContent = item.body;
-
-      const meta = document.createElement("div");
-      meta.className = "program-meta";
-      meta.textContent = `brand=${item.brand} • target=${item.target} • image=${item.image_mode}`;
-
-      card.append(title, body, meta);
-      programList.appendChild(card);
-    }
-
-    setProgramListStatus(`${items.length} notification${items.length > 1 ? "s" : ""} chargée${items.length > 1 ? "s" : ""} depuis GitHub.`, "success");
-  } catch (error) {
-    console.error(error);
-    setProgramListStatus(error.message, "error");
-  }
-}
-
-function updateScheduleEnabledText() {
-  if (!scheduleEnabledInput || !scheduleStateText) return;
-
-  scheduleStateText.textContent = scheduleEnabledInput.checked ? "Activé" : "Désactivé";
-  scheduleStateText.dataset.enabled = scheduleEnabledInput.checked ? "true" : "false";
-}
-
-function createScheduleSlotRow({ days = ["2"], time = "19:30" } = {}) {
-  if (!scheduleSlotsContainer) return;
-
-  const slot = document.createElement("div");
-  slot.className = "schedule-slot";
-
-  const head = document.createElement("div");
-  head.className = "schedule-slot-head";
-
-  const title = document.createElement("strong");
-  title.textContent = "Créneau hebdomadaire";
-
-  const removeBtn = document.createElement("button");
-  removeBtn.className = "secondary-btn";
-  removeBtn.type = "button";
-  removeBtn.textContent = "Supprimer";
-  removeBtn.addEventListener("click", () => {
-    slot.remove();
-
-    if (scheduleSlotsContainer && !scheduleSlotsContainer.querySelector(".schedule-slot")) {
-      createScheduleSlotRow();
-    }
-  });
-
-  head.appendChild(title);
-  head.appendChild(removeBtn);
-
-  const daysBox = document.createElement("div");
-  daysBox.className = "schedule-days";
-
-  for (const day of WEEK_DAYS) {
-    const label = document.createElement("label");
-    label.className = "schedule-day";
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.name = "schedule_day";
-    checkbox.value = day.value;
-    checkbox.checked = days.includes(day.value);
-
-    const span = document.createElement("span");
-    span.textContent = day.label;
-
-    label.appendChild(checkbox);
-    label.appendChild(span);
-    daysBox.appendChild(label);
-  }
-
-  const timeRow = document.createElement("label");
-  timeRow.className = "schedule-time-row";
-  timeRow.textContent = "Heure d’envoi";
-
-  const timeInput = document.createElement("input");
-  timeInput.type = "time";
-  timeInput.name = "schedule_time";
-  timeInput.value = time || "19:30";
-
-  timeRow.appendChild(timeInput);
-
-  slot.appendChild(head);
-  slot.appendChild(daysBox);
-  slot.appendChild(timeRow);
-
-  scheduleSlotsContainer.appendChild(slot);
-}
-
-function ensureDefaultScheduleSlot() {
-  if (!scheduleSlotsContainer) return;
-
-  if (!scheduleSlotsContainer.querySelector(".schedule-slot")) {
-    createScheduleSlotRow({
-      days: ["2"],
-      time: "19:30"
-    });
-  }
-}
-
-function getScheduleSlots() {
-  if (!scheduleSlotsContainer) {
-    return [];
-  }
-
-  const slots = [];
-  const seen = new Set();
-
-  for (const slot of scheduleSlotsContainer.querySelectorAll(".schedule-slot")) {
-    const days = Array.from(slot.querySelectorAll('input[name="schedule_day"]:checked'))
-      .map(input => Number(input.value))
-      .filter(day => Number.isInteger(day) && day >= 0 && day <= 6);
-
-    const time = slot.querySelector('input[name="schedule_time"]')?.value || "";
-
-    if (!days.length || !/^\d{2}:\d{2}$/.test(time)) {
-      continue;
-    }
-
-    for (const day of days) {
-      const key = `${day}|${time}`;
-
-      if (seen.has(key)) {
-        continue;
+    historyList.innerHTML = "";
+    if (!rows.length) {
+      historyList.innerHTML = `<div class="empty-box">Aucun historique pour le moment.</div>`;
+    } else {
+      for (const row of rows) {
+        const action = row.action || row.event || "abonnement";
+        const target = targetLabel(row.target);
+        const created = formatDateTime(row.created_at || row.createdAt || row.date);
+        const ua = row.user_agent || row.userAgent || row.device || "Appareil inconnu";
+        const endpoint = endpointShort(row.endpoint);
+        const item = document.createElement("article");
+        item.className = "history-item";
+        item.innerHTML = `
+          <div>
+            <strong>${created}</strong>
+            <span>${action} — ${target}</span>
+          </div>
+          <small>${ua}</small>
+          <code>${endpoint}</code>
+        `;
+        historyList.appendChild(item);
       }
-
-      seen.add(key);
-      slots.push({
-        day,
-        time
-      });
     }
+    setMiniStatus(historyStatus, "Historique à jour.", "success");
+  } catch (err) {
+    if (!silent) setMiniStatus(historyStatus, err.message, "warn");
   }
-
-  return slots;
 }
 
-function groupSlotsForUi(slots) {
-  const groups = new Map();
-
-  for (const slot of slots || []) {
-    const day = String(slot?.day ?? "");
-    const time = String(slot?.time || "").trim();
-
-    if (!/^[0-6]$/.test(day) || !/^\d{2}:\d{2}$/.test(time)) {
-      continue;
-    }
-
-    if (!groups.has(time)) {
-      groups.set(time, []);
-    }
-
-    groups.get(time).push(day);
-  }
-
-  return Array.from(groups.entries()).map(([time, days]) => ({
-    time,
-    days: Array.from(new Set(days))
-  }));
-}
-
-function renderScheduleFromSettings(settings) {
-  if (!scheduleSlotsContainer) return;
-
-  scheduleSlotsContainer.innerHTML = "";
-
-  if (scheduleEnabledInput) {
-    scheduleEnabledInput.checked = Boolean(settings?.enabled);
-  }
-
-  const groupedSlots = groupSlotsForUi(settings?.slots || []);
-
-  if (groupedSlots.length) {
-    for (const slot of groupedSlots) {
-      createScheduleSlotRow(slot);
-    }
-  } else {
-    createScheduleSlotRow({
-      days: ["2"],
-      time: "19:30"
-    });
-  }
-
-  updateScheduleEnabledText();
-}
-
-async function loadScheduleSettings() {
-  if (!isWorkerConfigured()) {
-    ensureDefaultScheduleSlot();
-    updateScheduleEnabledText();
-    return;
-  }
-
-  const adminKey = (scheduleAdminKeyInput?.value || adminKeyInput?.value || "").trim();
-
-  if (!adminKey) {
-    ensureDefaultScheduleSlot();
-    updateScheduleEnabledText();
-    return;
-  }
-
+async function loadImages(force = false) {
+  if (!imageSelect || (!force && imageCatalog.length)) return;
+  setMiniStatus(imageStatus, "Chargement images…", "warn");
   try {
-    const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/schedule-settings`, {
-      headers: {
-        "X-Admin-Key": adminKey
-      }
-    });
+    const res = await fetch(IMAGE_API, { cache: "no-store", headers: { Accept: "application/vnd.github+json" } });
+    if (!res.ok) throw new Error("GitHub HTTP " + res.status);
+    const files = await res.json();
+    imageCatalog = (Array.isArray(files) ? files : [])
+      .filter(f => f?.type === "file" && IMAGE_EXT.test(f.name || ""))
+      .map(f => ({ name: f.name, url: IMAGE_BASE + encodeURIComponent(f.name).replace(/%20/g, "%20") }))
+      .sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" }));
 
-    if (!response.ok) {
-      throw new Error("Réglages programmation indisponibles : " + response.status);
+    imageSelect.innerHTML = `<option value="">Aucune image</option>`;
+    for (const img of imageCatalog) {
+      const opt = document.createElement("option");
+      opt.value = img.url;
+      opt.textContent = img.name;
+      imageSelect.appendChild(opt);
     }
-
-    const data = await response.json();
-    renderScheduleFromSettings(data.settings || {});
-
-    setAdminStatus(
-      data.settings?.enabled
-        ? `Programmation chargée : ${formatScheduleSlots(data.settings.slots || [])}.`
-        : "Programmation chargée : désactivée.",
-      "success"
-    );
-  } catch (error) {
-    console.error(error);
-    ensureDefaultScheduleSlot();
-    updateScheduleEnabledText();
-    setAdminStatus("Impossible de charger la programmation : " + error.message, "warn");
+    setMiniStatus(imageStatus, `${imageCatalog.length} image(s) disponible(s).`, "success");
+  } catch (err) {
+    setMiniStatus(imageStatus, "Images indisponibles : " + err.message, "error");
   }
 }
 
-
-async function saveSchedule(event) {
-  event.preventDefault();
-
-  const adminKey = scheduleAdminKeyInput?.value.trim() || "";
-  const enabled = Boolean(scheduleEnabledInput?.checked);
-  const slots = getScheduleSlots();
-
-  if (!adminKey) {
-    setAdminStatus("Code admin obligatoire.", "warn");
+function updateImagePreview() {
+  const url = imageSelect?.value || "";
+  if (imageUrl) imageUrl.value = url;
+  if (!imagePreviewBox || !imagePreview) return;
+  if (!url) {
+    imagePreviewBox.hidden = true;
+    imagePreview.removeAttribute("src");
     return;
   }
+  imagePreview.src = url;
+  imagePreviewBox.hidden = false;
+}
 
-  if (enabled && !slots.length) {
-    setAdminStatus("Choisissez au moins un jour et une heure pour activer la programmation.", "warn");
-    return;
-  }
+function getBrand(key) {
+  return cfg.BRANDS?.[key] || cfg.BRANDS?.apero || {};
+}
 
-  if (!isWorkerConfigured()) {
-    setAdminStatus("Impossible d’enregistrer : l’URL du Worker Cloudflare n’est pas encore configurée.", "warn");
-    return;
-  }
+function cleanUrl(url) {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  const u = new URL(raw, window.location.href);
+  if (u.protocol !== "https:") throw new Error("URL image invalide : HTTPS obligatoire.");
+  return u.toString();
+}
 
+async function sendNotification(e) {
+  e.preventDefault();
   try {
-    const schedulePayload = {
-      enabled,
-      mode: "weekly_rotation",
-      default_time: "19:30",
-      rotation: true,
-      slots
+    const target = $("target")?.value || "all";
+    const brandKey = $("brandChoice")?.value || "apero";
+    const iconKey = $("iconChoice")?.value === "auto" ? brandKey : ($("iconChoice")?.value || brandKey);
+    const brand = getBrand(brandKey);
+    const iconBrand = getBrand(iconKey);
+    const title = $("title")?.value.trim() || "";
+    const body = $("body")?.value.trim() || "";
+    const img = cleanUrl($("imageUrl")?.value || "");
+
+    if (!title || !body) throw new Error("Titre et message obligatoires.");
+    if (!isWorkerReady()) throw new Error("Worker Cloudflare non configuré.");
+
+    const payload = {
+      target, title, body,
+      url: brand.siteUrl || "https://aperos.net/",
+      site_url: brand.siteUrl || "https://aperos.net/",
+      install_url: brand.playstoreUrl || "https://play.google.com/store/apps/details?id=fr.aperos.nuit66",
+      playstore_url: brand.playstoreUrl || "https://play.google.com/store/apps/details?id=fr.aperos.nuit66",
+      icon_url: iconBrand.iconUrl || brand.iconUrl || "",
+      badge_url: iconBrand.badgeUrl || brand.badgeUrl || "",
+      image_url: img,
+      tag: "adn66-alerte",
+      renotify: true,
+      require_interaction: true,
+      silent: false,
+      vibrate: [500, 150, 500, 150, 800]
     };
 
-    const response = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/schedule-settings`, {
+    setStatus("Envoi en cours…", "warn");
+    const res = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/send`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Admin-Key": adminKey
-      },
-      body: JSON.stringify(schedulePayload)
+      headers: headers(true),
+      body: JSON.stringify(payload)
     });
-
-    if (!response.ok) {
-      const text = await response.text();
-
-      if (response.status === 404) {
-        throw new Error("La route de programmation n’existe pas encore dans le Worker. Interface prête : il faudra ajouter /admin/push/schedule-settings côté Worker.");
-      }
-
-      throw new Error(text || "Erreur Worker : " + response.status);
-    }
-
-    setAdminStatus(
-      enabled
-        ? `Programmation activée : ${formatScheduleSlots(slots)}.`
-        : "Programmation désactivée.",
-      "success"
-    );
-  } catch (error) {
-    console.error(error);
-    setAdminStatus("Erreur programmation : " + error.message, "error");
+    if (!res.ok) throw new Error(await res.text() || "HTTP " + res.status);
+    const result = await res.json().catch(() => ({}));
+    setStatus(`Notification envoyée. Succès : ${result.sent_count ?? 0} / Échecs : ${result.failed_count ?? 0}.`, "success");
+    await Promise.allSettled([loadStats({ silent: true }), loadHistory({ silent: true })]);
+  } catch (err) {
+    setStatus("Erreur envoi : " + err.message, "error");
   }
 }
 
-function formatScheduleSlots(slots) {
-  if (!slots.length) {
-    return "aucun créneau";
+const DAYS = [
+  ["1", "Lundi"], ["2", "Mardi"], ["3", "Mercredi"], ["4", "Jeudi"],
+  ["5", "Vendredi"], ["6", "Samedi"], ["0", "Dimanche"]
+];
+
+function createSlot(slot = { days: ["1"], time: "19:30" }) {
+  if (!scheduleSlots) return;
+  const row = document.createElement("div");
+  row.className = "slot-row";
+  row.innerHTML = `
+    <select class="slot-day" multiple size="3">${DAYS.map(([v,l]) => `<option value="${v}" ${slot.days?.includes(v) ? "selected" : ""}>${l}</option>`).join("")}</select>
+    <input class="slot-time" type="time" value="${slot.time || "19:30"}">
+    <button class="secondary-btn danger-mini" type="button">Supprimer</button>
+  `;
+  row.querySelector("button").addEventListener("click", () => row.remove());
+  scheduleSlots.appendChild(row);
+}
+
+function getSlots() {
+  return [...document.querySelectorAll(".slot-row")].map(row => ({
+    days: [...row.querySelector(".slot-day").selectedOptions].map(o => o.value),
+    time: row.querySelector(".slot-time").value || "19:30"
+  })).filter(s => s.days.length && s.time);
+}
+
+function updateScheduleText() {
+  if (!scheduleStateText) return;
+  scheduleStateText.textContent = scheduleEnabled?.checked ? "Programmation activée" : "Programmation désactivée";
+}
+
+async function loadSchedule() {
+  if (!isWorkerReady()) return;
+  try {
+    const res = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/schedule-settings`, { cache: "no-store", headers: headers(false) });
+    if (!res.ok) return;
+    const data = await res.json();
+    const settings = data.settings || data || {};
+    if (scheduleEnabled) scheduleEnabled.checked = Boolean(settings.enabled);
+    if (scheduleSlots) scheduleSlots.innerHTML = "";
+    const slots = settings.slots?.length ? settings.slots : [{ days:["1","4","6"], time:"19:30" }];
+    slots.forEach(createSlot);
+    updateScheduleText();
+  } catch {}
+}
+
+async function saveSchedule(e) {
+  e.preventDefault();
+  try {
+    const payload = { enabled: Boolean(scheduleEnabled?.checked), mode: "weekly_rotation", rotation: true, slots: getSlots() };
+    if (payload.enabled && !payload.slots.length) throw new Error("Ajoutez au moins un jour et une heure.");
+    const res = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/schedule-settings`, {
+      method: "POST", headers: headers(true), body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(await res.text() || "HTTP " + res.status);
+    setStatus(payload.enabled ? "Programmation enregistrée." : "Programmation désactivée.", "success");
+  } catch (err) {
+    setStatus("Erreur programmation : " + err.message, "error");
   }
-
-  const dayLabels = Object.fromEntries(WEEK_DAYS.map(day => [day.value, day.label]));
-  const groupedSlots = groupSlotsForUi(slots);
-
-  return groupedSlots
-    .map(slot => {
-      const days = slot.days.map(day => dayLabels[day] || day).join(", ");
-      return `${days} à ${slot.time}`;
-    })
-    .join(" • ");
 }
 
-
-if (imageGallerySelect) {
-  imageGallerySelect.addEventListener("change", () => updateSelectedImage(""));
+function startAutoRefresh() {
+  clearInterval(statsTimer);
+  clearInterval(historyTimer);
+  statsTimer = setInterval(() => loadStats({ silent: true }), 4000);
+  historyTimer = setInterval(() => loadHistory({ silent: true }), 8000);
 }
 
-if (scheduleImageGallerySelect) {
-  scheduleImageGallerySelect.addEventListener("change", () => updateSelectedImage("schedule"));
+function bindTabs() {
+  const buttons = document.querySelectorAll("[data-admin-tab]");
+  const panels = document.querySelectorAll("[data-admin-panel]");
+  function open(name) {
+    buttons.forEach(b => b.classList.toggle("active", b.dataset.adminTab === name));
+    panels.forEach(p => p.classList.toggle("active", p.dataset.adminPanel === name));
+    if (name === "history") loadHistory();
+  }
+  buttons.forEach(b => b.addEventListener("click", () => open(b.dataset.adminTab)));
+  open("dashboard");
 }
 
-if (refreshImageGalleryBtn) {
-  refreshImageGalleryBtn.addEventListener("click", () => refreshImageGallery(true));
+function init() {
+  bindTabs();
+  $("refreshStatsBtn")?.addEventListener("click", () => loadStats());
+  $("refreshHistoryBtn")?.addEventListener("click", () => loadHistory());
+  $("sendForm")?.addEventListener("submit", sendNotification);
+  $("scheduleForm")?.addEventListener("submit", saveSchedule);
+  $("addScheduleSlot")?.addEventListener("click", () => createSlot({ days: [], time: "19:30" }));
+  scheduleEnabled?.addEventListener("change", updateScheduleText);
+  imageSelect?.addEventListener("change", updateImagePreview);
+  $("refreshImageGallery")?.addEventListener("click", () => loadImages(true));
+  $("logoutAdminBtn")?.addEventListener("click", () => window.adnAdminGateLock?.());
+  window.addEventListener("adn66-push-subscription-changed", () => Promise.allSettled([loadStats(), loadHistory({ silent: true })]));
+  window.addEventListener("adn66-admin-unlocked", () => Promise.allSettled([loadStats(), loadSchedule(), loadHistory({ silent: true })]));
+
+  if (!scheduleSlots?.children.length) createSlot({ days:["1","4","6"], time:"19:30" });
+  updateScheduleText();
+  loadImages(false);
+  setTimeout(() => Promise.allSettled([loadStats({ silent: true }), loadSchedule(), loadHistory({ silent: true })]), 250);
+  startAutoRefresh();
 }
 
-if (scheduleRefreshImageGalleryBtn) {
-  scheduleRefreshImageGalleryBtn.addEventListener("click", () => refreshImageGallery(true));
-}
-
-if (copyImageUrlBtn) {
-  copyImageUrlBtn.addEventListener("click", () => copySelectedImageUrl(""));
-}
-
-if (scheduleCopyImageUrlBtn) {
-  scheduleCopyImageUrlBtn.addEventListener("click", () => copySelectedImageUrl("schedule"));
-}
-
-if (refreshProgramListBtn) {
-  refreshProgramListBtn.addEventListener("click", loadProgramList);
-}
-
-if (instantTabBtn) {
-  instantTabBtn.addEventListener("click", () => setActiveTab("instant"));
-}
-
-if (scheduledTabBtn) {
-  scheduledTabBtn.addEventListener("click", () => setActiveTab("scheduled"));
-}
-
-if (sendForm) {
-  sendForm.addEventListener("submit", sendNotification);
-}
-
-if (scheduleForm) {
-  scheduleForm.addEventListener("submit", saveSchedule);
-}
-
-if (scheduleEnabledInput) {
-  scheduleEnabledInput.addEventListener("change", updateScheduleEnabledText);
-}
-
-if (addScheduleSlotBtn) {
-  addScheduleSlotBtn.addEventListener("click", () => createScheduleSlotRow({
-    days: [],
-    time: "19:30"
-  }));
-}
-
-if (adminKeyInput) {
-  adminKeyInput.addEventListener("input", () => syncAdminKeys("instant"));
-  adminKeyInput.addEventListener("change", loadStats);
-}
-
-if (scheduleAdminKeyInput) {
-  scheduleAdminKeyInput.addEventListener("input", () => syncAdminKeys("scheduled"));
-  scheduleAdminKeyInput.addEventListener("change", () => {
-    loadStats();
-    loadScheduleSettings();
-  });
-}
-
-setActiveTab("instant");
-ensureDefaultScheduleSlot();
-updateScheduleEnabledText();
-refreshImageGallery(false);
-loadProgramList();
-loadStats();
-loadScheduleSettings();
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+else init();

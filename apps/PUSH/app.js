@@ -281,8 +281,9 @@ async function subscribe(event) {
     await createOrRefreshSubscription(target);
 
     clearIgnoredCooldown();
-    setStatus("C’est activé sur cet appareil.", "success");
+    setStatus("Activé sur cet appareil.", "success");
     setButtonsState(true);
+    window.dispatchEvent(new CustomEvent("adn66-push-subscription-changed", { detail: { action: "subscribe", target } }));
   } catch (error) {
     console.error(error);
     setStatus("Erreur : " + error.message, "error");
@@ -325,8 +326,9 @@ async function unsubscribe() {
       });
     }
 
-    setStatus("C’est désactivé sur cet appareil.", "success");
+    setStatus("Désactivé sur cet appareil.", "success");
     setButtonsState(false);
+    window.dispatchEvent(new CustomEvent("adn66-push-subscription-changed", { detail: { action: "unsubscribe" } }));
   } catch (error) {
     console.error(error);
     setStatus("Erreur : " + error.message, "error");
@@ -364,7 +366,7 @@ async function refreshState() {
       return;
     }
 
-    setStatus("Recevez les offres, ouvertures et infos importantes.", "success");
+    setStatus("Prêt à activer.", "success");
     setButtonsState(false);
     return;
   }
@@ -380,16 +382,16 @@ async function refreshState() {
       await saveSubscriptionToWorker(subscription, target);
 
       clearIgnoredCooldown();
-      setStatus("C’est déjà activé sur cet appareil.", "success");
+      setStatus("Déjà activé sur cet appareil.", "success");
       setButtonsState(true);
       return;
     }
 
-    setStatus("Cliquez pour finaliser l’activation sur cet appareil.", "warn");
+    setStatus("Activation à finaliser.", "warn");
     setButtonsState(false);
   } catch (error) {
     console.warn(error);
-    setStatus("Recevez les offres, ouvertures et infos importantes.", "success");
+    setStatus("Prêt à activer.", "success");
     setButtonsState(false);
   }
 }

@@ -2,962 +2,194 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>PUSH ADN66 • Notifications</title>
+  <title>PUSH ADN66 • Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#5db7ee">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="description" content="Activation et administration des notifications Apéro de Nuit 66 et Apéro Catalan.">
+  <meta name="description" content="Administration PUSH Apéro de Nuit 66.">
   <link rel="manifest" href="./manifest.webmanifest">
   <style>
-
 :root{
-  --primary:#5db7ee;
-  --bg:#0b1220;
-  --bg-deep:#070b12;
-  --bg-mid:#111827;
-  --bg-soft:#1f2937;
-  --card:#111827;
-  --card-2:#172033;
-  --input:#0f172a;
-  --border:#283447;
-  --text:#f8fafc;
-  --text-soft:#cbd5e1;
-  --text-muted:#94a3b8;
-  --success:#16a34a;
-  --success-soft:#86efac;
-  --danger:#dc2626;
-  --danger-soft:#fecaca;
-  --radius-xl:26px;
-  --radius-lg:20px;
-  --radius-md:16px;
-  --shadow:0 24px 70px rgba(0,0,0,.42);
-}
-
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;min-height:100%}
-body{
-  color:var(--text);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:
-    radial-gradient(circle at top, rgba(93,183,238,.16) 0%, rgba(93,183,238,0) 28%),
-    linear-gradient(180deg,var(--bg-deep) 0%, var(--bg) 30%, var(--bg-mid) 72%, var(--bg-soft) 100%);
-  overflow-x:hidden;
-}
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  background:
-    linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
-  background-size:24px 24px;
-  mask-image:linear-gradient(to bottom, rgba(0,0,0,.25), transparent 85%);
-  z-index:0;
-}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-a{color:inherit}
-
-.sr-only{
-  position:absolute!important;
-  width:1px!important;
-  height:1px!important;
-  overflow:hidden!important;
-  clip:rect(0,0,0,0)!important;
-  white-space:nowrap!important;
-}
-
-.app-shell{
-  position:relative;
-  z-index:1;
-  width:min(1180px,100%);
-  margin:0 auto;
-  padding:16px 14px 42px;
-}
-
-.topbar{
-  position:sticky;
-  top:0;
-  z-index:1200;
-  margin:-16px -14px 16px;
-  padding:14px;
-  border-bottom:1px solid var(--border);
-  background:linear-gradient(180deg, rgba(7,11,18,.98), rgba(11,18,32,.90));
-  backdrop-filter:blur(14px);
-}
-.topbar-inner{
-  width:min(1180px,100%);
-  margin:0 auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-}
-.brand{
-  min-width:0;
-  display:flex;
-  align-items:center;
-  gap:13px;
-}
-.brand-logo{
-  width:52px;
-  height:52px;
-  border-radius:18px;
-  background:linear-gradient(180deg, rgba(93,183,238,.18), rgba(15,23,42,.88));
-  border:1px solid rgba(93,183,238,.36);
-  box-shadow:0 12px 28px rgba(0,0,0,.38);
-  display:grid;
-  place-items:center;
-  font-size:24px;
-  flex:0 0 auto;
-}
-.brand-kicker{
-  margin:0 0 4px;
-  color:var(--primary);
-  font-size:12px;
-  font-weight:900;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-}
-.brand h1{
-  margin:0;
-  font-size:clamp(21px,4vw,34px);
-  line-height:1.02;
-  font-weight:1000;
-  letter-spacing:-.03em;
-}
-.brand p{
-  margin:6px 0 0;
-  color:var(--text-soft);
-  font-size:13px;
-  line-height:1.35;
-  font-weight:700;
-}
-
-.adn66-header-menu{
-  position:relative;
-  z-index:2000;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  flex:0 0 auto;
-}
-.adn66-menu-btn{
-  min-height:44px;
-  padding:0 14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text);
-  font-size:14px;
-  font-weight:1000;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:9px;
-  box-shadow:0 12px 28px rgba(0,0,0,.28);
-  cursor:pointer;
-  white-space:nowrap;
-}
-.adn66-menu-btn:hover{border-color:rgba(93,183,238,.45);background:var(--card-2)}
-.adn66-menu-btn:active{transform:translateY(1px)}
-.adn66-menu-burger{display:inline-grid;gap:4px;width:18px;flex:0 0 auto}
-.adn66-menu-burger span{display:block;width:18px;height:2px;border-radius:999px;background:var(--text)}
-.adn66-menu-panel{
-  position:fixed;
-  top:calc(env(safe-area-inset-top) + 76px);
-  right:max(12px, env(safe-area-inset-right));
-  width:min(360px, calc(100vw - 24px));
-  max-height:calc(100dvh - 92px);
-  overflow:auto;
-  display:none;
-  padding:10px;
-  border-radius:22px;
-  border:1px solid var(--border);
-  background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(23,32,51,.98));
-  box-shadow:0 26px 60px rgba(0,0,0,.45);
-  overscroll-behavior:contain;
-}
-.adn66-menu-panel.is-open{display:block}
-.adn66-menu-head{padding:10px 10px 12px;border-bottom:1px solid var(--border);margin-bottom:10px}
-.adn66-menu-kicker{margin:0 0 4px;color:var(--primary);font-size:11px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase}
-.adn66-menu-title{margin:0;color:var(--text);font-size:18px;line-height:1.1;font-weight:1000}
-.adn66-menu-list{display:grid;gap:8px}
-.adn66-menu-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-width:0;
-  padding:12px;
-  border-radius:17px;
-  border:1px solid var(--border);
-  background:var(--input);
-  color:var(--text);
-  text-decoration:none;
-  transition:.16s ease;
-}
-.adn66-menu-item:hover{background:rgba(93,183,238,.10);border-color:rgba(93,183,238,.38)}
-.adn66-menu-item.is-current{background:rgba(93,183,238,.16);border-color:rgba(93,183,238,.48)}
-.adn66-menu-icon{
-  width:44px;
-  height:44px;
-  border-radius:15px;
-  display:grid;
-  place-items:center;
-  background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
-  border:1px solid rgba(93,183,238,.24);
-  font-size:22px;
-  flex:0 0 auto;
-}
-.adn66-menu-text{min-width:0;flex:1 1 auto}
-.adn66-menu-text strong{
-  display:block;
-  color:var(--text);
-  font-size:15px;
-  line-height:1.1;
-  font-weight:1000;
-  margin-bottom:4px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.adn66-menu-text span{display:block;color:var(--text-muted);font-size:12px;line-height:1.35;font-weight:800}
-.adn66-menu-arrow{color:var(--text-muted);font-size:18px;font-weight:1000;flex:0 0 auto}
-
-.page-tabs{
-  display:flex;
-  gap:10px;
-  overflow:auto;
-  padding:4px 0 14px;
-  scrollbar-width:none;
-}
-.page-tabs::-webkit-scrollbar{display:none}
-.page-tab{
-  flex:0 0 auto;
-  min-height:46px;
-  padding:0 15px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:rgba(17,24,39,.88);
-  color:var(--text);
-  font-weight:1000;
-}
-.page-tab.active{
-  background:var(--primary);
-  border-color:var(--primary);
-  color:#fff;
-  box-shadow:0 12px 28px rgba(93,183,238,.20);
-}
-.page-panel{display:none}
-.page-panel.active{display:block}
-
-.shell{
-  width:100%;
-  margin:0 auto;
-  padding:0;
-}
-.card{
-  background:linear-gradient(180deg, rgba(17,24,39,.96), rgba(23,32,51,.94));
-  border:1px solid var(--border);
-  border-radius:var(--radius-xl);
-  box-shadow:var(--shadow);
-  padding:22px;
-  margin-bottom:18px;
-  overflow:hidden;
-}
-.hero{
-  position:relative;
-}
-.hero::before{
-  content:"";
-  position:absolute;
-  right:-70px;
-  top:-70px;
-  width:180px;
-  height:180px;
-  border-radius:999px;
-  background:rgba(93,183,238,.16);
-  filter:blur(18px);
-  pointer-events:none;
-}
-.badge{
-  display:inline-flex;
-  align-items:center;
-  border:1px solid rgba(93,183,238,.26);
-  color:var(--primary);
-  background:rgba(93,183,238,.08);
-  border-radius:999px;
-  padding:7px 12px;
-  font-weight:900;
-  font-size:13px;
-  letter-spacing:.02em;
-}
-h1{
-  font-size:clamp(28px, 6vw, 44px);
-  line-height:1.02;
-  margin:18px 0 14px;
-  font-weight:1000;
-  letter-spacing:-.03em;
-}
-h2{
-  margin:0 0 8px;
-  font-size:20px;
-  font-weight:1000;
-}
-p{
-  color:var(--text-soft);
-  line-height:1.55;
-  font-weight:700;
-}
-.target-box,
-.form label{
-  display:grid;
-  gap:8px;
-  margin:18px 0;
-  color:var(--text-soft);
-  font-weight:900;
-  font-size:13px;
-}
-select,input,textarea{
-  width:100%;
-  border:1px solid var(--border);
-  background:var(--input);
-  color:var(--text);
-  border-radius:16px;
-  padding:14px 14px;
-  font-size:16px;
-  outline:none;
-}
-textarea{min-height:110px;resize:vertical}
-select:focus,input:focus,textarea:focus{
-  border-color:rgba(93,183,238,.62);
-  box-shadow:0 0 0 4px rgba(93,183,238,.12);
-}
-.primary-btn,
-.ghost-btn,
-.secondary-btn,
-.push-tab{
-  border-radius:16px;
-  padding:14px 16px;
-  font-size:15px;
-  font-weight:1000;
-  cursor:pointer;
-  border:1px solid var(--border);
-}
-.primary-btn{
-  width:100%;
-  color:#fff;
-  background:var(--primary);
-  border-color:var(--primary);
-  box-shadow:0 16px 38px rgba(93,183,238,.22);
-  margin-top:12px;
-}
-.ghost-btn,
-.secondary-btn{
-  color:var(--text);
-  background:rgba(15,23,42,.82);
-  border:1px solid var(--border);
-  text-decoration:none;
-}
-.ghost-btn{
-  width:100%;
-  margin-top:12px;
-}
-.secondary-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:40px;
-  padding:.65rem .9rem;
-}
-.status{
-  border-radius:16px;
-  padding:13px 14px;
-  margin-top:16px;
-  background:rgba(15,23,42,.72);
-  border:1px solid var(--border);
-  color:var(--text-soft);
-  font-weight:800;
-}
-.status.success{
-  color:var(--success-soft);
-  border-color:rgba(22,163,74,.34);
-  background:rgba(22,163,74,.10);
-}
-.status.warn,
-.status[data-type="warn"]{
-  color:#dff4ff;
-  border-color:rgba(93,183,238,.34);
-  background:rgba(93,183,238,.10);
-}
-.status.error,
-.status[data-type="error"]{
-  color:var(--danger-soft);
-  border-color:rgba(220,38,38,.34);
-  background:rgba(220,38,38,.10);
-}
-.admin-link{
-  display:inline-flex;
-  color:var(--primary);
-  text-decoration:none;
-  font-weight:900;
-  margin-top:8px;
-}
-.stats-grid{
-  display:grid;
-  grid-template-columns:repeat(4, minmax(0, 1fr));
-  gap:10px;
-  margin:18px 0;
-}
-.stats-grid > div{
-  background:rgba(15,23,42,.72);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:13px;
-}
-.stat-label{
-  display:block;
-  color:var(--text-muted);
-  font-size:11px;
-  text-transform:uppercase;
-  font-weight:1000;
-  letter-spacing:.06em;
-}
-.stats-grid strong{
-  display:block;
-  margin-top:6px;
-  color:var(--text);
-  font-size:24px;
-  font-weight:1000;
-}
-.push-tabs{
-  display:flex;
-  gap:10px;
-  overflow:auto;
-  padding:6px;
-  margin:18px 0 16px;
-  border-radius:18px;
-  border:1px solid var(--border);
-  background:rgba(15,23,42,.72);
-}
-.push-tab{
-  flex:1;
-  min-width:210px;
-  background:transparent;
-  color:var(--text-soft);
-}
-.push-tab.active{
-  background:var(--primary);
-  border-color:var(--primary);
-  color:#fff;
-}
-.push-panel{display:none}
-.push-panel.active{display:block}
-
-.image-picker,
-.schedule-simple-box,
-.program-list-box{
-  display:grid;
-  gap:.85rem;
-  padding:.95rem;
-  border:1px solid var(--border);
-  border-radius:20px;
-  background:rgba(15,23,42,.62);
-}
-.image-picker-head,
-.program-list-head,
-.schedule-toggle-row,
-.schedule-slot-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:.75rem;
-  flex-wrap:wrap;
-}
-.image-picker-head label{margin:0}
-.image-preview-box{
-  display:grid;
-  grid-template-columns:minmax(96px,150px) 1fr;
-  gap:.85rem;
-  align-items:stretch;
-  padding:.85rem;
-  border:1px solid var(--border);
-  border-radius:18px;
-  background:rgba(11,18,32,.70);
-}
-.image-preview-box img{
-  width:100%;
-  min-height:84px;
-  max-height:120px;
-  object-fit:cover;
-  border-radius:14px;
-  background:rgba(0,0,0,.25);
-}
-.image-preview-info{
-  display:grid;
-  gap:.45rem;
-  min-width:0;
-}
-.image-preview-info code{
-  display:block;
-  max-width:100%;
-  overflow-wrap:anywhere;
-  font-size:.78rem;
-  color:var(--text-soft);
-}
-.image-preview-actions{display:flex;gap:.5rem;flex-wrap:wrap}
-.mini-status{
-  margin:-.25rem 0 0;
-  font-size:.82rem;
-  color:var(--text-muted);
-  font-weight:800;
-}
-.mini-status[data-type="success"]{color:var(--success-soft)}
-.mini-status[data-type="error"]{color:var(--danger-soft)}
-.toggle-label{
-  display:flex!important;
-  align-items:center;
-  gap:.65rem!important;
-  margin:0!important;
-  font-weight:900!important;
-}
-.toggle-label input{
-  width:auto;
-  min-height:auto;
-  transform:scale(1.15);
-}
-.schedule-slot-list{display:grid;gap:.85rem}
-.schedule-slot{
-  display:grid;
-  gap:.8rem;
-  padding:.85rem;
-  border:1px solid var(--border);
-  border-radius:18px;
-  background:rgba(11,18,32,.60);
-}
-.schedule-days{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:.55rem;
-}
-.schedule-day{
-  display:flex!important;
-  align-items:center;
-  gap:.5rem!important;
-  margin:0!important;
-  padding:.6rem .7rem;
-  border:1px solid var(--border);
-  border-radius:14px;
-  background:rgba(15,23,42,.80);
-  font-size:.92rem;
-}
-.schedule-day input{
-  width:auto;
-  min-height:auto;
-}
-.schedule-time-row{display:grid;gap:.35rem}
-.schedule-note{
-  margin:0;
-  font-size:.9rem;
-  color:var(--text-soft);
-  line-height:1.45;
-}
-.program-list{display:grid;gap:.7rem}
-.program-item{
-  display:grid;
-  gap:.35rem;
-  padding:.8rem;
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:rgba(11,18,32,.60);
-}
-.program-item strong{font-size:.95rem}
-.program-item p{margin:0;color:var(--text-soft);line-height:1.38;font-size:.9rem}
-.program-meta{font-size:.78rem;color:var(--text-muted);overflow-wrap:anywhere}
-
-@media (min-width: 560px){
-  .schedule-days{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-@media (max-width: 820px){
-  .topbar-inner{align-items:flex-start}
-  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media (max-width: 640px){
-  .app-shell{padding:12px 10px 32px}
-  .topbar{margin:-12px -10px 12px;padding:12px 10px}
-  .brand-logo{width:48px;height:48px}
-  .brand p{display:none}
-  .adn66-menu-btn{min-height:42px;padding:0 12px;border-radius:13px;font-size:0}
-  .adn66-menu-btn::after{content:"Menu";font-size:13px}
-  .adn66-menu-panel{
-    top:calc(env(safe-area-inset-top) + 70px);
-    left:12px;
-    right:12px;
-    width:auto;
-    max-height:calc(100dvh - 82px);
-  }
-  .card{padding:18px;border-radius:22px}
-  .stats-grid{grid-template-columns:1fr 1fr}
-  .push-tabs{display:grid}
-  .push-tab{min-width:0}
-  .image-preview-box{grid-template-columns:1fr}
-}
-
+  --primary:#5db7ee;--bg:#0b1220;--deep:#070b12;--card:#111827;--card2:#172033;--input:#0f172a;
+  --border:#283447;--text:#f8fafc;--soft:#cbd5e1;--muted:#94a3b8;--success:#16a34a;--danger:#dc2626;
+  --green:#86efac;--red:#fecaca;--shadow:0 24px 70px rgba(0,0,0,.42)
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top,rgba(93,183,238,.18),transparent 30%),linear-gradient(180deg,var(--deep),var(--bg) 35%,#111827 100%);overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:24px 24px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.28),transparent 85%)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}.app{position:relative;z-index:1;width:min(1180px,100%);margin:0 auto;padding:14px 14px 42px}
+.topbar{position:sticky;top:0;z-index:50;margin:-14px -14px 14px;padding:14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(7,11,18,.98),rgba(11,18,32,.92));backdrop-filter:blur(14px)}
+.topbar-inner{width:min(1180px,100%);margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.logo{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(93,183,238,.22),rgba(15,23,42,.9));border:1px solid rgba(93,183,238,.38);font-size:24px;box-shadow:0 12px 28px rgba(0,0,0,.36)}
+.brand small{display:block;color:var(--primary);font-weight:1000;letter-spacing:.12em;text-transform:uppercase;font-size:11px}.brand h1{margin:2px 0 0;font-size:clamp(20px,4vw,32px);line-height:1.05}.brand p{margin:4px 0 0;color:var(--soft);font-weight:800;font-size:12px}.lock-btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:14px;min-height:44px;padding:0 13px;font-weight:1000;white-space:nowrap}
+.main-tabs,.admin-tabs{display:flex;gap:10px;overflow:auto;scrollbar-width:none;padding:3px 0 14px}.main-tabs::-webkit-scrollbar,.admin-tabs::-webkit-scrollbar{display:none}.tab{flex:0 0 auto;min-height:46px;padding:0 16px;border-radius:999px;border:1px solid var(--border);background:rgba(17,24,39,.9);color:var(--text);font-weight:1000}.tab.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 12px 28px rgba(93,183,238,.2)}
+.main-panel,.admin-panel{display:none}.main-panel.active,.admin-panel.active{display:block}.card{background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(23,32,51,.94));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.card h2{margin:0;font-size:20px}.card p{margin:5px 0 0;color:var(--muted);font-weight:800;font-size:13px;line-height:1.35}.grid{display:grid;gap:12px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}.stat{background:rgba(15,23,42,.72);border:1px solid var(--border);border-radius:18px;padding:14px}.stat span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;font-weight:1000;letter-spacing:.06em}.stat strong{display:block;margin-top:6px;font-size:28px}.pill{display:inline-flex;align-items:center;border:1px solid rgba(93,183,238,.35);background:rgba(93,183,238,.1);color:#dff4ff;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:1000;white-space:nowrap}
+label{display:grid;gap:8px;color:var(--soft);font-size:13px;font-weight:1000}input,select,textarea{width:100%;border:1px solid var(--border);background:var(--input);color:var(--text);border-radius:16px;padding:14px;outline:none}textarea{min-height:108px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:rgba(93,183,238,.64);box-shadow:0 0 0 4px rgba(93,183,238,.12)}
+.primary-btn,.secondary-btn,.ghost-btn{border-radius:16px;border:1px solid var(--border);min-height:46px;padding:0 15px;font-weight:1000}.primary-btn{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 16px 38px rgba(93,183,238,.22)}.secondary-btn,.ghost-btn{background:rgba(15,23,42,.85);color:var(--text)}.danger-mini{color:var(--red);border-color:rgba(220,38,38,.35)}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions>*{flex:1 1 160px}.status,.mini-status{border-radius:16px;padding:12px 13px;background:rgba(15,23,42,.72);border:1px solid var(--border);color:var(--soft);font-weight:900}.status.success,.mini-status[data-type="success"]{color:var(--green);background:rgba(22,163,74,.1);border-color:rgba(22,163,74,.35)}.status.warn,.mini-status[data-type="warn"]{color:#dff4ff;background:rgba(93,183,238,.1);border-color:rgba(93,183,238,.35)}.status.error,.mini-status[data-type="error"]{color:var(--red);background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.35)}
+.image-preview{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center;background:rgba(15,23,42,.7);border:1px solid var(--border);border-radius:18px;padding:12px}.image-preview img{width:100%;height:86px;object-fit:cover;border-radius:14px}.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--border);background:rgba(15,23,42,.7);border-radius:18px;padding:14px}.switch input{width:auto;transform:scale(1.25)}.slot-row{display:grid;grid-template-columns:1fr 150px auto;gap:10px;align-items:center;border:1px solid var(--border);background:rgba(15,23,42,.6);border-radius:18px;padding:12px}.history-list{display:grid;gap:10px}.history-item{display:grid;gap:6px;border:1px solid var(--border);background:rgba(15,23,42,.7);border-radius:18px;padding:13px}.history-item strong{font-size:14px}.history-item span,.history-item small{color:var(--soft);font-weight:800}.history-item code{color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis}.empty-box{color:var(--muted);font-weight:900;border:1px dashed var(--border);border-radius:18px;padding:16px;text-align:center}.subscribe-compact{max-width:680px;margin:auto}.big-title{font-size:clamp(28px,7vw,44px);margin:0 0 12px;line-height:1}
+@media(max-width:760px){.grid.two,.grid.four{grid-template-columns:1fr 1fr}.slot-row{grid-template-columns:1fr}.card{padding:15px}.brand p{display:none}.lock-btn{padding:0 10px;font-size:13px}.image-preview{grid-template-columns:1fr}.grid.four .stat strong{font-size:24px}}
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="topbar-inner">
-        <div class="brand">
-          <div class="brand-logo">🔔</div>
-          <div>
-            <p class="brand-kicker">Apéro de Nuit 66</p>
-            <h1>PUSH ADN66</h1>
-            <p>Notifications, abonnés, envoi instantané et programmation.</p>
-          </div>
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">🦉</div>
+        <div>
+          <small>APÉRO DE NUIT 66</small>
+          <h1>Admin PUSH</h1>
+          <p>Notifications, abonnés, programmation et historique</p>
         </div>
-
-      <div class="adn66-header-menu">
-        <button class="adn66-menu-btn" id="adn66TopMenuBtn" type="button" aria-expanded="false" aria-controls="adn66TopMenu">
-          <span class="adn66-menu-burger" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
-          </span>
-          Menu
-        </button>
-
-        <nav class="adn66-menu-panel" id="adn66TopMenu" aria-label="Menu outils ADN66">
-          <div class="adn66-menu-head">
-            <p class="adn66-menu-kicker">ADN66</p>
-            <h2 class="adn66-menu-title">Outils internes</h2>
-          </div>
-          <div class="adn66-menu-list">
-            <a class="adn66-menu-item is-current" href="./">
-              <div class="adn66-menu-icon">🔔</div>
-              <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-            <a class="adn66-menu-item" href="../apero/">
-              <div class="adn66-menu-icon">🧮</div>
-              <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-            <a class="adn66-menu-item" href="../fidel/admin.html">
-              <div class="adn66-menu-icon">🎁</div>
-              <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-            <a class="adn66-menu-item" href="../gps/">
-              <div class="adn66-menu-icon">📍</div>
-              <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-            <a class="adn66-menu-item" href="../status/">
-              <div class="adn66-menu-icon">📢</div>
-              <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-            <a class="adn66-menu-item" href="../stock/">
-              <div class="adn66-menu-icon">📦</div>
-              <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-            <a class="adn66-menu-item" href="../twilio/">
-              <div class="adn66-menu-icon">💬</div>
-              <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
-              <div class="adn66-menu-arrow">→</div>
-            </a>
-          </div>
-        </nav>
       </div>
+      <button id="logoutAdminBtn" class="lock-btn" type="button">Verrouiller</button>
+    </div>
+  </header>
 
-      </div>
-    </header>
+  <nav class="main-tabs" aria-label="Sections principales">
+    <button class="tab active" type="button" data-main-tab="admin">Admin PUSH</button>
+    <button class="tab" type="button" data-main-tab="subscribe">Abonnement</button>
+  </nav>
 
-    <nav class="page-tabs" aria-label="Sections PUSH">
-      <button class="page-tab active" type="button" data-main-tab="subscribe">Activation client</button>
-      <button class="page-tab" type="button" data-main-tab="admin">Administration PUSH</button>
+  <section class="main-panel active" data-main-panel="admin">
+    <nav class="admin-tabs" aria-label="Sections admin">
+      <button class="tab active" type="button" data-admin-tab="dashboard">Tableau</button>
+      <button class="tab" type="button" data-admin-tab="send">Envoyer</button>
+      <button class="tab" type="button" data-admin-tab="schedule">Programmer</button>
+      <button class="tab" type="button" data-admin-tab="history">Historique</button>
     </nav>
 
-    <section class="page-panel active" data-main-panel="subscribe">
-      <main class="shell">
-        <section class="card hero">
-          <div class="badge">ADN66 • Notifications</div>
-          <h1>Recevoir les alertes d’ouverture et les promos</h1>
-          <p>
-            Activez les notifications pour être prévenu des ouvertures,
-            informations importantes et offres ponctuelles.
-          </p>
-
-          <div class="target-box">
-            <label for="targetSelect">Site concerné</label>
-            <select id="targetSelect">
-              <option value="apero">Apéro de Nuit 66</option>
-              <option value="catalan">Apéro Catalan</option>
-              <option value="x">X — futur projet</option>
-            </select>
-          </div>
-
-          <button id="subscribeBtn" class="primary-btn" data-push-subscribe>
-            Activer les notifications
-          </button>
-
-          <button id="unsubscribeBtn" class="ghost-btn" data-push-unsubscribe>
-            Désactiver sur cet appareil
-          </button>
-
-          <p id="status" class="status">Initialisation...</p>
-        </section>
-
-        <section class="card">
-          <h2>Important</h2>
-          <p>
-            Les notifications ne sont activées qu’après accord.
-            Vous pouvez les bloquer à tout moment depuis les paramètres du navigateur.
-          </p>
-        </section>
-      </main>
+    <section class="admin-panel active" data-admin-panel="dashboard">
+      <article class="card">
+        <div class="card-head">
+          <div><h2>Abonnés</h2><p>Actualisation automatique.</p></div>
+          <span id="statsUpdatedAt" class="pill">MAJ —</span>
+        </div>
+        <div class="grid four">
+          <div class="stat"><span>Total</span><strong id="statTotal">—</strong></div>
+          <div class="stat"><span>Apéro</span><strong id="statApero">—</strong></div>
+          <div class="stat"><span>Catalan</span><strong id="statCatalan">—</strong></div>
+          <div class="stat"><span>X</span><strong id="statX">—</strong></div>
+        </div>
+        <div class="actions" style="margin-top:12px">
+          <button id="refreshStatsBtn" class="secondary-btn" type="button">Actualiser</button>
+          <button class="secondary-btn" type="button" data-admin-tab="history" onclick="document.querySelector('[data-admin-tab=history]').click()">Voir historique</button>
+        </div>
+      </article>
     </section>
 
-    <section class="page-panel" data-main-panel="admin">
-      <main class="shell">
-<section class="card hero">
-      <div class="badge">ADN66 • Admin Push</div>
-      <h1>Notifications push</h1>
-      <p>
-        Gérez les notifications instantanées et les futures notifications programmées
-        pour Apéro de Nuit 66 et Apéro Catalan.
-      </p>
-
-      <div class="stats-grid">
-        <div>
-          <span class="stat-label">Total actifs</span>
-          <strong id="statTotal">—</strong>
-        </div>
-        <div>
-          <span class="stat-label">Apéro</span>
-          <strong id="statApero">—</strong>
-        </div>
-        <div>
-          <span class="stat-label">Catalan</span>
-          <strong id="statCatalan">—</strong>
-        </div>
-        <div>
-          <span class="stat-label">X</span>
-          <strong id="statX">—</strong>
-        </div>
-      </div>
-
-      <div class="push-tabs" role="tablist" aria-label="Type de notification">
-        <button id="instantTabBtn" class="push-tab active" type="button" data-tab="instant" aria-controls="instantPanel" aria-selected="true">
-          Notification instantanée
-        </button>
-        <button id="scheduledTabBtn" class="push-tab" type="button" data-tab="scheduled" aria-controls="scheduledPanel" aria-selected="false">
-          Notification programmée
-        </button>
-      </div>
-
-      <section id="instantPanel" class="push-panel active" role="tabpanel" aria-labelledby="instantTabBtn">
-        <form id="sendForm" class="form" novalidate>
-          <label>
-            Code admin
-            <input id="adminKey" type="password" autocomplete="off" placeholder="Votre code admin">
-          </label>
-
-          <label>
-            Cible des abonnés
-            <select id="target">
-              <option value="all">Tous les abonnés</option>
-              <option value="apero">Abonnés Apéro de Nuit 66</option>
-              <option value="catalan">Abonnés Apéro Catalan</option>
-              <option value="x">X — futur projet</option>
-            </select>
-          </label>
-
-          <label>
-            Liens des boutons
-            <select id="brandChoice">
-              <option value="apero">Apéro de Nuit 66 — aperos.net</option>
-              <option value="catalan">Apéro Catalan — catalan.aperos.net</option>
-            </select>
-          </label>
-
-          <label>
-            Icône de notification
+    <section class="admin-panel" data-admin-panel="send">
+      <article class="card">
+        <div class="card-head"><div><h2>Notification instantanée</h2><p>Message court, image optionnelle.</p></div></div>
+        <form id="sendForm" class="grid" novalidate>
+          <div class="grid two">
+            <label>Cible
+              <select id="target">
+                <option value="all">Tous les abonnés</option>
+                <option value="apero">Apéro de Nuit 66</option>
+                <option value="catalan">Apéro Catalan</option>
+                <option value="x">X — futur projet</option>
+              </select>
+            </label>
+            <label>Marque du clic
+              <select id="brandChoice">
+                <option value="apero">Apéro de Nuit 66</option>
+                <option value="catalan">Apéro Catalan</option>
+              </select>
+            </label>
+          </div>
+          <label>Icône
             <select id="iconChoice">
-              <option value="auto">Automatique selon les liens choisis</option>
+              <option value="auto">Automatique</option>
               <option value="apero">Icône Apéro de Nuit 66</option>
               <option value="catalan">Icône Apéro Catalan</option>
             </select>
           </label>
-
-          <div class="image-picker" data-picker="instant">
-            <div class="image-picker-head">
-              <label for="imageGallerySelect">Image grande de la notification</label>
-              <button id="refreshImageGallery" class="secondary-btn" type="button">Actualiser les images</button>
-            </div>
-
-            <select id="imageGallerySelect">
-              <option value="">Chargement des images...</option>
-            </select>
-
-            <input id="imageUrl" type="hidden">
-
-            <div id="imagePreviewBox" class="image-preview-box" hidden>
-              <img id="imagePreview" alt="Aperçu de l’image sélectionnée">
-              <div class="image-preview-info">
-                <strong id="imagePreviewName">—</strong>
-                <code id="imagePreviewUrl">—</code>
-                <div class="image-preview-actions">
-                  <button id="copyImageUrl" class="secondary-btn" type="button">Copier l’URL</button>
-                  <a id="openImageUrl" class="secondary-btn" href="#" target="_blank" rel="noopener">Ouvrir</a>
-                </div>
-              </div>
-            </div>
-
-            <p id="imageGalleryStatus" class="mini-status">Les images sont lues automatiquement depuis /apps/PUSH/images/.</p>
+          <div class="grid two">
+            <label>Titre
+              <input id="title" type="text" maxlength="80" value="Apéro de Nuit 66">
+            </label>
+            <label>Image promo
+              <select id="imageGallerySelect"><option value="">Aucune image</option></select>
+            </label>
           </div>
-
-          <label>
-            Titre
-            <input id="title" type="text" maxlength="80" placeholder="Ex : Apéro de Nuit 66 est ouvert">
+          <label>Message
+            <textarea id="body" maxlength="220">Service ouvert ce soir. Livraison de 19h à 6h.</textarea>
           </label>
-
-          <label>
-            Message
-            <textarea id="body" maxlength="180" placeholder="Ex : Livraison disponible ce soir jusqu’à 6h."></textarea>
-          </label>
-
-          <button class="primary-btn" type="submit">Envoyer la notification</button>
+          <input id="imageUrl" type="hidden" value="">
+          <div id="imagePreviewBox" class="image-preview" hidden>
+            <img id="imagePreview" alt="Aperçu image notification">
+            <div><strong>Image sélectionnée</strong><p id="imageGalleryStatus" class="mini-status">—</p></div>
+          </div>
+          <div class="actions">
+            <button class="primary-btn" type="submit">Envoyer maintenant</button>
+            <button id="refreshImageGallery" class="secondary-btn" type="button">Recharger images</button>
+          </div>
         </form>
-      </section>
+      </article>
+    </section>
 
-      <section id="scheduledPanel" class="push-panel" role="tabpanel" aria-labelledby="scheduledTabBtn" hidden>
-        <form id="scheduleForm" class="form" novalidate>
-          <label>
-            Code admin
-            <input id="scheduleAdminKey" type="password" autocomplete="off" placeholder="Votre code admin">
-          </label>
-
-          <div class="sr-only" aria-hidden="true">
-            <select id="scheduleImageGallerySelect"><option value=""></option></select>
-            <input id="scheduleImageUrl" type="hidden">
-            <button id="scheduleRefreshImageGallery" type="button">Actualiser images programmées</button>
-            <button id="scheduleCopyImageUrl" type="button">Copier image programmée</button>
-            <p id="scheduleImageGalleryStatus"></p>
-            <div id="scheduleImagePreviewBox" hidden>
-              <img id="scheduleImagePreview" alt="">
-              <strong id="scheduleImagePreviewName">—</strong>
-              <code id="scheduleImagePreviewUrl">—</code>
-              <a id="scheduleOpenImageUrl" href="#"></a>
-            </div>
+    <section class="admin-panel" data-admin-panel="schedule">
+      <article class="card">
+        <div class="card-head"><div><h2>Programmation</h2><p>Jours et heures hebdomadaires.</p></div><span id="scheduleStateText" class="pill">Programmation désactivée</span></div>
+        <form id="scheduleForm" class="grid" novalidate>
+          <label class="switch"><span>Activer la programmation</span><input id="scheduleEnabled" type="checkbox"></label>
+          <div id="scheduleSlots" class="grid"></div>
+          <div class="actions">
+            <button id="addScheduleSlot" class="secondary-btn" type="button">Ajouter un horaire</button>
+            <button class="primary-btn" type="submit">Enregistrer</button>
           </div>
-
-
-          <div class="schedule-simple-box">
-            <div class="schedule-toggle-row">
-              <label class="toggle-label" for="scheduleEnabled">
-                <input id="scheduleEnabled" type="checkbox">
-                Activer les notifications programmées
-              </label>
-              <span id="scheduleStateText">Désactivé</span>
-            </div>
-
-            <p class="schedule-note">
-              Une fois activé, le système enverra automatiquement une notification chaque semaine
-              aux jours et horaires choisis. Les messages seront piochés dans l’ordre et en boucle
-              dans la liste que nous établirons ensuite.
-            </p>
-
-            <div id="scheduleSlots" class="schedule-slot-list" aria-label="Créneaux d’envoi programmés"></div>
-
-            <button id="addScheduleSlot" class="secondary-btn" type="button">Ajouter un autre créneau</button>
-
-            <p class="schedule-note">
-              Par défaut : mardi à 19h30. Vous pouvez cocher plusieurs jours sur un même créneau,
-              ou ajouter un deuxième créneau avec un horaire différent, par exemple jeudi à 20h00.
-            </p>
-          </div>
-
-
-
-          <div class="program-list-box">
-            <div class="program-list-head">
-              <div>
-                <strong>Liste GitHub de programmation</strong>
-                <p class="schedule-note">
-                  Le Worker lira <code>admin-programmation.json</code>, puis piochera les notifications dans l’ordre et en boucle.
-                  L’image grande sera choisie aléatoirement dans <code>/apps/PUSH/images/</code> à chaque envoi.
-                </p>
-              </div>
-              <button id="refreshProgramList" class="secondary-btn" type="button">Actualiser la liste</button>
-            </div>
-            <p id="programListStatus" class="mini-status">Chargement de la liste GitHub...</p>
-            <div id="programList" class="program-list" aria-label="Notifications programmées depuis GitHub"></div>
-          </div>
-
-          <button class="primary-btn" type="submit">Enregistrer la programmation</button>
         </form>
-      </section>
-
-      <p id="adminStatus" class="status">Configuration en attente du Worker Cloudflare.</p>
-
-      
+      </article>
     </section>
-      </main>
+
+    <section class="admin-panel" data-admin-panel="history">
+      <article class="card">
+        <div class="card-head">
+          <div><h2>Historique abonnements</h2><p>Jour, date, heure, cible et appareil.</p></div>
+          <button id="refreshHistoryBtn" class="secondary-btn" type="button">Actualiser</button>
+        </div>
+        <p id="historyStatus" class="mini-status">Chargement…</p>
+        <div id="historyList" class="history-list" style="margin-top:12px"><div class="empty-box">Aucun historique chargé.</div></div>
+      </article>
     </section>
-  </div>
 
-  
-<script>
-(function(){
-  const btn = document.getElementById('adn66TopMenuBtn');
-  const panel = document.getElementById('adn66TopMenu');
-  if(!btn || !panel) return;
+    <p id="adminStatus" class="status">Admin prêt.</p>
+  </section>
 
-  function closeMenu(){
-    panel.classList.remove('is-open');
-    btn.setAttribute('aria-expanded','false');
-  }
+  <section class="main-panel" data-main-panel="subscribe">
+    <article class="card subscribe-compact">
+      <h2 class="big-title">Alertes</h2>
+      <div class="grid">
+        <label>Site
+          <select id="targetSelect">
+            <option value="apero">Apéro de Nuit 66</option>
+            <option value="catalan">Apéro Catalan</option>
+            <option value="x">X — futur projet</option>
+          </select>
+        </label>
+        <button id="subscribeBtn" class="primary-btn" type="button" data-push-subscribe>Activer les alertes</button>
+        <button id="unsubscribeBtn" class="ghost-btn" type="button" data-push-unsubscribe>Désactiver</button>
+        <p id="status" class="status">Prêt.</p>
+      </div>
+    </article>
+  </section>
+</div>
 
-  function toggleMenu(){
-    const open = panel.classList.toggle('is-open');
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-
-  btn.addEventListener('click', function(e){
-    e.stopPropagation();
-    toggleMenu();
-  });
-
-  panel.addEventListener('click', function(e){ e.stopPropagation(); });
-  document.addEventListener('click', closeMenu);
-  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeMenu(); });
-})();
-</script>
-
-  
 <script>
 (function(){
   const buttons = document.querySelectorAll('[data-main-tab]');
   const panels = document.querySelectorAll('[data-main-panel]');
-
   function setMainTab(name){
     buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.mainTab === name));
     panels.forEach(panel => panel.classList.toggle('active', panel.dataset.mainPanel === name));
   }
-
   buttons.forEach(btn => btn.addEventListener('click', () => setMainTab(btn.dataset.mainTab)));
-  setMainTab('subscribe');
+  setMainTab('admin');
 })();
 </script>
-
-  <script src="./config.js"></script>
-  <script type="module" src="./app.js"></script>
-  <script type="module" src="./admin.js?v=github-programmation-random-20260521-1"></script>
-  <script src="./admin-gate.js"></script>
+<script src="./config.js"></script>
+<script type="module" src="./app.js?v=adn66-refonte-20260608"></script>
+<script type="module" src="./admin.js?v=adn66-refonte-20260608"></script>
+<script src="./admin-gate.js?v=adn66-refonte-20260608"></script>
 </body>
 </html>
