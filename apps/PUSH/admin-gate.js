@@ -21,7 +21,7 @@
 (function(){
   "use strict";
 
-  const DEFAULT_PASSWORD_HASH = "c7c084318b6f1bece6f74ffce1ea53596070345272dee8040037497c7d4cbffe";
+  const DEFAULT_PASSWORD_HASH = "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0";
 
   const CFG = Object.assign({
     passwordHash: DEFAULT_PASSWORD_HASH,
