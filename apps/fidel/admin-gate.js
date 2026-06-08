@@ -36,6 +36,7 @@
   const OVERLAY_ID = "adnAdminGate";
   const INPUT_ID = "adnAdminGatePassword";
   const ERROR_ID = "adnAdminGateError";
+  const WORKER_KEY_STORAGE = "adn66_admin_worker_key";
 
   function now(){ return Date.now(); }
 
@@ -352,6 +353,24 @@
     const got = (await sha256(value)).toLowerCase();
     return expected && got === expected;
   }
+
+  function saveWorkerKey(value){
+    try{ sessionStorage.setItem(WORKER_KEY_STORAGE, String(value || "").trim()); }catch(e){}
+  }
+
+  function getWorkerKey(){
+    try{ return sessionStorage.getItem(WORKER_KEY_STORAGE) || ""; }catch(e){ return ""; }
+  }
+
+  function clearWorkerKey(){
+    try{ sessionStorage.removeItem(WORKER_KEY_STORAGE); }catch(e){}
+  }
+
+  window.ADNAdminGate = Object.assign(window.ADNAdminGate || {}, {
+    isUnlocked,
+    getWorkerKey,
+    lock: function(){ lock(); clearWorkerKey(); location.reload(); }
+  });
 
   function wire(){
     const form = document.getElementById("adnAdminGateForm");

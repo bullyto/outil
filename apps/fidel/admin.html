@@ -60,8 +60,9 @@
       <div class="card-h"><h1>Action rapide</h1><div class="mono hint" id="who">—</div></div>
       <div class="card-body">
         <div>
-          <label>Clé admin (PIN)</label>
-          <input id="adminKey" class="mono" value="0000" autocomplete="off" />
+          <label>Code module local</label>
+          <input id="adminKey" class="mono" value="0000" inputmode="numeric" autocomplete="off" />
+          <div class="hint">Sécurité 1 : mot de passe Age Gate “steven”. Sécurité 2 : code local du module “0000”.</div>
         </div>
 
         <input id="clientId" class="mono" placeholder="UUID..." />
@@ -93,6 +94,14 @@
           <button class="secondary" id="btnClear" type="button">Effacer</button>
         </div>
         <div id="results" class="results"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-h"><h1>Historique des cartes créées</h1><button class="secondary small" id="btnHistory" type="button">Actualiser</button></div>
+      <div class="card-body">
+        <div class="hint">Affiche les clients qui ont créé une carte de fidélité : nom, téléphone, date, heure et points. Le bouton +1 ajoute un point directement.</div>
+        <div id="historyList" class="results"></div>
       </div>
     </section>
   </div>
@@ -137,7 +146,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/@zxing/browser@latest/umd/index.min.js"></script>
-  <script src="./admin.js?v=20260130-smart"></script>
+  <script src="./admin.js?v=20260608-history"></script>
   <script src="./admin-gate.js"></script>
 </body>
 </html>

@@ -25,7 +25,9 @@ function extractClientIdFromAny(raw){
 }
 
 const API_BASE = "https://carte-de-fideliter.apero-nuit-du-66.workers.dev";
-const ADMIN_LS = "adn66_loyalty_admin_key";
+const ADMIN_LS = "adn66_loyalty_local_pin";
+const LOCAL_MODULE_PIN = "0000";
+const WORKER_KEY_STORAGE = "adn66_admin_worker_key";
 const RESTORE_PREFIX = "https://www.aperos.net/fidel/client.html?restore=1&id=";
 
 const $ = (id) => document.getElementById(id);
@@ -44,6 +46,39 @@ let zxingControls = null;
 function normalizePhone(raw){ return (raw||"").replace(/[^0-9+]/g,"").trim(); }
 function escapeHtml(s){ return String(s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function maskPhone(phone){ phone=(phone||"").replace(/\s+/g,""); return phone.length < 6 ? phone : phone.slice(0,2)+" ** ** "+phone.slice(-2); }
+function displayPhone(phone, phoneLast4=""){
+  const clean = normalizePhone(phone || "");
+  if(clean) return clean.replace(/(\d{2})(?=\d)/g, "$1 ").trim();
+  const l4 = String(phoneLast4 || "").trim();
+  return l4 ? "•• •• •• " + l4 : "—";
+}
+function formatDateTime(iso){
+  if(!iso) return "—";
+  const d = new Date(String(iso));
+  if(Number.isNaN(d.getTime())) return String(iso);
+  return d.toLocaleString("fr-FR", {day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit"});
+}
+function getWorkerAdminKey(){
+  try{
+    if(window.ADNAdminGate && typeof window.ADNAdminGate.getWorkerKey === "function"){
+      const k = window.ADNAdminGate.getWorkerKey();
+      if(k) return String(k).trim();
+    }
+    return String(sessionStorage.getItem(WORKER_KEY_STORAGE) || "").trim();
+  }catch(_){ return ""; }
+}
+function checkLocalPin(){
+  const pin = ($("adminKey") && $("adminKey").value || "").trim();
+  if(pin !== LOCAL_MODULE_PIN){ showError("Code module incorrect. Le code local est obligatoire avant d’afficher ou modifier les données."); return false; }
+  localStorage.setItem(ADMIN_LS, pin);
+  return true;
+}
+function requireAdminAccess(){
+  if(!checkLocalPin()) return "";
+  const key = getWorkerAdminKey();
+  if(!key){ showError("Mot de passe Age Gate manquant. Fermez puis rouvrez la page et entrez le mot de passe admin."); return ""; }
+  return key;
+}
 function pointsLabel(points){ return points === null || points === undefined || points === "" ? "Points : ?" : `Points : ${Number(points||0)}/8`; }
 function clientName(meta){ return (meta && (meta.name || meta.prenom || meta.firstname)) || "Client"; }
 function isValidClientId(id){
@@ -264,12 +299,11 @@ function confirmStampClient(client){
 }
 
 async function stampClient(cid, meta={}){
-  const key = ($("adminKey").value||"").trim();
+  const key = requireAdminAccess();
   cid = String(cid || "").trim();
-  if(!key) return showError("Clé admin manquante.");
+  if(!key) return;
   if(!isValidClientId(cid)) return showError("ID client invalide.");
-  localStorage.setItem(ADMIN_LS, key);
-  $("who").textContent = "PIN: " + key;
+  $("who").textContent = "PIN local OK";
   setClient(cid, meta);
   if(!API_BASE){
     const stKey = "adn66_demo_state_"+cid;
@@ -319,11 +353,10 @@ async function stamp(){
 }
 
 async function search(){
-  const key = ($("adminKey").value||"").trim();
+  const key = requireAdminAccess();
   const phone = normalizePhone($("searchPhone").value);
-  if(!key) return showError("Clé admin manquante.");
+  if(!key) return;
   if(!phone || phone.length < 10) return showError("Téléphone invalide.");
-  localStorage.setItem(ADMIN_LS, key);
   setMainStatus("Recherche en cours…");
   if(!API_BASE){
     const items = demoSearchByPhone(phone);
@@ -345,6 +378,55 @@ async function search(){
 }
 
 function clearResults(){ $("results").innerHTML = ""; $("searchPhone").value = ""; setMainStatus("Recherche effacée."); }
+
+function renderHistory(items){
+  const host = $("historyList");
+  if(!host) return;
+  if(!items || !items.length){ host.innerHTML = "<div class='hint'>Aucune carte créée pour le moment.</div>"; return; }
+  host.innerHTML = "";
+  items.forEach(it=>{
+    const cid = it.client_id || it.id || "";
+    const card = document.createElement("article");
+    card.className = "result-card";
+    card.innerHTML = `
+      <div class="result-top">
+        <div>
+          <div class="result-name">${escapeHtml(it.name || "Client")}</div>
+          <div class="result-meta mono">${escapeHtml(displayPhone(it.phone || it.phone_digits || "", it.phone_last4))}</div>
+          <div class="result-meta">Créée le ${escapeHtml(formatDateTime(it.created_at))}</div>
+        </div>
+        <div class="result-meta">${pointsLabel(it.points)}<br>${it.completed_at ? "Complète" : ""}</div>
+      </div>
+      <div class="result-actions">
+        <button class="small" data-action="stamp">+1 point</button>
+        <button class="secondary small" data-action="select">Sélect.</button>
+        <button class="secondary small" data-action="qr">QR</button>
+        <button class="secondary small" data-action="copy">Copier</button>
+      </div>`;
+    card.querySelector('[data-action="stamp"]').addEventListener("click", ()=>confirmStampClient({client_id:cid, name:it.name, phone:it.phone || it.phone_digits, phone_last4:it.phone_last4, points:it.points}));
+    card.querySelector('[data-action="select"]').addEventListener("click", ()=>{ setClient(cid, {name:it.name, phone:it.phone || it.phone_digits, points:it.points}); setMainStatus("Client sélectionné depuis l’historique."); });
+    card.querySelector('[data-action="qr"]').addEventListener("click", ()=>showRecoveryQr(cid, {name:it.name, phone:it.phone || it.phone_digits, points:it.points}));
+    card.querySelector('[data-action="copy"]').addEventListener("click", ()=>copyText(cid, "ID copié."));
+    host.appendChild(card);
+  });
+}
+
+async function loadHistory(){
+  const key = requireAdminAccess();
+  if(!key) return;
+  setMainStatus("Chargement de l’historique…");
+  if(!API_BASE){ renderHistory([]); setApiState(true, "Démo locale"); return; }
+  try{
+    const r = await api("/admin/loyalty/history?limit=100&admin_key="+encodeURIComponent(key), {method:"GET"});
+    const items = r.items || r.history || [];
+    renderHistory(items);
+    setApiState(true, "Historique OK");
+    setMainStatus(items.length ? `${items.length} carte(s) affichée(s).` : "Aucune carte trouvée.");
+  }catch(e){
+    setApiState(false, "Erreur");
+    showError("Erreur historique : " + e.message);
+  }
+}
 
 function qrRender(payload){
   const host = $("qrSvg"); if(!host) return;
@@ -383,6 +465,7 @@ $("btnManualClose").addEventListener("click", ()=>stopScan(true));
 $("btnStamp").addEventListener("click", stamp);
 $("btnSearch").addEventListener("click", search);
 $("btnClear").addEventListener("click", clearResults);
+if($("btnHistory")) $("btnHistory").addEventListener("click", loadHistory);
 $("btnCloseQr").addEventListener("click", ()=>closeModal(qrModal));
 $("btnCopy").addEventListener("click", ()=>copyText(($("clientId").value||"").trim(), "ID copié."));
 $("btnQrStamp").addEventListener("click", ()=>{ closeModal(qrModal); confirmStampClient({client_id:currentQr.id, ...currentQr.meta}); });
@@ -391,9 +474,12 @@ $("btnCopyQrLink").addEventListener("click", ()=>copyText(currentQr.url, "Lien Q
 $("btnQrSelect").addEventListener("click", ()=>{ setClient(currentQr.id, currentQr.meta||{}); closeModal(qrModal); setMainStatus("Client sélectionné depuis le QR."); });
 
 $("searchPhone").addEventListener("keydown", (e)=>{ if(e.key === "Enter"){ e.preventDefault(); search(); } });
+$("adminKey").addEventListener("input", ()=>{ $("who").textContent = ($("adminKey").value || "").trim() === LOCAL_MODULE_PIN ? "PIN local OK" : "—"; });
+window.addEventListener("adn-admin-gate-unlocked", ()=>setMainStatus("Accès Age Gate validé. Vous pouvez charger l’historique."));
 
 const saved = localStorage.getItem(ADMIN_LS);
-if(saved){ $("adminKey").value = saved; $("who").textContent = "PIN: " + saved; }
+if(saved){ $("adminKey").value = saved; }
+$("who").textContent = saved === LOCAL_MODULE_PIN ? "PIN local OK" : "—";
 setEnvPill();
 setApiState(true, API_BASE ? "Serveur" : "Démo locale");
 setClient("", {});
