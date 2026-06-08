@@ -28,6 +28,7 @@ const STATIC_ASSETS = [
   "./config.js",
   "./app.js",
   "./admin.js",
+  "./images.json",
   "./manifest.webmanifest",
   "./icons/icon-192.png",
   "./icons/icon-512.png",

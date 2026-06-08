@@ -7,12 +7,82 @@ const cfg = window.ADN_PUSH_CONFIG || {};
 
 const ADMIN_KEY_STORAGE = "adn66_admin_key";
 const DEFAULT_ADMIN_KEY = "0000";
-// Galerie images : retour à la méthode du rollback qui fonctionnait.
-// On lit le dossier GitHub /apps/PUSH/images via l’API GitHub,
-// puis on construit les vraies URLs GitHub Pages des images.
+// Galerie images robuste :
+// 1) on lit /apps/PUSH/images.json (aucun 403, aucune API GitHub) ;
+// 2) si images.json manque, on essaye l’API GitHub ;
+// 3) si l’API GitHub répond 403, on garde une liste interne de secours.
+const IMAGE_LIST_URL = "./images.json";
 const IMAGE_API = "https://api.github.com/repos/bullyto/outil/contents/apps/PUSH/images";
 const IMAGE_BASE = "https://bullyto.github.io/outil/apps/PUSH/images/";
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif)$/i;
+const FALLBACK_IMAGE_NAMES = [
+  "APERO DE NUIT - ABSOLUT 2.jpg",
+  "APERO DE NUIT - ABSOLUT 9.jpeg",
+  "APERO DE NUIT - ANISER 1.jpg",
+  "APERO DE NUIT - ANISER 2.jpg",
+  "APERO DE NUIT - BERLINGO 1.jpeg",
+  "APERO DE NUIT - BERLINGO 2.jpeg",
+  "APERO DE NUIT - BERLINGO 3.jpeg",
+  "APERO DE NUIT - BERLINGO 4.jpeg",
+  "APERO DE NUIT - BERLINGO 5.jpeg",
+  "APERO DE NUIT - BERLINGO 6.jpeg",
+  "APERO DE NUIT - BERLINGO 7.jpeg",
+  "APERO DE NUIT - BERLINGO 8.jpeg",
+  "APERO DE NUIT - CENTRE VILLE 1.jpeg",
+  "APERO DE NUIT - CENTRE VILLE 2.jpeg",
+  "APERO DE NUIT - CENTRE VILLE 3.jpeg",
+  "APERO DE NUIT - CENTRE VILLE 4.jpeg",
+  "APERO DE NUIT - CENTRE VILLE 6.jpeg",
+  "APERO DE NUIT - Captain Morgan 1.jpeg",
+  "APERO DE NUIT - Captain Morgan 11.jpeg",
+  "APERO DE NUIT - Captain Morgan 14.jpeg",
+  "APERO DE NUIT - Captain Morgan 16.jpg",
+  "APERO DE NUIT - Captain Morgan 2.jpeg",
+  "APERO DE NUIT - Captain Morgan 4.jpeg",
+  "APERO DE NUIT - Captain Morgan 7.jpeg",
+  "APERO DE NUIT - GET27 3.jpg",
+  "APERO DE NUIT - GET27 4.jpg",
+  "APERO DE NUIT - JACK DANIELS MIEL 6.jpeg",
+  "APERO DE NUIT - JACK DANIELS MIEL 7.jpeg",
+  "APERO DE NUIT - Jagermeister 2.jpeg",
+  "APERO DE NUIT - LIVRAISON ALCOOL DOMICILE 150.jpeg",
+  "APERO DE NUIT - LIVRAISON ALCOOL DOMICILE 61.jpeg",
+  "APERO DE NUIT - LIVRAISON ALCOOL DOMICILE 65.jpeg",
+  "APERO DE NUIT - PARC 10.jpeg",
+  "APERO DE NUIT - PARC 11.jpeg",
+  "APERO DE NUIT - PARC 12.jpeg",
+  "APERO DE NUIT - PARC 13.jpeg",
+  "APERO DE NUIT - PARC 16.jpg",
+  "APERO DE NUIT - PARC 17.jpg",
+  "APERO DE NUIT - PARC 18.jpg",
+  "APERO DE NUIT - PARC 19.jpg",
+  "APERO DE NUIT - PARC 20.jpg",
+  "APERO DE NUIT - PARC 21.jpg",
+  "APERO DE NUIT - PARC 5.jpeg",
+  "APERO DE NUIT - PARC 6.jpeg",
+  "APERO DE NUIT - PARC 8.jpeg",
+  "APERO DE NUIT - PARC 9.jpeg",
+  "APERO DE NUIT - PLAGE 10.jpeg",
+  "APERO DE NUIT - PLAGE 11.jpeg",
+  "APERO DE NUIT - PLAGE 12.jpeg",
+  "APERO DE NUIT - PLAGE 2.jpeg",
+  "APERO DE NUIT - PLAGE 3.jpeg",
+  "APERO DE NUIT - PLAGE 5.jpeg",
+  "APERO DE NUIT - PLAGE 6.jpeg",
+  "APERO DE NUIT - PLAGE 8.jpeg",
+  "APERO DE NUIT - PLAGE 9.jpeg",
+  "APERO DE NUIT - Parc 6(1).jpeg",
+  "APERO DE NUIT - Parc 7(1).jpeg",
+  "APERO DE NUIT - Parc 8(1).jpeg",
+  "APERO DE NUIT - Parc 9(1).jpeg",
+  "APERO DE NUIT - TEQUILA.jpg",
+  "APERO DE NUIT - ciroc 1.jpg",
+  "APERO DE NUIT - ciroc 11.jpeg",
+  "APERO DE NUIT - ciroc 2.jpeg",
+  "APERO DE NUIT - ciroc 23.jpeg",
+  "APERO DE NUIT - ciroc 50.jpeg",
+  "ouvert-ce-soir.jpg"
+];
 
 const $ = (id) => document.getElementById(id);
 
@@ -230,25 +300,59 @@ async function loadImages(force = false) {
   setMiniStatus(imageStatus, "Chargement images…", "warn");
 
   try {
-    // Méthode rollback : lecture directe du dossier GitHub.
-    const res = await fetch(IMAGE_API, {
-      cache: "no-store",
-      headers: {
-        "Accept": "application/vnd.github+json"
-      }
-    });
+    let imageNames = [];
+    let source = "images.json";
 
-    if (!res.ok) {
-      throw new Error("GitHub HTTP " + res.status);
+    // Méthode principale : fichier local images.json.
+    // GitHub Pages sert ce fichier comme un simple fichier statique, donc pas de limite API et pas de 403.
+    try {
+      const listRes = await fetch(IMAGE_LIST_URL + "?v=" + Date.now(), {
+        cache: "no-store",
+        headers: { "Accept": "application/json" }
+      });
+
+      if (listRes.ok) {
+        const data = await listRes.json();
+        imageNames = Array.isArray(data)
+          ? data
+          : (Array.isArray(data.images) ? data.images : []);
+      }
+    } catch (error) {
+      imageNames = [];
     }
 
-    const files = await res.json();
+    // Secours : ancienne méthode rollback via API GitHub.
+    if (!imageNames.length) {
+      try {
+        source = "GitHub API";
+        const res = await fetch(IMAGE_API, {
+          cache: "no-store",
+          headers: { "Accept": "application/vnd.github+json" }
+        });
 
-    imageCatalog = (Array.isArray(files) ? files : [])
-      .filter(file => file && file.type === "file" && IMAGE_EXT.test(file.name || ""))
-      .map(file => ({
-        name: file.name,
-        url: buildGithubPagesImageUrl(file.name)
+        if (res.ok) {
+          const files = await res.json();
+          imageNames = (Array.isArray(files) ? files : [])
+            .filter(file => file && file.type === "file" && IMAGE_EXT.test(file.name || ""))
+            .map(file => file.name);
+        }
+      } catch (error) {
+        imageNames = [];
+      }
+    }
+
+    // Dernier secours : liste intégrée dans admin.js.
+    if (!imageNames.length) {
+      source = "liste intégrée";
+      imageNames = FALLBACK_IMAGE_NAMES;
+    }
+
+    imageCatalog = imageNames
+      .map(name => String(name || "").trim())
+      .filter(name => IMAGE_EXT.test(name))
+      .map(name => ({
+        name,
+        url: buildGithubPagesImageUrl(name)
       }))
       .sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" }));
 
@@ -257,7 +361,7 @@ async function loadImages(force = false) {
     setMiniStatus(
       imageStatus,
       imageCatalog.length
-        ? `${imageCatalog.length} image(s) disponible(s).`
+        ? `${imageCatalog.length} image(s) disponible(s). Source : ${source}.`
         : "Aucune image trouvée dans /apps/PUSH/images/.",
       imageCatalog.length ? "success" : "warn"
     );
@@ -267,7 +371,7 @@ async function loadImages(force = false) {
     renderImageOptions();
     setMiniStatus(
       imageStatus,
-      "Images indisponibles : " + err.message + ". Réessayez avec Recharger images.",
+      "Images indisponibles : " + err.message,
       "error"
     );
   }
