@@ -61,8 +61,8 @@
       <div class="card-body">
         <div>
           <label>Code module local</label>
-          <input id="adminKey" class="mono" value="0000" inputmode="numeric" autocomplete="off" />
-          <div class="hint">Sécurité 1 : mot de passe Age Gate “steven”. Sécurité 2 : code local du module “0000”.</div>
+          <input id="adminKey" class="mono" type="password" inputmode="numeric" autocomplete="off" placeholder="Code local" />
+          <div class="hint">Double validation obligatoire : accès admin + code local du module. Aucun historique ne sera chargé sans validation serveur.</div>
         </div>
 
         <input id="clientId" class="mono" placeholder="UUID..." />
@@ -146,7 +146,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/@zxing/browser@latest/umd/index.min.js"></script>
-  <script src="./admin.js?v=20260608-history"></script>
-  <script src="./admin-gate.js"></script>
+  <script src="./admin-gate.js?v=20260608-history-secure"></script>
+  <script src="./admin.js?v=20260608-history-secure"></script>
 </body>
 </html>

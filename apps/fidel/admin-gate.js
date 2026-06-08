@@ -1,31 +1,15 @@
 /*!
  * admin-gate.js — Apéro de Nuit 66®
- * Pop-up d'accès admin inspirée de l'Age Gate.
- *
- * Intégration sur chaque page admin :
- *   <script src="./admin-gate.js"></script>
- *
- * Optionnel AVANT le script :
- *   <script>
- *     window.ADN_ADMIN_GATE = {
- *       passwordHash: "SHA256_DU_MOT_DE_PASSE",
- *       rememberHours: 2160
- *     };
- *   </script>
- *
- * Important :
- * - Le mot de passe n'est jamais affiché dans l'interface.
- * - Le code ne montre pas le mot de passe en clair.
- * - Pour une vraie sécurité serveur, il faudra ensuite protéger par Worker/API.
+ * Pop-up d'accès admin.
+ * Le mot de passe n'est pas stocké dans ce fichier : validation côté Worker.
  */
 (function(){
   "use strict";
 
-  const DEFAULT_PASSWORD_HASH = "c7c084318b6f1bece6f74ffce1ea53596070345272dee8040037497c7d4cbffe";
-
   const CFG = Object.assign({
-    passwordHash: DEFAULT_PASSWORD_HASH,
-    rememberHours: 2160,
+    authUrl: "https://carte-de-fideliter.apero-nuit-du-66.workers.dev/admin/auth",
+    rememberHours: 0,
+    forceOnLoad: true,
     title: "Accès admin",
     subtitle: "Espace réservé",
     storageKey: "adn66_admin_gate_until",
@@ -106,14 +90,15 @@
     storeDel(CFG.storageKey);
   }
 
-  async function sha256(text){
-    const normalized = String(text || "");
-    if(!window.crypto || !window.crypto.subtle){
-      throw new Error("Crypto indisponible");
-    }
-    const data = new TextEncoder().encode(normalized);
-    const hash = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+  async function verifyPassword(value){
+    const key = String(value || "").trim();
+    if(!key) return false;
+    const res = await fetch(CFG.authUrl, {
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({admin_key:key})
+    });
+    return res.ok;
   }
 
   function ensureStyle(){
@@ -300,7 +285,7 @@
               <button class="adnAdminGateBtn adnAdminGateBtnSecondary" type="button" id="adnAdminGateClear">Effacer</button>
             </div>
 
-            <div class="adnAdminGateFine">Accès mémorisé temporairement sur cet appareil.</div>
+            <div class="adnAdminGateFine">Accès obligatoire au démarrage de la page.</div>
           </form>
         </div>
       </div>
@@ -348,11 +333,6 @@
     el.classList.remove("show");
   }
 
-  async function verifyPassword(value){
-    const expected = String(CFG.passwordHash || "").trim().toLowerCase();
-    const got = (await sha256(value)).toLowerCase();
-    return expected && got === expected;
-  }
 
   function saveWorkerKey(value){
     try{ sessionStorage.setItem(WORKER_KEY_STORAGE, String(value || "").trim()); }catch(e){}
@@ -397,6 +377,8 @@
             return;
           }
           unlock();
+          saveWorkerKey(value);
+          try{ window.dispatchEvent(new CustomEvent("adn-admin-gate-unlocked")); }catch(_){}
           if(input) input.value = "";
           hideGate();
 
@@ -406,7 +388,7 @@
             fn();
           }
         }catch(err){
-          setError("Vérification impossible sur ce navigateur.");
+          setError("Vérification serveur impossible.");
         }
       });
     }
@@ -416,6 +398,8 @@
       clear.addEventListener("click", () => {
         if(input) input.value = "";
         clearError();
+        lock();
+        clearWorkerKey();
         setTimeout(() => input && input.focus(), 50);
       });
     }
@@ -425,8 +409,7 @@
       overlay.__adnAdminGateBound = true;
       overlay.addEventListener("click", (e) => {
         if(e.target === overlay){
-          // volontairement aucune fermeture par clic dehors
-        }
+            }
       });
     }
 
@@ -454,6 +437,7 @@
     window.requireAdminThen = requireAdminThen;
     window.adnAdminGateLock = function(){
       lock();
+      clearWorkerKey();
       showGate();
     };
     window.adnAdminGateUnlockUntil = function(hours){
@@ -464,7 +448,17 @@
       hideGate();
     };
 
-    if(!isUnlocked()) showGate();
+    // Accès forcé au chargement : aucune donnée serveur sans saisie dans cette session.
+    if(CFG.forceOnLoad){
+      lock();
+      clearWorkerKey();
+      showGate();
+      return;
+    }
+    if(!isUnlocked() || !getWorkerKey()){
+      if(isUnlocked() && !getWorkerKey()) lock();
+      showGate();
+    }
   }
 
   if(document.readyState === "loading"){

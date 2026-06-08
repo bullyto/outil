@@ -26,7 +26,7 @@ function extractClientIdFromAny(raw){
 
 const API_BASE = "https://carte-de-fideliter.apero-nuit-du-66.workers.dev";
 const ADMIN_LS = "adn66_loyalty_local_pin";
-const LOCAL_MODULE_PIN = "0000";
+const LOCAL_MODULE_PIN_HASH = "9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0";
 const WORKER_KEY_STORAGE = "adn66_admin_worker_key";
 const RESTORE_PREFIX = "https://www.aperos.net/fidel/client.html?restore=1&id=";
 
@@ -45,6 +45,12 @@ let zxingControls = null;
 
 function normalizePhone(raw){ return (raw||"").replace(/[^0-9+]/g,"").trim(); }
 function escapeHtml(s){ return String(s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+async function sha256Text(text){
+  if(!window.crypto || !window.crypto.subtle) throw new Error("Crypto indisponible");
+  const data = new TextEncoder().encode(String(text || ""));
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
 function maskPhone(phone){ phone=(phone||"").replace(/\s+/g,""); return phone.length < 6 ? phone : phone.slice(0,2)+" ** ** "+phone.slice(-2); }
 function displayPhone(phone, phoneLast4=""){
   const clean = normalizePhone(phone || "");
@@ -67,16 +73,23 @@ function getWorkerAdminKey(){
     return String(sessionStorage.getItem(WORKER_KEY_STORAGE) || "").trim();
   }catch(_){ return ""; }
 }
-function checkLocalPin(){
+async function checkLocalPin(){
   const pin = ($("adminKey") && $("adminKey").value || "").trim();
-  if(pin !== LOCAL_MODULE_PIN){ showError("Code module incorrect. Le code local est obligatoire avant d’afficher ou modifier les données."); return false; }
-  localStorage.setItem(ADMIN_LS, pin);
+  if(!pin){ showError("Code local obligatoire."); return false; }
+  let ok = false;
+  try{ ok = (await sha256Text(pin)) === LOCAL_MODULE_PIN_HASH; }catch(_){ ok = false; }
+  if(!ok){ showError("Code local incorrect."); return false; }
+  try{ sessionStorage.setItem(ADMIN_LS, "ok"); }catch(_){}
   return true;
 }
-function requireAdminAccess(){
-  if(!checkLocalPin()) return "";
+async function requireAdminAccess(){
+  if(!(await checkLocalPin())) return "";
   const key = getWorkerAdminKey();
-  if(!key){ showError("Mot de passe Age Gate manquant. Fermez puis rouvrez la page et entrez le mot de passe admin."); return ""; }
+  if(!key){
+    if(window.ADNAdminGate && typeof window.ADNAdminGate.lock === "function") window.ADNAdminGate.lock();
+    showError("Accès admin serveur manquant. Entrez le mot de passe d’accès au démarrage de la page.");
+    return "";
+  }
   return key;
 }
 function pointsLabel(points){ return points === null || points === undefined || points === "" ? "Points : ?" : `Points : ${Number(points||0)}/8`; }
@@ -366,7 +379,7 @@ async function search(){
     return;
   }
   try{
-    const items = await api("/admin/loyalty/search?phone="+encodeURIComponent(phone)+"&admin_key="+encodeURIComponent(key), {method:"GET"});
+    const items = await api("/admin/loyalty/search?phone="+encodeURIComponent(phone), {method:"GET", headers:{"x-admin-key":key}});
     const results = items.found && items.client ? [items.client] : (items.results || []);
     renderResults(results);
     setApiState(true, "OK");
@@ -412,12 +425,12 @@ function renderHistory(items){
 }
 
 async function loadHistory(){
-  const key = requireAdminAccess();
+  const key = await requireAdminAccess();
   if(!key) return;
   setMainStatus("Chargement de l’historique…");
   if(!API_BASE){ renderHistory([]); setApiState(true, "Démo locale"); return; }
   try{
-    const r = await api("/admin/loyalty/history?limit=100&admin_key="+encodeURIComponent(key), {method:"GET"});
+    const r = await api("/admin/loyalty/history?limit=100", {method:"GET", headers:{"x-admin-key":key}});
     const items = r.items || r.history || [];
     renderHistory(items);
     setApiState(true, "Historique OK");
@@ -474,12 +487,11 @@ $("btnCopyQrLink").addEventListener("click", ()=>copyText(currentQr.url, "Lien Q
 $("btnQrSelect").addEventListener("click", ()=>{ setClient(currentQr.id, currentQr.meta||{}); closeModal(qrModal); setMainStatus("Client sélectionné depuis le QR."); });
 
 $("searchPhone").addEventListener("keydown", (e)=>{ if(e.key === "Enter"){ e.preventDefault(); search(); } });
-$("adminKey").addEventListener("input", ()=>{ $("who").textContent = ($("adminKey").value || "").trim() === LOCAL_MODULE_PIN ? "PIN local OK" : "—"; });
+$("adminKey").addEventListener("input", ()=>{ $("who").textContent = $("adminKey").value ? "Code local saisi" : "—"; });
 window.addEventListener("adn-admin-gate-unlocked", ()=>setMainStatus("Accès Age Gate validé. Vous pouvez charger l’historique."));
 
-const saved = localStorage.getItem(ADMIN_LS);
-if(saved){ $("adminKey").value = saved; }
-$("who").textContent = saved === LOCAL_MODULE_PIN ? "PIN local OK" : "—";
+const saved = sessionStorage.getItem(ADMIN_LS);
+$("who").textContent = saved ? "Code local OK" : "—";
 setEnvPill();
 setApiState(true, API_BASE ? "Serveur" : "Démo locale");
 setClient("", {});
