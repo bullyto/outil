@@ -7,6 +7,9 @@ const cfg = window.ADN_PUSH_CONFIG || {};
 
 const ADMIN_KEY_STORAGE = "adn66_admin_key";
 const DEFAULT_ADMIN_KEY = "0000";
+// Galerie images : retour à la méthode du rollback qui fonctionnait.
+// On lit le dossier GitHub /apps/PUSH/images via l’API GitHub,
+// puis on construit les vraies URLs GitHub Pages des images.
 const IMAGE_API = "https://api.github.com/repos/bullyto/outil/contents/apps/PUSH/images";
 const IMAGE_BASE = "https://bullyto.github.io/outil/apps/PUSH/images/";
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif)$/i;
@@ -197,112 +200,77 @@ async function loadHistory({ silent = false } = {}) {
   }
 }
 
+function buildGithubPagesImageUrl(fileName) {
+  return IMAGE_BASE + encodeURIComponent(String(fileName || "")).replace(/%20/g, "%20");
+}
+
+function renderImageOptions() {
+  if (!imageSelect) return;
+
+  const previous = imageSelect.value || "";
+  imageSelect.innerHTML = `<option value="">Aucune image</option>`;
+
+  for (const img of imageCatalog) {
+    const opt = document.createElement("option");
+    opt.value = img.url;
+    opt.textContent = img.name;
+    imageSelect.appendChild(opt);
+  }
+
+  if (previous && imageCatalog.some(img => img.url === previous)) {
+    imageSelect.value = previous;
+  }
+
+  updateImagePreview();
+}
+
 async function loadImages(force = false) {
   if (!imageSelect || (!force && imageCatalog.length)) return;
 
   setMiniStatus(imageStatus, "Chargement images…", "warn");
-  if (imagePreviewBox) imagePreviewBox.hidden = true;
-  if (imagePreview) imagePreview.removeAttribute("src");
 
   try {
-    imageCatalog = await fetchImageCatalogSafe();
-
-    imageSelect.innerHTML = `<option value="">Aucune image</option>`;
-    for (const img of imageCatalog) {
-      const opt = document.createElement("option");
-      opt.value = img.url;
-      opt.textContent = img.name || img.url.split("/").pop() || "Image";
-      imageSelect.appendChild(opt);
-    }
-
-    updateImagePreview();
-
-    if (imageCatalog.length) {
-      setMiniStatus(imageStatus, `${imageCatalog.length} image(s) disponible(s).`, "success");
-    } else {
-      setMiniStatus(imageStatus, "Aucune image trouvée. Envoi possible sans image.", "warn");
-    }
-  } catch (err) {
-    imageCatalog = [];
-    imageSelect.innerHTML = `<option value="">Aucune image</option>`;
-    updateImagePreview();
-    setMiniStatus(imageStatus, "Images non chargées. Envoi possible sans image.", "warn");
-  }
-}
-
-async function fetchImageCatalogSafe() {
-  const sources = [];
-
-  if (isWorkerReady()) {
-    sources.push(async () => {
-      const res = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/images`, {
-        cache: "no-store",
-        headers: headers(false)
-      });
-      if (!res.ok) throw new Error("Worker images HTTP " + res.status);
-      const data = await res.json();
-      return normalizeImages(data.images || data.items || []);
-    });
-
-    sources.push(async () => {
-      const res = await fetch(`${cfg.WORKER_BASE_URL}/admin/push/programmation-list`, {
-        cache: "no-store",
-        headers: headers(false)
-      });
-      if (!res.ok) throw new Error("Worker programmation HTTP " + res.status);
-      const data = await res.json();
-      return normalizeImages(data.images || []);
-    });
-  }
-
-  sources.push(async () => {
-    const res = await fetch(`./admin-images.json?v=${Date.now()}`, { cache: "no-store" });
-    if (!res.ok) throw new Error("admin-images.json absent");
-    const data = await res.json();
-    return normalizeImages(data.images || data);
-  });
-
-  sources.push(async () => {
+    // Méthode rollback : lecture directe du dossier GitHub.
     const res = await fetch(IMAGE_API, {
       cache: "no-store",
-      headers: { Accept: "application/vnd.github+json" }
-    });
-    if (!res.ok) throw new Error("GitHub HTTP " + res.status);
-    const files = await res.json();
-    return normalizeImages((Array.isArray(files) ? files : [])
-      .filter(f => f?.type === "file" && IMAGE_EXT.test(f.name || ""))
-      .map(f => ({ name: f.name, url: IMAGE_BASE + encodeURIComponent(f.name).replace(/%20/g, "%20") }))
-    );
-  });
-
-  let lastError = null;
-  for (const source of sources) {
-    try {
-      const images = await source();
-      if (images.length) return images;
-    } catch (err) {
-      lastError = err;
-    }
-  }
-
-  if (lastError) console.warn("Images indisponibles", lastError);
-  return [];
-}
-
-function normalizeImages(value) {
-  return (Array.isArray(value) ? value : [])
-    .map(img => {
-      if (typeof img === "string") {
-        return { name: img.split("/").pop() || "Image", url: img };
+      headers: {
+        "Accept": "application/vnd.github+json"
       }
-      return {
-        name: img.name || img.filename || String(img.url || "").split("/").pop() || "Image",
-        url: img.url || img.download_url || img.href || ""
-      };
-    })
-    .filter(img => img.url && /^https:\/\//i.test(img.url) && IMAGE_EXT.test(img.url.split("?")[0]))
-    .filter(img => !/\/icons\/(icon-|badge-)/i.test(img.url))
-    .sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" }));
+    });
+
+    if (!res.ok) {
+      throw new Error("GitHub HTTP " + res.status);
+    }
+
+    const files = await res.json();
+
+    imageCatalog = (Array.isArray(files) ? files : [])
+      .filter(file => file && file.type === "file" && IMAGE_EXT.test(file.name || ""))
+      .map(file => ({
+        name: file.name,
+        url: buildGithubPagesImageUrl(file.name)
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" }));
+
+    renderImageOptions();
+
+    setMiniStatus(
+      imageStatus,
+      imageCatalog.length
+        ? `${imageCatalog.length} image(s) disponible(s).`
+        : "Aucune image trouvée dans /apps/PUSH/images/.",
+      imageCatalog.length ? "success" : "warn"
+    );
+  } catch (err) {
+    console.error(err);
+    imageCatalog = [];
+    renderImageOptions();
+    setMiniStatus(
+      imageStatus,
+      "Images indisponibles : " + err.message + ". Réessayez avec Recharger images.",
+      "error"
+    );
+  }
 }
 
 function updateImagePreview() {
