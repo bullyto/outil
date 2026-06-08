@@ -70,16 +70,26 @@ function getWorkerAdminKey(){
       const k = window.ADNAdminGate.getWorkerKey();
       if(k) return String(k).trim();
     }
-    return String(sessionStorage.getItem(WORKER_KEY_STORAGE) || "").trim();
+    return String(localStorage.getItem(WORKER_KEY_STORAGE) || "").trim();
   }catch(_){ return ""; }
 }
+function getSavedLocalPin(){
+  try{ return String(localStorage.getItem(ADMIN_LS) || "").trim(); }catch(_){ return ""; }
+}
+function saveLocalPin(pin){
+  try{ localStorage.setItem(ADMIN_LS, String(pin || "").trim()); }catch(_){}
+}
 async function checkLocalPin(){
-  const pin = ($("adminKey") && $("adminKey").value || "").trim();
+  const input = $("adminKey");
+  const typed = (input && input.value || "").trim();
+  const saved = getSavedLocalPin();
+  const pin = typed || saved;
   if(!pin){ showError("Code local obligatoire."); return false; }
   let ok = false;
   try{ ok = (await sha256Text(pin)) === LOCAL_MODULE_PIN_HASH; }catch(_){ ok = false; }
   if(!ok){ showError("Code local incorrect."); return false; }
-  try{ sessionStorage.setItem(ADMIN_LS, "ok"); }catch(_){}
+  saveLocalPin(pin);
+  if(input && !typed) input.value = pin;
   return true;
 }
 async function requireAdminAccess(){
@@ -312,7 +322,7 @@ function confirmStampClient(client){
 }
 
 async function stampClient(cid, meta={}){
-  const key = requireAdminAccess();
+  const key = await requireAdminAccess();
   cid = String(cid || "").trim();
   if(!key) return;
   if(!isValidClientId(cid)) return showError("ID client invalide.");
@@ -366,7 +376,7 @@ async function stamp(){
 }
 
 async function search(){
-  const key = requireAdminAccess();
+  const key = await requireAdminAccess();
   const phone = normalizePhone($("searchPhone").value);
   if(!key) return;
   if(!phone || phone.length < 10) return showError("Téléphone invalide.");
@@ -490,7 +500,8 @@ $("searchPhone").addEventListener("keydown", (e)=>{ if(e.key === "Enter"){ e.pre
 $("adminKey").addEventListener("input", ()=>{ $("who").textContent = $("adminKey").value ? "Code local saisi" : "—"; });
 window.addEventListener("adn-admin-gate-unlocked", ()=>setMainStatus("Accès Age Gate validé. Vous pouvez charger l’historique."));
 
-const saved = sessionStorage.getItem(ADMIN_LS);
+const saved = getSavedLocalPin();
+if(saved && $("adminKey")) $("adminKey").value = saved;
 $("who").textContent = saved ? "Code local OK" : "—";
 setEnvPill();
 setApiState(true, API_BASE ? "Serveur" : "Démo locale");

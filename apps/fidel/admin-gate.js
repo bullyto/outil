@@ -8,8 +8,8 @@
 
   const CFG = Object.assign({
     authUrl: "https://carte-de-fideliter.apero-nuit-du-66.workers.dev/admin/auth",
-    rememberHours: 0,
-    forceOnLoad: true,
+    rememberHours: 2160,
+    forceOnLoad: false,
     title: "Accès admin",
     subtitle: "Espace réservé",
     storageKey: "adn66_admin_gate_until",
@@ -285,7 +285,7 @@
               <button class="adnAdminGateBtn adnAdminGateBtnSecondary" type="button" id="adnAdminGateClear">Effacer</button>
             </div>
 
-            <div class="adnAdminGateFine">Accès obligatoire au démarrage de la page.</div>
+            <div class="adnAdminGateFine">Accès mémorisé localement sur cet appareil.</div>
           </form>
         </div>
       </div>
@@ -335,15 +335,15 @@
 
 
   function saveWorkerKey(value){
-    try{ sessionStorage.setItem(WORKER_KEY_STORAGE, String(value || "").trim()); }catch(e){}
+    try{ localStorage.setItem(WORKER_KEY_STORAGE, String(value || "").trim()); }catch(e){}
   }
 
   function getWorkerKey(){
-    try{ return sessionStorage.getItem(WORKER_KEY_STORAGE) || ""; }catch(e){ return ""; }
+    try{ return localStorage.getItem(WORKER_KEY_STORAGE) || ""; }catch(e){ return ""; }
   }
 
   function clearWorkerKey(){
-    try{ sessionStorage.removeItem(WORKER_KEY_STORAGE); }catch(e){}
+    try{ localStorage.removeItem(WORKER_KEY_STORAGE); }catch(e){}
   }
 
   window.ADNAdminGate = Object.assign(window.ADNAdminGate || {}, {
@@ -448,7 +448,8 @@
       hideGate();
     };
 
-    // Accès forcé au chargement : aucune donnée serveur sans saisie dans cette session.
+    // Accès mémorisé localement : si le mot de passe serveur a déjà été validé
+    // sur cet appareil, on ne le redemande pas à chaque ouverture.
     if(CFG.forceOnLoad){
       lock();
       clearWorkerKey();
@@ -458,6 +459,8 @@
     if(!isUnlocked() || !getWorkerKey()){
       if(isUnlocked() && !getWorkerKey()) lock();
       showGate();
+    }else{
+      try{ window.dispatchEvent(new CustomEvent("adn-admin-gate-unlocked")); }catch(_){}
     }
   }
 
