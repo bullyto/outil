@@ -1,23 +1,23 @@
 {
   "version": 1,
   "scope": "vehicule",
-  "updatedAt": "2026-06-08T20:36:53.219Z",
+  "updatedAt": "2026-06-08T20:50:50.342Z",
   "items": [
     {
       "id": "cacahuette",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "bretzel",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "curly",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "chips",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "monster_munch",
@@ -37,39 +37,39 @@
     },
     {
       "id": "absolut",
-      "qty": 1
+      "qty": 2
     },
     {
       "id": "ciroc_classic",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "ciroc_redberry",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "ciroc_pomme",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "william_peel",
-      "qty": 1
+      "qty": 2
     },
     {
       "id": "label_5",
-      "qty": 1
+      "qty": 2
     },
     {
       "id": "ballantines",
-      "qty": 1
+      "qty": 2
     },
     {
       "id": "jack_old7",
-      "qty": 1
+      "qty": 2
     },
     {
       "id": "jack_honey",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "old_nick_darkwood",
@@ -141,15 +141,15 @@
     },
     {
       "id": "oasis_tropical",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "schweppes_tonic",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "perrier",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "perrier_citron",
@@ -157,23 +157,23 @@
     },
     {
       "id": "crazy_tiger",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "jus_pomme",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "jus_orange",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "jus_ananas",
-      "qty": 0
+      "qty": 1
     },
     {
       "id": "verre_whisky",
-      "qty": 0
+      "qty": 1
     }
   ]
 }
