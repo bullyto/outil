@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scope": "vehicule",
-  "updatedAt": "2026-06-05T03:59:11.182Z",
+  "updatedAt": "2026-06-08T20:36:53.219Z",
   "items": [
     {
       "id": "cacahuette",
@@ -33,7 +33,7 @@
     },
     {
       "id": "poliakov",
-      "qty": 1
+      "qty": 5
     },
     {
       "id": "absolut",
