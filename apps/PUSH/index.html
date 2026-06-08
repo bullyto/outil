@@ -19,14 +19,39 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:
 body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:24px 24px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.28),transparent 85%)}
 button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit}.app{position:relative;z-index:1;width:min(1180px,100%);margin:0 auto;padding:14px 14px 42px}
 .topbar{position:sticky;top:0;z-index:50;margin:-14px -14px 14px;padding:14px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(7,11,18,.98),rgba(11,18,32,.92));backdrop-filter:blur(14px)}
-.topbar-inner{width:min(1180px,100%);margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.logo{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(93,183,238,.22),rgba(15,23,42,.9));border:1px solid rgba(93,183,238,.38);font-size:24px;box-shadow:0 12px 28px rgba(0,0,0,.36)}
-.brand small{display:block;color:var(--primary);font-weight:1000;letter-spacing:.12em;text-transform:uppercase;font-size:11px}.brand h1{margin:2px 0 0;font-size:clamp(20px,4vw,32px);line-height:1.05}.brand p{margin:4px 0 0;color:var(--soft);font-weight:800;font-size:12px}.lock-btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:14px;min-height:44px;padding:0 13px;font-weight:1000;white-space:nowrap}
+.topbar-inner{width:min(1180px,100%);margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.logo{width:64px;height:64px;border-radius:21px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(93,183,238,.22),rgba(15,23,42,.9));border:1px solid rgba(93,183,238,.38);box-shadow:0 12px 28px rgba(0,0,0,.36);padding:4px;flex:0 0 auto}.logo img{width:100%;height:100%;object-fit:contain;border-radius:17px;display:block}
+.brand small{display:block;color:var(--primary);font-weight:1000;letter-spacing:.12em;text-transform:uppercase;font-size:11px}.brand h1{margin:2px 0 0;font-size:clamp(20px,4vw,32px);line-height:1.05}.brand p{margin:4px 0 0;color:var(--soft);font-weight:800;font-size:12px}.topbar-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex:0 0 auto}.lock-btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:14px;min-height:44px;padding:0 13px;font-weight:1000;white-space:nowrap}
 .main-tabs,.admin-tabs{display:flex;gap:10px;overflow:auto;scrollbar-width:none;padding:3px 0 14px}.main-tabs::-webkit-scrollbar,.admin-tabs::-webkit-scrollbar{display:none}.tab{flex:0 0 auto;min-height:46px;padding:0 16px;border-radius:999px;border:1px solid var(--border);background:rgba(17,24,39,.9);color:var(--text);font-weight:1000}.tab.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 12px 28px rgba(93,183,238,.2)}
 .main-panel,.admin-panel{display:none}.main-panel.active,.admin-panel.active{display:block}.card{background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(23,32,51,.94));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow);padding:18px;margin-bottom:16px}.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.card h2{margin:0;font-size:20px}.card p{margin:5px 0 0;color:var(--muted);font-weight:800;font-size:13px;line-height:1.35}.grid{display:grid;gap:12px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}.stat{background:rgba(15,23,42,.72);border:1px solid var(--border);border-radius:18px;padding:14px}.stat span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;font-weight:1000;letter-spacing:.06em}.stat strong{display:block;margin-top:6px;font-size:28px}.pill{display:inline-flex;align-items:center;border:1px solid rgba(93,183,238,.35);background:rgba(93,183,238,.1);color:#dff4ff;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:1000;white-space:nowrap}
 label{display:grid;gap:8px;color:var(--soft);font-size:13px;font-weight:1000}input,select,textarea{width:100%;border:1px solid var(--border);background:var(--input);color:var(--text);border-radius:16px;padding:14px;outline:none}textarea{min-height:108px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:rgba(93,183,238,.64);box-shadow:0 0 0 4px rgba(93,183,238,.12)}
 .primary-btn,.secondary-btn,.ghost-btn{border-radius:16px;border:1px solid var(--border);min-height:46px;padding:0 15px;font-weight:1000}.primary-btn{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 16px 38px rgba(93,183,238,.22)}.secondary-btn,.ghost-btn{background:rgba(15,23,42,.85);color:var(--text)}.danger-mini{color:var(--red);border-color:rgba(220,38,38,.35)}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions>*{flex:1 1 160px}.status,.mini-status{border-radius:16px;padding:12px 13px;background:rgba(15,23,42,.72);border:1px solid var(--border);color:var(--soft);font-weight:900}.status.success,.mini-status[data-type="success"]{color:var(--green);background:rgba(22,163,74,.1);border-color:rgba(22,163,74,.35)}.status.warn,.mini-status[data-type="warn"]{color:#dff4ff;background:rgba(93,183,238,.1);border-color:rgba(93,183,238,.35)}.status.error,.mini-status[data-type="error"]{color:var(--red);background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.35)}
 .image-preview{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center;background:rgba(15,23,42,.7);border:1px solid var(--border);border-radius:18px;padding:12px}.image-preview img{width:100%;height:86px;object-fit:cover;border-radius:14px}.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--border);background:rgba(15,23,42,.7);border-radius:18px;padding:14px}.switch input{width:auto;transform:scale(1.25)}.slot-row{display:grid;grid-template-columns:1fr 150px auto;gap:10px;align-items:center;border:1px solid var(--border);background:rgba(15,23,42,.6);border-radius:18px;padding:12px}.history-list{display:grid;gap:10px}.history-item{display:grid;gap:6px;border:1px solid var(--border);background:rgba(15,23,42,.7);border-radius:18px;padding:13px}.history-item strong{font-size:14px}.history-item span,.history-item small{color:var(--soft);font-weight:800}.history-item code{color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis}.empty-box{color:var(--muted);font-weight:900;border:1px dashed var(--border);border-radius:18px;padding:16px;text-align:center}.subscribe-compact{max-width:680px;margin:auto}.big-title{font-size:clamp(28px,7vw,44px);margin:0 0 12px;line-height:1}
 .day-picker{display:flex;flex-wrap:wrap;gap:8px}.day-chip{display:inline-flex;align-items:center;justify-content:center;margin:0}.day-chip input{position:absolute;opacity:0;pointer-events:none}.day-chip span{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--border);background:rgba(15,23,42,.85);color:var(--soft);font-weight:1000;font-size:13px}.day-chip input:checked+span{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 10px 24px rgba(93,183,238,.18)}
+
+/* ===== MENU ADN66 — logos modules ===== */
+.adn66-header-menu{position:relative;z-index:2000;display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto}
+.adn66-menu-btn{min-height:44px;padding:0 14px;border-radius:14px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;font-weight:1000;display:inline-flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 12px 28px rgba(0,0,0,.28);cursor:pointer;white-space:nowrap}
+.adn66-menu-btn:hover{border-color:rgba(93,183,238,.45);background:var(--card2)}
+.adn66-menu-btn:active{transform:translateY(1px)}
+.adn66-menu-burger{display:inline-grid;gap:4px;width:18px;flex:0 0 auto}
+.adn66-menu-burger span{display:block;width:18px;height:2px;border-radius:999px;background:var(--text)}
+.adn66-menu-panel{position:fixed;top:calc(env(safe-area-inset-top) + 76px);right:max(12px, env(safe-area-inset-right));width:min(380px, calc(100vw - 24px));max-height:calc(100dvh - 92px);overflow:auto;display:none;padding:10px;border-radius:22px;border:1px solid var(--border);background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(23,32,51,.98));box-shadow:0 26px 60px rgba(0,0,0,.45);overscroll-behavior:contain}
+.adn66-menu-panel.is-open{display:block}
+.adn66-menu-head{padding:10px 10px 12px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.adn66-menu-kicker{margin:0 0 4px;color:var(--primary);font-size:11px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase}
+.adn66-menu-title{margin:0;color:var(--text);font-size:18px;line-height:1.1;font-weight:1000}
+.adn66-menu-list{display:grid;gap:8px}
+.adn66-menu-item{display:flex;align-items:center;gap:12px;min-width:0;padding:11px;border-radius:17px;border:1px solid var(--border);background:var(--input);color:var(--text);text-decoration:none;transition:.16s ease}
+.adn66-menu-item:hover{background:rgba(93,183,238,.10);border-color:rgba(93,183,238,.38)}
+.adn66-menu-item.is-current{background:rgba(93,183,238,.16);border-color:rgba(93,183,238,.48)}
+.adn66-menu-icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));border:1px solid rgba(93,183,238,.24);flex:0 0 auto;padding:3px}
+.adn66-menu-icon img{width:100%;height:100%;object-fit:contain;border-radius:13px;display:block}
+.adn66-menu-text{min-width:0;flex:1 1 auto}
+.adn66-menu-text strong{display:block;color:var(--text);font-size:15px;line-height:1.1;font-weight:1000;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.adn66-menu-text span{display:block;color:var(--muted);font-size:12px;line-height:1.35;font-weight:800}
+.adn66-menu-arrow{color:var(--muted);font-size:18px;font-weight:1000;flex:0 0 auto}
+@media(max-width:760px){.topbar-inner{display:grid;grid-template-columns:1fr auto;align-items:center}.topbar-actions{grid-column:1 / -1;width:100%;justify-content:space-between}.logo{width:58px;height:58px}.adn66-menu-btn{min-height:42px;padding:0 12px;border-radius:13px;font-size:0}.adn66-menu-btn::after{content:"Menu";font-size:13px}.adn66-menu-panel{top:calc(env(safe-area-inset-top) + 76px);left:12px;right:12px;width:auto;max-height:calc(100dvh - 88px)}}
+
 @media(max-width:760px){.grid.two,.grid.four{grid-template-columns:1fr 1fr}.slot-row{grid-template-columns:1fr}.card{padding:15px}.brand p{display:none}.lock-btn{padding:0 10px;font-size:13px}.image-preview{grid-template-columns:1fr}.grid.four .stat strong{font-size:24px}}
   </style>
 </head>
@@ -35,14 +60,70 @@ label{display:grid;gap:8px;color:var(--soft);font-size:13px;font-weight:1000}inp
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <div class="logo">🦉</div>
+        <div class="logo">
+          <img src="./ADN66_PUSH.png" alt="Logo PUSH ADN66" onerror="this.onerror=null;this.style.display='none';this.parentElement.textContent='🦉';">
+        </div>
         <div>
           <small>APÉRO DE NUIT 66</small>
-          <h1>Admin PUSH</h1>
+          <h1>Module PUSH</h1>
           <p>Notifications, abonnés, programmation et historique</p>
         </div>
       </div>
-      <button id="logoutAdminBtn" class="lock-btn" type="button">Verrouiller</button>
+
+      <div class="topbar-actions">
+        <div class="adn66-header-menu">
+          <button class="adn66-menu-btn" id="adn66TopMenuBtn" type="button" aria-expanded="false" aria-controls="adn66TopMenu">
+            <span class="adn66-menu-burger" aria-hidden="true"><span></span><span></span><span></span></span>
+            Menu
+          </button>
+
+          <nav class="adn66-menu-panel" id="adn66TopMenu" aria-label="Menu outils ADN66">
+            <div class="adn66-menu-head">
+              <p class="adn66-menu-kicker">ADN66</p>
+              <h2 class="adn66-menu-title">Outils internes</h2>
+            </div>
+            <div class="adn66-menu-list">
+              <a class="adn66-menu-item is-current" href="./">
+                <div class="adn66-menu-icon"><img src="./ADN66_PUSH.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+              <a class="adn66-menu-item" href="../apero/">
+                <div class="adn66-menu-icon"><img src="../apero/ADN66_CALCUL.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+              <a class="adn66-menu-item" href="../fidel/admin.html">
+                <div class="adn66-menu-icon"><img src="../fidel/ADN66_FIDELITE.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+              <a class="adn66-menu-item" href="../gps/">
+                <div class="adn66-menu-icon"><img src="../gps/ADN66_GPS.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+              <a class="adn66-menu-item" href="../status/">
+                <div class="adn66-menu-icon"><img src="../status/ADN66_STATUS.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+              <a class="adn66-menu-item" href="../stock/">
+                <div class="adn66-menu-icon"><img src="../stock/ADN66_STOCK.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+              <a class="adn66-menu-item" href="../twilio/">
+                <div class="adn66-menu-icon"><img src="../twilio/ADN66_SMS.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+            </div>
+          </nav>
+        </div>
+
+        <button id="logoutAdminBtn" class="lock-btn" type="button">Verrouiller</button>
+      </div>
     </div>
   </header>
 
@@ -188,6 +269,39 @@ label{display:grid;gap:8px;color:var(--soft);font-size:13px;font-weight:1000}inp
   setMainTab('admin');
 })();
 </script>
+
+<script>
+(function(){
+  const btn = document.getElementById('adn66TopMenuBtn');
+  const panel = document.getElementById('adn66TopMenu');
+  if(!btn || !panel) return;
+
+  function closeMenu(){
+    panel.classList.remove('is-open');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleMenu(){
+    const open = panel.classList.toggle('is-open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  panel.addEventListener('click', function(e){
+    e.stopPropagation();
+  });
+
+  document.addEventListener('click', closeMenu);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeMenu();
+  });
+})();
+</script>
+
 <script src="./config.js"></script>
 <script type="module" src="./app.js?v=adn66-refonte-20260608"></script>
 <script type="module" src="./admin.js?v=adn66-refonte-20260608"></script>
