@@ -7,9 +7,9 @@
   <title>Calculateur courses Metro HT • Apéro de Nuit 66</title>
 
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon-192.png" type="image/png" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
-  <link rel="icon" href="icon-512.png" sizes="512x512" type="image/png" />
+  <link rel="icon" href="./ADN66_CALCUL.png" type="image/png" />
+  <link rel="apple-touch-icon" href="./ADN66_CALCUL.png" />
+  <link rel="icon" href="./ADN66_CALCUL.png" sizes="512x512" type="image/png" />
 
   <style>
     :root {
@@ -77,14 +77,32 @@
       min-width:0;
     }
     .brand-logo {
-      width:54px;
-      height:54px;
+      width:92px;
+      height:92px;
       object-fit:contain;
-      border-radius:18px;
+      border-radius:24px;
       background:#0f172a;
-      border:1px solid var(--border);
-      box-shadow:0 12px 28px rgba(0,0,0,.38);
-      padding:4px;
+      border:1px solid rgba(93,183,238,.38);
+      box-shadow:0 18px 42px rgba(0,0,0,.42), 0 0 0 5px rgba(93,183,238,.08);
+      padding:0;
+      flex:0 0 auto;
+    }
+    .brand-copy{min-width:0;}
+    .company-name{
+      display:block;
+      color:var(--blue2);
+      font-size:12px;
+      line-height:1;
+      font-weight:1000;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+    }
+    .module-name{
+      margin:8px 0 0;
+      font-size:clamp(23px,4.8vw,38px);
+      line-height:1.02;
+      letter-spacing:-.8px;
+      font-weight:1000;
     }
     .eyebrow {
       display:inline-flex;
@@ -546,15 +564,23 @@
     }
 
     .adn66-menu-icon{
-      width:44px;
-      height:44px;
-      border-radius:15px;
+      width:48px;
+      height:48px;
+      border-radius:16px;
       display:grid;
       place-items:center;
       background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
       border:1px solid rgba(93,183,238,.24);
       font-size:22px;
       flex:0 0 auto;
+      overflow:hidden;
+    }
+
+    .adn66-menu-icon img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
     }
 
     .adn66-menu-text{
@@ -631,7 +657,7 @@
       .app-shell { padding:12px 10px 28px; }
       .hero { margin:-12px -10px 12px; padding:12px 10px; }
       .hero-inner { flex-direction:column; }
-      .brand-logo { width:48px; height:48px; }
+      .brand-logo { width:68px; height:68px; border-radius:20px; }
       .total-card { width:100%; text-align:left; }
       .form-grid, .actions-row, .summary-band, .sm\:grid-cols-3, .sm\:grid-cols-2 { grid-template-columns:1fr; }
       .sm\:col-span-2, .sm\:col-span-1 { grid-column:auto; }
@@ -657,14 +683,14 @@
       <div class="hero-inner">
         <div class="brand">
           <img
-            src="https://static.wixstatic.com/media/bc6106_2760d0ad9fe847418ba1d73666102706~mv2.png/v1/fill/w_560,h_320,al_c,lg_1,q_85,enc_avif,quality_auto/apero%20de%20nuit%20n.png"
-            alt="Apéro de Nuit 66"
+            src="./ADN66_CALCUL.png"
+            alt="Logo Calculateur ADN66"
             class="brand-logo"
             onerror="this.onerror=null;this.src='icon-192.png';"
           />
-          <div>
-            <span class="eyebrow">Metro HT • Apéro de Nuit 66</span>
-            <h1>Calculateur courses HT</h1>
+          <div class="brand-copy">
+            <span class="company-name">APÉRO DE NUIT 66</span>
+            <h1 class="module-name">Calculateur courses HT</h1>
             <p class="subtitle">Ajout produit, scanner article, calcul TVA, CSS alcool et total TTC. Données gardées en local.</p>
           </div>
         </div>
@@ -688,43 +714,43 @@
 
             <div class="adn66-menu-list">
               <a class="adn66-menu-item" href="../PUSH/">
-                <div class="adn66-menu-icon">🔔</div>
+                <div class="adn66-menu-icon"><img src="../PUSH/ADN66_PUSH.png" alt=""></div>
                 <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item is-current" href="./">
-                <div class="adn66-menu-icon">🧮</div>
+                <div class="adn66-menu-icon"><img src="./ADN66_CALCUL.png" alt=""></div>
                 <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item" href="../fidel/admin.html">
-                <div class="adn66-menu-icon">🎁</div>
+                <div class="adn66-menu-icon"><img src="../fidel/ADN66_FIDELITE.png" alt=""></div>
                 <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item" href="../gps/">
-                <div class="adn66-menu-icon">📍</div>
+                <div class="adn66-menu-icon"><img src="../gps/ADN66_GPS.png" alt=""></div>
                 <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item" href="../status/">
-                <div class="adn66-menu-icon">📢</div>
+                <div class="adn66-menu-icon"><img src="../status/ADN66_STATUS.png" alt=""></div>
                 <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item" href="../stock/">
-                <div class="adn66-menu-icon">📦</div>
+                <div class="adn66-menu-icon"><img src="../stock/ADN66_STOCK.png" alt=""></div>
                 <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item" href="../twilio/">
-                <div class="adn66-menu-icon">💬</div>
+                <div class="adn66-menu-icon"><img src="../twilio/ADN66_SMS.png" alt=""></div>
                 <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
