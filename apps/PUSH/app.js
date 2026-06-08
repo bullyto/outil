@@ -322,7 +322,11 @@ async function unsubscribe() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ endpoint })
+        body: JSON.stringify({
+          endpoint,
+          target: targetSelect?.value || cfg.DEFAULT_TARGET || "apero",
+          userAgent: navigator.userAgent
+        })
       });
     }
 

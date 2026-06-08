@@ -90,6 +90,47 @@ function endpointShort(endpoint) {
   return raw.length > 28 ? raw.slice(0, 16) + "…" + raw.slice(-8) : raw;
 }
 
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;",
+    "'": "&#039;"
+  }[char]));
+}
+
+function actionLabel(value) {
+  const action = String(value || "").toLowerCase();
+  if (action === "subscribe") return "Nouvel abonnement";
+  if (action === "unsubscribe") return "Désabonnement";
+  if (action === "target_change") return "Changement de cible";
+  return "Événement";
+}
+
+function cleanDeviceLabel(row) {
+  const provided = row.device_label || row.deviceLabel || row.device || "";
+  if (provided && !String(provided).startsWith("Mozilla/")) return String(provided);
+
+  const ua = String(row.user_agent || row.userAgent || "").toLowerCase();
+  let os = "Appareil inconnu";
+  if (ua.includes("android")) os = "Téléphone Android";
+  else if (ua.includes("iphone")) os = "iPhone";
+  else if (ua.includes("ipad")) os = "iPad";
+  else if (ua.includes("windows")) os = "PC Windows";
+  else if (ua.includes("mac os")) os = "Mac";
+  else if (ua.includes("linux")) os = "Appareil Linux";
+
+  let browser = "Navigateur";
+  if (ua.includes("edg/")) browser = "Edge";
+  else if (ua.includes("opr/") || ua.includes("opera")) browser = "Opera";
+  else if (ua.includes("firefox/")) browser = "Firefox";
+  else if (ua.includes("chrome/") || ua.includes("crios/")) browser = "Chrome";
+  else if (ua.includes("safari/")) browser = "Safari";
+
+  return `${os} — ${browser}`;
+}
+
 async function loadStats({ silent = false } = {}) {
   if (!isWorkerReady()) {
     if (!silent) setStatus("Worker Cloudflare non configuré.", "warn");
@@ -135,20 +176,17 @@ async function loadHistory({ silent = false } = {}) {
       historyList.innerHTML = `<div class="empty-box">Aucun historique pour le moment.</div>`;
     } else {
       for (const row of rows) {
-        const action = row.action || row.event || "abonnement";
-        const target = targetLabel(row.target);
+        const action = row.action_label || row.actionLabel || actionLabel(row.action || row.event);
+        const target = row.target_label || row.targetLabel || targetLabel(row.target);
         const created = formatDateTime(row.created_at || row.createdAt || row.date);
-        const ua = row.user_agent || row.userAgent || row.device || "Appareil inconnu";
-        const endpoint = endpointShort(row.endpoint);
+        const device = cleanDeviceLabel(row);
         const item = document.createElement("article");
         item.className = "history-item";
         item.innerHTML = `
           <div>
-            <strong>${created}</strong>
-            <span>${action} — ${target}</span>
+            <strong>${escapeHtml(created)}</strong>
+            <span>${escapeHtml(action)} — ${escapeHtml(target)} — ${escapeHtml(device)}</span>
           </div>
-          <small>${ua}</small>
-          <code>${endpoint}</code>
         `;
         historyList.appendChild(item);
       }

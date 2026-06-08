@@ -13,7 +13,7 @@
   - choix retenu : pas de bouton "Voir le site" car Android/Chrome inverse les actions quand il y a 2 boutons sur certains téléphones
 */
 
-const CACHE_NAME = "adn66-push-v14-refonte-index-admin-first";
+const CACHE_NAME = "adn66-push-v15-history-phrases-desabo";
 const WORKER_BASE_URL = "https://adn66-push.apero-nuit-du-66.workers.dev";
 
 const DEFAULT_ICON = "https://bullyto.github.io/outil/apps/PUSH/icons/icon-adn66-192.png";
