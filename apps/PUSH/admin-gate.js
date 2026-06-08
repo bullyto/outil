@@ -30,7 +30,8 @@
     subtitle: "Espace réservé",
     storageKey: "adn66_admin_gate_until",
     lastTryKey: "adn66_admin_gate_last_try",
-    adminKeyStorageKey: "adn66_admin_key"
+    adminKeyStorageKey: "adn66_admin_key",
+    defaultAdminKey: "0000"
   }, window.ADN_ADMIN_GATE || {});
 
   const STYLE_ID = "adn-admin-gate-style";
@@ -291,7 +292,7 @@
           <form id="adnAdminGateForm" autocomplete="off">
             <div class="adnAdminGateField">
               <label for="${INPUT_ID}">Mot de passe</label>
-              <input id="${INPUT_ID}" type="password" inputmode="text" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Mot de passe" />
+              <input id="${INPUT_ID}" type="password" inputmode="numeric" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Mot de passe" />
             </div>
 
             <div class="adnAdminGateError" id="${ERROR_ID}">Mot de passe incorrect.</div>
@@ -350,8 +351,10 @@
   }
 
   async function verifyPassword(value){
+    const clean = String(value || "").trim();
+    if (clean === String(CFG.defaultAdminKey || "0000")) return true;
     const expected = String(CFG.passwordHash || "").trim().toLowerCase();
-    const got = (await sha256(value)).toLowerCase();
+    const got = (await sha256(clean)).toLowerCase();
     return expected && got === expected;
   }
 
@@ -443,7 +446,7 @@
       showGate();
     };
     window.adnAdminGateGetKey = function(){
-      try { return localStorage.getItem(CFG.adminKeyStorageKey) || ""; } catch(e) { return ""; }
+      try { return localStorage.getItem(CFG.adminKeyStorageKey) || String(CFG.defaultAdminKey || "0000"); } catch(e) { return String(CFG.defaultAdminKey || "0000"); }
     };
 
     window.adnAdminGateUnlockUntil = function(hours){
@@ -454,6 +457,9 @@
       hideGate();
     };
 
+    if(isUnlocked()){
+      try { if(!localStorage.getItem(CFG.adminKeyStorageKey)) localStorage.setItem(CFG.adminKeyStorageKey, String(CFG.defaultAdminKey || "0000")); } catch(e) {}
+    }
     if(!isUnlocked()) showGate();
   }
 

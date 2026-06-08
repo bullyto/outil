@@ -6,6 +6,7 @@
 const cfg = window.ADN_PUSH_CONFIG || {};
 
 const ADMIN_KEY_STORAGE = "adn66_admin_key";
+const DEFAULT_ADMIN_KEY = "0000";
 const IMAGE_API = "https://api.github.com/repos/bullyto/outil/contents/apps/PUSH/images";
 const IMAGE_BASE = "https://bullyto.github.io/outil/apps/PUSH/images/";
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif)$/i;
@@ -54,7 +55,7 @@ function getAdminKey() {
     const fromGate = window.adnAdminGateGetKey();
     if (fromGate) return fromGate;
   }
-  try { return localStorage.getItem(ADMIN_KEY_STORAGE) || ""; } catch { return ""; }
+  try { return localStorage.getItem(ADMIN_KEY_STORAGE) || DEFAULT_ADMIN_KEY; } catch { return DEFAULT_ADMIN_KEY; }
 }
 
 function requireKey() {
