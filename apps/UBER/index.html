@@ -7,25 +7,38 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#0b1220" />
   <style>
-    :root{--blue:#5db7ee;--bg:#0b1220;--bg2:#070b12;--card:#111827;--card2:#172033;--input:#0f172a;--line:#283447;--txt:#f8fafc;--muted:#cbd5e1;--soft:#94a3b8;--ok:#16a34a;--bad:#dc2626;--uber:#06c167}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(145deg,var(--bg2),var(--bg),#1f2937);color:var(--txt);min-height:100vh}.app{max-width:1120px;margin:0 auto;padding:14px 14px 90px}.top{position:sticky;top:0;z-index:20;margin:0 -14px 16px;padding:12px 14px;background:rgba(7,11,18,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;justify-content:space-between;gap:10px}.brand-title{font-weight:900;letter-spacing:.02em}.brand-sub{font-size:12px;color:var(--soft);margin-top:2px}.token-btn{border:1px solid var(--line);background:#0f172a;color:var(--muted);border-radius:12px;padding:9px 12px;font-weight:800}.menu{display:flex;gap:8px;overflow:auto;padding-top:12px}.menu button,.tabs button{white-space:nowrap;border:1px solid var(--line);background:#0f172a;color:var(--muted);border-radius:999px;padding:10px 14px;font-weight:800}.menu .active,.tabs .active{background:var(--blue);border-color:var(--blue);color:#fff}.card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 18px 50px rgba(0,0,0,.28);margin-bottom:14px}.hero{background:linear-gradient(135deg,rgba(93,183,238,.18),rgba(6,193,103,.08),rgba(17,24,39,.95));}.h1{font-size:24px;margin:0 0 8px}.p{color:var(--muted);line-height:1.5;margin:0}.tabs{display:flex;gap:8px;overflow:auto;margin:14px 0}.row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.field label{display:block;color:var(--muted);font-weight:800;font-size:13px;margin:0 0 7px}.field input{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--input);color:var(--txt);padding:15px;font-size:18px;font-weight:900;outline:none;text-transform:uppercase}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.16)}.btn{border:0;border-radius:16px;background:var(--blue);color:white;padding:15px 18px;font-weight:900;font-size:15px;min-height:52px}.btn.secondary{background:#172033;color:var(--txt);border:1px solid var(--line)}.btn.green{background:var(--ok)}.btn.red{background:var(--bad)}.btn:disabled{opacity:.55}.status{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.badge{padding:8px 10px;border-radius:999px;background:#0f172a;border:1px solid var(--line);color:var(--muted);font-weight:800;font-size:13px}.badge.ok{color:#86efac;border-color:rgba(22,163,74,.45)}.badge.warn{color:#fde68a;border-color:rgba(245,158,11,.45)}.preview{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#000;position:relative;margin-top:14px}.preview video{width:100%;display:block;max-height:64vh;background:#000}.rec-overlay{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);padding:10px 12px;border-radius:14px;font-weight:900}.rec-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-right:8px;box-shadow:0 0 18px #ef4444}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.hidden{display:none!important}.day-title{font-size:18px;margin:22px 0 10px;font-weight:900;color:#fff}.record{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid var(--line);background:rgba(15,23,42,.72);border-radius:18px;padding:14px;margin-bottom:10px}.record strong{font-size:17px}.record small{display:block;color:var(--soft);margin-top:4px}.record-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.mini{padding:10px 12px;border-radius:12px;font-size:13px;min-height:auto}.modal{position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:18px;overflow:auto}.modal-card{width:min(930px,100%);background:#0b1220;border:1px solid var(--line);border-radius:24px;padding:16px;box-shadow:0 30px 90px rgba(0,0,0,.5)}.public-preview{border:1px solid var(--line);border-radius:24px;background:radial-gradient(circle at top,#153552 0,#07101d 50%,#050812 100%);padding:18px}.public-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.uber-pill{border:1px solid rgba(6,193,103,.45);background:rgba(6,193,103,.08);color:#b8ffd8;border-radius:999px;padding:9px 12px;font-weight:900}.public-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.public-item{background:rgba(15,23,42,.82);border:1px solid var(--line);border-radius:16px;padding:12px}.public-item span{display:block;color:var(--soft);font-size:12px;text-transform:uppercase;font-weight:800}.public-item b{display:block;margin-top:5px;word-break:break-word}.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111827;border:1px solid var(--line);padding:12px 14px;border-radius:14px;color:#fff;z-index:100;box-shadow:0 18px 45px rgba(0,0,0,.45)}@media(max-width:720px){.row{grid-template-columns:1fr}.record{grid-template-columns:1fr}.record-actions{justify-content:flex-start}.public-grid{grid-template-columns:1fr}.public-head{display:block}.uber-pill{display:inline-block;margin-top:10px}}
+    :root{--blue:#5db7ee;--bg:#0b1220;--bg2:#070b12;--card:#111827;--card2:#172033;--input:#0f172a;--line:#283447;--txt:#f8fafc;--muted:#cbd5e1;--soft:#94a3b8;--ok:#16a34a;--bad:#dc2626;--uber:#06c167}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(145deg,var(--bg2),var(--bg),#1f2937);color:var(--txt)}
+    .app{max-width:980px;margin:0 auto;padding:12px 12px 90px}
+    .top{position:sticky;top:0;z-index:30;margin:0 -12px 12px;padding:10px 12px;background:rgba(7,11,18,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand-title{font-size:15px;font-weight:950;letter-spacing:.02em}.brand-sub{font-size:12px;color:var(--soft);margin-top:2px}
+    .menu-btn{width:46px;height:46px;border-radius:15px;border:1px solid var(--line);background:#0f172a;color:#fff;font-size:24px;font-weight:950}
+    .drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:80}.drawer{position:fixed;top:0;right:0;width:min(360px,88vw);height:100vh;background:#0b1220;border-left:1px solid var(--line);z-index:90;padding:16px;box-shadow:-20px 0 60px rgba(0,0,0,.45);overflow:auto}
+    .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.drawer-title{font-size:18px;font-weight:950}.drawer-close{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:#101827;color:#fff;font-size:20px}
+    .drawer a,.drawer button.link{display:flex;width:100%;align-items:center;justify-content:space-between;text-decoration:none;color:#fff;background:#0f172a;border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin:8px 0;font-weight:850;font-size:15px}
+    .drawer a.active{background:var(--blue);border-color:var(--blue)}.drawer .sep{height:1px;background:var(--line);margin:14px 0}.drawer small{color:var(--soft);line-height:1.35;display:block}
+    .card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:22px;padding:15px;box-shadow:0 18px 50px rgba(0,0,0,.28);margin-bottom:12px}.hero{background:linear-gradient(135deg,rgba(93,183,238,.18),rgba(6,193,103,.08),rgba(17,24,39,.95))}
+    .h1{font-size:22px;margin:0}.tabs{display:flex;gap:8px;overflow:auto;margin:12px 0}.tabs button{white-space:nowrap;border:1px solid var(--line);background:#0f172a;color:var(--muted);border-radius:999px;padding:10px 14px;font-weight:900}.tabs .active{background:var(--blue);border-color:var(--blue);color:#fff}
+    .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.field label{display:block;color:var(--muted);font-weight:850;font-size:13px;margin:0 0 7px}.field input{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--input);color:var(--txt);padding:15px;font-size:18px;font-weight:950;outline:none;text-transform:uppercase}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.16)}
+    .btn{border:0;border-radius:16px;background:var(--blue);color:white;padding:14px 16px;font-weight:950;font-size:15px;min-height:52px;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn.secondary{background:#172033;color:var(--txt);border:1px solid var(--line)}.btn.red{background:var(--bad)}.btn.green{background:var(--ok)}.btn:disabled{opacity:.55}
+    .status{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.badge{padding:8px 10px;border-radius:999px;background:#0f172a;border:1px solid var(--line);color:var(--muted);font-weight:850;font-size:13px}.badge.ok{color:#86efac;border-color:rgba(22,163,74,.45)}.badge.warn{color:#fde68a;border-color:rgba(245,158,11,.45)}
+    .preview{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#000;position:relative;margin-top:14px}.preview video{width:100%;display:block;max-height:58vh;background:#000}.rec-overlay{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);padding:10px 12px;border-radius:14px;font-weight:950}.rec-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-right:8px;box-shadow:0 0 18px #ef4444}.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.hidden{display:none!important}
+    .day-title{font-size:18px;margin:20px 0 10px;font-weight:950;color:#fff}.record{display:grid;grid-template-columns:1fr;gap:12px;border:1px solid var(--line);background:rgba(15,23,42,.72);border-radius:18px;padding:14px;margin-bottom:10px}.record strong{font-size:17px}.record small{display:block;color:var(--soft);margin-top:4px}.record-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.mini{min-height:44px;padding:10px 8px;border-radius:13px;font-size:13px}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto}.modal-card{width:min(940px,100%);background:#0b1220;border:1px solid var(--line);border-radius:24px;padding:12px;box-shadow:0 30px 90px rgba(0,0,0,.5)}
+    .public-frame{width:100%;height:70vh;border:1px solid var(--line);border-radius:18px;background:#050812}.modal-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111827;border:1px solid var(--line);padding:12px 14px;border-radius:14px;color:#fff;z-index:100;box-shadow:0 18px 45px rgba(0,0,0,.45)}
+    @media(max-width:720px){.app{padding-left:10px;padding-right:10px}.top{margin-left:-10px;margin-right:-10px}.row{grid-template-columns:1fr}.actions,.record-actions,.modal-actions{grid-template-columns:1fr}.btn{width:100%}.public-frame{height:66vh}.h1{font-size:20px}}
   </style>
 </head>
 <body>
   <div class="app">
     <header class="top">
       <div class="brand">
-        <div><div class="brand-title">APERO DE NUIT 66 — Module Outil</div><div class="brand-sub">Enregistrement partenaire Uber</div></div>
-        <button class="token-btn" id="settingsBtn">Réglages</button>
+        <div><div class="brand-title">APERO DE NUIT 66 — Outil</div><div class="brand-sub">Enregistrement partenaire Uber</div></div>
+        <button class="menu-btn" id="openMenu" aria-label="Ouvrir le menu">☰</button>
       </div>
-      <nav class="menu" aria-label="Menu outil existant">
-        <button>Accueil</button><button>PUSH</button><button>SMS</button><button>FIDÉLITÉ</button><button>GPS</button><button>STATUS</button><button>STOCK</button><button class="active">Partenaire Uber</button>
-      </nav>
     </header>
 
-    <section class="card hero">
-      <h1 class="h1">Enregistrement partenaire Uber</h1>
-      <p class="p">Saisissez le numéro de commande, lancez l’enregistrement avec caméra avant, audio et GPS, puis partagez une page isolée et professionnelle à Uber Eats.</p>
-    </section>
+    <section class="card hero"><h1 class="h1">Enregistrement partenaire Uber</h1></section>
 
     <div class="tabs">
       <button id="tabNew" class="active">Nouvel enregistrement</button>
@@ -43,8 +56,8 @@
         </div>
         <div class="status">
           <span id="gpsBadge" class="badge warn">GPS en attente</span>
-          <span id="audioBadge" class="badge">Audio ON</span>
-          <span id="cameraBadge" class="badge">Caméra avant</span>
+          <span class="badge">Audio ON</span>
+          <span class="badge">Caméra avant</span>
           <span id="durationBadge" class="badge">Durée 00:00</span>
         </div>
         <div id="previewBox" class="preview hidden">
@@ -58,12 +71,12 @@
       </section>
 
       <section id="resultCard" class="card hidden">
-        <h2>Enregistrement terminé ✅</h2>
-        <p class="p" id="resultText"></p>
+        <h2 style="margin:0 0 8px">Enregistrement terminé ✅</h2>
+        <p style="color:var(--muted);line-height:1.45;margin:0" id="resultText"></p>
         <div class="actions">
           <button class="btn" id="copyLastLink">Copier le lien</button>
-          <button class="btn secondary" id="copyLastMsg">Copier message Uber Eats</button>
-          <button class="btn secondary" id="openLastPublic">Ouvrir la page publique</button>
+          <button class="btn secondary" id="mailLastMsg">Mail contestation</button>
+          <button class="btn secondary" id="openLastPublic">Voir</button>
         </div>
       </section>
     </main>
@@ -79,29 +92,61 @@
     </main>
   </div>
 
+  <div id="drawerBg" class="drawer-bg hidden"></div>
+  <aside id="drawer" class="drawer hidden" aria-label="Menu outil">
+    <div class="drawer-head"><div><div class="drawer-title">Menu Outil</div><small>Apéro de Nuit 66</small></div><button class="drawer-close" id="closeMenu">×</button></div>
+    <a href="../">Accueil</a>
+    <a href="../PUSH/">PUSH</a>
+    <a href="../apero/">APERO</a>
+    <a href="../fidel/">FIDÉLITÉ</a>
+    <a href="../gps/">GPS</a>
+    <a href="../status/">STATUS</a>
+    <a href="../stock/">STOCK</a>
+    <a href="../twilio/">TWILIO</a>
+    <a class="active" href="./">Partenaire Uber</a>
+    <div class="sep"></div>
+    <button class="link" id="settingsBtn">Réglages admin <span>›</span></button>
+    <small>Le token reste enregistré uniquement sur cet appareil.</small>
+  </aside>
+
   <div id="modal" class="modal hidden"><div class="modal-card" id="modalContent"></div></div>
   <div id="toast" class="toast hidden"></div>
 
 <script>
 const DEFAULT_WORKER = 'https://uber.apero-nuit-du-66.workers.dev';
-let workerBase = localStorage.getItem('adn66_uber_worker') || DEFAULT_WORKER;
+const UBER_CONTEST_EMAIL = 'magasin-france@uber.com';
+const BUSINESS = {
+  name: 'APERO DE NUIT 66',
+  manager: 'Steven Hauviller',
+  address: '12 rue du Fer à Cheval, 66410 Villelongue-de-la-Salanque',
+  phone: '0652336461'
+};
+
+let workerBase = DEFAULT_WORKER;
 let adminToken = localStorage.getItem('adn66_uber_token') || '';
 let mediaRecorder, stream, chunks = [], startedAt = 0, timer = null, lastGps = null, lastRecord = null;
 const els = Object.fromEntries([...document.querySelectorAll('[id]')].map(e => [e.id, e]));
 
 function toast(msg){ els.toast.textContent=msg; els.toast.classList.remove('hidden'); setTimeout(()=>els.toast.classList.add('hidden'),2600); }
-function fmtTime(s){ s=Math.max(0,Math.floor(s)); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function fmtTime(s){ s=Math.max(0,Math.floor(s||0)); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function fmtDuration(s){ s=Math.max(0,Math.floor(s||0)); return `${Math.floor(s/60)} min ${s%60} s`; }
 function cleanOrder(v){ return (v||'').trim().replace(/[^a-zA-Z0-9_-]/g,'').toUpperCase(); }
 function headers(json=true){ const h={'x-admin-token':adminToken}; if(json) h['content-type']='application/json'; return h; }
 function api(path, opts={}){ return fetch(workerBase+path, opts); }
+function enc(v){ return encodeURIComponent(v||''); }
+
+function openDrawer(){ els.drawer.classList.remove('hidden'); els.drawerBg.classList.remove('hidden'); }
+function closeDrawer(){ els.drawer.classList.add('hidden'); els.drawerBg.classList.add('hidden'); }
+els.openMenu.onclick=openDrawer; els.closeMenu.onclick=closeDrawer; els.drawerBg.onclick=closeDrawer;
 
 els.settingsBtn.onclick = () => {
-  const wb = prompt('URL du Worker', workerBase) || workerBase;
-  const tk = prompt('ADMIN_TOKEN Cloudflare', adminToken) || adminToken;
-  workerBase = wb.replace(/\/$/,''); adminToken = tk;
-  localStorage.setItem('adn66_uber_worker', workerBase);
-  localStorage.setItem('adn66_uber_token', adminToken);
-  toast('Réglages enregistrés');
+  const tk = prompt('Code admin', adminToken ? '********' : '') || '';
+  if(tk && tk !== '********'){
+    adminToken = tk;
+    localStorage.setItem('adn66_uber_token', adminToken);
+    toast('Réglages enregistrés');
+  }
+  closeDrawer();
 };
 
 els.tabNew.onclick = () => switchTab('new');
@@ -117,14 +162,17 @@ function updateGpsBadge(){
 }
 function initGps(){
   if(!navigator.geolocation){ els.gpsBadge.textContent='GPS indisponible'; return; }
-  navigator.geolocation.watchPosition(pos => { lastGps={ lat:pos.coords.latitude, lng:pos.coords.longitude, accuracy:pos.coords.accuracy, recordedAt:new Date(pos.timestamp).toISOString() }; updateGpsBadge(); }, () => { els.gpsBadge.textContent='GPS refusé ou indisponible'; els.gpsBadge.className='badge warn'; }, { enableHighAccuracy:true, maximumAge:5000, timeout:15000 });
+  navigator.geolocation.watchPosition(pos => {
+    lastGps={ lat:pos.coords.latitude, lng:pos.coords.longitude, accuracy:pos.coords.accuracy, recordedAt:new Date(pos.timestamp).toISOString() };
+    updateGpsBadge();
+  }, () => { els.gpsBadge.textContent='GPS refusé ou indisponible'; els.gpsBadge.className='badge warn'; }, { enableHighAccuracy:true, maximumAge:5000, timeout:15000 });
 }
 initGps();
 
 els.startBtn.onclick = async () => {
   const order = cleanOrder(els.orderNumber.value);
   if(!order) return toast('Numéro de commande obligatoire');
-  if(!adminToken) return toast('Renseignez le token dans Réglages');
+  if(!adminToken) return toast('Ouvrez le menu puis Réglages admin');
   try{
     stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ideal:1280}, height:{ideal:720} }, audio:true });
     els.preview.srcObject = stream;
@@ -177,24 +225,57 @@ async function uploadCompiledRecord(blob, durationSeconds){
   }
   const complete = await api('/api/multipart/complete',{ method:'POST', headers:headers(), body:JSON.stringify({ id:create.id, key:create.key, uploadId:create.uploadId, parts, durationSeconds, sizeBytes:blob.size, gps:lastGps })}).then(r=>r.json());
   if(!complete.ok) throw new Error(complete.error||'Finalisation impossible');
-  lastRecord = { orderNumber, publicUrl: complete.publicUrl, durationSeconds };
-  els.resultText.textContent = `Commande ${orderNumber} · durée ${fmtTime(durationSeconds)} · lien prêt pour Uber Eats.`;
+  lastRecord = { orderNumber, publicUrl: complete.publicUrl, durationSeconds, completed_at:new Date().toISOString(), gps:lastGps };
+  els.resultText.textContent = `Commande ${orderNumber} · durée ${fmtDuration(durationSeconds)} · lien prêt pour Uber Eats.`;
   els.resultCard.classList.remove('hidden');
   toast('Enregistrement envoyé ✅');
 }
 
-function messageUber(order, url){ return `Bonjour,\n\nJe conteste le remboursement lié à la commande Uber Eats n° ${order}.\n\nUn enregistrement vidéo/audio horodaté, avec position GPS enregistrée au moment de la remise, est disponible ici :\n\n${url}\n\nCordialement,\nAPERO DE NUIT 66`; }
+function mailSubject(order){ return `Contestation remboursement Uber Eats - commande ${order}`; }
+function mailBody(order, url, r={}){
+  const dt = r.completed_at || r.created_at ? new Date(r.completed_at || r.created_at).toLocaleString('fr-FR') : new Date().toLocaleString('fr-FR');
+  const lat = r.gps_lat || (r.gps && r.gps.lat);
+  const lng = r.gps_lng || (r.gps && r.gps.lng);
+  const acc = r.gps_accuracy || (r.gps && r.gps.accuracy);
+  return `Bonjour,
+
+Je conteste le remboursement / l'ajustement lié à la commande Uber Eats n° ${order}.
+
+Un enregistrement vidéo/audio horodaté, avec position GPS enregistrée au moment de la remise, est disponible ici :
+${url}
+
+Informations commande :
+- Numéro de commande Uber Eats : ${order}
+- Date de l'enregistrement : ${dt}
+- Durée : ${fmtDuration(r.duration_seconds || lastRecord?.durationSeconds || 0)}
+- GPS : ${lat && lng ? `latitude ${Number(lat).toFixed(6)}, longitude ${Number(lng).toFixed(6)}, précision environ ${Math.round(acc || 0)} mètres` : 'non disponible'}
+
+Identification partenaire :
+- Entreprise : ${BUSINESS.name}
+- Responsable : ${BUSINESS.manager}
+- Adresse : ${BUSINESS.address}
+- Téléphone : ${BUSINESS.phone}
+
+Merci de réexaminer ce dossier.
+
+Cordialement,
+${BUSINESS.name}`;
+}
+function openContestMail(order, url, r={}){
+  const href = `mailto:${enc(UBER_CONTEST_EMAIL)}?subject=${enc(mailSubject(order))}&body=${enc(mailBody(order,url,r))}`;
+  window.location.href = href;
+}
 async function copy(text){ await navigator.clipboard.writeText(text); toast('Copié'); }
 els.copyLastLink.onclick = () => lastRecord && copy(lastRecord.publicUrl);
-els.copyLastMsg.onclick = () => lastRecord && copy(messageUber(lastRecord.orderNumber, lastRecord.publicUrl));
-els.openLastPublic.onclick = () => lastRecord && window.open(lastRecord.publicUrl, '_blank');
+els.mailLastMsg.onclick = () => lastRecord && openContestMail(lastRecord.orderNumber, lastRecord.publicUrl, lastRecord);
+els.openLastPublic.onclick = () => lastRecord && showPublicPreview({ order_number:lastRecord.orderNumber, public_url:lastRecord.publicUrl, duration_seconds:lastRecord.durationSeconds, completed_at:lastRecord.completed_at, gps_lat:lastGps?.lat, gps_lng:lastGps?.lng, gps_accuracy:lastGps?.accuracy });
 
 els.refreshBtn.onclick = loadHistory; els.searchInput.oninput = () => setTimeout(loadHistory, 250);
 async function loadHistory(){
-  if(!adminToken){ els.historyList.innerHTML='<section class="card"><p class="p">Renseignez le token dans Réglages.</p></section>'; return; }
+  if(!adminToken){ els.historyList.innerHTML='<section class="card"><p style="color:var(--muted);margin:0">Ouvrez le menu puis Réglages admin.</p></section>'; return; }
   const q = encodeURIComponent(cleanOrder(els.searchInput.value));
   const data = await api('/api/records?limit=200&q='+q,{ headers:headers(false) }).then(r=>r.json()).catch(e=>({ok:false,error:e.message}));
-  if(!data.ok){ els.historyList.innerHTML='<section class="card"><p class="p">Erreur : '+(data.error||'chargement impossible')+'</p></section>'; return; }
+  if(!data.ok){ els.historyList.innerHTML='<section class="card"><p style="color:var(--muted);margin:0">Erreur : '+(data.error||'chargement impossible')+'</p></section>'; return; }
   renderHistory(data.records||[]);
 }
 function dayLabel(iso){
@@ -211,18 +292,20 @@ function renderHistory(records){
   for(const [day, items] of Object.entries(groups)){
     html += `<h2 class="day-title">${day}</h2>`;
     for(const r of items){
-      html += `<article class="record"><div><strong>Uber ${escapeHtml(r.order_number)}</strong><small>${timeLabel(r.completed_at||r.created_at)} · ${fmtTime(r.duration_seconds)} · GPS ${r.gps_lat?'OK':'non'} · Audio ${r.audio_enabled?'ON':'non'}</small></div><div class="record-actions"><button class="btn mini" onclick='showRecord(${JSON.stringify(r)})'>Voir</button><button class="btn secondary mini" onclick='copy(${JSON.stringify(r.public_url)})'>Copier lien</button><button class="btn secondary mini" onclick='copy(${JSON.stringify(messageUber(r.order_number,r.public_url))})'>Message Uber</button></div></article>`;
+      html += `<article class="record"><div><strong>Uber ${escapeHtml(r.order_number)}</strong><small>${timeLabel(r.completed_at||r.created_at)} · ${fmtDuration(r.duration_seconds)} · GPS ${r.gps_lat?'OK':'non'} · Audio ${r.audio_enabled?'ON':'non'}</small></div><div class="record-actions"><button class="btn mini" onclick='showPublicPreview(${JSON.stringify(r)})'>Voir</button><button class="btn secondary mini" onclick='copy(${JSON.stringify(r.public_url)})'>Copier lien</button><button class="btn secondary mini" onclick='openContestMail(${JSON.stringify(r.order_number)},${JSON.stringify(r.public_url)},${JSON.stringify(r)})'>Mail contestation</button></div></article>`;
     }
   }
-  els.historyList.innerHTML = html || '<section class="card"><p class="p">Aucun enregistrement.</p></section>';
+  els.historyList.innerHTML = html || '<section class="card"><p style="color:var(--muted);margin:0">Aucun enregistrement.</p></section>';
 }
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
-window.showRecord = (r) => {
-  els.modalContent.innerHTML = `<div class="public-preview"><div class="public-head"><div><h2 style="margin:0">APERO DE NUIT 66</h2><p class="p" style="font-weight:800">Enregistrement partenaire Uber Eats</p></div><div class="uber-pill">Aperçu page Uber</div></div><div class="preview"><video controls playsinline src="${workerBase}/media/${r.token}"></video></div><div class="public-grid"><div class="public-item"><span>Commande Uber Eats</span><b>${escapeHtml(r.order_number)}</b></div><div class="public-item"><span>Date / heure</span><b>${new Intl.DateTimeFormat('fr-FR',{dateStyle:'full',timeStyle:'short'}).format(new Date(r.completed_at||r.created_at))}</b></div><div class="public-item"><span>Durée</span><b>${fmtTime(r.duration_seconds)}</b></div><div class="public-item"><span>GPS</span><b>${r.gps_lat?'Enregistré · ± '+Math.round(r.gps_accuracy||0)+' m':'Non disponible'}</b></div><div class="public-item"><span>Audio</span><b>${r.audio_enabled?'Enregistré':'Non'}</b></div><div class="public-item"><span>URL</span><b>${escapeHtml(r.public_url)}</b></div></div><div class="actions"><button class="btn" onclick='copy(${JSON.stringify(r.public_url)})'>Copier le lien</button><button class="btn secondary" onclick='copy(${JSON.stringify(messageUber(r.order_number,r.public_url))})'>Copier message Uber Eats</button><button class="btn secondary" onclick='window.open(${JSON.stringify(r.public_url)},"_blank")'>Ouvrir la page publique</button><button class="btn red" onclick='closeModal()'>Fermer</button></div></div>`;
+window.showPublicPreview = (r) => {
+  const url = r.public_url;
+  els.modalContent.innerHTML = `<iframe class="public-frame" src="${escapeHtml(url)}" title="Aperçu Uber"></iframe><div class="modal-actions"><button class="btn" onclick='copy(${JSON.stringify(url)})'>Copier lien</button><button class="btn secondary" onclick='openContestMail(${JSON.stringify(r.order_number)},${JSON.stringify(url)},${JSON.stringify(r)})'>Mail contestation</button><button class="btn secondary" onclick='window.open(${JSON.stringify(url)},"_blank")'>Ouvrir</button><button class="btn red" onclick='closeModal()'>Fermer</button></div>`;
   els.modal.classList.remove('hidden');
 };
 window.closeModal = () => els.modal.classList.add('hidden');
 els.modal.onclick = e => { if(e.target === els.modal) closeModal(); };
+window.copy = copy; window.openContestMail = openContestMail;
 </script>
 </body>
 </html>
