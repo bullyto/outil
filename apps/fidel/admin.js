@@ -103,6 +103,105 @@ async function requireAdminAccess(){
   return key;
 }
 function pointsLabel(points){ return points === null || points === undefined || points === "" ? "Points : ?" : `Points : ${Number(points||0)}/8`; }
+
+function ensureHibairAdminStyles(){
+  if(document.getElementById('adn66HibairAdminStyles')) return;
+  const st = document.createElement('style');
+  st.id = 'adn66HibairAdminStyles';
+  st.textContent = `
+    .hibair-mini{display:grid;gap:6px;margin-top:2px;padding:9px;border:1px solid rgba(93,183,238,.18);border-radius:14px;background:rgba(93,183,238,.06)}
+    .hibair-line{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;font-weight:900;line-height:1.2}
+    .hibair-line b{color:var(--text);font-weight:1000}.hibair-line .ok{color:var(--green2)}.hibair-line .off{color:var(--soft)}.hibair-line .warn{color:#fde68a}
+    .hibair-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}.hibair-badge{border:1px solid rgba(255,255,255,.12);background:rgba(15,23,42,.86);color:var(--muted);border-radius:999px;padding:5px 8px;font-size:11px;font-weight:1000;white-space:nowrap}.hibair-badge.active{border-color:rgba(22,163,74,.42);background:rgba(22,163,74,.14);color:var(--green2)}.hibair-badge.game{border-color:rgba(93,183,238,.42);background:rgba(93,183,238,.14);color:#bfdbfe}.hibair-detail-grid{display:grid;gap:8px}.hibair-detail-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);padding:7px 0;color:var(--muted);font-weight:800}.hibair-detail-row b{color:var(--text);text-align:right}.hibair-detail-title{margin:12px 0 4px;color:var(--blue);font-weight:1000;letter-spacing:.04em;text-transform:uppercase;font-size:12px}`;
+  document.head.appendChild(st);
+}
+function rawPhoneForClient(it){ return it.phone || it.phone_digits || ''; }
+function formatDateTimeSeconds(iso){
+  if(!iso) return '—';
+  const d = new Date(String(iso));
+  if(Number.isNaN(d.getTime())) return String(iso);
+  return d.toLocaleString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+function msLeftLabel(iso){
+  if(!iso) return '';
+  const ms = Date.parse(String(iso)) - Date.now();
+  if(!Number.isFinite(ms) || ms <= 0) return 'expirée';
+  const total = Math.floor(ms / 1000);
+  const d = Math.floor(total / 86400);
+  const h = Math.floor((total % 86400) / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const sec = total % 60;
+  if(d > 0) return `${d}j ${h}h ${m}min ${sec}s`;
+  if(h > 0) return `${h}h ${m}min ${sec}s`;
+  if(m > 0) return `${m}min ${sec}s`;
+  return `${sec}s`;
+}
+function getGameInfo(it){ return (it && it.game && typeof it.game === 'object') ? it.game : {has_played:false}; }
+function getFreeDeliveryInfo(it){ return (it && it.free_delivery && typeof it.free_delivery === 'object') ? it.free_delivery : {active:false}; }
+function renderHibairMini(it){
+  ensureHibairAdminStyles();
+  const g = getGameInfo(it);
+  const fd = getFreeDeliveryInfo(it);
+  const hasGame = !!g.has_played;
+  const best = (g.best_score !== null && g.best_score !== undefined) ? Number(g.best_score || 0) : null;
+  const stampAt = g.reward_stamp_claimed_at || (it.rewards && it.rewards.GAME_25) || null;
+  const deliveryClaimAt = g.free_delivery_claimed_at || (it.rewards && it.rewards.GAME_35) || null;
+  const fdActive = !!fd.active;
+  const fdTxt = fdActive ? `Active · ${msLeftLabel(fd.expires_at)}` : (fd.expires_at ? `Expirée le ${formatDateTime(fd.expires_at)}` : 'Non');
+  return `
+    <div class="hibair-mini">
+      <div class="hibair-line"><span>🎮 Hib’air Drink</span><b class="${hasGame ? 'ok' : 'off'}">${hasGame ? 'Oui' : 'Non'}${hasGame && best !== null ? ' · Score max '+best : ''}</b></div>
+      <div class="hibair-line"><span>🚚 Livraison offerte</span><b class="${fdActive ? 'ok' : 'off'}">${escapeHtml(fdTxt)}</b></div>
+      <div class="hibair-badges">
+        ${stampAt ? '<span class="hibair-badge game">+1 jeu débloqué</span>' : '<span class="hibair-badge">+1 jeu non réclamé</span>'}
+        ${deliveryClaimAt ? '<span class="hibair-badge game">Palier 35 réclamé</span>' : '<span class="hibair-badge">Palier 35 non réclamé</span>'}
+        ${fdActive ? '<span class="hibair-badge active">Livraison active</span>' : ''}
+      </div>
+    </div>`;
+}
+function showClientDetails(it){
+  const cid = it.client_id || it.id || it.cid || currentClient.id || '';
+  const g = getGameInfo(it);
+  const fd = getFreeDeliveryInfo(it);
+  const stampAt = g.reward_stamp_claimed_at || (it.rewards && it.rewards.GAME_25) || null;
+  const deliveryClaimAt = g.free_delivery_claimed_at || (it.rewards && it.rewards.GAME_35) || null;
+  const hasGame = !!g.has_played;
+  const body = `
+    <div class="hibair-detail-grid">
+      <div class="hibair-detail-title">Client</div>
+      <div class="hibair-detail-row"><span>Nom</span><b>${escapeHtml(it.name || 'Client')}</b></div>
+      <div class="hibair-detail-row"><span>Téléphone</span><b>${escapeHtml(displayPhone(rawPhoneForClient(it), it.phone_last4))}</b></div>
+      <div class="hibair-detail-row"><span>Carte</span><b>${escapeHtml(pointsLabel(it.points))}</b></div>
+      <div class="hibair-detail-row"><span>Créée le</span><b>${escapeHtml(formatDateTime(it.created_at))}</b></div>
+      <div class="hibair-detail-title">Hib’air Drink</div>
+      <div class="hibair-detail-row"><span>A joué</span><b>${hasGame ? 'Oui' : 'Non'}</b></div>
+      <div class="hibair-detail-row"><span>Pseudo jeu</span><b>${escapeHtml(g.public_name || '—')}</b></div>
+      <div class="hibair-detail-row"><span>Meilleur score</span><b>${g.best_score !== undefined && g.best_score !== null ? Number(g.best_score || 0) : '—'}</b></div>
+      <div class="hibair-detail-row"><span>Dernier score</span><b>${g.last_score !== undefined && g.last_score !== null ? Number(g.last_score || 0) : '—'}</b></div>
+      <div class="hibair-detail-row"><span>Dernière partie</span><b>${escapeHtml(formatDateTimeSeconds(g.last_played_at))}</b></div>
+      <div class="hibair-detail-title">Récompenses jeu</div>
+      <div class="hibair-detail-row"><span>+1 tampon jeu</span><b>${stampAt ? 'Oui · '+escapeHtml(formatDateTime(stampAt)) : 'Non'}</b></div>
+      <div class="hibair-detail-row"><span>Livraison offerte gagnée</span><b>${deliveryClaimAt ? 'Oui · '+escapeHtml(formatDateTime(deliveryClaimAt)) : 'Non'}</b></div>
+      <div class="hibair-detail-title">Livraison offerte</div>
+      <div class="hibair-detail-row"><span>Statut</span><b>${fd.active ? 'Active' : (fd.expires_at ? 'Expirée' : 'Non')}</b></div>
+      <div class="hibair-detail-row"><span>Activée le</span><b>${escapeHtml(formatDateTime(fd.starts_at || fd.created_at))}</b></div>
+      <div class="hibair-detail-row"><span>Expire le</span><b>${escapeHtml(formatDateTimeSeconds(fd.expires_at))}</b></div>
+      <div class="hibair-detail-row"><span>Temps restant</span><b>${fd.active ? escapeHtml(msLeftLabel(fd.expires_at)) : '—'}</b></div>
+      <div class="hibair-detail-title">ID</div>
+      <div class="mono" style="font-size:11px;color:var(--soft);overflow-wrap:anywhere">${escapeHtml(cid)}</div>
+    </div>`;
+  showSmart({
+    title:'Fiche client',
+    sub: it.name || 'Client fidélité',
+    body,
+    actions:[
+      {label:'Sélectionner', onClick:()=>{ setClient(cid, {name:it.name, phone:rawPhoneForClient(it), points:it.points}); setMainStatus('Client sélectionné depuis les détails.'); }},
+      {label:'QR', secondary:true, onClick:()=>showRecoveryQr(cid, it)},
+      {label:'Fermer', secondary:true}
+    ]
+  });
+}
+
 function clientName(meta){ return (meta && (meta.name || meta.prenom || meta.firstname)) || "Client"; }
 function isValidClientId(id){
   const s = String(id||"").trim();
@@ -292,15 +391,16 @@ function renderResults(items){
         </div>
         <div class="result-meta">${pointsLabel(it.points)}</div>
       </div>
+      ${renderHibairMini(it)}
       <div class="result-actions">
         <button class="small" data-action="stamp">+1</button>
         <button class="secondary small" data-action="qr">QR</button>
-        <button class="secondary small" data-action="select">Sélect.</button>
+        <button class="secondary small" data-action="select">Détails</button>
         <button class="secondary small" data-action="copy">Copier</button>
       </div>`;
     card.querySelector('[data-action="stamp"]').addEventListener("click", ()=>confirmStampClient({...it, client_id:cid}));
     card.querySelector('[data-action="qr"]').addEventListener("click", ()=>showRecoveryQr(cid, it));
-    card.querySelector('[data-action="select"]').addEventListener("click", ()=>{ setClient(cid, it); setMainStatus("Client sélectionné depuis la recherche."); });
+    card.querySelector('[data-action="select"]').addEventListener("click", ()=>showClientDetails({...it, client_id:cid}));
     card.querySelector('[data-action="copy"]').addEventListener("click", ()=>copyText(cid, "ID copié."));
     host.appendChild(card);
   });
@@ -420,14 +520,15 @@ function renderHistory(items){
         </div>
         <div class="result-meta">${pointsLabel(it.points)}<br>${it.completed_at ? "Complète" : ""}</div>
       </div>
+      ${renderHibairMini(it)}
       <div class="result-actions">
         <button class="small" data-action="stamp">+1 point</button>
-        <button class="secondary small" data-action="select">Sélect.</button>
+        <button class="secondary small" data-action="select">Détails</button>
         <button class="secondary small" data-action="qr">QR</button>
         <button class="secondary small" data-action="copy">Copier</button>
       </div>`;
     card.querySelector('[data-action="stamp"]').addEventListener("click", ()=>confirmStampClient({client_id:cid, name:it.name, phone:it.phone || it.phone_digits, phone_last4:it.phone_last4, points:it.points}));
-    card.querySelector('[data-action="select"]').addEventListener("click", ()=>{ setClient(cid, {name:it.name, phone:it.phone || it.phone_digits, points:it.points}); setMainStatus("Client sélectionné depuis l’historique."); });
+    card.querySelector('[data-action="select"]').addEventListener("click", ()=>showClientDetails({...it, client_id:cid}));
     card.querySelector('[data-action="qr"]').addEventListener("click", ()=>showRecoveryQr(cid, {name:it.name, phone:it.phone || it.phone_digits, points:it.points}));
     card.querySelector('[data-action="copy"]').addEventListener("click", ()=>copyText(cid, "ID copié."));
     host.appendChild(card);
