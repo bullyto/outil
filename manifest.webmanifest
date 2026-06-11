@@ -1,102 +1,50 @@
-{
-  "name": "Outils ADN66 — Apéro de Nuit 66",
-  "short_name": "Outils ADN66",
-  "start_url": "./index.html?source=pwa",
-  "scope": "./",
-  "display": "standalone",
-  "background_color": "#0b1220",
-  "theme_color": "#5db7ee",
-  "icons": [
-    {
-      "src": "./icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "./icons/icon-192-maskable.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "./icons/icon-512-maskable.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "GPS prospection",
-      "short_name": "GPS",
-      "description": "Carte, terrain et zones de prospection",
-      "url": "./apps/gps/",
-      "icons": [
-        {
-          "src": "./icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Stock marchandise",
-      "short_name": "Stock",
-      "description": "Stock véhicule, local et disponibilité marchandise",
-      "url": "./apps/stock/",
-      "icons": [
-        {
-          "src": "./icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Admin carte fidélité",
-      "short_name": "Fidélité",
-      "description": "Administration des cartes fidélité, points et QR code",
-      "url": "./apps/fidel/admin.html",
-      "icons": [
-        {
-          "src": "./icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Enregistrement Uber Eats",
-      "short_name": "Uber Eats",
-      "description": "Enregistrement preuve vidéo, audio, GPS et lien privé",
-      "url": "./apps/UBER/",
-      "icons": [
-        {
-          "src": "./icons/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    }
-  ],
-  "id": "/outil/",
-  "description": "Menu officiel des outils internes Apéro de Nuit 66.",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
-  "orientation": "portrait",
-  "categories": [
-    "business",
-    "productivity",
-    "utilities"
-  ],
-  "lang": "fr-FR"
-}
+"shortcuts": [
+  {
+    "name": "GPS prospection",
+    "short_name": "GPS",
+    "url": "./apps/gps/",
+    "icons": [
+      {
+        "src": "./icons/ADN66_GPS_192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      }
+    ]
+  },
+  {
+    "name": "Stock marchandise",
+    "short_name": "Stock",
+    "url": "./apps/stock/",
+    "icons": [
+      {
+        "src": "./icons/ADN66_stock_192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      }
+    ]
+  },
+  {
+    "name": "Admin carte fidélité",
+    "short_name": "Fidélité",
+    "url": "./apps/fidel/admin.html",
+    "icons": [
+      {
+        "src": "./icons/ADN66_fidelite_192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      }
+    ]
+  },
+  {
+    "name": "Enregistrement Uber Eats",
+    "short_name": "Uber Eats",
+    "url": "./apps/UBER/",
+    "icons": [
+      {
+        "src": "./icons/ADN66_uber_192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      }
+    ]
+  }
+]
