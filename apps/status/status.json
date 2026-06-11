@@ -1,14 +1,14 @@
 {
   "active": true,
   "mode": "info",
-  "last_update": "2026-06-11T14:55:29.338+02:00",
+  "last_update": "2026-06-11T15:14:18.000+02:00",
   "modes": {
     "info": {
-      "title": "Panne",
-      "message": "Il n’est pas possible de payer par carte ce soir. Nous acceptons uniquement les paiements en espèces. Merci de votre compréhension.\n\nVous pouvez commander directement par téléphone au 06 52 33 64 61.",
+      "title": "",
+      "message": "",
       "image": "images/panne.png",
       "severity": "info",
-      "ok_delay_seconds": 4,
+      "ok_delay_seconds": 5,
       "image_catalan": "images/CATALAN_panne_2.png",
       "image_catalan_disabled": false
     },
@@ -83,7 +83,7 @@
     }
   },
   "created_at": "2026-01-01T19:53:43.073+01:00",
-  "published_at": "2026-06-11T14:55:29.338+02:00",
+  "published_at": "2026-06-11T15:14:18.000+02:00",
   "ends_at": "",
   "starts_at": "2026-01-01T19:56:27.600+01:00"
 }
