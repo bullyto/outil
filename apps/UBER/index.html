@@ -22,7 +22,7 @@
     .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.field label{display:block;color:var(--muted);font-weight:850;font-size:13px;margin:0 0 7px}.field input{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--input);color:var(--txt);padding:15px;font-size:18px;font-weight:950;outline:none;text-transform:uppercase}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.16)}
     .btn{border:0;border-radius:16px;background:var(--blue);color:white;padding:14px 16px;font-weight:950;font-size:15px;min-height:52px;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn.secondary{background:#172033;color:var(--txt);border:1px solid var(--line)}.btn.red{background:var(--bad)}.btn.green{background:var(--ok)}.btn:disabled{opacity:.55}
     .status{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.badge{padding:8px 10px;border-radius:999px;background:#0f172a;border:1px solid var(--line);color:var(--muted);font-weight:850;font-size:13px}.badge.ok{color:#86efac;border-color:rgba(22,163,74,.45)}.badge.warn{color:#fde68a;border-color:rgba(245,158,11,.45)}
-    .preview{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#000;position:relative;margin-top:14px}.preview video{width:100%;display:block;max-height:58vh;background:#000}.stealth-box{border-radius:20px;border:1px solid rgba(220,38,38,.45);background:linear-gradient(135deg,rgba(220,38,38,.16),rgba(15,23,42,.95));padding:18px;margin-top:14px}.stealth-title{font-size:19px;font-weight:950;margin-bottom:8px}.stealth-text{color:var(--muted);font-weight:750;line-height:1.45}.rec-overlay{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);padding:10px 12px;border-radius:14px;font-weight:950}.rec-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-right:8px;box-shadow:0 0 18px #ef4444}.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.hidden{display:none!important}
+    .preview{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#000;position:relative;margin-top:14px}.preview video{width:100%;display:block;max-height:58vh;background:#000}.stealth-box{display:inline-flex;align-items:center;gap:8px;border-radius:999px;border:1px solid rgba(22,163,74,.35);background:rgba(15,23,42,.62);padding:8px 11px;margin-top:12px;color:var(--muted);font-weight:850;font-size:13px}.quiet-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 9px rgba(34,197,94,.65);flex:0 0 auto}.btn.quiet-recording{background:#0f172a;color:var(--muted);border:1px solid var(--line)}.btn.quiet-stop{background:#172033;color:var(--txt);border:1px solid var(--line)}.rec-overlay{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);padding:10px 12px;border-radius:14px;font-weight:950}.rec-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-right:8px;box-shadow:0 0 18px #ef4444}.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.hidden{display:none!important}
     .day-title{font-size:18px;margin:20px 0 10px;font-weight:950;color:#fff}.record{display:grid;grid-template-columns:1fr;gap:12px;border:1px solid var(--line);background:rgba(15,23,42,.72);border-radius:18px;padding:14px;margin-bottom:10px}.record strong{font-size:17px}.record small{display:block;color:var(--soft);margin-top:4px}.record-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.mini{min-height:44px;padding:10px 8px;border-radius:13px;font-size:13px}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto}.modal-card{width:min(940px,100%);background:#0b1220;border:1px solid var(--line);border-radius:24px;padding:12px;box-shadow:0 30px 90px rgba(0,0,0,.5)}
     .public-frame{width:100%;height:70vh;border:1px solid var(--line);border-radius:18px;background:#050812}.modal-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111827;border:1px solid var(--line);padding:12px 14px;border-radius:14px;color:#fff;z-index:100;box-shadow:0 18px 45px rgba(0,0,0,.45)}
@@ -64,9 +64,9 @@
           <video id="preview" autoplay muted playsinline></video>
           <div class="rec-overlay"><span class="rec-dot"></span><span id="recText">REC 00:00</span></div>
         </div>
-        <div id="stealthBox" class="stealth-box hidden">
-          <div class="stealth-title">🔴 Enregistrement en cours</div>
-          <div class="stealth-text">Mode sans aperçu caméra : la vidéo et le son sont enregistrés, mais l’image caméra n’est pas affichée à l’écran.</div>
+        <div id="stealthBox" class="stealth-box hidden" aria-live="polite">
+          <span class="quiet-dot" aria-hidden="true"></span>
+          <span>Actif · sans aperçu</span>
         </div>
         <div class="actions">
           <button id="stopBtn" class="btn red hidden">ARRÊTER ET VALIDER</button>
@@ -189,14 +189,20 @@ els.startBtn.onclick = async () => {
       els.preview.srcObject = null;
       els.previewBox.classList.add('hidden');
       els.stealthBox.classList.remove('hidden');
-      els.startBtn.classList.add('red');
-      els.startBtn.textContent = '🔴 ENREGISTREMENT EN COURS';
+      els.startBtn.classList.add('quiet-recording');
+      els.startBtn.textContent = '● Actif';
+      els.stopBtn.textContent = 'Mettre fin';
+      els.stopBtn.classList.add('quiet-stop');
+      els.stopBtn.classList.remove('red');
     } else {
       els.preview.srcObject = stream;
       els.previewBox.classList.remove('hidden');
       els.stealthBox.classList.add('hidden');
-      els.startBtn.classList.remove('red');
+      els.startBtn.classList.remove('quiet-recording');
       els.startBtn.textContent = '🎥 ENREGISTRER';
+      els.stopBtn.textContent = 'ARRÊTER ET VALIDER';
+      els.stopBtn.classList.remove('quiet-stop');
+      els.stopBtn.classList.add('red');
     }
     els.stopBtn.classList.remove('hidden'); els.cancelBtn.classList.remove('hidden'); els.startBtn.disabled=true;
     chunks=[]; startedAt = Date.now();
@@ -205,7 +211,7 @@ els.startBtn.onclick = async () => {
     mediaRecorder.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
     mediaRecorder.start(5000);
     timer = setInterval(()=>{ const sec=(Date.now()-startedAt)/1000; els.recText.textContent='REC '+fmtTime(sec); els.durationBadge.textContent='Durée '+fmtTime(sec); }, 500);
-  } catch(e){ currentRecording=null; els.startBtn.classList.remove('red'); els.startBtn.textContent='🎥 ENREGISTRER'; toast('Caméra/audio impossible : '+e.message); }
+  } catch(e){ currentRecording=null; els.startBtn.classList.remove('quiet-recording'); els.startBtn.textContent='🎥 ENREGISTRER'; els.stopBtn.classList.remove('quiet-stop'); els.stopBtn.classList.add('red'); toast('Caméra/audio impossible : '+e.message); }
 };
 
 els.cancelBtn.onclick = () => cleanupRecording(true);
@@ -230,7 +236,7 @@ function cleanupRecording(clearResult){
   if(stream) stream.getTracks().forEach(t=>t.stop());
   stream=null; mediaRecorder=null; chunks=[];
   els.preview.srcObject = null;
-  els.previewBox.classList.add('hidden'); els.stealthBox.classList.add('hidden'); els.stopBtn.classList.add('hidden'); els.cancelBtn.classList.add('hidden'); els.startBtn.disabled=false; els.startBtn.classList.remove('red'); els.startBtn.textContent='🎥 ENREGISTRER'; els.durationBadge.textContent='Durée 00:00';
+  els.previewBox.classList.add('hidden'); els.stealthBox.classList.add('hidden'); els.stopBtn.classList.add('hidden'); els.cancelBtn.classList.add('hidden'); els.startBtn.disabled=false; els.startBtn.classList.remove('quiet-recording'); els.startBtn.textContent='🎥 ENREGISTRER'; els.stopBtn.classList.remove('quiet-stop'); els.stopBtn.classList.add('red'); els.durationBadge.textContent='Durée 00:00';
   currentRecording = null;
   if(clearResult) toast('Enregistrement annulé');
 }
@@ -259,7 +265,7 @@ async function uploadCompiledRecord(blob, durationSeconds){
   if(!complete.ok) throw new Error(complete.error||'Finalisation impossible');
   lastRecord = { orderNumber, order_number:orderNumber, publicUrl: complete.publicUrl, public_url:complete.publicUrl, durationSeconds, duration_seconds:durationSeconds, completed_at:new Date().toISOString(), gps:lastGps, type_preuve:rec.type_preuve, record_type:rec.type_preuve, stealthRef:rec.stealthRef };
   els.resultText.textContent = rec.noPreviewMode ? `Vidéo sans aperçu · durée ${fmtDuration(durationSeconds)} · lien prêt.` : `Commande ${orderNumber} · durée ${fmtDuration(durationSeconds)} · lien prêt pour Uber Eats.`;
-  els.mailLastMsg.classList.toggle('hidden', rec.noPreviewMode);
+  els.mailLastMsg.classList.toggle('hidden', !!rec.noPreviewMode);
   els.openLastPublic.textContent = rec.noPreviewMode ? 'Ouvrir' : 'Voir';
   els.resultCard.classList.remove('hidden');
   toast('Enregistrement envoyé ✅');
