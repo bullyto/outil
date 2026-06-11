@@ -292,9 +292,10 @@ function humanCampaignResult(data) {
     return { title: "Erreur campagne", text: data.error || "La campagne n’a pas pu être envoyée.", details: "" };
   }
 
+  const mode = data.testMode ? "Mode test : aucun vrai SMS envoyé." : "Envoi réel effectué.";
   return {
-    title: "Campagne envoyée",
-    text: `Envoi réel effectué.\n${data.sent || 0} envoyé(s), ${data.failed || 0} échec(s), ${data.total || 0} destinataire(s).`,
+    title: data.testMode ? "Test campagne réussi" : "Campagne envoyée",
+    text: `${mode}\n${data.sent || 0} envoyé(s), ${data.failed || 0} échec(s), ${data.total || 0} destinataire(s).`,
     details: `
       Campagne n° ${data.campaignId}<br>
       Encodage : ${escapeHtml(data.encoding || "")}<br>
@@ -358,9 +359,9 @@ async function previewCampaign() {
     title: $("campaignTitle")?.value || "Campagne ADN66",
     message: $("campaignMessage")?.value || "",
     limit: Number($("sendLimit")?.value || 0),
-    targetMode: $("targetMode")?.value || "active_unsent",
     onlyActive: true,
-    excludeAlreadySent: $("excludeAlreadySent")?.checked === true
+    excludeAlreadySent: $("excludeAlreadySent")?.checked === true,
+    targetMode: $("targetMode")?.value || "active_unsent"
   };
 
   const data = await api("/campaign/preview", { method: "POST", body: JSON.stringify(body) });
@@ -401,10 +402,9 @@ async function sendCampaign() {
     title: $("campaignTitle")?.value || "Campagne ADN66",
     message: $("campaignMessage")?.value || "",
     limit: Number($("sendLimit")?.value || 0),
-    targetMode: $("targetMode")?.value || "active_unsent",
     onlyActive: true,
     excludeAlreadySent: $("excludeAlreadySent")?.checked === true,
-    testMode: false
+    targetMode: $("targetMode")?.value || "active_unsent"
   };
 
   const data = await api("/campaign/send", { method: "POST", body: JSON.stringify(body) });
@@ -516,8 +516,8 @@ async function loadClients() {
     tr.innerHTML = `
       <td>${escapeHtml(client.name || "—")}</td>
       <td>${escapeHtml(client.phone || "")}</td>
-      <td>${loyaltyCardPill(client)}</td>
       <td>${statusPill(Number(client.is_active) === 1)}</td>
+      <td>${loyaltyPill(client.has_loyalty_card, client.loyalty_points, client.loyalty_goal)}</td>
       <td>${client.total_sent || 0}</td>
       <td>${escapeHtml(client.last_error_message || "")}</td>
       <td>${clientActions(client)}</td>
@@ -562,27 +562,17 @@ function clientActions(client) {
   return `<button class="mini disabled" disabled>Désactiver</button><button class="mini reactivate" data-action="reactivate" data-phone="${phone}">Réactiver</button>`;
 }
 
+function loyaltyPill(hasCard, points, goal) {
+  if (hasCard === true || Number(hasCard) === 1) {
+    const p = points === null || points === undefined || points === "" ? "" : ` · ${Number(points || 0)}/${Number(goal || 8)}`;
+    return `<span class="pill ok">Oui${p}</span>`;
+  }
+  return '<span class="pill neutral">Non</span>';
+}
+
 function statusPill(active) {
   if (!active) return '<span class="pill neutral">Désactivé</span>';
   return '<span class="pill ok">Actif</span>';
-}
-
-function loyaltyCardPill(client) {
-  const hasCard =
-    client?.has_loyalty_card === true ||
-    client?.hasLoyaltyCard === true ||
-    client?.loyalty_card === true ||
-    Number(client?.loyalty_points) >= 0 ||
-    Number(client?.loyaltyPoints) >= 0;
-
-  if (!hasCard) return '<span class="pill neutral">Non</span>';
-
-  const rawPoints = client?.loyalty_points ?? client?.loyaltyPoints ?? client?.points_fidelity ?? null;
-  const pointsText = rawPoints !== null && rawPoints !== undefined && rawPoints !== ""
-    ? ` · ${Number(rawPoints || 0)}/8`
-    : "";
-
-  return `<span class="pill ok">Oui${pointsText}</span>`;
 }
 
 document.addEventListener("click", async (event) => {
