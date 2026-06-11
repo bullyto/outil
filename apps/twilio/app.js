@@ -468,6 +468,146 @@ async function importContacts() {
   await refreshDashboard();
 }
 
+// ======================================================
+// SYNCHRO FIDÉLITÉ → TWILIO
+// ======================================================
+
+const LOYALTY_WORKER_URL = "https://carte-de-fideliter.apero-nuit-du-66.workers.dev";
+const LOYALTY_KEY_STORAGE = "adn66_admin_worker_key"; // même clé que l'admin fidélité actuel
+const LOYALTY_KEY_ALT_STORAGE = "adn66_loyalty_admin_key";
+
+function getSavedLoyaltyAdminKey() {
+  // Même clé que l'Admin Fidélité : admin-gate.js la sauvegarde ici après validation serveur.
+  // Comme /fidel/ et /twilio/ sont sur www.aperos.net, le localStorage est partagé.
+  return String(
+    localStorage.getItem(LOYALTY_KEY_STORAGE) ||
+    localStorage.getItem(LOYALTY_KEY_ALT_STORAGE) ||
+    localStorage.getItem("adn66_admin_worker_key") ||
+    ""
+  ).trim();
+}
+
+function saveLoyaltyAdminKey(key) {
+  const value = String(key || "").trim();
+  if (!value) return;
+  localStorage.setItem(LOYALTY_KEY_STORAGE, value);
+  localStorage.setItem(LOYALTY_KEY_ALT_STORAGE, value);
+}
+
+async function fetchAllLoyaltyCardsFromFidelityWorker(adminKey) {
+  const all = [];
+  const limit = 200;
+  let offset = 0;
+
+  while (true) {
+    const url = `${LOYALTY_WORKER_URL}/admin/loyalty/history?limit=${limit}&offset=${offset}`;
+    const response = await fetch(url, {
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        "x-admin-key": adminKey,
+        "Accept": "application/json"
+      }
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || data.ok === false) {
+      throw new Error(data.error || `Worker Fidélité HTTP ${response.status}`);
+    }
+
+    const items = Array.isArray(data.items) ? data.items : [];
+    all.push(...items);
+
+    if (items.length < limit) break;
+    offset += limit;
+    if (offset > 10000) break;
+  }
+
+  return all;
+}
+
+async function syncLoyaltyCardsIntoTwilio(options = {}) {
+  const silent = options.silent === true;
+  let adminKey = getSavedLoyaltyAdminKey();
+
+  if (!adminKey) {
+    if (silent) return { success: false, skipped: true, error: "Clé Admin Fidélité absente" };
+    adminKey = prompt("Collez le ADMIN_KEY du Worker Fidélité pour synchroniser les cartes :") || "";
+    adminKey = adminKey.trim();
+    if (!adminKey) {
+      toast("Synchronisation annulée");
+      return { success: false, skipped: true };
+    }
+    saveLoyaltyAdminKey(adminKey);
+  }
+
+  const btn = $("syncLoyaltyBtn");
+  if (btn) btn.disabled = true;
+  if (!silent) setText("clientsSummary", "Synchronisation des cartes fidélité en cours...");
+
+  try {
+    const cards = await fetchAllLoyaltyCardsFromFidelityWorker(adminKey);
+
+    const payload = cards
+      .map((card) => ({
+        client_id: card.client_id || "",
+        name: card.name || "",
+        phone: card.phone || card.phone_digits || "",
+        points: card.points ?? 0,
+        goal: card.goal ?? 8
+      }))
+      .filter((card) => String(card.phone || "").trim());
+
+    const result = await api("/clients/loyalty-sync", {
+      method: "POST",
+      body: JSON.stringify({ cards: payload })
+    });
+
+    if (!result.success) {
+      throw new Error(result.error || "Synchronisation Twilio impossible");
+    }
+
+    localStorage.setItem("adn66_twilio_loyalty_last_sync", String(Date.now()));
+
+    if (!silent) {
+      toast(`Cartes synchronisées : ${result.matched || 0} client(s)`);
+      showModal(
+        "Synchronisation terminée",
+        `${result.matched || 0} client(s) Twilio reconnu(s) avec une carte fidélité.`,
+        `Cartes lues côté Fidélité : <strong>${result.received || 0}</strong><br>Numéros valides : <strong>${result.valid || 0}</strong><br>Correspondances Twilio : <strong>${result.matched || 0}</strong>`
+      );
+    }
+
+    state.clientsPage = 1;
+    await loadClients();
+    return result;
+  } catch (error) {
+    const msg = error?.message || "Synchronisation impossible";
+    if (!silent) {
+      toast(msg);
+      showModal("Erreur synchronisation", msg, "La clé utilisée est celle de l’Admin Fidélité : localStorage adn66_admin_worker_key.");
+    }
+    if (/unauthorized/i.test(msg)) {
+      localStorage.removeItem(LOYALTY_KEY_STORAGE);
+      localStorage.removeItem(LOYALTY_KEY_ALT_STORAGE);
+      // On ne supprime pas forcément adn66_admin_worker_key ici : elle appartient aussi à l'Admin Fidélité.
+    }
+    return { success: false, error: msg };
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function autoSyncLoyaltyIfPossible() {
+  const key = getSavedLoyaltyAdminKey();
+  if (!key) return;
+  const last = Number(localStorage.getItem("adn66_twilio_loyalty_last_sync") || "0");
+  const tenMinutes = 10 * 60 * 1000;
+  if (Date.now() - last < tenMinutes) return;
+  await syncLoyaltyCardsIntoTwilio({ silent: true });
+}
+
 async function loadClients() {
   const filter = $("clientFilter")?.value || "active";
   const tbody = $("clientsTable");
@@ -567,7 +707,7 @@ function loyaltyPill(client) {
     return `<span class="pill ok">Oui${pts}</span>`;
   }
   if (client && client.loyalty_error) {
-    return `<span class="pill neutral" title="${escapeHtml(client.loyalty_error)}">Erreur : ${escapeHtml(client.loyalty_error)}</span>`;
+    return `<span class="pill neutral" title="${escapeHtml(client.loyalty_error)}">Non</span>`;
   }
   return '<span class="pill neutral">Non</span>';
 }
@@ -784,6 +924,7 @@ $("importCsvFile")?.addEventListener("change", () => {
 });
 $("clearImportBtn")?.addEventListener("click", () => { if ($("importNumbers")) $("importNumbers").value = ""; });
 $("loadClientsBtn")?.addEventListener("click", loadClients);
+$("syncLoyaltyBtn")?.addEventListener("click", syncLoyaltyCardsIntoTwilio);
 $("clientFilter")?.addEventListener("change", () => {
   state.clientsPage = 1;
   loadClients();
@@ -833,7 +974,7 @@ function bootAppAfterAdminUnlock() {
   appBooted = true;
   initSettings();
   refreshDashboard();
-  loadClients();
+  autoSyncLoyaltyIfPossible().then(() => loadClients()).catch(() => loadClients());
   loadProblems();
   loadHistory();
   loadSentTracking();
