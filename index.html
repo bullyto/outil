@@ -2,366 +2,388 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ADN66 — Enregistrement partenaire Uber</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#0b1220" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Outils ADN66 — Modules</title>
+  <meta name="theme-color" content="#5db7ee" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Outils ADN66" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+
   <style>
-    :root{--blue:#5db7ee;--bg:#0b1220;--bg2:#070b12;--card:#111827;--card2:#172033;--input:#0f172a;--line:#283447;--txt:#f8fafc;--muted:#cbd5e1;--soft:#94a3b8;--ok:#16a34a;--bad:#dc2626;--uber:#06c167}
-    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(145deg,var(--bg2),var(--bg),#1f2937);color:var(--txt)}
-    .app{max-width:980px;margin:0 auto;padding:12px 12px 90px}
-    .top{position:sticky;top:0;z-index:30;margin:0 -12px 12px;padding:10px 12px;background:rgba(7,11,18,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-    .brand{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand-title{font-size:15px;font-weight:950;letter-spacing:.02em}.brand-sub{font-size:12px;color:var(--soft);margin-top:2px}
-    .menu-btn{width:46px;height:46px;border-radius:15px;border:1px solid var(--line);background:#0f172a;color:#fff;font-size:24px;font-weight:950}
-    .drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:80}.drawer{position:fixed;top:0;right:0;width:min(360px,88vw);height:100vh;background:#0b1220;border-left:1px solid var(--line);z-index:90;padding:16px;box-shadow:-20px 0 60px rgba(0,0,0,.45);overflow:auto}
-    .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.drawer-title{font-size:18px;font-weight:950}.drawer-close{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:#101827;color:#fff;font-size:20px}
-    .drawer a,.drawer button.link{display:flex;width:100%;align-items:center;justify-content:space-between;text-decoration:none;color:#fff;background:#0f172a;border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin:8px 0;font-weight:850;font-size:15px}
-    .drawer a.active{background:var(--blue);border-color:var(--blue)}.drawer .sep{height:1px;background:var(--line);margin:14px 0}.drawer small{color:var(--soft);line-height:1.35;display:block}
-    .card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:22px;padding:15px;box-shadow:0 18px 50px rgba(0,0,0,.28);margin-bottom:12px}.hero{background:linear-gradient(135deg,rgba(93,183,238,.18),rgba(6,193,103,.08),rgba(17,24,39,.95))}
-    .h1{font-size:22px;margin:0}.tabs{display:flex;gap:8px;overflow:auto;margin:12px 0}.tabs button{white-space:nowrap;border:1px solid var(--line);background:#0f172a;color:var(--muted);border-radius:999px;padding:10px 14px;font-weight:900}.tabs .active{background:var(--blue);border-color:var(--blue);color:#fff}
-    .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.field label{display:block;color:var(--muted);font-weight:850;font-size:13px;margin:0 0 7px}.field input{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--input);color:var(--txt);padding:15px;font-size:18px;font-weight:950;outline:none;text-transform:uppercase}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.16)}
-    .btn{border:0;border-radius:16px;background:var(--blue);color:white;padding:14px 16px;font-weight:950;font-size:15px;min-height:52px;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn.secondary{background:#172033;color:var(--txt);border:1px solid var(--line)}.btn.red{background:var(--bad)}.btn.green{background:var(--ok)}.btn:disabled{opacity:.55}
-    .status{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.badge{padding:8px 10px;border-radius:999px;background:#0f172a;border:1px solid var(--line);color:var(--muted);font-weight:850;font-size:13px}.badge.ok{color:#86efac;border-color:rgba(22,163,74,.45)}.badge.warn{color:#fde68a;border-color:rgba(245,158,11,.45)}
-    .preview{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#000;position:relative;margin-top:14px}.preview video{width:100%;display:block;max-height:58vh;background:#000}.stealth-box{display:inline-flex;align-items:center;gap:8px;border-radius:999px;border:1px solid rgba(22,163,74,.35);background:rgba(15,23,42,.62);padding:8px 11px;margin-top:12px;color:var(--muted);font-weight:850;font-size:13px}.quiet-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 9px rgba(34,197,94,.65);flex:0 0 auto}.btn.quiet-recording{background:#0f172a;color:var(--muted);border:1px solid var(--line)}.btn.quiet-stop{background:#172033;color:var(--txt);border:1px solid var(--line)}.rec-overlay{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);padding:10px 12px;border-radius:14px;font-weight:950}.rec-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-right:8px;box-shadow:0 0 18px #ef4444}.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.hidden{display:none!important}
-    .day-title{font-size:18px;margin:20px 0 10px;font-weight:950;color:#fff}.record{display:grid;grid-template-columns:1fr;gap:12px;border:1px solid var(--line);background:rgba(15,23,42,.72);border-radius:18px;padding:14px;margin-bottom:10px}.record strong{font-size:17px}.record small{display:block;color:var(--soft);margin-top:4px}.record-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.mini{min-height:44px;padding:10px 8px;border-radius:13px;font-size:13px}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto}.modal-card{width:min(940px,100%);background:#0b1220;border:1px solid var(--line);border-radius:24px;padding:12px;box-shadow:0 30px 90px rgba(0,0,0,.5)}
-    .public-frame{width:100%;height:70vh;border:1px solid var(--line);border-radius:18px;background:#050812}.modal-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111827;border:1px solid var(--line);padding:12px 14px;border-radius:14px;color:#fff;z-index:100;box-shadow:0 18px 45px rgba(0,0,0,.45)}
-    @media(max-width:720px){.app{padding-left:10px;padding-right:10px}.top{margin-left:-10px;margin-right:-10px}.row{grid-template-columns:1fr}.actions,.record-actions,.modal-actions{grid-template-columns:1fr}.btn{width:100%}.public-frame{height:66vh}.h1{font-size:20px}}
+    :root{
+      --primary:#5db7ee;
+      --bg:#0b1220;
+      --bg-deep:#070b12;
+      --bg-mid:#111827;
+      --bg-soft:#1f2937;
+      --card:#111827;
+      --card-2:#172033;
+      --border:#283447;
+      --text:#f8fafc;
+      --text-soft:#cbd5e1;
+      --text-muted:#94a3b8;
+      --radius-xl:26px;
+      --radius-lg:20px;
+      --radius-md:16px;
+      --shadow:0 18px 40px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;min-height:100%}
+
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top, rgba(93,183,238,.16) 0%, rgba(93,183,238,0) 28%),
+        linear-gradient(180deg,var(--bg-deep) 0%, var(--bg) 30%, var(--bg-mid) 72%, var(--bg-soft) 100%);
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size:24px 24px;
+      mask-image:linear-gradient(to bottom, rgba(0,0,0,.25), transparent 85%);
+      z-index:0;
+    }
+
+    .page{
+      position:relative;
+      z-index:1;
+      max-width:1180px;
+      margin:0 auto;
+      padding:18px 14px 34px;
+    }
+
+    .sr-only{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:14px;
+    }
+
+    .card{
+      background:
+        radial-gradient(circle at top left, rgba(93,183,238,.13), transparent 34%),
+        linear-gradient(180deg, rgba(17,24,39,.96), rgba(23,32,51,.94));
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      min-height:260px;
+      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .card:hover{
+      transform:translateY(-2px);
+      border-color:rgba(93,183,238,.36);
+      box-shadow:0 22px 44px rgba(0,0,0,.40);
+    }
+
+    .card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .card-icon{
+      width:60px;
+      height:60px;
+      border-radius:20px;
+      display:grid;
+      place-items:center;
+      font-size:26px;
+      background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
+      border:1px solid rgba(93,183,238,.24);
+      box-shadow:0 10px 24px rgba(0,0,0,.28);
+      flex:0 0 auto;
+    }
+
+    .card-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(93,183,238,.12);
+      border:1px solid rgba(93,183,238,.22);
+      color:var(--text);
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+
+    .card h2{
+      margin:0 0 8px;
+      font-size:22px;
+      line-height:1.1;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+
+    .card p{
+      margin:0 0 16px;
+      color:var(--text-soft);
+      font-size:14px;
+      line-height:1.55;
+      font-weight:700;
+    }
+
+    .card ul{
+      margin:0 0 18px;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+    }
+
+    .card ul li{
+      display:flex;
+      gap:8px;
+      color:var(--text-muted);
+      font-size:13px;
+      line-height:1.4;
+      font-weight:700;
+    }
+
+    .card ul li::before{
+      content:"•";
+      color:var(--primary);
+      font-weight:900;
+    }
+
+    .card-footer{
+      margin-top:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .card-link{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:48px;
+      padding:0 18px;
+      border-radius:14px;
+      text-decoration:none;
+      background:var(--primary);
+      color:#fff;
+      font-size:15px;
+      font-weight:900;
+      border:1px solid var(--primary);
+      box-shadow:0 10px 24px rgba(93,183,238,.22);
+    }
+
+    .card-link:hover{ filter:brightness(1.05); }
+
+    .card-arrow{
+      color:var(--text-muted);
+      font-size:22px;
+      font-weight:700;
+    }
+
+    @media (max-width: 1060px){
+      .cards{grid-template-columns:repeat(2, minmax(0,1fr))}
+    }
+
+    @media (max-width: 720px){
+      .page{padding:14px 12px 28px}
+      .cards{grid-template-columns:1fr}
+      .card{min-height:auto}
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="top">
-      <div class="brand">
-        <div><div class="brand-title">APERO DE NUIT 66 — Outil</div><div class="brand-sub">Enregistrement partenaire Uber</div></div>
-        <button class="menu-btn" id="openMenu" aria-label="Ouvrir le menu">☰</button>
-      </div>
-    </header>
+  <main class="page">
+    <h1 class="sr-only">Modules ADN66</h1>
 
-    <section class="card hero"><h1 class="h1">Enregistrement partenaire Uber</h1></section>
-
-    <div class="tabs">
-      <button id="tabNew" class="active">Nouvel enregistrement</button>
-      <button id="tabHistory">Historique</button>
-    </div>
-
-    <main id="newPanel">
-      <section class="card">
-        <div class="row">
-          <div class="field">
-            <label for="orderNumber">Numéro de commande Uber Eats <span style="color:var(--soft);font-weight:700">— vide = mode sans aperçu</span></label>
-            <input id="orderNumber" placeholder="EX : A1B2C3 ou laisser vide" autocomplete="off" />
-          </div>
-          <button id="startBtn" class="btn">🎥 ENREGISTRER</button>
+    <section class="cards" aria-label="Modules ADN66">
+      <article class="card">
+        <div class="card-top">
+          <div class="card-icon">🔔</div>
+          <div class="card-badge">Notifications</div>
         </div>
-        <div class="status">
-          <span id="gpsBadge" class="badge warn">GPS en attente</span>
-          <span class="badge">Audio ON</span>
-          <span class="badge">Caméra avant</span>
-          <span id="durationBadge" class="badge">Durée 00:00</span>
+        <h2>PUSH</h2>
+        <p>Gestion des notifications push, de la diffusion instantanée et des abonnés web.</p>
+        <ul>
+          <li>Envoi rapide</li>
+          <li>Campagnes push</li>
+          <li>Gestion des abonnés</li>
+        </ul>
+        <div class="card-footer">
+          <a class="card-link" href="./apps/PUSH/">Ouvrir</a>
+          <div class="card-arrow">→</div>
         </div>
-        <div id="previewBox" class="preview hidden">
-          <video id="preview" autoplay muted playsinline></video>
-          <div class="rec-overlay"><span class="rec-dot"></span><span id="recText">REC 00:00</span></div>
+      </article>
+
+      <article class="card">
+        <div class="card-top">
+          <div class="card-icon">🧮</div>
+          <div class="card-badge">Calculatrice</div>
         </div>
-        <div id="stealthBox" class="stealth-box hidden" aria-live="polite">
-          <span class="quiet-dot" aria-hidden="true"></span>
-          <span>Actif · sans aperçu</span>
+        <h2>Calculateur</h2>
+        <p>Calculateur interne pour les opérations rapides Apéro de Nuit 66.</p>
+        <ul>
+          <li>Calculatrice métier</li>
+          <li>Calculs rapides</li>
+          <li>Interface interne ADN66</li>
+        </ul>
+        <div class="card-footer">
+          <a class="card-link" href="./apps/apero/">Ouvrir</a>
+          <div class="card-arrow">→</div>
         </div>
-        <div class="actions">
-          <button id="stopBtn" class="btn red hidden">ARRÊTER ET VALIDER</button>
-          <button id="cancelBtn" class="btn secondary hidden">Annuler</button>
+      </article>
+
+      <article class="card">
+        <div class="card-top">
+          <div class="card-icon">🎁</div>
+          <div class="card-badge">Clients</div>
         </div>
-      </section>
-
-      <section id="resultCard" class="card hidden">
-        <h2 style="margin:0 0 8px">Enregistrement terminé ✅</h2>
-        <p style="color:var(--muted);line-height:1.45;margin:0" id="resultText"></p>
-        <div class="actions">
-          <button class="btn" id="copyLastLink">Copier le lien</button>
-          <button class="btn secondary" id="mailLastMsg">Mail contestation</button>
-          <button class="btn secondary" id="openLastPublic">Voir</button>
+        <h2>Fidélité</h2>
+        <p>Gestion de la fidélité client avec avantages, récompenses et administration dédiée.</p>
+        <ul>
+          <li>Carte de fidélité</li>
+          <li>Suivi des avantages</li>
+          <li>Gestion client</li>
+        </ul>
+        <div class="card-footer">
+          <a class="card-link" href="./apps/fidel/admin.html">Ouvrir</a>
+          <div class="card-arrow">→</div>
         </div>
-      </section>
-    </main>
+      </article>
 
-    <main id="historyPanel" class="hidden">
-      <section class="card">
-        <div class="row">
-          <div class="field"><label>Rechercher une commande</label><input id="searchInput" placeholder="Numéro commande" /></div>
-          <button class="btn secondary" id="refreshBtn">Actualiser</button>
+      <article class="card">
+        <div class="card-top">
+          <div class="card-icon">📍</div>
+          <div class="card-badge">Livraison</div>
         </div>
-      </section>
-      <section id="historyList"></section>
-    </main>
-  </div>
+        <h2>GPS</h2>
+        <p>Outils terrain pour les trajets, la localisation et l’organisation des livraisons.</p>
+        <ul>
+          <li>Positionnement</li>
+          <li>Support tournée</li>
+          <li>Usage mobile terrain</li>
+        </ul>
+        <div class="card-footer">
+          <a class="card-link" href="./apps/gps/">Ouvrir</a>
+          <div class="card-arrow">→</div>
+        </div>
+      </article>
 
-  <div id="drawerBg" class="drawer-bg hidden"></div>
-  <aside id="drawer" class="drawer hidden" aria-label="Menu outil">
-    <div class="drawer-head"><div><div class="drawer-title">Menu Outil</div><small>Apéro de Nuit 66</small></div><button class="drawer-close" id="closeMenu">×</button></div>
-    <a href="../">Accueil</a>
-    <a href="../PUSH/">PUSH</a>
-    <a href="../apero/">APERO</a>
-    <a href="../fidel/">FIDÉLITÉ</a>
-    <a href="../gps/">GPS</a>
-    <a href="../status/">STATUS</a>
-    <a href="../stock/">STOCK</a>
-    <a href="../twilio/">TWILIO</a>
-    <a class="active" href="./">Partenaire Uber</a>
-    <div class="sep"></div>
-    <button class="link" id="settingsBtn">Réglages admin <span>›</span></button>
-    <small>Le token reste enregistré uniquement sur cet appareil.</small>
-  </aside>
+      <article class="card">
+        <div class="card-top">
+          <div class="card-icon">📢</div>
+          <div class="card-badge">Pilotage</div>
+        </div>
+        <h2>Status</h2>
+        <p>Pilotage des statuts, annonces et messages visibles sur les différents sites.</p>
+        <ul>
+          <li>Pop-ups et états</li>
+          <li>Messages dynamiques</li>
+          <li>Contrôle centralisé</li>
+        </ul>
+        <div class="card-footer">
+          <a class="card-link" href="./apps/status/">Ouvrir</a>
+          <div class="card-arrow">→</div>
+        </div>
+      </article>
 
-  <div id="modal" class="modal hidden"><div class="modal-card" id="modalContent"></div></div>
-  <div id="toast" class="toast hidden"></div>
+      <article class="card">
+        <div class="card-top">
+          <div class="card-icon">📦</div>
+          <div class="card-badge">Stock</div>
+        </div>
+        <h2>Stock</h2>
+        <p>Gestion des produits, disponibilité, tarifs et suivi opérationnel du stock.</p>
+        <ul>
+          <li>Gestion produits</li>
+          <li>Disponibilités</li>
+          <li>Suivi interne</li>
+        </ul>
+        <div class="card-footer">
+          <a class="card-link" href="./apps/stock/">Ouvrir</a>
+          <div class="card-arrow">→</div>
+        </div>
+      </article>
 
-<script>
-const DEFAULT_WORKER = 'https://uber.apero-nuit-du-66.workers.dev';
-const UBER_CONTEST_EMAIL = 'magasin-france@uber.com';
-const BUSINESS = {
-  name: 'APERO DE NUIT 66',
-  manager: 'Steven Hauviller',
-  address: '12 rue du Fer à Cheval, 66410 Villelongue-de-la-Salanque',
-  phone: '0652336461'
-};
+      <article class="card">
+        <div class="card-top">
+          <div class="card-icon">💬</div>
+          <div class="card-badge">SMS</div>
+        </div>
+        <h2>Twilio / Marketing SMS</h2>
+        <p>Module marketing SMS pour campagnes, contacts, estimation, historique et suivi.</p>
+        <ul>
+          <li>Campagnes SMS</li>
+          <li>Gestion des contacts</li>
+          <li>Suivi et historique</li>
+        </ul>
+        <div class="card-footer">
+          <a class="card-link" href="./apps/twilio/">Ouvrir</a>
+          <div class="card-arrow">→</div>
+        </div>
+      </article>
 
-let workerBase = DEFAULT_WORKER;
-let adminToken = localStorage.getItem('adn66_uber_token') || '';
-let mediaRecorder, stream, chunks = [], startedAt = 0, timer = null, lastGps = null, lastRecord = null, currentRecording = null;
-const els = Object.fromEntries([...document.querySelectorAll('[id]')].map(e => [e.id, e]));
 
-function toast(msg){ els.toast.textContent=msg; els.toast.classList.remove('hidden'); setTimeout(()=>els.toast.classList.add('hidden'),2600); }
-function fmtTime(s){ s=Math.max(0,Math.floor(s||0)); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
-function fmtDuration(s){ s=Math.max(0,Math.floor(s||0)); return `${Math.floor(s/60)} min ${s%60} s`; }
-function cleanOrder(v){ return (v||'').trim().replace(/[^a-zA-Z0-9_-]/g,'').toUpperCase(); }
-function headers(json=true){ const h={'x-admin-token':adminToken}; if(json) h['content-type']='application/json'; return h; }
-function api(path, opts={}){ return fetch(workerBase+path, opts); }
-function enc(v){ return encodeURIComponent(v||''); }
+      <article class="card">
+        <div class="card-top">
+          <div class="card-icon">🎥</div>
+          <div class="card-badge">Uber Eats</div>
+        </div>
+        <h2>Enregistrement partenaire Uber</h2>
+        <p>Module terrain pour enregistrer une remise partenaire Uber Eats avec vidéo, audio, GPS et lien privé consultable.</p>
+        <ul>
+          <li>Vidéo/audio avec caméra avant</li>
+          <li>GPS, date, durée et commande</li>
+          <li>Historique et page privée Uber</li>
+        </ul>
+        <div class="card-footer">
+          <a class="card-link" href="./apps/UBER/">Ouvrir</a>
+          <div class="card-arrow">→</div>
+        </div>
+      </article>
+    </section>
+  </main>
 
-function openDrawer(){ els.drawer.classList.remove('hidden'); els.drawerBg.classList.remove('hidden'); }
-function closeDrawer(){ els.drawer.classList.add('hidden'); els.drawerBg.classList.add('hidden'); }
-els.openMenu.onclick=openDrawer; els.closeMenu.onclick=closeDrawer; els.drawerBg.onclick=closeDrawer;
-
-els.settingsBtn.onclick = () => {
-  const tk = prompt('Code admin', adminToken ? '********' : '') || '';
-  if(tk && tk !== '********'){
-    adminToken = tk;
-    localStorage.setItem('adn66_uber_token', adminToken);
-    toast('Réglages enregistrés');
-  }
-  closeDrawer();
-};
-
-els.tabNew.onclick = () => switchTab('new');
-els.tabHistory.onclick = () => { switchTab('history'); loadHistory(); };
-function switchTab(name){
-  els.tabNew.classList.toggle('active', name==='new'); els.tabHistory.classList.toggle('active', name==='history');
-  els.newPanel.classList.toggle('hidden', name!=='new'); els.historyPanel.classList.toggle('hidden', name!=='history');
-}
-
-function updateGpsBadge(){
-  if(lastGps){ els.gpsBadge.textContent = 'GPS OK ± '+Math.round(lastGps.accuracy||0)+' m'; els.gpsBadge.className='badge ok'; }
-  else { els.gpsBadge.textContent = 'GPS en attente'; els.gpsBadge.className='badge warn'; }
-}
-function initGps(){
-  if(!navigator.geolocation){ els.gpsBadge.textContent='GPS indisponible'; return; }
-  navigator.geolocation.watchPosition(pos => {
-    lastGps={ lat:pos.coords.latitude, lng:pos.coords.longitude, accuracy:pos.coords.accuracy, recordedAt:new Date(pos.timestamp).toISOString() };
-    updateGpsBadge();
-  }, () => { els.gpsBadge.textContent='GPS refusé ou indisponible'; els.gpsBadge.className='badge warn'; }, { enableHighAccuracy:true, maximumAge:5000, timeout:15000 });
-}
-initGps();
-
-els.startBtn.onclick = async () => {
-  const order = cleanOrder(els.orderNumber.value);
-  const noPreviewMode = !order;
-  if(!adminToken) return toast('Ouvrez le menu puis Réglages admin');
-  try{
-    currentRecording = {
-      orderNumber: order,
-      noPreviewMode,
-      type_preuve: noPreviewMode ? 'video_sans_apercu' : 'commande_uber',
-      stealthRef: noPreviewMode ? ('FURTIF-' + new Date().toISOString().replace(/[-:.TZ]/g,'').slice(0,14)) : ''
-    };
-    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ideal:1280}, height:{ideal:720} }, audio:true });
-    if(noPreviewMode){
-      els.preview.srcObject = null;
-      els.previewBox.classList.add('hidden');
-      els.stealthBox.classList.remove('hidden');
-      els.startBtn.classList.add('quiet-recording');
-      els.startBtn.textContent = '● Actif';
-      els.stopBtn.textContent = 'Mettre fin';
-      els.stopBtn.classList.add('quiet-stop');
-      els.stopBtn.classList.remove('red');
-    } else {
-      els.preview.srcObject = stream;
-      els.previewBox.classList.remove('hidden');
-      els.stealthBox.classList.add('hidden');
-      els.startBtn.classList.remove('quiet-recording');
-      els.startBtn.textContent = '🎥 ENREGISTRER';
-      els.stopBtn.textContent = 'ARRÊTER ET VALIDER';
-      els.stopBtn.classList.remove('quiet-stop');
-      els.stopBtn.classList.add('red');
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(function (error) {
+          console.warn("Service Worker non enregistré :", error);
+        });
+      });
     }
-    els.stopBtn.classList.remove('hidden'); els.cancelBtn.classList.remove('hidden'); els.startBtn.disabled=true;
-    chunks=[]; startedAt = Date.now();
-    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm';
-    mediaRecorder = new MediaRecorder(stream, { mimeType:mime, videoBitsPerSecond:2500000, audioBitsPerSecond:96000 });
-    mediaRecorder.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
-    mediaRecorder.start(5000);
-    timer = setInterval(()=>{ const sec=(Date.now()-startedAt)/1000; els.recText.textContent='REC '+fmtTime(sec); els.durationBadge.textContent='Durée '+fmtTime(sec); }, 500);
-  } catch(e){ currentRecording=null; els.startBtn.classList.remove('quiet-recording'); els.startBtn.textContent='🎥 ENREGISTRER'; els.stopBtn.classList.remove('quiet-stop'); els.stopBtn.classList.add('red'); toast('Caméra/audio impossible : '+e.message); }
-};
-
-els.cancelBtn.onclick = () => cleanupRecording(true);
-els.stopBtn.onclick = async () => {
-  els.stopBtn.disabled = true; els.stopBtn.textContent = 'Compilation...';
-  try{
-    const blob = await stopAndGetBlob();
-    const durationSeconds = Math.round((Date.now()-startedAt)/1000);
-    await uploadCompiledRecord(blob, durationSeconds);
-  } catch(e){ toast('Erreur : '+e.message); }
-  finally { cleanupRecording(false); els.stopBtn.disabled=false; els.stopBtn.textContent='ARRÊTER ET VALIDER'; }
-};
-
-function stopAndGetBlob(){
-  return new Promise(resolve => {
-    mediaRecorder.onstop = () => resolve(new Blob(chunks, { type: mediaRecorder.mimeType || 'video/webm' }));
-    mediaRecorder.stop();
-  });
-}
-function cleanupRecording(clearResult){
-  clearInterval(timer); timer=null;
-  if(stream) stream.getTracks().forEach(t=>t.stop());
-  stream=null; mediaRecorder=null; chunks=[];
-  els.preview.srcObject = null;
-  els.previewBox.classList.add('hidden'); els.stealthBox.classList.add('hidden'); els.stopBtn.classList.add('hidden'); els.cancelBtn.classList.add('hidden'); els.startBtn.disabled=false; els.startBtn.classList.remove('quiet-recording'); els.startBtn.textContent='🎥 ENREGISTRER'; els.stopBtn.classList.remove('quiet-stop'); els.stopBtn.classList.add('red'); els.durationBadge.textContent='Durée 00:00';
-  currentRecording = null;
-  if(clearResult) toast('Enregistrement annulé');
-}
-async function uploadCompiledRecord(blob, durationSeconds){
-  const rec = currentRecording || { orderNumber: cleanOrder(els.orderNumber.value), noPreviewMode:false, type_preuve:'commande_uber', stealthRef:'' };
-  const orderNumber = rec.orderNumber;
-  const displayTitle = rec.noPreviewMode ? 'Vidéo sans aperçu' : `Commande ${orderNumber}`;
-  const createPayload = { orderNumber: rec.noPreviewMode ? '' : orderNumber, recordType: rec.type_preuve, type_preuve: rec.type_preuve, stealthRef: rec.stealthRef, mimeType:blob.type, deviceLabel:navigator.userAgent };
-  let create = await api('/api/multipart/create',{ method:'POST', headers:headers(), body:JSON.stringify(createPayload)}).then(r=>r.json());
-  if(!create.ok && rec.noPreviewMode){
-    // Compatibilité avec un Worker qui impose encore un numéro de commande.
-    createPayload.orderNumber = rec.stealthRef;
-    create = await api('/api/multipart/create',{ method:'POST', headers:headers(), body:JSON.stringify(createPayload)}).then(r=>r.json());
-  }
-  if(!create.ok) throw new Error(create.error||'Création upload impossible');
-  const partSize = 8 * 1024 * 1024;
-  const parts=[]; let partNumber=1;
-  for(let offset=0; offset<blob.size; offset+=partSize){
-    const part = blob.slice(offset, offset+partSize);
-    toast('Upload morceau '+partNumber+'...');
-    const res = await api(`/api/multipart/upload?key=${encodeURIComponent(create.key)}&uploadId=${encodeURIComponent(create.uploadId)}&partNumber=${partNumber}`, { method:'PUT', headers:headers(false), body:part }).then(r=>r.json());
-    if(!res.ok) throw new Error(res.error || 'Upload morceau impossible');
-    parts.push(res.part); partNumber++;
-  }
-  const complete = await api('/api/multipart/complete',{ method:'POST', headers:headers(), body:JSON.stringify({ id:create.id, key:create.key, uploadId:create.uploadId, parts, durationSeconds, sizeBytes:blob.size, gps:lastGps, recordType:rec.type_preuve, type_preuve:rec.type_preuve, stealthRef:rec.stealthRef, orderNumber: rec.noPreviewMode ? null : orderNumber })}).then(r=>r.json());
-  if(!complete.ok) throw new Error(complete.error||'Finalisation impossible');
-  lastRecord = { orderNumber, order_number:orderNumber, publicUrl: complete.publicUrl, public_url:complete.publicUrl, durationSeconds, duration_seconds:durationSeconds, completed_at:new Date().toISOString(), gps:lastGps, type_preuve:rec.type_preuve, record_type:rec.type_preuve, stealthRef:rec.stealthRef };
-  els.resultText.textContent = rec.noPreviewMode ? `Vidéo sans aperçu · durée ${fmtDuration(durationSeconds)} · lien prêt.` : `Commande ${orderNumber} · durée ${fmtDuration(durationSeconds)} · lien prêt pour Uber Eats.`;
-  els.mailLastMsg.classList.toggle('hidden', !!rec.noPreviewMode);
-  els.openLastPublic.textContent = rec.noPreviewMode ? 'Ouvrir' : 'Voir';
-  els.resultCard.classList.remove('hidden');
-  toast('Enregistrement envoyé ✅');
-}
-
-function mailSubject(order){ return `Contestation remboursement Uber Eats - commande ${order}`; }
-function mailBody(order, url, r={}){
-  const dt = r.completed_at || r.created_at ? new Date(r.completed_at || r.created_at).toLocaleString('fr-FR') : new Date().toLocaleString('fr-FR');
-  const lat = r.gps_lat || (r.gps && r.gps.lat);
-  const lng = r.gps_lng || (r.gps && r.gps.lng);
-  const acc = r.gps_accuracy || (r.gps && r.gps.accuracy);
-  return `Bonjour,
-
-Je conteste le remboursement / l'ajustement lié à la commande Uber Eats n° ${order}.
-
-Un enregistrement vidéo/audio horodaté, avec position GPS enregistrée au moment de la remise, est disponible ici :
-${url}
-
-Informations commande :
-- Numéro de commande Uber Eats : ${order}
-- Date de l'enregistrement : ${dt}
-- Durée : ${fmtDuration(r.duration_seconds || lastRecord?.durationSeconds || 0)}
-- GPS : ${lat && lng ? `latitude ${Number(lat).toFixed(6)}, longitude ${Number(lng).toFixed(6)}, précision environ ${Math.round(acc || 0)} mètres` : 'non disponible'}
-
-Identification partenaire :
-- Entreprise : ${BUSINESS.name}
-- Responsable : ${BUSINESS.manager}
-- Adresse : ${BUSINESS.address}
-- Téléphone : ${BUSINESS.phone}
-
-Merci de réexaminer ce dossier.
-
-Cordialement,
-${BUSINESS.name}`;
-}
-function openContestMail(order, url, r={}){
-  const href = `mailto:${enc(UBER_CONTEST_EMAIL)}?subject=${enc(mailSubject(order))}&body=${enc(mailBody(order,url,r))}`;
-  window.location.href = href;
-}
-async function copy(text){ await navigator.clipboard.writeText(text); toast('Copié'); }
-els.copyLastLink.onclick = () => lastRecord && copy(lastRecord.publicUrl);
-els.mailLastMsg.onclick = () => lastRecord && !isStealthRecord(lastRecord) && openContestMail(lastRecord.orderNumber, lastRecord.publicUrl, lastRecord);
-els.openLastPublic.onclick = () => lastRecord && showPublicPreview({ order_number:lastRecord.orderNumber, public_url:lastRecord.publicUrl, duration_seconds:lastRecord.durationSeconds, completed_at:lastRecord.completed_at, gps_lat:lastGps?.lat, gps_lng:lastGps?.lng, gps_accuracy:lastGps?.accuracy });
-
-els.refreshBtn.onclick = loadHistory; els.searchInput.oninput = () => setTimeout(loadHistory, 250);
-async function loadHistory(){
-  if(!adminToken){ els.historyList.innerHTML='<section class="card"><p style="color:var(--muted);margin:0">Ouvrez le menu puis Réglages admin.</p></section>'; return; }
-  const q = encodeURIComponent(cleanOrder(els.searchInput.value));
-  const data = await api('/api/records?limit=200&q='+q,{ headers:headers(false) }).then(r=>r.json()).catch(e=>({ok:false,error:e.message}));
-  if(!data.ok){ els.historyList.innerHTML='<section class="card"><p style="color:var(--muted);margin:0">Erreur : '+(data.error||'chargement impossible')+'</p></section>'; return; }
-  renderHistory(data.records||[]);
-}
-function dayLabel(iso){
-  const d = new Date(iso); const today = new Date();
-  const same = d.toDateString()===today.toDateString();
-  const y = new Date(Date.now()-86400000); const yesterday = d.toDateString()===y.toDateString();
-  const label = new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Paris'}).format(d);
-  return (same?'Aujourd’hui — ':yesterday?'Hier — ':'') + label.charAt(0).toUpperCase()+label.slice(1);
-}
-function timeLabel(iso){ return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}).format(new Date(iso)); }
-function isStealthRecord(r){
-  const t = String(r?.type_preuve || r?.record_type || r?.type || '').toLowerCase();
-  const n = String(r?.order_number || r?.orderNumber || '').toUpperCase();
-  return t.includes('sans_apercu') || t.includes('stealth') || n.startsWith('FURTIF-');
-}
-
-function renderHistory(records){
-  const groups={}; records.forEach(r=>{ const k=dayLabel(r.completed_at||r.created_at); (groups[k] ||= []).push(r); });
-  let html='';
-  for(const [day, items] of Object.entries(groups)){
-    html += `<h2 class="day-title">${day}</h2>`;
-    for(const r of items){
-      const stealth = isStealthRecord(r);
-      const title = stealth ? 'Vidéo sans aperçu' : `Uber ${escapeHtml(r.order_number)}`;
-      const details = stealth ? `${timeLabel(r.completed_at||r.created_at)} · ${fmtDuration(r.duration_seconds)} · Aucun numéro de commande · GPS ${r.gps_lat?'OK':'non'} · Audio ${r.audio_enabled?'ON':'non'}` : `${timeLabel(r.completed_at||r.created_at)} · ${fmtDuration(r.duration_seconds)} · GPS ${r.gps_lat?'OK':'non'} · Audio ${r.audio_enabled?'ON':'non'}`;
-      const actions = stealth
-        ? `<button class="btn secondary mini" onclick='copy(${JSON.stringify(r.public_url)})'>Copier lien</button><button class="btn mini" onclick='window.open(${JSON.stringify(r.public_url)},"_blank")'>Ouvrir</button>`
-        : `<button class="btn mini" onclick='showPublicPreview(${JSON.stringify(r)})'>Voir</button><button class="btn secondary mini" onclick='copy(${JSON.stringify(r.public_url)})'>Copier lien</button><button class="btn secondary mini" onclick='openContestMail(${JSON.stringify(r.order_number)},${JSON.stringify(r.public_url)},${JSON.stringify(r)})'>Mail contestation</button>`;
-      html += `<article class="record"><div><strong>${title}</strong><small>${details}</small></div><div class="record-actions">${actions}</div></article>`;
-    }
-  }
-  els.historyList.innerHTML = html || '<section class="card"><p style="color:var(--muted);margin:0">Aucun enregistrement.</p></section>';
-}
-function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
-window.showPublicPreview = (r) => {
-  const url = r.public_url;
-  const stealth = isStealthRecord(r);
-  const buttons = stealth
-    ? `<button class="btn" onclick='copy(${JSON.stringify(url)})'>Copier lien</button><button class="btn secondary" onclick='window.open(${JSON.stringify(url)},"_blank")'>Ouvrir</button><button class="btn red" onclick='closeModal()'>Fermer</button>`
-    : `<button class="btn" onclick='copy(${JSON.stringify(url)})'>Copier lien</button><button class="btn secondary" onclick='openContestMail(${JSON.stringify(r.order_number)},${JSON.stringify(url)},${JSON.stringify(r)})'>Mail contestation</button><button class="btn secondary" onclick='window.open(${JSON.stringify(url)},"_blank")'>Ouvrir</button><button class="btn red" onclick='closeModal()'>Fermer</button>`;
-  els.modalContent.innerHTML = `<iframe class="public-frame" src="${escapeHtml(url)}" title="Aperçu"></iframe><div class="modal-actions">${buttons}</div>`;
-  els.modal.classList.remove('hidden');
-};
-window.closeModal = () => els.modal.classList.add('hidden');
-els.modal.onclick = e => { if(e.target === els.modal) closeModal(); };
-window.copy = copy; window.openContestMail = openContestMail;
-</script>
+  </script>
+<script src="./admin-gate.js"></script>
 </body>
 </html>
