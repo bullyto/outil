@@ -511,9 +511,31 @@
             <textarea id="message" placeholder="Texte affiché dans le pop-up..."></textarea>
           </div>
 
-          <div style="margin-top:12px">
-            <label>Image Apéro de Nuit 66</label>
-            <input id="image" placeholder="images/panne.png" />
+          <div class="card" style="margin-top:12px">
+            <div class="bd">
+              <div style="font-weight:900; margin-bottom:10px;">Image Apéro de Nuit 66</div>
+              <div class="row">
+                <div>
+                  <label>Méthode image ADN66</label>
+                  <select id="adnImageMethod">
+                    <option value="none">Aucune image</option>
+                    <option value="list">Choisir dans la liste ADN66</option>
+                    <option value="url">URL personnalisée ADN66</option>
+                  </select>
+                </div>
+                <div id="adnImageListWrap" class="ui-hide">
+                  <label>Image prédéfinie ADN66</label>
+                  <select id="adnImageSelect"></select>
+                </div>
+              </div>
+              <div id="adnImageUrlWrap" class="ui-hide" style="margin-top:12px">
+                <label>URL image ADN66</label>
+                <input id="image" placeholder="https://... ou images/ADN66_panne_1.png" />
+              </div>
+              <div class="small" style="margin-top:10px">
+                Cette image est utilisée par Apéro de Nuit 66. Apéro Catalan peut garder sa propre image séparée.
+              </div>
+            </div>
           </div>
 
           <div class="card" style="margin-top:12px">
@@ -731,6 +753,7 @@
     })();
   </script>
 
+  <script src="./status-images-adn66.js"></script>
   <script src="./status-images-catalan.js"></script>
   <script src="./app.js"></script>
 

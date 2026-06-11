@@ -167,22 +167,65 @@ function formatCountdown(seconds){
   return `Activé — durée : ${min} minute${min > 1 ? "s" : ""} et ${rest} seconde${rest > 1 ? "s" : ""}`;
 }
 
+function catalogAdn66(){
+  return Array.isArray(window.STATUS_IMAGES_ADN66) ? window.STATUS_IMAGES_ADN66 : [];
+}
+
 function catalogCatalan(){
   return Array.isArray(window.STATUS_IMAGES_CATALAN) ? window.STATUS_IMAGES_CATALAN : [];
 }
 
-function fillCatalanImageSelect(){
-  const sel = $("catalanImageSelect");
+function fillImageSelect(selId, list){
+  const sel = $(selId);
   if(!sel) return;
-  const list = catalogCatalan();
   sel.innerHTML = list.map(item => `<option value="${item.value}">${item.label}</option>`).join("");
 }
 
-function imageLabelFromCatalog(value){
+function fillAdnImageSelect(){ fillImageSelect("adnImageSelect", catalogAdn66()); }
+function fillCatalanImageSelect(){ fillImageSelect("catalanImageSelect", catalogCatalan()); }
+
+function imageLabelFromAnyCatalog(value){
   const v = String(value || "").trim();
   if(!v) return "Aucune image";
-  const found = catalogCatalan().find(x => x.value === v);
+  const found = [...catalogAdn66(), ...catalogCatalan()].find(x => x.value === v);
   return found ? found.label : v;
+}
+
+function imageLabelFromCatalog(value){
+  return imageLabelFromAnyCatalog(value);
+}
+
+function syncAdnImageUi(){
+  const method = getVal("adnImageMethod", "none");
+  const listWrap = $("adnImageListWrap");
+  const urlWrap = $("adnImageUrlWrap");
+  if(listWrap) listWrap.classList.toggle("ui-hide", method !== "list");
+  if(urlWrap) urlWrap.classList.toggle("ui-hide", method !== "url");
+}
+
+function getAdnImageState(){
+  const method = getVal("adnImageMethod", "none");
+  if(method === "list") return { value:getVal("adnImageSelect", ""), method };
+  if(method === "url") return { value:getVal("image", ""), method };
+  return { value:"", method:"none" };
+}
+
+function setAdnFormFromCfg(cfg){
+  fillAdnImageSelect();
+  const value = String(cfg?.image || "").trim();
+  const list = catalogAdn66();
+  if(value && list.some(x => x.value === value)){
+    setVal("adnImageMethod", "list");
+    setVal("adnImageSelect", value);
+    setVal("image", value);
+  }else if(value){
+    setVal("adnImageMethod", "url");
+    setVal("image", value);
+  }else{
+    setVal("adnImageMethod", "none");
+    setVal("image", "");
+  }
+  syncAdnImageUi();
 }
 
 function syncCatalanImageUi(){
@@ -301,7 +344,9 @@ function renderLivePreview(data){
         <div class="k">Compte à rebours :</div><div><b>${countdown}</b></div>
         ${mode === "warning" ? `<div class="k">Blocage :</div><div><b>${scheduleText(cfg)}</b></div>` : ""}
         ${mode === "warning" && cfg.warning_click_message ? `<div class="k">Message au clic :</div><div><b>${cfg.warning_click_message}</b></div>` : ""}
-        <div class="k">Image ADN66 :</div><div><b>${imgAdn || "Aucune image"}</b></div>
+        <div class="k">Image ADN66 :</div><div><b>${imgAdn ? imageLabelFromAnyCatalog(imgAdn) : "Aucune image"}</b></div>
+        <div class="k">Image ADN66 :</div><div><b>${imgAdn ? imageLabelFromAnyCatalog(imgAdn) : "Aucune image"}</b></div>
+        <div class="k">Image ADN66 :</div><div><b>${imgAdn ? imageLabelFromAnyCatalog(imgAdn) : "Aucune image"}</b></div>
         <div class="k">Image Catalan :</div><div><b>${cfg.image_catalan_disabled ? "Aucune image Catalan" : (cfg.image_catalan ? imageLabelFromCatalog(cfg.image_catalan) : "Même image que ADN66")}</b></div>
       </div>
       ${imgCat && imgCat !== imgAdn ? `<div style="margin-top:14px"><div class="small" style="margin-bottom:8px"><b>Aperçu image Catalan</b></div><img src="${imgCat}" alt="Image Apéro Catalan" style="width:100%;max-height:220px;object-fit:cover;border-radius:18px"></div>` : ""}
@@ -347,6 +392,7 @@ function renderPreview(data){
         <div class="k">Commande bloquée :</div><div><b>${blocked ? "Oui" : "Non"}</b></div>
         <div class="k">Compte à rebours :</div><div><b>${countdown}</b></div>
         ${mode === "warning" ? `<div class="k">Blocage :</div><div><b>${scheduleText(cfg)}</b></div>` : ""}
+        <div class="k">Image ADN66 :</div><div><b>${imgAdn ? imageLabelFromAnyCatalog(imgAdn) : "Aucune image"}</b></div>
         <div class="k">Image Catalan :</div><div><b>${cfg.image_catalan_disabled ? "Aucune image Catalan" : (cfg.image_catalan ? imageLabelFromCatalog(cfg.image_catalan) : "Même image que ADN66")}</b></div>
       </div>
       ${imgCat && imgCat !== imgAdn ? `<div style="margin-top:12px"><div class="small" style="margin-bottom:8px"><b>Aperçu Catalan</b></div><img src="${imgCat}" alt="Aperçu image Catalan" style="width:100%;max-height:220px;object-fit:cover;border-radius:18px"></div>` : ""}
@@ -380,7 +426,10 @@ function setFormFromStatus(data){
   const preset = data.presets?.[presetKey] || {};
   setVal("title", preset.title || "");
   setVal("message", preset.message || "");
-  setVal("image", preset.image || "");
+
+  const modeCfgForAdn = data.modes?.[uiMode] || {};
+  const adnSource = (presetKey && presetKey !== "libre") ? preset : modeCfgForAdn;
+  setAdnFormFromCfg(adnSource);
 
   const modeCfgForCatalan = data.modes?.[uiMode] || {};
   const catalanSource = (presetKey && presetKey !== "libre") ? preset : modeCfgForCatalan;
@@ -444,7 +493,8 @@ function buildUpdatedStatus(current){
 
   const title = getVal("title","").trim();
   const message = getVal("message","").trim();
-  const image = getVal("image","").trim();
+  const adnImage = getAdnImageState();
+  const image = adnImage.value;
   const catalanImage = getCatalanImageState();
 
   if(presetKey && presetKey !== "libre"){
@@ -531,6 +581,7 @@ async function main(){
       ["info","warning"].map(m => `<option value="${m}">${m}</option>`).join("");
   }
 
+  fillAdnImageSelect();
   fillCatalanImageSelect();
   setFormFromStatus(current);
 
@@ -544,19 +595,21 @@ async function main(){
     const p = current.presets?.[key] || {};
     setVal("title", p.title || "");
     setVal("message", p.message || "");
-    setVal("image", p.image || "");
+    setAdnFormFromCfg(p);
+    setCatalanFormFromCfg(p);
     rerender();
   });
 
   if ($("active")) $("active").addEventListener("change", rerender);
   if ($("mode")) $("mode").addEventListener("change", ()=> { syncModePanels(); rerender(); });
 
-  ["title","message","image","catalanImageMethod","catalanImageSelect","catalanImageUrl","okDelay","schedEnabled","schedStart","schedEnd","warningClickMsg"].forEach(id => {
+  ["title","message","adnImageMethod","adnImageSelect","image","catalanImageMethod","catalanImageSelect","catalanImageUrl","okDelay","schedEnabled","schedStart","schedEnd","warningClickMsg"].forEach(id => {
     const el = $(id);
     if(el) el.addEventListener("input", rerender);
     if(el) el.addEventListener("change", rerender);
   });
   if($("schedDays")) $("schedDays").addEventListener("change", rerender);
+  if($("adnImageMethod")) $("adnImageMethod").addEventListener("change", () => { syncAdnImageUi(); rerender(); });
   if($("catalanImageMethod")) $("catalanImageMethod").addEventListener("change", () => { syncCatalanImageUi(); rerender(); });
 
   // Boutons "token" => deviennent "PIN"
