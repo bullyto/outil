@@ -1,5 +1,5 @@
 /* ADN66 Outils — Service Worker racine pour installation PWA */
-const CACHE_VERSION = "adn66-outils-pwa-v7";
+const CACHE_VERSION = "adn66-outils-pwa-v8";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,14 +8,10 @@ const APP_SHELL = [
   "./icons/icon-512.png",
   "./icons/icon-192-maskable.png",
   "./icons/icon-512-maskable.png",
-  "./icons/ADN66_GPS_192.png",
-  "./icons/ADN66_stock_192.png",
-  "./icons/ADN66_fidelite_192.png",
-  "./icons/ADN66_uber_192.png",
-  "./icons/ADN66_GPS.png",
-  "./icons/ADN66_stock.png",
-  "./icons/ADN66_fidelite.png",
-  "./icons/ADN66_uber.png",
+  "https://bullyto.github.io/outil/icons/ADN66_GPS_192.png",
+  "https://bullyto.github.io/outil/icons/ADN66_stock_192.png",
+  "https://bullyto.github.io/outil/icons/ADN66_fidelite_192.png",
+  "https://bullyto.github.io/outil/icons/ADN66_uber_192.png",
   "./icons/ADN66_push.png",
   "./icons/ADN66_calculatrice.png",
   "./icons/ADN66_statut.png",
