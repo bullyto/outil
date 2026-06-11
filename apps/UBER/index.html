@@ -50,7 +50,7 @@
         <div class="row">
           <div class="field">
             <label for="orderNumber">Numéro de commande Uber Eats <span style="color:var(--soft);font-weight:700">— vide = mode sans aperçu</span></label>
-            <input id="orderNumber" placeholder="EX : A1B2C3 ou laisser vide" autocomplete="off" />
+            <input id="orderNumber" placeholder="EX : A1B2C3 ou laisser vide" autocomplete="off" maxlength="6" inputmode="latin" pattern="[A-Za-z0-9]{6}" />
           </div>
           <button id="startBtn" class="btn">🎥 ENREGISTRER</button>
         </div>
@@ -134,7 +134,9 @@ const els = Object.fromEntries([...document.querySelectorAll('[id]')].map(e => [
 function toast(msg){ els.toast.textContent=msg; els.toast.classList.remove('hidden'); setTimeout(()=>els.toast.classList.add('hidden'),2600); }
 function fmtTime(s){ s=Math.max(0,Math.floor(s||0)); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 function fmtDuration(s){ s=Math.max(0,Math.floor(s||0)); return `${Math.floor(s/60)} min ${s%60} s`; }
-function cleanOrder(v){ return (v||'').trim().replace(/[^a-zA-Z0-9_-]/g,'').toUpperCase(); }
+function cleanOrder(v){ return (v||'').trim().replace(/[^a-zA-Z0-9]/g,'').toUpperCase(); }
+function isValidUberOrder(v){ const raw=(v||'').trim(); if(!raw) return true; return /^[A-Za-z0-9]{6}$/.test(raw); }
+function orderFormatHelp(){ return 'Laissez vide pour le mode sans aperçu, ou entrez exactement 6 caractères Uber Eats, exemple A1B2C3.'; }
 function headers(json=true){ const h={'x-admin-token':adminToken}; if(json) h['content-type']='application/json'; return h; }
 function api(path, opts={}){ return fetch(workerBase+path, opts); }
 function enc(v){ return encodeURIComponent(v||''); }
@@ -173,8 +175,20 @@ function initGps(){
 }
 initGps();
 
+els.orderNumber.addEventListener('input', () => {
+  const raw = els.orderNumber.value.trim();
+  if(!raw){ els.orderNumber.setCustomValidity(''); return; }
+  els.orderNumber.value = cleanOrder(raw).slice(0,6);
+  els.orderNumber.setCustomValidity(isValidUberOrder(els.orderNumber.value) ? '' : orderFormatHelp());
+});
+
 els.startBtn.onclick = async () => {
-  const order = cleanOrder(els.orderNumber.value);
+  const rawOrder = els.orderNumber.value.trim();
+  if(!isValidUberOrder(rawOrder)){
+    els.orderNumber.focus();
+    return toast(orderFormatHelp());
+  }
+  const order = cleanOrder(rawOrder);
   const noPreviewMode = !order;
   if(!adminToken) return toast('Ouvrez le menu puis Réglages admin');
   try{
