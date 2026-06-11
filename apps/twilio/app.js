@@ -567,7 +567,7 @@ function loyaltyPill(client) {
     return `<span class="pill ok">Oui${pts}</span>`;
   }
   if (client && client.loyalty_error) {
-    return `<span class="pill neutral" title="${escapeHtml(client.loyalty_error)}">Non</span>`;
+    return `<span class="pill neutral" title="${escapeHtml(client.loyalty_error)}">Erreur : ${escapeHtml(client.loyalty_error)}</span>`;
   }
   return '<span class="pill neutral">Non</span>';
 }
