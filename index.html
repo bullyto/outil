@@ -28,8 +28,6 @@
       --text-soft:#cbd5e1;
       --text-muted:#94a3b8;
       --radius-xl:26px;
-      --radius-lg:20px;
-      --radius-md:16px;
       --shadow:0 18px 40px rgba(0,0,0,.35);
     }
 
@@ -78,143 +76,8 @@
       border:0;
     }
 
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:14px;
-    }
-
-    .card{
-      background:
-        radial-gradient(circle at top left, rgba(93,183,238,.13), transparent 34%),
-        linear-gradient(180deg, rgba(17,24,39,.96), rgba(23,32,51,.94));
-      border:1px solid var(--border);
-      border-radius:24px;
-      padding:18px;
-      box-shadow:var(--shadow);
-      display:flex;
-      flex-direction:column;
-      min-height:260px;
-      transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-
-    .card:hover{
-      transform:translateY(-2px);
-      border-color:rgba(93,183,238,.36);
-      box-shadow:0 22px 44px rgba(0,0,0,.40);
-    }
-
-    .card-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:14px;
-    }
-
-    .card-icon{
-      width:60px;
-      height:60px;
-      border-radius:20px;
-      display:grid;
-      place-items:center;
-      font-size:26px;
-      background:linear-gradient(180deg, rgba(93,183,238,.20), rgba(93,183,238,.08));
-      border:1px solid rgba(93,183,238,.24);
-      box-shadow:0 10px 24px rgba(0,0,0,.28);
-      flex:0 0 auto;
-    }
-
-    .card-badge{
-      display:inline-flex;
-      align-items:center;
-      padding:7px 10px;
-      border-radius:999px;
-      background:rgba(93,183,238,.12);
-      border:1px solid rgba(93,183,238,.22);
-      color:var(--text);
-      font-size:11px;
-      font-weight:900;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      white-space:nowrap;
-    }
-
-    .card h2{
-      margin:0 0 8px;
-      font-size:22px;
-      line-height:1.1;
-      font-weight:900;
-      letter-spacing:-.02em;
-    }
-
-    .card p{
-      margin:0 0 16px;
-      color:var(--text-soft);
-      font-size:14px;
-      line-height:1.55;
-      font-weight:700;
-    }
-
-    .card ul{
-      margin:0 0 18px;
-      padding:0;
-      list-style:none;
-      display:grid;
-      gap:8px;
-    }
-
-    .card ul li{
-      display:flex;
-      gap:8px;
-      color:var(--text-muted);
-      font-size:13px;
-      line-height:1.4;
-      font-weight:700;
-    }
-
-    .card ul li::before{
-      content:"•";
-      color:var(--primary);
-      font-weight:900;
-    }
-
-    .card-footer{
-      margin-top:auto;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .card-link{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:48px;
-      padding:0 18px;
-      border-radius:14px;
-      text-decoration:none;
-      background:var(--primary);
-      color:#fff;
-      font-size:15px;
-      font-weight:900;
-      border:1px solid var(--primary);
-      box-shadow:0 10px 24px rgba(93,183,238,.22);
-    }
-
-    .card-link:hover{ filter:brightness(1.05); }
-
-    .card-arrow{
-      color:var(--text-muted);
-      font-size:22px;
-      font-weight:700;
-    }
-
-
-    .quick-shortcuts{
-      margin:0 0 18px;
+    .modules-panel{
+      margin:0;
       padding:18px;
       border-radius:var(--radius-xl);
       background:
@@ -224,7 +87,7 @@
       box-shadow:var(--shadow);
     }
 
-    .quick-shortcuts-header{
+    .modules-header{
       display:flex;
       align-items:flex-end;
       justify-content:space-between;
@@ -232,18 +95,21 @@
       margin-bottom:14px;
     }
 
-    .quick-shortcuts h2{
+    .modules-header h1{
       margin:0;
-      font-size:20px;
+      font-size:22px;
       line-height:1.1;
       font-weight:950;
       letter-spacing:-.02em;
     }
 
-    .quick-shortcuts small{
+    .modules-header small{
       color:var(--text-muted);
       font-size:12px;
-      font-weight:800;
+      font-weight:900;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      white-space:nowrap;
     }
 
     .shortcut-grid{
@@ -293,6 +159,7 @@
       background:var(--primary);
       color:#fff;
       box-shadow:0 10px 24px rgba(93,183,238,.22);
+      flex:0 0 auto;
     }
 
     .shortcut-rank{
@@ -319,38 +186,56 @@
     }
 
     @media (max-width: 1060px){
-      .cards{grid-template-columns:repeat(2, minmax(0,1fr))}
       .shortcut-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
     }
 
     @media (max-width: 720px){
       .page{padding:14px 12px 28px}
-      .quick-shortcuts{padding:14px;border-radius:22px}
-      .quick-shortcuts-header{align-items:flex-start;flex-direction:column}
-      .cards{grid-template-columns:1fr}
+      .modules-panel{padding:14px;border-radius:22px}
+      .modules-header{align-items:flex-start;flex-direction:column}
+      .modules-header h1{font-size:21px}
       .shortcut-grid{grid-template-columns:1fr}
       .shortcut-btn{min-height:auto;flex-direction:row;align-items:center;justify-content:flex-start}
       .shortcut-head{justify-content:flex-start}
       .shortcut-rank{display:none}
-      .card{min-height:auto}
     }
   </style>
 </head>
 <body>
   <main class="page">
-    <h1 class="sr-only">Modules ADN66</h1>
-
-    <section class="quick-shortcuts" aria-label="Raccourcis principaux ADN66">
-      <div class="quick-shortcuts-header">
-        <h2>Raccourcis principaux</h2>
-        <small>Accès rapide PWA</small>
+    <section class="modules-panel" aria-label="Modules ADN66">
+      <div class="modules-header">
+        <h1>APÉRO DE NUIT 66®</h1>
+        <small>Module ADN66</small>
       </div>
 
       <div class="shortcut-grid">
+        <a class="shortcut-btn" href="./apps/PUSH/">
+          <div class="shortcut-head">
+            <div class="shortcut-icon">🔔</div>
+            <div class="shortcut-rank">01</div>
+          </div>
+          <div>
+            <strong>PUSH</strong>
+            <span>Notifications, abonnés et campagnes push.</span>
+          </div>
+        </a>
+
+        <a class="shortcut-btn" href="./apps/apero/">
+          <div class="shortcut-head">
+            <div class="shortcut-icon">🧮</div>
+            <div class="shortcut-rank">02</div>
+          </div>
+          <div>
+            <strong>Calculateur</strong>
+            <span>Calculs rapides et outils internes.</span>
+          </div>
+        </a>
+
         <a class="shortcut-btn" href="./apps/gps/">
           <div class="shortcut-head">
             <div class="shortcut-icon">📍</div>
-            <div class="shortcut-rank">01</div>
+            <div class="shortcut-rank">03</div>
           </div>
           <div>
             <strong>GPS prospection</strong>
@@ -361,7 +246,7 @@
         <a class="shortcut-btn" href="./apps/stock/">
           <div class="shortcut-head">
             <div class="shortcut-icon">📦</div>
-            <div class="shortcut-rank">02</div>
+            <div class="shortcut-rank">04</div>
           </div>
           <div>
             <strong>Stock marchandise</strong>
@@ -372,7 +257,7 @@
         <a class="shortcut-btn" href="./apps/fidel/admin.html">
           <div class="shortcut-head">
             <div class="shortcut-icon">🎫</div>
-            <div class="shortcut-rank">03</div>
+            <div class="shortcut-rank">05</div>
           </div>
           <div>
             <strong>Admin carte fidélité</strong>
@@ -380,10 +265,32 @@
           </div>
         </a>
 
+        <a class="shortcut-btn" href="./apps/status/">
+          <div class="shortcut-head">
+            <div class="shortcut-icon">📢</div>
+            <div class="shortcut-rank">06</div>
+          </div>
+          <div>
+            <strong>Status</strong>
+            <span>Messages, annonces et états des sites.</span>
+          </div>
+        </a>
+
+        <a class="shortcut-btn" href="./apps/twilio/">
+          <div class="shortcut-head">
+            <div class="shortcut-icon">💬</div>
+            <div class="shortcut-rank">07</div>
+          </div>
+          <div>
+            <strong>Twilio / Marketing SMS</strong>
+            <span>Campagnes, contacts et historique SMS.</span>
+          </div>
+        </a>
+
         <a class="shortcut-btn" href="./apps/UBER/">
           <div class="shortcut-head">
             <div class="shortcut-icon">🎥</div>
-            <div class="shortcut-rank">04</div>
+            <div class="shortcut-rank">08</div>
           </div>
           <div>
             <strong>Enregistrement Uber Eats</strong>
@@ -391,154 +298,6 @@
           </div>
         </a>
       </div>
-    </section>
-
-
-    <section class="cards" aria-label="Modules ADN66">
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">🔔</div>
-          <div class="card-badge">Notifications</div>
-        </div>
-        <h2>PUSH</h2>
-        <p>Gestion des notifications push, de la diffusion instantanée et des abonnés web.</p>
-        <ul>
-          <li>Envoi rapide</li>
-          <li>Campagnes push</li>
-          <li>Gestion des abonnés</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/PUSH/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">🧮</div>
-          <div class="card-badge">Calculatrice</div>
-        </div>
-        <h2>Calculateur</h2>
-        <p>Calculateur interne pour les opérations rapides Apéro de Nuit 66.</p>
-        <ul>
-          <li>Calculatrice métier</li>
-          <li>Calculs rapides</li>
-          <li>Interface interne ADN66</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/apero/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">🎁</div>
-          <div class="card-badge">Clients</div>
-        </div>
-        <h2>Fidélité</h2>
-        <p>Gestion de la fidélité client avec avantages, récompenses et administration dédiée.</p>
-        <ul>
-          <li>Carte de fidélité</li>
-          <li>Suivi des avantages</li>
-          <li>Gestion client</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/fidel/admin.html">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">📍</div>
-          <div class="card-badge">Livraison</div>
-        </div>
-        <h2>GPS</h2>
-        <p>Outils terrain pour les trajets, la localisation et l’organisation des livraisons.</p>
-        <ul>
-          <li>Positionnement</li>
-          <li>Support tournée</li>
-          <li>Usage mobile terrain</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/gps/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">📢</div>
-          <div class="card-badge">Pilotage</div>
-        </div>
-        <h2>Status</h2>
-        <p>Pilotage des statuts, annonces et messages visibles sur les différents sites.</p>
-        <ul>
-          <li>Pop-ups et états</li>
-          <li>Messages dynamiques</li>
-          <li>Contrôle centralisé</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/status/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">📦</div>
-          <div class="card-badge">Stock</div>
-        </div>
-        <h2>Stock</h2>
-        <p>Gestion des produits, disponibilité, tarifs et suivi opérationnel du stock.</p>
-        <ul>
-          <li>Gestion produits</li>
-          <li>Disponibilités</li>
-          <li>Suivi interne</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/stock/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">💬</div>
-          <div class="card-badge">SMS</div>
-        </div>
-        <h2>Twilio / Marketing SMS</h2>
-        <p>Module marketing SMS pour campagnes, contacts, estimation, historique et suivi.</p>
-        <ul>
-          <li>Campagnes SMS</li>
-          <li>Gestion des contacts</li>
-          <li>Suivi et historique</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/twilio/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
-
-
-      <article class="card">
-        <div class="card-top">
-          <div class="card-icon">🎥</div>
-          <div class="card-badge">Uber Eats</div>
-        </div>
-        <h2>Enregistrement partenaire Uber</h2>
-        <p>Module terrain pour enregistrer une remise partenaire Uber Eats avec vidéo, audio, GPS et lien privé consultable.</p>
-        <ul>
-          <li>Vidéo/audio avec caméra avant</li>
-          <li>GPS, date, durée et commande</li>
-          <li>Historique et page privée Uber</li>
-        </ul>
-        <div class="card-footer">
-          <a class="card-link" href="./apps/UBER/">Ouvrir</a>
-          <div class="card-arrow">→</div>
-        </div>
-      </article>
     </section>
   </main>
 
@@ -551,6 +310,6 @@
       });
     }
   </script>
-<script src="./admin-gate.js"></script>
+  <script src="./admin-gate.js"></script>
 </body>
 </html>
