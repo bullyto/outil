@@ -292,10 +292,9 @@ function humanCampaignResult(data) {
     return { title: "Erreur campagne", text: data.error || "La campagne n’a pas pu être envoyée.", details: "" };
   }
 
-  const mode = data.testMode ? "Mode test : aucun vrai SMS envoyé." : "Envoi réel effectué.";
   return {
-    title: data.testMode ? "Test campagne réussi" : "Campagne envoyée",
-    text: `${mode}\n${data.sent || 0} envoyé(s), ${data.failed || 0} échec(s), ${data.total || 0} destinataire(s).`,
+    title: "Campagne envoyée",
+    text: `Envoi réel effectué.\n${data.sent || 0} envoyé(s), ${data.failed || 0} échec(s), ${data.total || 0} destinataire(s).`,
     details: `
       Campagne n° ${data.campaignId}<br>
       Encodage : ${escapeHtml(data.encoding || "")}<br>
@@ -517,9 +516,9 @@ async function loadClients() {
       <td>${escapeHtml(client.name || "—")}</td>
       <td>${escapeHtml(client.phone || "")}</td>
       <td>${statusPill(Number(client.is_active) === 1)}</td>
-      <td>${loyaltyPill(client)}</td>
       <td>${client.total_sent || 0}</td>
       <td>${escapeHtml(client.last_error_message || "")}</td>
+      <td>${loyaltyPill(client)}</td>
       <td>${clientActions(client)}</td>
     `;
     tbody.appendChild(tr);
@@ -563,10 +562,14 @@ function clientActions(client) {
 }
 
 function loyaltyPill(client) {
-  const has = client && (client.has_loyalty_card === true || Number(client.has_loyalty_card) === 1);
-  if (!has) return '<span class="pill neutral">Non</span>';
-  const points = client.loyalty_points === null || client.loyalty_points === undefined ? '' : ` · ${Number(client.loyalty_points || 0)}/${Number(client.loyalty_goal || 8)}`;
-  return `<span class="pill ok">Oui${points}</span>`;
+  if (client && client.has_loyalty_card === true) {
+    const pts = client.loyalty_points !== undefined && client.loyalty_points !== null ? ` · ${client.loyalty_points}/${client.loyalty_goal || 8}` : "";
+    return `<span class="pill ok">Oui${pts}</span>`;
+  }
+  if (client && client.loyalty_error) {
+    return `<span class="pill neutral" title="${escapeHtml(client.loyalty_error)}">Non</span>`;
+  }
+  return '<span class="pill neutral">Non</span>';
 }
 
 function statusPill(active) {
