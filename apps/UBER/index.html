@@ -22,7 +22,7 @@
     .row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.field label{display:block;color:var(--muted);font-weight:850;font-size:13px;margin:0 0 7px}.field input{width:100%;border:1px solid var(--line);border-radius:16px;background:var(--input);color:var(--txt);padding:15px;font-size:18px;font-weight:950;outline:none;text-transform:uppercase}.field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(93,183,238,.16)}
     .btn{border:0;border-radius:16px;background:var(--blue);color:white;padding:14px 16px;font-weight:950;font-size:15px;min-height:52px;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn.secondary{background:#172033;color:var(--txt);border:1px solid var(--line)}.btn.red{background:var(--bad)}.btn.green{background:var(--ok)}.btn:disabled{opacity:.55}
     .status{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.badge{padding:8px 10px;border-radius:999px;background:#0f172a;border:1px solid var(--line);color:var(--muted);font-weight:850;font-size:13px}.badge.ok{color:#86efac;border-color:rgba(22,163,74,.45)}.badge.warn{color:#fde68a;border-color:rgba(245,158,11,.45)}
-    .preview{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#000;position:relative;margin-top:14px}.preview video{width:100%;display:block;max-height:58vh;background:#000}.rec-overlay{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);padding:10px 12px;border-radius:14px;font-weight:950}.rec-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-right:8px;box-shadow:0 0 18px #ef4444}.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.hidden{display:none!important}
+    .preview{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:#000;position:relative;margin-top:14px}.preview video{width:100%;display:block;max-height:58vh;background:#000}.stealth-box{border-radius:20px;border:1px solid rgba(220,38,38,.45);background:linear-gradient(135deg,rgba(220,38,38,.16),rgba(15,23,42,.95));padding:18px;margin-top:14px}.stealth-title{font-size:19px;font-weight:950;margin-bottom:8px}.stealth-text{color:var(--muted);font-weight:750;line-height:1.45}.rec-overlay{position:absolute;left:12px;top:12px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);padding:10px 12px;border-radius:14px;font-weight:950}.rec-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;margin-right:8px;box-shadow:0 0 18px #ef4444}.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.hidden{display:none!important}
     .day-title{font-size:18px;margin:20px 0 10px;font-weight:950;color:#fff}.record{display:grid;grid-template-columns:1fr;gap:12px;border:1px solid var(--line);background:rgba(15,23,42,.72);border-radius:18px;padding:14px;margin-bottom:10px}.record strong{font-size:17px}.record small{display:block;color:var(--soft);margin-top:4px}.record-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.mini{min-height:44px;padding:10px 8px;border-radius:13px;font-size:13px}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto}.modal-card{width:min(940px,100%);background:#0b1220;border:1px solid var(--line);border-radius:24px;padding:12px;box-shadow:0 30px 90px rgba(0,0,0,.5)}
     .public-frame{width:100%;height:70vh;border:1px solid var(--line);border-radius:18px;background:#050812}.modal-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111827;border:1px solid var(--line);padding:12px 14px;border-radius:14px;color:#fff;z-index:100;box-shadow:0 18px 45px rgba(0,0,0,.45)}
@@ -49,8 +49,8 @@
       <section class="card">
         <div class="row">
           <div class="field">
-            <label for="orderNumber">Numéro de commande Uber Eats</label>
-            <input id="orderNumber" placeholder="EX : A1B2C3" autocomplete="off" />
+            <label for="orderNumber">Numéro de commande Uber Eats <span style="color:var(--soft);font-weight:700">— vide = mode sans aperçu</span></label>
+            <input id="orderNumber" placeholder="EX : A1B2C3 ou laisser vide" autocomplete="off" />
           </div>
           <button id="startBtn" class="btn">🎥 ENREGISTRER</button>
         </div>
@@ -63,6 +63,10 @@
         <div id="previewBox" class="preview hidden">
           <video id="preview" autoplay muted playsinline></video>
           <div class="rec-overlay"><span class="rec-dot"></span><span id="recText">REC 00:00</span></div>
+        </div>
+        <div id="stealthBox" class="stealth-box hidden">
+          <div class="stealth-title">🔴 Enregistrement en cours</div>
+          <div class="stealth-text">Mode sans aperçu caméra : la vidéo et le son sont enregistrés, mais l’image caméra n’est pas affichée à l’écran.</div>
         </div>
         <div class="actions">
           <button id="stopBtn" class="btn red hidden">ARRÊTER ET VALIDER</button>
@@ -124,7 +128,7 @@ const BUSINESS = {
 
 let workerBase = DEFAULT_WORKER;
 let adminToken = localStorage.getItem('adn66_uber_token') || '';
-let mediaRecorder, stream, chunks = [], startedAt = 0, timer = null, lastGps = null, lastRecord = null;
+let mediaRecorder, stream, chunks = [], startedAt = 0, timer = null, lastGps = null, lastRecord = null, currentRecording = null;
 const els = Object.fromEntries([...document.querySelectorAll('[id]')].map(e => [e.id, e]));
 
 function toast(msg){ els.toast.textContent=msg; els.toast.classList.remove('hidden'); setTimeout(()=>els.toast.classList.add('hidden'),2600); }
@@ -171,16 +175,38 @@ initGps();
 
 els.startBtn.onclick = async () => {
   const order = cleanOrder(els.orderNumber.value);
-  if(!order) return toast('Numéro de commande obligatoire');
+  const noPreviewMode = !order;
   if(!adminToken) return toast('Ouvrez le menu puis Réglages admin');
   try{
+    currentRecording = {
+      orderNumber: order,
+      noPreviewMode,
+      type_preuve: noPreviewMode ? 'video_sans_apercu' : 'commande_uber',
+      stealthRef: noPreviewMode ? ('FURTIF-' + new Date().toISOString().replace(/[-:.TZ]/g,'').slice(0,14)) : ''
+    };
     stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ideal:1280}, height:{ideal:720} }, audio:true });
-    els.preview.srcObject = stream;
-    els.previewBox.classList.remove('hidden'); els.stopBtn.classList.remove('hidden'); els.cancelBtn.classList.remove('hidden'); els.startBtn.disabled=true;
+    if(noPreviewMode){
+      els.preview.srcObject = null;
+      els.previewBox.classList.add('hidden');
+      els.stealthBox.classList.remove('hidden');
+      els.startBtn.classList.add('red');
+      els.startBtn.textContent = '🔴 ENREGISTREMENT EN COURS';
+    } else {
+      els.preview.srcObject = stream;
+      els.previewBox.classList.remove('hidden');
+      els.stealthBox.classList.add('hidden');
+      els.startBtn.classList.remove('red');
+      els.startBtn.textContent = '🎥 ENREGISTRER';
+    }
+    els.stopBtn.classList.remove('hidden'); els.cancelBtn.classList.remove('hidden'); els.startBtn.disabled=true;
     chunks=[]; startedAt = Date.now();
     const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm';
     mediaRecorder = new MediaRecorder(stream, { mimeType:mime, videoBitsPerSecond:2500000, audioBitsPerSecond:96000 });
     mediaRecorder.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
+    mediaRecorder.start(5000);
+    timer = setInterval(()=>{ const sec=(Date.now()-startedAt)/1000; els.recText.textContent='REC '+fmtTime(sec); els.durationBadge.textContent='Durée '+fmtTime(sec); }, 500);
+  } catch(e){ currentRecording=null; els.startBtn.classList.remove('red'); els.startBtn.textContent='🎥 ENREGISTRER'; toast('Caméra/audio impossible : '+e.message); }
+};
     mediaRecorder.start(5000);
     timer = setInterval(()=>{ const s=(Date.now()-startedAt)/1000; els.recText.textContent='REC '+fmtTime(s); els.durationBadge.textContent='Durée '+fmtTime(s); }, 500);
   } catch(e){ toast('Caméra/audio impossible : '+e.message); }
@@ -207,12 +233,22 @@ function cleanupRecording(clearResult){
   clearInterval(timer); timer=null;
   if(stream) stream.getTracks().forEach(t=>t.stop());
   stream=null; mediaRecorder=null; chunks=[];
-  els.previewBox.classList.add('hidden'); els.stopBtn.classList.add('hidden'); els.cancelBtn.classList.add('hidden'); els.startBtn.disabled=false; els.durationBadge.textContent='Durée 00:00';
+  els.preview.srcObject = null;
+  els.previewBox.classList.add('hidden'); els.stealthBox.classList.add('hidden'); els.stopBtn.classList.add('hidden'); els.cancelBtn.classList.add('hidden'); els.startBtn.disabled=false; els.startBtn.classList.remove('red'); els.startBtn.textContent='🎥 ENREGISTRER'; els.durationBadge.textContent='Durée 00:00';
+  currentRecording = null;
   if(clearResult) toast('Enregistrement annulé');
 }
 async function uploadCompiledRecord(blob, durationSeconds){
-  const orderNumber = cleanOrder(els.orderNumber.value);
-  const create = await api('/api/multipart/create',{ method:'POST', headers:headers(), body:JSON.stringify({ orderNumber, mimeType:blob.type, deviceLabel:navigator.userAgent })}).then(r=>r.json());
+  const rec = currentRecording || { orderNumber: cleanOrder(els.orderNumber.value), noPreviewMode:false, type_preuve:'commande_uber', stealthRef:'' };
+  const orderNumber = rec.orderNumber;
+  const displayTitle = rec.noPreviewMode ? 'Vidéo sans aperçu' : `Commande ${orderNumber}`;
+  const createPayload = { orderNumber: rec.noPreviewMode ? '' : orderNumber, recordType: rec.type_preuve, type_preuve: rec.type_preuve, stealthRef: rec.stealthRef, mimeType:blob.type, deviceLabel:navigator.userAgent };
+  let create = await api('/api/multipart/create',{ method:'POST', headers:headers(), body:JSON.stringify(createPayload)}).then(r=>r.json());
+  if(!create.ok && rec.noPreviewMode){
+    // Compatibilité avec un Worker qui impose encore un numéro de commande.
+    createPayload.orderNumber = rec.stealthRef;
+    create = await api('/api/multipart/create',{ method:'POST', headers:headers(), body:JSON.stringify(createPayload)}).then(r=>r.json());
+  }
   if(!create.ok) throw new Error(create.error||'Création upload impossible');
   const partSize = 8 * 1024 * 1024;
   const parts=[]; let partNumber=1;
@@ -223,10 +259,12 @@ async function uploadCompiledRecord(blob, durationSeconds){
     if(!res.ok) throw new Error(res.error || 'Upload morceau impossible');
     parts.push(res.part); partNumber++;
   }
-  const complete = await api('/api/multipart/complete',{ method:'POST', headers:headers(), body:JSON.stringify({ id:create.id, key:create.key, uploadId:create.uploadId, parts, durationSeconds, sizeBytes:blob.size, gps:lastGps })}).then(r=>r.json());
+  const complete = await api('/api/multipart/complete',{ method:'POST', headers:headers(), body:JSON.stringify({ id:create.id, key:create.key, uploadId:create.uploadId, parts, durationSeconds, sizeBytes:blob.size, gps:lastGps, recordType:rec.type_preuve, type_preuve:rec.type_preuve, stealthRef:rec.stealthRef, orderNumber: rec.noPreviewMode ? null : orderNumber })}).then(r=>r.json());
   if(!complete.ok) throw new Error(complete.error||'Finalisation impossible');
-  lastRecord = { orderNumber, publicUrl: complete.publicUrl, durationSeconds, completed_at:new Date().toISOString(), gps:lastGps };
-  els.resultText.textContent = `Commande ${orderNumber} · durée ${fmtDuration(durationSeconds)} · lien prêt pour Uber Eats.`;
+  lastRecord = { orderNumber, order_number:orderNumber, publicUrl: complete.publicUrl, public_url:complete.publicUrl, durationSeconds, duration_seconds:durationSeconds, completed_at:new Date().toISOString(), gps:lastGps, type_preuve:rec.type_preuve, record_type:rec.type_preuve, stealthRef:rec.stealthRef };
+  els.resultText.textContent = rec.noPreviewMode ? `Vidéo sans aperçu · durée ${fmtDuration(durationSeconds)} · lien prêt.` : `Commande ${orderNumber} · durée ${fmtDuration(durationSeconds)} · lien prêt pour Uber Eats.`;
+  els.mailLastMsg.classList.toggle('hidden', rec.noPreviewMode);
+  els.openLastPublic.textContent = rec.noPreviewMode ? 'Ouvrir' : 'Voir';
   els.resultCard.classList.remove('hidden');
   toast('Enregistrement envoyé ✅');
 }
@@ -267,7 +305,7 @@ function openContestMail(order, url, r={}){
 }
 async function copy(text){ await navigator.clipboard.writeText(text); toast('Copié'); }
 els.copyLastLink.onclick = () => lastRecord && copy(lastRecord.publicUrl);
-els.mailLastMsg.onclick = () => lastRecord && openContestMail(lastRecord.orderNumber, lastRecord.publicUrl, lastRecord);
+els.mailLastMsg.onclick = () => lastRecord && !isStealthRecord(lastRecord) && openContestMail(lastRecord.orderNumber, lastRecord.publicUrl, lastRecord);
 els.openLastPublic.onclick = () => lastRecord && showPublicPreview({ order_number:lastRecord.orderNumber, public_url:lastRecord.publicUrl, duration_seconds:lastRecord.durationSeconds, completed_at:lastRecord.completed_at, gps_lat:lastGps?.lat, gps_lng:lastGps?.lng, gps_accuracy:lastGps?.accuracy });
 
 els.refreshBtn.onclick = loadHistory; els.searchInput.oninput = () => setTimeout(loadHistory, 250);
@@ -286,13 +324,25 @@ function dayLabel(iso){
   return (same?'Aujourd’hui — ':yesterday?'Hier — ':'') + label.charAt(0).toUpperCase()+label.slice(1);
 }
 function timeLabel(iso){ return new Intl.DateTimeFormat('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'}).format(new Date(iso)); }
+function isStealthRecord(r){
+  const t = String(r?.type_preuve || r?.record_type || r?.type || '').toLowerCase();
+  const n = String(r?.order_number || r?.orderNumber || '').toUpperCase();
+  return t.includes('sans_apercu') || t.includes('stealth') || n.startsWith('FURTIF-');
+}
+
 function renderHistory(records){
   const groups={}; records.forEach(r=>{ const k=dayLabel(r.completed_at||r.created_at); (groups[k] ||= []).push(r); });
   let html='';
   for(const [day, items] of Object.entries(groups)){
     html += `<h2 class="day-title">${day}</h2>`;
     for(const r of items){
-      html += `<article class="record"><div><strong>Uber ${escapeHtml(r.order_number)}</strong><small>${timeLabel(r.completed_at||r.created_at)} · ${fmtDuration(r.duration_seconds)} · GPS ${r.gps_lat?'OK':'non'} · Audio ${r.audio_enabled?'ON':'non'}</small></div><div class="record-actions"><button class="btn mini" onclick='showPublicPreview(${JSON.stringify(r)})'>Voir</button><button class="btn secondary mini" onclick='copy(${JSON.stringify(r.public_url)})'>Copier lien</button><button class="btn secondary mini" onclick='openContestMail(${JSON.stringify(r.order_number)},${JSON.stringify(r.public_url)},${JSON.stringify(r)})'>Mail contestation</button></div></article>`;
+      const stealth = isStealthRecord(r);
+      const title = stealth ? 'Vidéo sans aperçu' : `Uber ${escapeHtml(r.order_number)}`;
+      const details = stealth ? `${timeLabel(r.completed_at||r.created_at)} · ${fmtDuration(r.duration_seconds)} · Aucun numéro de commande · GPS ${r.gps_lat?'OK':'non'} · Audio ${r.audio_enabled?'ON':'non'}` : `${timeLabel(r.completed_at||r.created_at)} · ${fmtDuration(r.duration_seconds)} · GPS ${r.gps_lat?'OK':'non'} · Audio ${r.audio_enabled?'ON':'non'}`;
+      const actions = stealth
+        ? `<button class="btn secondary mini" onclick='copy(${JSON.stringify(r.public_url)})'>Copier lien</button><button class="btn mini" onclick='window.open(${JSON.stringify(r.public_url)},"_blank")'>Ouvrir</button>`
+        : `<button class="btn mini" onclick='showPublicPreview(${JSON.stringify(r)})'>Voir</button><button class="btn secondary mini" onclick='copy(${JSON.stringify(r.public_url)})'>Copier lien</button><button class="btn secondary mini" onclick='openContestMail(${JSON.stringify(r.order_number)},${JSON.stringify(r.public_url)},${JSON.stringify(r)})'>Mail contestation</button>`;
+      html += `<article class="record"><div><strong>${title}</strong><small>${details}</small></div><div class="record-actions">${actions}</div></article>`;
     }
   }
   els.historyList.innerHTML = html || '<section class="card"><p style="color:var(--muted);margin:0">Aucun enregistrement.</p></section>';
@@ -300,7 +350,11 @@ function renderHistory(records){
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
 window.showPublicPreview = (r) => {
   const url = r.public_url;
-  els.modalContent.innerHTML = `<iframe class="public-frame" src="${escapeHtml(url)}" title="Aperçu Uber"></iframe><div class="modal-actions"><button class="btn" onclick='copy(${JSON.stringify(url)})'>Copier lien</button><button class="btn secondary" onclick='openContestMail(${JSON.stringify(r.order_number)},${JSON.stringify(url)},${JSON.stringify(r)})'>Mail contestation</button><button class="btn secondary" onclick='window.open(${JSON.stringify(url)},"_blank")'>Ouvrir</button><button class="btn red" onclick='closeModal()'>Fermer</button></div>`;
+  const stealth = isStealthRecord(r);
+  const buttons = stealth
+    ? `<button class="btn" onclick='copy(${JSON.stringify(url)})'>Copier lien</button><button class="btn secondary" onclick='window.open(${JSON.stringify(url)},"_blank")'>Ouvrir</button><button class="btn red" onclick='closeModal()'>Fermer</button>`
+    : `<button class="btn" onclick='copy(${JSON.stringify(url)})'>Copier lien</button><button class="btn secondary" onclick='openContestMail(${JSON.stringify(r.order_number)},${JSON.stringify(url)},${JSON.stringify(r)})'>Mail contestation</button><button class="btn secondary" onclick='window.open(${JSON.stringify(url)},"_blank")'>Ouvrir</button><button class="btn red" onclick='closeModal()'>Fermer</button>`;
+  els.modalContent.innerHTML = `<iframe class="public-frame" src="${escapeHtml(url)}" title="Aperçu"></iframe><div class="modal-actions">${buttons}</div>`;
   els.modal.classList.remove('hidden');
 };
 window.closeModal = () => els.modal.classList.add('hidden');
