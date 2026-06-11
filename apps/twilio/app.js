@@ -292,10 +292,9 @@ function humanCampaignResult(data) {
     return { title: "Erreur campagne", text: data.error || "La campagne n’a pas pu être envoyée.", details: "" };
   }
 
-  const mode = data.testMode ? "Mode test : aucun vrai SMS envoyé." : "Envoi réel effectué.";
   return {
-    title: data.testMode ? "Test campagne réussi" : "Campagne envoyée",
-    text: `${mode}\n${data.sent || 0} envoyé(s), ${data.failed || 0} échec(s), ${data.total || 0} destinataire(s).`,
+    title: "Campagne envoyée",
+    text: `Envoi réel effectué.\n${data.sent || 0} envoyé(s), ${data.failed || 0} échec(s), ${data.total || 0} destinataire(s).`,
     details: `
       Campagne n° ${data.campaignId}<br>
       Encodage : ${escapeHtml(data.encoding || "")}<br>
@@ -359,6 +358,7 @@ async function previewCampaign() {
     title: $("campaignTitle")?.value || "Campagne ADN66",
     message: $("campaignMessage")?.value || "",
     limit: Number($("sendLimit")?.value || 0),
+    targetMode: $("targetMode")?.value || "active_unsent",
     onlyActive: true,
     excludeAlreadySent: $("excludeAlreadySent")?.checked === true
   };
@@ -395,16 +395,16 @@ async function previewCampaign() {
 }
 
 async function sendCampaign() {
-  const testMode = $("dryRun")?.checked === true;
-  if (!testMode && !confirm("Confirmer l’envoi réel de la campagne SMS ?")) return;
+  if (!confirm("Confirmer l’envoi réel de la campagne SMS ?")) return;
 
   const body = {
     title: $("campaignTitle")?.value || "Campagne ADN66",
     message: $("campaignMessage")?.value || "",
     limit: Number($("sendLimit")?.value || 0),
+    targetMode: $("targetMode")?.value || "active_unsent",
     onlyActive: true,
     excludeAlreadySent: $("excludeAlreadySent")?.checked === true,
-    testMode
+    testMode: false
   };
 
   const data = await api("/campaign/send", { method: "POST", body: JSON.stringify(body) });
@@ -479,7 +479,7 @@ async function loadClients() {
   const offset = (page - 1) * pageSize;
   const search = String(state.clientsSearch || "").trim();
 
-  tbody.innerHTML = `<tr><td colspan="6">Chargement des clients...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="7">Chargement des clients...</td></tr>`;
   setText("clientsSummary", search ? `Recherche : ${search} — chargement...` : "Chargement...");
 
   let route = "/clients/list?filter=" + encodeURIComponent(filter)
@@ -494,7 +494,7 @@ async function loadClients() {
   tbody.innerHTML = "";
 
   if (!data.success) {
-    tbody.innerHTML = `<tr><td colspan="6">Erreur chargement clients : ${escapeHtml(data.error || "réponse Worker invalide")}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7">Erreur chargement clients : ${escapeHtml(data.error || "réponse Worker invalide")}</td></tr>`;
     updateClientsPagination(0, page, pageSize, 0);
     return;
   }
@@ -507,7 +507,7 @@ async function loadClients() {
   updateClientsPagination(total, state.clientsPage, pageSize, clients.length);
 
   if (clients.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6">Aucun client à afficher sur cette page.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7">Aucun client à afficher sur cette page.</td></tr>`;
     return;
   }
 
@@ -516,6 +516,7 @@ async function loadClients() {
     tr.innerHTML = `
       <td>${escapeHtml(client.name || "—")}</td>
       <td>${escapeHtml(client.phone || "")}</td>
+      <td>${loyaltyCardPill(client)}</td>
       <td>${statusPill(Number(client.is_active) === 1)}</td>
       <td>${client.total_sent || 0}</td>
       <td>${escapeHtml(client.last_error_message || "")}</td>
@@ -564,6 +565,24 @@ function clientActions(client) {
 function statusPill(active) {
   if (!active) return '<span class="pill neutral">Désactivé</span>';
   return '<span class="pill ok">Actif</span>';
+}
+
+function loyaltyCardPill(client) {
+  const hasCard =
+    client?.has_loyalty_card === true ||
+    client?.hasLoyaltyCard === true ||
+    client?.loyalty_card === true ||
+    Number(client?.loyalty_points) >= 0 ||
+    Number(client?.loyaltyPoints) >= 0;
+
+  if (!hasCard) return '<span class="pill neutral">Non</span>';
+
+  const rawPoints = client?.loyalty_points ?? client?.loyaltyPoints ?? client?.points_fidelity ?? null;
+  const pointsText = rawPoints !== null && rawPoints !== undefined && rawPoints !== ""
+    ? ` · ${Number(rawPoints || 0)}/8`
+    : "";
+
+  return `<span class="pill ok">Oui${pointsText}</span>`;
 }
 
 document.addEventListener("click", async (event) => {

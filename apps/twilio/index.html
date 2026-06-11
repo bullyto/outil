@@ -374,6 +374,7 @@
               <select id="targetMode">
                 <option value="active_unsent">Clients actifs jamais contactés</option>
                 <option value="active_all">Clients actifs</option>
+                <option value="loyalty_card">Clients avec carte de fidélité</option>
                 <option value="error_retry">Clients en erreur à réessayer</option>
               </select>
             </div>
@@ -381,7 +382,6 @@
 
           <div class="switch-row">
             <label><input id="excludeAlreadySent" type="checkbox" checked /> Exclure ceux déjà contactés</label>
-            <label><input id="dryRun" type="checkbox" checked /> Mode test sans envoyer</label>
           </div>
 
           <div class="quick-actions">
@@ -451,6 +451,7 @@
           <div class="filters">
             <select id="clientFilter">
               <option value="active">Actifs</option>
+              <option value="loyalty_card">Avec carte fidélité</option>
               <option value="inactive">Désactivés</option>
               <option value="error">En erreur</option>
               <option value="all">Tous</option>
@@ -479,7 +480,7 @@
           </div>
           <p id="clientPageInfo" class="hint">Page 1</p>
 
-          <div class="table-wrap"><table><thead><tr><th>Nom</th><th>Numéro</th><th>Statut</th><th>Envoyés</th><th>Erreur</th><th>Action</th></tr></thead><tbody id="clientsTable"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Nom</th><th>Numéro</th><th>Carte fidélité</th><th>Statut</th><th>Envoyés</th><th>Erreur</th><th>Action</th></tr></thead><tbody id="clientsTable"></tbody></table></div>
         </div>
       </section>
 
