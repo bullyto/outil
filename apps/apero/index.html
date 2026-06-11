@@ -7,9 +7,9 @@
   <title>Calculateur courses Metro HT • Apéro de Nuit 66</title>
 
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="./ADN66_CALCUL.png" type="image/png" />
-  <link rel="apple-touch-icon" href="./ADN66_CALCUL.png" />
-  <link rel="icon" href="./ADN66_CALCUL.png" sizes="512x512" type="image/png" />
+  <link rel="icon" href="../../icons/ADN66_calculatrice.png" type="image/png" />
+  <link rel="apple-touch-icon" href="../../icons/ADN66_calculatrice.png" />
+  <link rel="icon" href="../../icons/ADN66_calculatrice.png" sizes="512x512" type="image/png" />
 
   <style>
     :root {
@@ -579,7 +579,8 @@
     .adn66-menu-icon img{
       width:100%;
       height:100%;
-      object-fit:cover;
+      object-fit:contain;
+      border-radius:13px;
       display:block;
     }
 
@@ -683,10 +684,10 @@
       <div class="hero-inner">
         <div class="brand">
           <img
-            src="./ADN66_CALCUL.png"
+            src="../../icons/ADN66_calculatrice.png"
             alt="Logo Calculateur ADN66"
             class="brand-logo"
-            onerror="this.onerror=null;this.src='icon-192.png';"
+            onerror="this.onerror=null;this.src='../../icons/icon-192.png';"
           />
           <div class="brand-copy">
             <span class="company-name">APÉRO DE NUIT 66</span>
@@ -713,45 +714,57 @@
             </div>
 
             <div class="adn66-menu-list">
+              <a class="adn66-menu-item" href="../../">
+                <div class="adn66-menu-icon"><img src="../../icons/icon-192.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Accueil</strong><span>Menu général ADN66</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
               <a class="adn66-menu-item" href="../PUSH/">
-                <div class="adn66-menu-icon"><img src="../PUSH/ADN66_PUSH.png" alt=""></div>
+                <div class="adn66-menu-icon"><img src="../../icons/ADN66_push.png" alt=""></div>
                 <div class="adn66-menu-text"><strong>PUSH</strong><span>Notifications et abonnés</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item is-current" href="./">
-                <div class="adn66-menu-icon"><img src="./ADN66_CALCUL.png" alt=""></div>
-                <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculatrice métier</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </a>
-
-              <a class="adn66-menu-item" href="../fidel/admin.html">
-                <div class="adn66-menu-icon"><img src="../fidel/ADN66_FIDELITE.png" alt=""></div>
-                <div class="adn66-menu-text"><strong>Fidélité</strong><span>Administration client</span></div>
+                <div class="adn66-menu-icon"><img src="../../icons/ADN66_calculatrice.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Calculateur</strong><span>Calculs rapides et outils internes</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item" href="../gps/">
-                <div class="adn66-menu-icon"><img src="../gps/ADN66_GPS.png" alt=""></div>
-                <div class="adn66-menu-text"><strong>GPS</strong><span>Trajets et livraisons</span></div>
-                <div class="adn66-menu-arrow">→</div>
-              </a>
-
-              <a class="adn66-menu-item" href="../status/">
-                <div class="adn66-menu-icon"><img src="../status/ADN66_STATUS.png" alt=""></div>
-                <div class="adn66-menu-text"><strong>Status</strong><span>Messages des sites</span></div>
+                <div class="adn66-menu-icon"><img src="../../icons/ADN66_GPS.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>GPS prospection</strong><span>Carte, terrain et zones</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item" href="../stock/">
-                <div class="adn66-menu-icon"><img src="../stock/ADN66_STOCK.png" alt=""></div>
-                <div class="adn66-menu-text"><strong>Stock</strong><span>Produits et disponibilités</span></div>
+                <div class="adn66-menu-icon"><img src="../../icons/ADN66_stock.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Stock marchandise</strong><span>Véhicule, local et disponibilité</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <a class="adn66-menu-item" href="../fidel/admin.html">
+                <div class="adn66-menu-icon"><img src="../../icons/ADN66_fidelite.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Admin carte fidélité</strong><span>Clients, points et QR code</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <a class="adn66-menu-item" href="../status/">
+                <div class="adn66-menu-icon"><img src="../../icons/ADN66_statut.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Status</strong><span>Messages, annonces et états</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
 
               <a class="adn66-menu-item" href="../twilio/">
-                <div class="adn66-menu-icon"><img src="../twilio/ADN66_SMS.png" alt=""></div>
-                <div class="adn66-menu-text"><strong>Twilio SMS</strong><span>Marketing SMS</span></div>
+                <div class="adn66-menu-icon"><img src="../../icons/ADN66_twillio.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Twilio / Marketing SMS</strong><span>Campagnes, contacts et historique</span></div>
+                <div class="adn66-menu-arrow">→</div>
+              </a>
+
+              <a class="adn66-menu-item" href="../UBER/">
+                <div class="adn66-menu-icon"><img src="../../icons/ADN66_uber.png" alt=""></div>
+                <div class="adn66-menu-text"><strong>Enregistrement Uber Eats</strong><span>Preuve vidéo, GPS et lien privé</span></div>
                 <div class="adn66-menu-arrow">→</div>
               </a>
             </div>
