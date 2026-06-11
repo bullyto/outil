@@ -517,7 +517,7 @@ async function loadClients() {
       <td>${escapeHtml(client.name || "—")}</td>
       <td>${escapeHtml(client.phone || "")}</td>
       <td>${statusPill(Number(client.is_active) === 1)}</td>
-      <td>${loyaltyPill(client.has_loyalty_card, client.loyalty_points, client.loyalty_goal)}</td>
+      <td>${loyaltyPill(client)}</td>
       <td>${client.total_sent || 0}</td>
       <td>${escapeHtml(client.last_error_message || "")}</td>
       <td>${clientActions(client)}</td>
@@ -562,12 +562,11 @@ function clientActions(client) {
   return `<button class="mini disabled" disabled>Désactiver</button><button class="mini reactivate" data-action="reactivate" data-phone="${phone}">Réactiver</button>`;
 }
 
-function loyaltyPill(hasCard, points, goal) {
-  if (hasCard === true || Number(hasCard) === 1) {
-    const p = points === null || points === undefined || points === "" ? "" : ` · ${Number(points || 0)}/${Number(goal || 8)}`;
-    return `<span class="pill ok">Oui${p}</span>`;
-  }
-  return '<span class="pill neutral">Non</span>';
+function loyaltyPill(client) {
+  const has = client && (client.has_loyalty_card === true || Number(client.has_loyalty_card) === 1);
+  if (!has) return '<span class="pill neutral">Non</span>';
+  const points = client.loyalty_points === null || client.loyalty_points === undefined ? '' : ` · ${Number(client.loyalty_points || 0)}/${Number(client.loyalty_goal || 8)}`;
+  return `<span class="pill ok">Oui${points}</span>`;
 }
 
 function statusPill(active) {
