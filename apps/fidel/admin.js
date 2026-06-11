@@ -104,6 +104,31 @@ async function requireAdminAccess(){
 }
 function pointsLabel(points){ return points === null || points === undefined || points === "" ? "Points : ?" : `Points : ${Number(points||0)}/8`; }
 
+function isCompleteCard(points){
+  return Number(points || 0) >= 8;
+}
+async function fetchClientCardById(cid){
+  const id = String(cid || "").trim();
+  if(!id || !API_BASE) return null;
+  try{
+    const r = await api("/loyalty/me?client_id=" + encodeURIComponent(id), {method:"GET"});
+    const card = r && r.card ? r.card : null;
+    if(!card) return null;
+    return {
+      client_id: id,
+      name: card.name || "",
+      phone: card.phone || "",
+      phone_last4: card.phone_last4 || "",
+      points: Number(card.points || 0),
+      goal: Number(card.goal || 8),
+      completed_at: card.completed_at || null,
+      free_delivery: card.free_delivery || {active:false}
+    };
+  }catch(_){
+    return null;
+  }
+}
+
 function ensureHibairAdminStyles(){
   if(document.getElementById('adn66HibairAdminStyles')) return;
   const st = document.createElement('style');
@@ -166,12 +191,14 @@ function showClientDetails(it){
   const stampAt = g.reward_stamp_claimed_at || (it.rewards && it.rewards.GAME_25) || null;
   const deliveryClaimAt = g.free_delivery_claimed_at || (it.rewards && it.rewards.GAME_35) || null;
   const hasGame = !!g.has_played;
+  const complete = isCompleteCard(it.points);
   const body = `
     <div class="hibair-detail-grid">
       <div class="hibair-detail-title">Client</div>
       <div class="hibair-detail-row"><span>Nom</span><b>${escapeHtml(it.name || 'Client')}</b></div>
       <div class="hibair-detail-row"><span>Téléphone</span><b>${escapeHtml(displayPhone(rawPhoneForClient(it), it.phone_last4))}</b></div>
       <div class="hibair-detail-row"><span>Carte</span><b>${escapeHtml(pointsLabel(it.points))}</b></div>
+      ${complete ? '<div class="hibair-detail-row"><span>Action disponible</span><b>Remise à 0 possible</b></div>' : ''}
       <div class="hibair-detail-row"><span>Créée le</span><b>${escapeHtml(formatDateTime(it.created_at))}</b></div>
       <div class="hibair-detail-title">Hib’air Drink</div>
       <div class="hibair-detail-row"><span>A joué</span><b>${hasGame ? 'Oui' : 'Non'}</b></div>
@@ -190,15 +217,19 @@ function showClientDetails(it){
       <div class="hibair-detail-title">ID</div>
       <div class="mono" style="font-size:11px;color:var(--soft);overflow-wrap:anywhere">${escapeHtml(cid)}</div>
     </div>`;
+  const actions = [];
+  if(complete){
+    actions.push({label:'Remettre à 0', className:'danger', onClick:()=>confirmResetClient({...it, client_id:cid})});
+  }else{
+    actions.push({label:'Sélectionner', onClick:()=>{ setClient(cid, {name:it.name, phone:rawPhoneForClient(it), points:it.points}); setMainStatus('Client sélectionné depuis les détails.'); }});
+  }
+  actions.push({label:'QR', secondary:true, onClick:()=>showRecoveryQr(cid, it)});
+  actions.push({label:'Fermer', secondary:true});
   showSmart({
     title:'Fiche client',
     sub: it.name || 'Client fidélité',
     body,
-    actions:[
-      {label:'Sélectionner', onClick:()=>{ setClient(cid, {name:it.name, phone:rawPhoneForClient(it), points:it.points}); setMainStatus('Client sélectionné depuis les détails.'); }},
-      {label:'QR', secondary:true, onClick:()=>showRecoveryQr(cid, it)},
-      {label:'Fermer', secondary:true}
-    ]
+    actions
   });
 }
 
@@ -285,14 +316,24 @@ function showError(message){
   showSmart({title:"Erreur", sub:"Action impossible", body:escapeHtml(message), actions:[{label:"OK", secondary:true}]});
 }
 
-function showScanConfirm(id){
+async function showScanConfirm(id){
+  const fresh = await fetchClientCardById(id);
+  if(fresh){
+    setClient(id, {name:fresh.name, phone:fresh.phone, points:fresh.points});
+  }
+  const client = fresh || currentClient || {points:null};
+  const complete = isCompleteCard(client.points);
   showSmart({
-    title:"Carte détectée ✅",
-    sub:"Client prêt à être validé",
-    body:`<p><b>ID client :</b><br><span class="mono">${escapeHtml(id)}</span></p><p>${pointsLabel(currentClient.points)}</p>`,
-    actions:[
-      {label:"Ajouter +1 point", onClick:()=>confirmStampClient({client_id:id, points:currentClient.points})},
-      {label:"Afficher QR", secondary:true, onClick:()=>showRecoveryQr(id, currentClient)},
+    title: complete ? "Carte complète 🎁" : "Carte détectée ✅",
+    sub: complete ? "Remise à zéro disponible" : "Client prêt à être validé",
+    body:`<p><b>ID client :</b><br><span class="mono">${escapeHtml(id)}</span></p><p>${pointsLabel(client.points)}</p>${complete ? '<p>La carte est à 8/8. Vous pouvez remettre uniquement les points à 0, sans supprimer la carte.</p>' : ''}`,
+    actions: complete ? [
+      {label:"Remettre à 0", className:"danger", onClick:()=>confirmResetClient({...client, client_id:id})},
+      {label:"Afficher QR", secondary:true, onClick:()=>showRecoveryQr(id, client)},
+      {label:"Annuler", secondary:true}
+    ] : [
+      {label:"Ajouter +1 point", onClick:()=>confirmStampClient({client_id:id, points:client.points, name:client.name, phone:client.phone})},
+      {label:"Afficher QR", secondary:true, onClick:()=>showRecoveryQr(id, client)},
       {label:"Annuler", secondary:true}
     ]
   });
@@ -311,7 +352,7 @@ async function startScan(){
     scanHint.textContent = "QR détecté ✅";
     await stopScan(false);
     closeModal(scanModal);
-    showScanConfirm(cid);
+    await showScanConfirm(cid);
   };
   try{
     if("BarcodeDetector" in window){
@@ -409,6 +450,9 @@ function renderResults(items){
 function confirmStampClient(client){
   const cid = client.client_id || client.id || currentClient.id || $("clientId").value;
   if(!cid) return showError("Aucun client sélectionné.");
+  if(isCompleteCard(client.points ?? currentClient.points)){
+    return confirmResetClient({...client, client_id:cid});
+  }
   showSmart({
     title:"Confirmer +1 point ?",
     sub:clientName(client),
@@ -454,6 +498,57 @@ async function stampClient(cid, meta={}){
     showError("Erreur validation : " + e.message);
   }
 }
+
+
+function confirmResetClient(client){
+  const cid = client.client_id || client.id || currentClient.id || $("clientId").value;
+  if(!cid) return showError("Aucun client sélectionné.");
+  showSmart({
+    title:"Remettre la carte à 0 ?",
+    sub:clientName(client),
+    body:`<p><b>Carte actuelle :</b> ${escapeHtml(pointsLabel(client.points ?? currentClient.points))}</p><p>Cette action conserve le client, le téléphone, le QR, l’historique, Hib’air Drink et la livraison offerte.</p><p><b>Seuls les points repassent à 0/8.</b></p><p class="mono">${escapeHtml(cid)}</p>`,
+    actions:[
+      {label:"Confirmer remise à 0", className:"danger", onClick:()=>resetClientPoints(cid, client)},
+      {label:"Afficher QR", secondary:true, onClick:()=>showRecoveryQr(cid, client)},
+      {label:"Annuler", secondary:true}
+    ]
+  });
+}
+
+async function resetClientPoints(cid, meta={}){
+  const key = await requireAdminAccess();
+  cid = String(cid || "").trim();
+  if(!key) return;
+  if(!isValidClientId(cid)) return showError("ID client invalide.");
+  $("who").textContent = "PIN local OK";
+  setClient(cid, meta);
+
+  if(!API_BASE){
+    const stKey = "adn66_demo_state_"+cid;
+    const state = JSON.parse(localStorage.getItem(stKey) || '{"points":0,"completed_at":null}');
+    state.points = 0;
+    state.completed_at = null;
+    state.last_stamp_ts = null;
+    localStorage.setItem(stKey, JSON.stringify(state));
+    setApiState(true, "Démo locale");
+    setClient(cid, {...meta, points:0});
+    showPointResult(cid, meta, 0, false, "Carte remise à 0/8.");
+    return;
+  }
+
+  try{
+    const r = await api("/loyalty/reset-points", {method:"POST", headers:{"content-type":"text/plain;charset=utf-8"}, body:JSON.stringify({admin_key:key, client_id:cid})});
+    const points = r.points ?? 0;
+    setApiState(true, "Remise à 0 ✅");
+    setClient(cid, {...meta, points});
+    showPointResult(cid, {...meta, points}, points, false, "Carte remise à 0/8. Le client, le QR et les informations restent conservés.");
+    try{ await loadHistory(); }catch(_){}
+  }catch(e){
+    setApiState(false, "Erreur");
+    showError("Erreur remise à zéro : " + e.message);
+  }
+}
+
 
 function showPointResult(cid, meta={}, points=null, complete=false, custom=""){
   const title = complete ? "Carte complète 🎁" : "Point ajouté ✅";
@@ -522,12 +617,18 @@ function renderHistory(items){
       </div>
       ${renderHibairMini(it)}
       <div class="result-actions">
-        <button class="small" data-action="stamp">+1 point</button>
+        <button class="small ${isCompleteCard(it.points) ? 'danger' : ''}" data-action="${isCompleteCard(it.points) ? 'reset' : 'stamp'}">${isCompleteCard(it.points) ? 'Remettre à 0' : '+1 point'}</button>
         <button class="secondary small" data-action="select">Détails</button>
         <button class="secondary small" data-action="qr">QR</button>
         <button class="secondary small" data-action="copy">Copier</button>
       </div>`;
-    card.querySelector('[data-action="stamp"]').addEventListener("click", ()=>confirmStampClient({client_id:cid, name:it.name, phone:it.phone || it.phone_digits, phone_last4:it.phone_last4, points:it.points}));
+    const mainAction = card.querySelector('[data-action="stamp"], [data-action="reset"]');
+    if(mainAction){
+      mainAction.addEventListener("click", ()=> isCompleteCard(it.points)
+        ? confirmResetClient({client_id:cid, name:it.name, phone:it.phone || it.phone_digits, phone_last4:it.phone_last4, points:it.points})
+        : confirmStampClient({client_id:cid, name:it.name, phone:it.phone || it.phone_digits, phone_last4:it.phone_last4, points:it.points})
+      );
+    }
     card.querySelector('[data-action="select"]').addEventListener("click", ()=>showClientDetails({...it, client_id:cid}));
     card.querySelector('[data-action="qr"]').addEventListener("click", ()=>showRecoveryQr(cid, {name:it.name, phone:it.phone || it.phone_digits, points:it.points}));
     card.querySelector('[data-action="copy"]').addEventListener("click", ()=>copyText(cid, "ID copié."));
@@ -572,6 +673,11 @@ function showRecoveryQr(cid, meta={}){
     const restoreUrl = RESTORE_PREFIX + encodeURIComponent(id);
     currentQr = {id, url:restoreUrl, meta};
     $("qrSub").textContent = `${clientName(meta)} • ${pointsLabel(meta.points)} • ${restoreUrl}`;
+    const qrAction = $("btnQrStamp");
+    if(qrAction){
+      qrAction.textContent = isCompleteCard(meta.points) ? "Remettre à 0" : "+1 point";
+      qrAction.classList.toggle("danger", isCompleteCard(meta.points));
+    }
     qrRender(restoreUrl);
     openModal(qrModal);
   }catch(e){ showError("Erreur QR : " + (e && e.message ? e.message : e)); }
@@ -592,7 +698,12 @@ $("btnClear").addEventListener("click", clearResults);
 if($("btnHistory")) $("btnHistory").addEventListener("click", loadHistory);
 $("btnCloseQr").addEventListener("click", ()=>closeModal(qrModal));
 $("btnCopy").addEventListener("click", ()=>copyText(($("clientId").value||"").trim(), "ID copié."));
-$("btnQrStamp").addEventListener("click", ()=>{ closeModal(qrModal); confirmStampClient({client_id:currentQr.id, ...currentQr.meta}); });
+$("btnQrStamp").addEventListener("click", ()=>{
+  closeModal(qrModal);
+  const client = {client_id:currentQr.id, ...currentQr.meta};
+  if(isCompleteCard(client.points)) confirmResetClient(client);
+  else confirmStampClient(client);
+});
 $("btnCopyQrId").addEventListener("click", ()=>copyText(currentQr.id, "ID copié."));
 $("btnCopyQrLink").addEventListener("click", ()=>copyText(currentQr.url, "Lien QR copié."));
 $("btnQrSelect").addEventListener("click", ()=>{ setClient(currentQr.id, currentQr.meta||{}); closeModal(qrModal); setMainStatus("Client sélectionné depuis le QR."); });
