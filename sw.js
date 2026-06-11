@@ -1,5 +1,5 @@
 /* ADN66 Outils — Service Worker racine pour installation PWA */
-const CACHE_VERSION = "adn66-outils-pwa-v3";
+const CACHE_VERSION = "adn66-outils-pwa-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,7 +7,15 @@ const APP_SHELL = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-192-maskable.png",
-  "./icons/icon-512-maskable.png"
+  "./icons/icon-512-maskable.png",
+  "./icons/ADN66_GPS.png",
+  "./icons/ADN66_stock.png",
+  "./icons/ADN66_fidelite.png",
+  "./icons/ADN66_uber.png",
+  "./icons/ADN66_push.png",
+  "./icons/ADN66_calculatrice.png",
+  "./icons/ADN66_statut.png",
+  "./icons/ADN66_twillio.png"
 ];
 
 self.addEventListener("install", (event) => {

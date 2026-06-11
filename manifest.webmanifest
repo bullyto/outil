@@ -40,7 +40,7 @@
       "url": "./apps/gps/",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/ADN66_GPS.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -53,7 +53,7 @@
       "url": "./apps/stock/",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/ADN66_stock.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -66,7 +66,7 @@
       "url": "./apps/fidel/admin.html",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/ADN66_fidelite.png",
           "sizes": "192x192",
           "type": "image/png"
         }
@@ -79,7 +79,7 @@
       "url": "./apps/UBER/",
       "icons": [
         {
-          "src": "./icons/icon-192.png",
+          "src": "./icons/ADN66_uber.png",
           "sizes": "192x192",
           "type": "image/png"
         }
