@@ -1,5 +1,5 @@
 /* ADN66 Outils — Service Worker racine pour installation PWA */
-const CACHE_VERSION = "adn66-outils-pwa-v5";
+const CACHE_VERSION = "adn66-outils-pwa-v5.1";
 const APP_SHELL = [
   "./",
   "./index.html",
