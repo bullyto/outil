@@ -8,7 +8,9 @@
       "message": "Merci pour vôtre compréhension.",
       "image": "",
       "severity": "info",
-      "ok_delay_seconds": 4
+      "ok_delay_seconds": 4,
+      "image_catalan": "",
+      "image_catalan_disabled": false
     },
     "warning": {
       "title": "EXCEPTIONNELLEMENT FERMER",
@@ -25,7 +27,9 @@
           4
         ]
       },
-      "warning_click_message": "Ce n'est actuellement pas possible de commander."
+      "warning_click_message": "Ce n'est actuellement pas possible de commander.",
+      "image_catalan": "",
+      "image_catalan_disabled": false
     }
   },
   "presets": {
@@ -33,37 +37,49 @@
       "title": "EXCEPTIONNELLEMENT FERMER",
       "message": "Merci pour vôtre compréhension.",
       "image": "",
-      "severity": "info"
+      "severity": "info",
+      "image_catalan": "images/CATALAN_incident_1.png",
+      "image_catalan_disabled": false
     },
     "météo": {
       "title": "Météo",
       "message": "Conditions météo compliquées. Service possiblement ralenti.",
       "image": "images/météo.png",
-      "severity": "info"
+      "severity": "info",
+      "image_catalan": "images/CATALAN_meteo_1.png",
+      "image_catalan_disabled": false
     },
     "panne": {
       "title": "Panne",
       "message": "Il n’est pas possible de payer par carte ce soir. Nous acceptons uniquement les paiements en espèces. Merci de votre compréhension.\n\nVous pouvez commander directement par téléphone au 06 52 33 64 61.",
       "image": "images/panne.png",
-      "severity": "info"
+      "severity": "info",
+      "image_catalan": "images/CATALAN_panne_1.png",
+      "image_catalan_disabled": false
     },
     "sécurité": {
       "title": "Sécurité",
       "message": "Mesure de sécurité en cours. Service temporairement indisponible.",
       "image": "images/sécurité.png",
-      "severity": "info"
+      "severity": "info",
+      "image_catalan": "images/CATALAN_incident_1.png",
+      "image_catalan_disabled": false
     },
     "libre": {
       "title": "",
       "message": "",
       "image": "images/panne.png",
-      "severity": "info"
+      "severity": "info",
+      "image_catalan": "",
+      "image_catalan_disabled": false
     },
     "ouverture_2230": {
       "title": "Beaucoup de rupture",
       "message": "Il est préférable d'appeler pour commander",
       "image": "",
-      "severity": "info"
+      "severity": "info",
+      "image_catalan": "images/CATALAN_fermeture_1.png",
+      "image_catalan_disabled": false
     }
   },
   "created_at": "2026-01-01T19:53:43.073+01:00",

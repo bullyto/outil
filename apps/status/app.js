@@ -140,6 +140,102 @@ function normalizeStatus(raw){
   return data;
 }
 
+
+function formatDateFr(value){
+  if(!value) return "—";
+  const d = new Date(value);
+  if(Number.isNaN(d.getTime())) return String(value);
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday:"long", day:"numeric", month:"long", year:"numeric",
+    hour:"2-digit", minute:"2-digit"
+  }).format(d).replace(":", "h");
+}
+
+function modeLabel(mode){
+  if(mode === "info") return "Information";
+  if(mode === "warning") return "Alerte / blocage";
+  return "Aucun";
+}
+
+function formatCountdown(seconds){
+  const n = Number(seconds || 0);
+  if(!Number.isFinite(n) || n <= 0) return "Non";
+  if(n < 60) return `Activé — durée : ${n} seconde${n > 1 ? "s" : ""}`;
+  const min = Math.floor(n / 60);
+  const rest = n % 60;
+  if(!rest) return `Activé — durée : ${min} minute${min > 1 ? "s" : ""}`;
+  return `Activé — durée : ${min} minute${min > 1 ? "s" : ""} et ${rest} seconde${rest > 1 ? "s" : ""}`;
+}
+
+function catalogCatalan(){
+  return Array.isArray(window.STATUS_IMAGES_CATALAN) ? window.STATUS_IMAGES_CATALAN : [];
+}
+
+function fillCatalanImageSelect(){
+  const sel = $("catalanImageSelect");
+  if(!sel) return;
+  const list = catalogCatalan();
+  sel.innerHTML = list.map(item => `<option value="${item.value}">${item.label}</option>`).join("");
+}
+
+function imageLabelFromCatalog(value){
+  const v = String(value || "").trim();
+  if(!v) return "Aucune image";
+  const found = catalogCatalan().find(x => x.value === v);
+  return found ? found.label : v;
+}
+
+function syncCatalanImageUi(){
+  const method = getVal("catalanImageMethod", "same");
+  const listWrap = $("catalanImageListWrap");
+  const urlWrap = $("catalanImageUrlWrap");
+  if(listWrap) listWrap.classList.toggle("ui-hide", method !== "list");
+  if(urlWrap) urlWrap.classList.toggle("ui-hide", method !== "url");
+}
+
+function getCatalanImageState(){
+  const method = getVal("catalanImageMethod", "same");
+  if(method === "none") return { value:"", disabled:true, method };
+  if(method === "list") return { value:getVal("catalanImageSelect", ""), disabled:false, method };
+  if(method === "url") return { value:getVal("catalanImageUrl", ""), disabled:false, method };
+  return { value:"", disabled:false, method:"same" };
+}
+
+function setCatalanFormFromCfg(cfg){
+  fillCatalanImageSelect();
+  const disabled = !!cfg?.image_catalan_disabled;
+  const value = String(cfg?.image_catalan || "").trim();
+  const list = catalogCatalan();
+
+  if(disabled){
+    setVal("catalanImageMethod", "none");
+  }else if(value && list.some(x => x.value === value)){
+    setVal("catalanImageMethod", "list");
+    setVal("catalanImageSelect", value);
+  }else if(value){
+    setVal("catalanImageMethod", "url");
+    setVal("catalanImageUrl", value);
+  }else{
+    setVal("catalanImageMethod", "same");
+  }
+  syncCatalanImageUi();
+}
+
+function catalanImageForDisplay(cfg){
+  if(cfg?.image_catalan_disabled) return "";
+  return String(cfg?.image_catalan || cfg?.image || "").trim();
+}
+
+function scheduleText(cfg){
+  if(!cfg || !cfg.block_order) return "Non";
+  const s = cfg.block_schedule || {};
+  if(!s.enabled) return "Oui — blocage permanent";
+  const days = Array.isArray(s.days) ? s.days : [];
+  const names = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+  const dayText = days.length ? days.map(d => names[d] || d).join(", ") : "tous les jours";
+  return `Oui — ${s.start || "—"} → ${s.end || "—"}, ${dayText}`;
+}
+
 function fillPresetSelect(data){
   const sel = $("preset");
   if(!sel) return;
@@ -167,60 +263,94 @@ function syncModePanels(){
 function renderLivePreview(data){
   const active = !!data.active;
   const mode = data.mode || "none";
+  const cfg = getLiveCfg(data) || {};
+  const card = $("publishedNow");
+  if(!card) return;
 
   safeText("liveActive", active ? "ACTIF" : "INACTIF");
   safeText("liveMode", mode);
-  safeText("liveUpdated", data.last_update || "");
+  safeText("liveUpdated", formatDateFr(data.last_update || ""));
 
-  const cfg = getLiveCfg(data);
+  const bd = card.querySelector(".bd");
+  if(!bd) return;
 
-  safeText("liveTitle", cfg?.title, "—");
-  safeText("liveMsg", cfg?.message, "—");
-  safeImg("liveImg", cfg?.image, "images/panne.png");
-
-  const sev = pickFirst(cfg, ["severity"]) || mode || "info";
-  safeText("liveSev", sev);
-
-  const imgPath = pickFirst(cfg, ["image","img","image_path","imagePath"]) || "images/panne.png";
-  safeText("liveImagePath", imgPath);
-
-  const created = pickFirst(data, ["created_at","createdAt"]) ?? data.last_update ?? "";
-  safeText("liveCreated", created);
-
-  const starts = pickFirst(data, ["starts_at","startsAt"]) ?? pickFirst(data, ["published_at","publishedAt"]) ?? data.last_update ?? "";
-  const ends = pickFirst(data, ["ends_at","endsAt"]) ?? "";
-  safeText("liveStarts", starts);
-  safeText("liveEnds", ends ? ends : "—");
-
-  const extraEl = $("liveExtra");
-  if(extraEl){
-    if(active && mode === "warning"){
-      const clickMsg = data?.modes?.warning?.warning_click_message || "";
-      const sched = data?.modes?.warning?.block_schedule || {};
-      const schedTxt = sched?.enabled ? `Blocage plage ${sched.start || "—"} → ${sched.end || "—"}` : "Blocage 24/24";
-      extraEl.textContent = (clickMsg ? (clickMsg + " • ") : "") + schedTxt;
-    } else {
-      extraEl.textContent = "";
-    }
+  if(!active || mode === "none" || !getLiveCfg(data)){
+    bd.innerHTML = `
+      <div class="adn-lite-inline-card">
+        <h3 style="margin:0 0 10px;font-size:22px;color:#f8fafc">Aucun statut n’est publié actuellement.</h3>
+        <div class="small">Dernière modification : <b>${formatDateFr(data.last_update)}</b></div>
+      </div>`;
+    return;
   }
+
+  const imgAdn = String(cfg.image || "").trim();
+  const imgCat = catalanImageForDisplay(cfg);
+  const countdown = mode === "info" ? formatCountdown(cfg.ok_delay_seconds) : "Non";
+  const blocked = mode === "warning" && cfg.block_order;
+
+  bd.innerHTML = `
+    <div class="adn-lite-inline-card">
+      <h3 style="margin:0 0 12px;font-size:22px;color:#f8fafc">Statut actuellement publié</h3>
+      ${imgAdn ? `<img src="${imgAdn}" alt="Image Apéro de Nuit 66" style="width:100%;max-height:240px;object-fit:cover;border-radius:18px;margin-bottom:12px">` : ""}
+      <div class="kv" aria-label="Détails publication">
+        <div class="k">Titre :</div><div><b>${cfg.title || "—"}</b></div>
+        <div class="k">Message :</div><div><b>${cfg.message || "—"}</b></div>
+        <div class="k">Mode :</div><div><b>${modeLabel(mode)}</b></div>
+        <div class="k">Publié le :</div><div><b>${formatDateFr(data.published_at || data.last_update)}</b></div>
+        <div class="k">Commande bloquée :</div><div><b>${blocked ? "Oui" : "Non"}</b></div>
+        <div class="k">Compte à rebours :</div><div><b>${countdown}</b></div>
+        ${mode === "warning" ? `<div class="k">Blocage :</div><div><b>${scheduleText(cfg)}</b></div>` : ""}
+        ${mode === "warning" && cfg.warning_click_message ? `<div class="k">Message au clic :</div><div><b>${cfg.warning_click_message}</b></div>` : ""}
+        <div class="k">Image ADN66 :</div><div><b>${imgAdn || "Aucune image"}</b></div>
+        <div class="k">Image Catalan :</div><div><b>${cfg.image_catalan_disabled ? "Aucune image Catalan" : (cfg.image_catalan ? imageLabelFromCatalog(cfg.image_catalan) : "Même image que ADN66")}</b></div>
+      </div>
+      ${imgCat && imgCat !== imgAdn ? `<div style="margin-top:14px"><div class="small" style="margin-bottom:8px"><b>Aperçu image Catalan</b></div><img src="${imgCat}" alt="Image Apéro Catalan" style="width:100%;max-height:220px;object-fit:cover;border-radius:18px"></div>` : ""}
+    </div>`;
 }
 
 function renderPreview(data){
   const active = getVal("active", "false") === "true";
   const mode = getVal("mode", "none");
+  const cfg = data.modes?.[mode] || {};
+  const preview = document.querySelector(".preview .bd");
 
   if ($("pActive")) $("pActive").textContent = active ? "ACTIF" : "INACTIF";
   if ($("pMode")) $("pMode").textContent = mode;
-  if ($("pUpdated")) $("pUpdated").textContent = data.last_update || "";
 
-  const cfg = data.modes?.[mode] || {};
+  if(!preview) return;
 
-  if ($("pTitle")) $("pTitle").textContent = cfg.title || "(titre)";
-  if ($("pMsg")) $("pMsg").textContent = cfg.message || "(message)";
-  if ($("pSev")) $("pSev").textContent = mode || "—";
+  if(!active || mode === "none"){
+    preview.innerHTML = `
+      <div class="adn-lite-inline-card">
+        <h3 style="margin:0 0 10px;font-size:22px;color:#f8fafc">Aucun statut publié actuellement</h3>
+        <div class="small">Dernière modification : <b>${formatDateFr(data.last_update)}</b></div>
+      </div>`;
+    return;
+  }
 
-  const imgSrc = cfg.image ? cfg.image : "images/panne.png";
-  if ($("pImg")) $("pImg").src = imgSrc;
+  const imgAdn = String(cfg.image || "").trim();
+  const imgCat = catalanImageForDisplay(cfg);
+  const countdown = mode === "info" ? formatCountdown(cfg.ok_delay_seconds) : "Non";
+  const blocked = mode === "warning" && cfg.block_order;
+
+  preview.innerHTML = `
+    ${imgAdn ? `<img id="pImg" alt="Aperçu image ADN66" src="${imgAdn}" />` : ""}
+    <div class="badge" style="margin-top:12px">
+      <span>Dernière maj :</span> <b>${formatDateFr(data.last_update)}</b>
+      <span style="opacity:.5">•</span>
+      <span>Mode :</span> <b>${modeLabel(mode)}</b>
+    </div>
+    <div style="margin-top:12px;font-weight:900;font-size:24px;color:#f8fafc">${cfg.title || "—"}</div>
+    <div style="margin-top:8px;color:#cbd5e1;font-weight:700;line-height:1.35">${(cfg.message || "—").replace(/\n/g,"<br>")}</div>
+    <div class="adn-lite-inline-card">
+      <div class="kv">
+        <div class="k">Commande bloquée :</div><div><b>${blocked ? "Oui" : "Non"}</b></div>
+        <div class="k">Compte à rebours :</div><div><b>${countdown}</b></div>
+        ${mode === "warning" ? `<div class="k">Blocage :</div><div><b>${scheduleText(cfg)}</b></div>` : ""}
+        <div class="k">Image Catalan :</div><div><b>${cfg.image_catalan_disabled ? "Aucune image Catalan" : (cfg.image_catalan ? imageLabelFromCatalog(cfg.image_catalan) : "Même image que ADN66")}</b></div>
+      </div>
+      ${imgCat && imgCat !== imgAdn ? `<div style="margin-top:12px"><div class="small" style="margin-bottom:8px"><b>Aperçu Catalan</b></div><img src="${imgCat}" alt="Aperçu image Catalan" style="width:100%;max-height:220px;object-fit:cover;border-radius:18px"></div>` : ""}
+    </div>`;
 }
 
 function setFormFromStatus(data){
@@ -251,6 +381,10 @@ function setFormFromStatus(data){
   setVal("title", preset.title || "");
   setVal("message", preset.message || "");
   setVal("image", preset.image || "");
+
+  const modeCfgForCatalan = data.modes?.[uiMode] || {};
+  const catalanSource = (presetKey && presetKey !== "libre") ? preset : modeCfgForCatalan;
+  setCatalanFormFromCfg(catalanSource);
 
   const infoCfg = data.modes?.info || {};
   setVal("okDelay", String(infoCfg.ok_delay_seconds ?? 5));
@@ -311,12 +445,15 @@ function buildUpdatedStatus(current){
   const title = getVal("title","").trim();
   const message = getVal("message","").trim();
   const image = getVal("image","").trim();
+  const catalanImage = getCatalanImageState();
 
   if(presetKey && presetKey !== "libre"){
     if(!data.presets[presetKey]) data.presets[presetKey] = {};
     data.presets[presetKey].title = title;
     data.presets[presetKey].message = message;
     data.presets[presetKey].image = image;
+    data.presets[presetKey].image_catalan = catalanImage.value;
+    data.presets[presetKey].image_catalan_disabled = !!catalanImage.disabled;
   }
 
   if (mode !== "none" && active){
@@ -324,6 +461,8 @@ function buildUpdatedStatus(current){
       data.modes.info.title = title;
       data.modes.info.message = message;
       data.modes.info.image = image;
+      data.modes.info.image_catalan = catalanImage.value;
+      data.modes.info.image_catalan_disabled = !!catalanImage.disabled;
       data.modes.info.severity = "info";
       const d = parseInt(getVal("okDelay","5"),10);
       data.modes.info.ok_delay_seconds = Number.isFinite(d) && d >= 0 ? d : 5;
@@ -333,6 +472,8 @@ function buildUpdatedStatus(current){
       data.modes.warning.title = title;
       data.modes.warning.message = message;
       data.modes.warning.image = image;
+      data.modes.warning.image_catalan = catalanImage.value;
+      data.modes.warning.image_catalan_disabled = !!catalanImage.disabled;
       data.modes.warning.severity = "warning";
       data.modes.warning.block_order = true;
       data.modes.warning.warning_click_message = getVal("warningClickMsg","Ce n'est actuellement pas possible de commander.").trim();
@@ -390,6 +531,7 @@ async function main(){
       ["info","warning"].map(m => `<option value="${m}">${m}</option>`).join("");
   }
 
+  fillCatalanImageSelect();
   setFormFromStatus(current);
 
   const rerender = () => {
@@ -409,12 +551,13 @@ async function main(){
   if ($("active")) $("active").addEventListener("change", rerender);
   if ($("mode")) $("mode").addEventListener("change", ()=> { syncModePanels(); rerender(); });
 
-  ["title","message","image","okDelay","schedEnabled","schedStart","schedEnd","warningClickMsg"].forEach(id => {
+  ["title","message","image","catalanImageMethod","catalanImageSelect","catalanImageUrl","okDelay","schedEnabled","schedStart","schedEnd","warningClickMsg"].forEach(id => {
     const el = $(id);
     if(el) el.addEventListener("input", rerender);
     if(el) el.addEventListener("change", rerender);
   });
   if($("schedDays")) $("schedDays").addEventListener("change", rerender);
+  if($("catalanImageMethod")) $("catalanImageMethod").addEventListener("change", () => { syncCatalanImageUi(); rerender(); });
 
   // Boutons "token" => deviennent "PIN"
   if ($("btnSaveToken")) $("btnSaveToken").addEventListener("click", ()=>{

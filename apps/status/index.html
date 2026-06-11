@@ -512,8 +512,36 @@
           </div>
 
           <div style="margin-top:12px">
-            <label>Image</label>
+            <label>Image Apéro de Nuit 66</label>
             <input id="image" placeholder="images/panne.png" />
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <div class="bd">
+              <div style="font-weight:900; margin-bottom:10px;">Image Apéro Catalan</div>
+              <div class="row">
+                <div>
+                  <label>Méthode image Catalan</label>
+                  <select id="catalanImageMethod">
+                    <option value="same">Même image que Apéro de Nuit 66</option>
+                    <option value="list">Choisir dans la liste Catalan</option>
+                    <option value="url">URL personnalisée Catalan</option>
+                    <option value="none">Aucune image Catalan</option>
+                  </select>
+                </div>
+                <div id="catalanImageListWrap" class="ui-hide">
+                  <label>Image prédéfinie Catalan</label>
+                  <select id="catalanImageSelect"></select>
+                </div>
+              </div>
+              <div id="catalanImageUrlWrap" class="ui-hide" style="margin-top:12px">
+                <label>URL image Catalan</label>
+                <input id="catalanImageUrl" placeholder="https://... ou images/CATALAN_panne_1.png" />
+              </div>
+              <div class="small" style="margin-top:10px">
+                Apéro de Nuit 66 garde l’image actuelle. Catalan utilise cette image uniquement si vous la choisissez ici.
+              </div>
+            </div>
           </div>
 
           <div class="hr"></div>
@@ -703,6 +731,7 @@
     })();
   </script>
 
+  <script src="./status-images-catalan.js"></script>
   <script src="./app.js"></script>
 
   <script>

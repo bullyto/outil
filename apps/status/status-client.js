@@ -52,7 +52,7 @@ const StatusClient = (() => {
     return await r.json();
   }
 
-  function init({statusUrl, orderButtonSelector}){
+  function init({statusUrl, orderButtonSelector, brand}){
     ensureOverlay();
     const overlay = document.getElementById("statusOverlay");
     const img = document.getElementById("statusImg");
@@ -95,7 +95,17 @@ const StatusClient = (() => {
       const cfg = data.modes?.[mode];
       if(!cfg) return;
 
-      img.src = cfg.image || "images/panne.png";
+      const isCatalan = (brand === "catalan") || (!brand && location.hostname.includes("catalan"));
+      const wantedImage = isCatalan
+        ? (cfg.image_catalan_disabled ? "" : (cfg.image_catalan || cfg.image || "images/panne.png"))
+        : (cfg.image || "images/panne.png");
+      if(wantedImage){
+        img.src = wantedImage;
+        img.style.display = "block";
+      }else{
+        img.removeAttribute("src");
+        img.style.display = "none";
+      }
       title.textContent = cfg.title || "Information";
       msg.textContent = cfg.message || "";
       secondary.textContent = "";
