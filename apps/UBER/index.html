@@ -207,10 +207,6 @@ els.startBtn.onclick = async () => {
     timer = setInterval(()=>{ const sec=(Date.now()-startedAt)/1000; els.recText.textContent='REC '+fmtTime(sec); els.durationBadge.textContent='Durée '+fmtTime(sec); }, 500);
   } catch(e){ currentRecording=null; els.startBtn.classList.remove('red'); els.startBtn.textContent='🎥 ENREGISTRER'; toast('Caméra/audio impossible : '+e.message); }
 };
-    mediaRecorder.start(5000);
-    timer = setInterval(()=>{ const s=(Date.now()-startedAt)/1000; els.recText.textContent='REC '+fmtTime(s); els.durationBadge.textContent='Durée '+fmtTime(s); }, 500);
-  } catch(e){ toast('Caméra/audio impossible : '+e.message); }
-};
 
 els.cancelBtn.onclick = () => cleanupRecording(true);
 els.stopBtn.onclick = async () => {
