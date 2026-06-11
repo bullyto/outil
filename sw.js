@@ -12,10 +12,6 @@ const APP_SHELL = [
   "./icons/ADN66_stock_192.png",
   "./icons/ADN66_fidelite_192.png",
   "./icons/ADN66_uber_192.png",
-  "./icons/ADN66_push.png",
-  "./icons/ADN66_calculatrice.png",
-  "./icons/ADN66_statut.png",
-  "./icons/ADN66_twillio.png"
 ];
 
 self.addEventListener("install", (event) => {
