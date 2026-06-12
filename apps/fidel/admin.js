@@ -137,7 +137,7 @@ function ensureHibairAdminStyles(){
     .hibair-mini{display:grid;gap:6px;margin-top:2px;padding:9px;border:1px solid rgba(93,183,238,.18);border-radius:14px;background:rgba(93,183,238,.06)}
     .hibair-line{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;font-weight:900;line-height:1.2}
     .hibair-line b{color:var(--text);font-weight:1000}.hibair-line .ok{color:var(--green2)}.hibair-line .off{color:var(--soft)}.hibair-line .warn{color:#fde68a}
-    .hibair-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}.hibair-badge{border:1px solid rgba(255,255,255,.12);background:rgba(15,23,42,.86);color:var(--muted);border-radius:999px;padding:5px 8px;font-size:11px;font-weight:1000;white-space:nowrap}.hibair-badge.active{border-color:rgba(22,163,74,.42);background:rgba(22,163,74,.14);color:var(--green2)}.hibair-badge.game{border-color:rgba(93,183,238,.42);background:rgba(93,183,238,.14);color:#bfdbfe}.hibair-detail-grid{display:grid;gap:8px}.hibair-detail-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);padding:7px 0;color:var(--muted);font-weight:800}.hibair-detail-row b{color:var(--text);text-align:right}.hibair-detail-title{margin:12px 0 4px;color:var(--blue);font-weight:1000;letter-spacing:.04em;text-transform:uppercase;font-size:12px}`;
+    .hibair-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}.hibair-badge{border:1px solid rgba(255,255,255,.12);background:rgba(15,23,42,.86);color:var(--muted);border-radius:999px;padding:5px 8px;font-size:11px;font-weight:1000;white-space:nowrap}.hibair-badge.active{border-color:rgba(22,163,74,.42);background:rgba(22,163,74,.14);color:var(--green2)}.hibair-badge.game{border-color:rgba(93,183,238,.42);background:rgba(93,183,238,.14);color:#bfdbfe}.hibair-badge.wheel{border-color:rgba(250,204,21,.45);background:rgba(250,204,21,.13);color:#fde68a}.hibair-detail-grid{display:grid;gap:8px}.hibair-detail-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);padding:7px 0;color:var(--muted);font-weight:800}.hibair-detail-row b{color:var(--text);text-align:right}.hibair-detail-title{margin:12px 0 4px;color:var(--blue);font-weight:1000;letter-spacing:.04em;text-transform:uppercase;font-size:12px}`;
   document.head.appendChild(st);
 }
 function rawPhoneForClient(it){ return it.phone || it.phone_digits || ''; }
@@ -163,10 +163,29 @@ function msLeftLabel(iso){
 }
 function getGameInfo(it){ return (it && it.game && typeof it.game === 'object') ? it.game : {has_played:false}; }
 function getFreeDeliveryInfo(it){ return (it && it.free_delivery && typeof it.free_delivery === 'object') ? it.free_delivery : {active:false}; }
+
+function getWheelInfo(it){ return (it && it.wheel && typeof it.wheel === 'object') ? it.wheel : {has_claim:false}; }
+function wheelRewardNiceLabel(w){
+  const id = String(w && w.reward_id || '');
+  const label = String(w && w.reward_label || '').trim();
+  if(id === 'WHEEL_DELIVERY_7D') return label || 'Livraison offerte 1 semaine';
+  if(id === 'WHEEL_STAMP') return label || '1 tampon fidélité';
+  if(id === 'WHEEL_REROLL') return label || 'Retourner la roue';
+  return label || (id ? id : '—');
+}
+function wheelRewardShortLabel(w){
+  const id = String(w && w.reward_id || '');
+  if(id === 'WHEEL_DELIVERY_7D') return 'Livraison gagnée';
+  if(id === 'WHEEL_STAMP') return 'Tampon gagné';
+  if(id === 'WHEEL_REROLL') return 'Relance';
+  return w && w.has_claim ? 'Gain roue' : 'Non';
+}
 function renderHibairMini(it){
   ensureHibairAdminStyles();
   const g = getGameInfo(it);
   const fd = getFreeDeliveryInfo(it);
+  const wheel = getWheelInfo(it);
+  const hasWheel = !!wheel.has_claim;
   const hasGame = !!g.has_played;
   const best = (g.best_score !== null && g.best_score !== undefined) ? Number(g.best_score || 0) : null;
   const stampAt = g.reward_stamp_claimed_at || (it.rewards && it.rewards.GAME_25) || null;
@@ -177,10 +196,12 @@ function renderHibairMini(it){
     <div class="hibair-mini">
       <div class="hibair-line"><span>🎮 Hib’air Drink</span><b class="${hasGame ? 'ok' : 'off'}">${hasGame ? 'Oui' : 'Non'}${hasGame && best !== null ? ' · Score max '+best : ''}</b></div>
       <div class="hibair-line"><span>🚚 Livraison offerte</span><b class="${fdActive ? 'ok' : 'off'}">${escapeHtml(fdTxt)}</b></div>
+      <div class="hibair-line"><span>🎡 Roue de la chance</span><b class="${hasWheel ? 'ok' : 'off'}">${hasWheel ? escapeHtml(wheelRewardShortLabel(wheel)) : 'Non'}</b></div>
       <div class="hibair-badges">
         ${stampAt ? '<span class="hibair-badge game">+1 jeu débloqué</span>' : '<span class="hibair-badge">+1 jeu non réclamé</span>'}
         ${deliveryClaimAt ? '<span class="hibair-badge game">Palier 35 réclamé</span>' : '<span class="hibair-badge">Palier 35 non réclamé</span>'}
         ${fdActive ? '<span class="hibair-badge active">Livraison active</span>' : ''}
+        ${hasWheel ? '<span class="hibair-badge wheel">Roue : '+escapeHtml(wheelRewardShortLabel(wheel))+'</span>' : '<span class="hibair-badge">Roue non jouée</span>'}
       </div>
     </div>`;
 }
@@ -188,6 +209,7 @@ function showClientDetails(it){
   const cid = it.client_id || it.id || it.cid || currentClient.id || '';
   const g = getGameInfo(it);
   const fd = getFreeDeliveryInfo(it);
+  const wheel = getWheelInfo(it);
   const stampAt = g.reward_stamp_claimed_at || (it.rewards && it.rewards.GAME_25) || null;
   const deliveryClaimAt = g.free_delivery_claimed_at || (it.rewards && it.rewards.GAME_35) || null;
   const hasGame = !!g.has_played;
@@ -199,13 +221,19 @@ function showClientDetails(it){
       <div class="hibair-detail-row"><span>Téléphone</span><b>${escapeHtml(displayPhone(rawPhoneForClient(it), it.phone_last4))}</b></div>
       <div class="hibair-detail-row"><span>Carte</span><b>${escapeHtml(pointsLabel(it.points))}</b></div>
       ${complete ? '<div class="hibair-detail-row"><span>Action disponible</span><b>Remise à 0 possible</b></div>' : ''}
-      <div class="hibair-detail-row"><span>Créée le</span><b>${escapeHtml(formatDateTime(it.created_at))}</b></div>
+      <div class="hibair-detail-row"><span>Créée le</span><b>${escapeHtml(formatDateTimeSeconds(it.created_at))}</b></div>
+      <div class="hibair-detail-row"><span>Dernière mise à jour</span><b>${escapeHtml(formatDateTimeSeconds(it.updated_at))}</b></div>
       <div class="hibair-detail-title">Hib’air Drink</div>
       <div class="hibair-detail-row"><span>A joué</span><b>${hasGame ? 'Oui' : 'Non'}</b></div>
       <div class="hibair-detail-row"><span>Pseudo jeu</span><b>${escapeHtml(g.public_name || '—')}</b></div>
       <div class="hibair-detail-row"><span>Meilleur score</span><b>${g.best_score !== undefined && g.best_score !== null ? Number(g.best_score || 0) : '—'}</b></div>
       <div class="hibair-detail-row"><span>Dernier score</span><b>${g.last_score !== undefined && g.last_score !== null ? Number(g.last_score || 0) : '—'}</b></div>
       <div class="hibair-detail-row"><span>Dernière partie</span><b>${escapeHtml(formatDateTimeSeconds(g.last_played_at))}</b></div>
+      <div class="hibair-detail-title">Roue de la chance</div>
+      <div class="hibair-detail-row"><span>A tourné / récupéré</span><b>${wheel.has_claim ? 'Oui' : 'Non'}</b></div>
+      <div class="hibair-detail-row"><span>Gain obtenu</span><b>${escapeHtml(wheelRewardNiceLabel(wheel))}</b></div>
+      <div class="hibair-detail-row"><span>Date du gain</span><b>${escapeHtml(formatDateTimeSeconds(wheel.claimed_at))}</b></div>
+      <div class="hibair-detail-row"><span>ID gain roue</span><b>${escapeHtml(wheel.reward_id || '—')}</b></div>
       <div class="hibair-detail-title">Récompenses jeu</div>
       <div class="hibair-detail-row"><span>+1 tampon jeu</span><b>${stampAt ? 'Oui · '+escapeHtml(formatDateTime(stampAt)) : 'Non'}</b></div>
       <div class="hibair-detail-row"><span>Livraison offerte gagnée</span><b>${deliveryClaimAt ? 'Oui · '+escapeHtml(formatDateTime(deliveryClaimAt)) : 'Non'}</b></div>
