@@ -11,6 +11,12 @@ const state = {
   sendingCampaign: false
 };
 
+window.addEventListener("beforeunload", (event) => {
+  if (!state.sendingCampaign) return;
+  event.preventDefault();
+  event.returnValue = "Campagne SMS en cours : ne quittez pas la page.";
+});
+
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   state.deferredPrompt = e;
@@ -454,13 +460,30 @@ async function sendCampaign() {
   if (previewBtn) previewBtn.disabled = true;
 
   const progress = $("sendProgress");
-  if (progress) {
+  const estimatedTotal = Math.max(1, Math.min(Number(body.limit || estimatedCount || 1), getUiSmsLimit()));
+  const startedAtMs = Date.now();
+  let progressTimer = null;
+
+  function renderSendingProgress() {
+    if (!progress) return;
+    const elapsed = Math.floor((Date.now() - startedAtMs) / 1000);
+    const estimatedDone = Math.min(estimatedTotal, Math.max(0, elapsed));
+    const remaining = Math.max(0, estimatedTotal - estimatedDone);
     progress.classList.remove("hidden");
     progress.innerHTML = `
-      <strong>Envoi en cours</strong><br>
-      1 SMS par seconde. Attendez la fin avant de quitter la page.<br>
-      Historique réel en préparation...
+      <div class="send-lock-box">
+        <strong>Envoi en cours — NE PAS QUITTER LA PAGE</strong>
+        <div class="send-lock-text">Le Worker envoie environ <strong>1 SMS par seconde</strong>. Gardez cet écran ouvert jusqu'au message de fin.</div>
+        <div class="send-progress-line">Traitement estimé : <strong>${estimatedDone} / ${estimatedTotal}</strong></div>
+        <div class="send-progress-bar"><span style="width:${Math.round((estimatedDone / estimatedTotal) * 100)}%"></span></div>
+        <div class="send-lock-sub">Temps écoulé : ${elapsed}s — restant estimé : ${remaining}s</div>
+      </div>
     `;
+  }
+
+  if (progress) {
+    renderSendingProgress();
+    progressTimer = setInterval(renderSendingProgress, 1000);
   }
 
   try {
@@ -491,6 +514,7 @@ async function sendCampaign() {
     showModal("Erreur campagne", msg);
     if (progress) progress.innerHTML = `<strong>Erreur :</strong> ${escapeHtml(msg)}`;
   } finally {
+    if (progressTimer) clearInterval(progressTimer);
     state.sendingCampaign = false;
     if (btn) {
       btn.disabled = false;
@@ -832,12 +856,22 @@ async function loadProblems() {
   if (!tbody) return;
   tbody.innerHTML = "";
 
-  (data.problems || []).forEach((problem) => {
+  const problems = data.problems || [];
+  if (problems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8">Aucun SMS en erreur pour le moment.</td></tr>`;
+    return;
+  }
+
+  problems.forEach((problem) => {
     const client = { phone: problem.phone, is_active: problem.is_active ?? 1 };
     const tr = document.createElement("tr");
+    tr.classList.add("problem-row");
     tr.innerHTML = `
+      <td>${escapeHtml(problem.campaign_id || "")}</td>
+      <td>${escapeHtml(problem.campaign_title || "")}</td>
       <td>${escapeHtml(problem.phone || "")}</td>
-      <td>${escapeHtml(problem.twilio_sid || "")}</td>
+      <td>${escapeHtml(problem.status || "")}</td>
+      <td>${escapeHtml(problem.error_code || "")}</td>
       <td>${escapeHtml(problem.error_message || "")}</td>
       <td>${escapeHtml(problem.created_at || "")}</td>
       <td>${clientActions(client)}</td>
@@ -895,6 +929,7 @@ async function openCampaignDetails(id) {
       <td>${escapeHtml(m.phone || "")}</td>
       <td>${escapeHtml(m.status || "")}</td>
       <td>${Number(m.segments || 0)}</td>
+      <td>${escapeHtml(m.error_code || "")}</td>
       <td>${escapeHtml(m.error_message || "")}</td>
     </tr>
   `).join("");
@@ -915,8 +950,8 @@ async function openCampaignDetails(id) {
         <div><span>Statut final</span><strong>${escapeHtml(campaign.status || "")}</strong></div>
       </div>
       <table>
-        <thead><tr><th>Nom</th><th>Numéro</th><th>Statut Twilio</th><th>Segments</th><th>Erreur</th></tr></thead>
-        <tbody>${rows || '<tr><td colspan="5">Aucun détail</td></tr>'}</tbody>
+        <thead><tr><th>Nom</th><th>Numéro</th><th>Statut Twilio</th><th>Segments</th><th>Code</th><th>Erreur exacte</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="6">Aucun détail</td></tr>'}</tbody>
       </table>
     `
   );
