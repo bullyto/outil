@@ -8,8 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#111827" />
   <title>ADN66 Marketing SMS</title>
-  <link rel="manifest" href="manifest.json?v=11" />
-  <link rel="stylesheet" href="styles.css?v=11" />
+  <link rel="manifest" href="manifest.json?v=12" />
+  <link rel="stylesheet" href="styles.css?v=12" />
 
   <style>
     /* ===== MENU ADN66 — bouton en haut à droite, vrai menu déroulant ===== */
@@ -379,7 +379,8 @@
           <div class="grid two">
             <div>
               <label>Nombre de SMS à envoyer maintenant</label>
-              <input id="sendLimit" type="number" min="1" value="300" />
+              <input id="sendLimit" type="number" min="1" max="300" value="300" />
+              <p class="hint mini-hint">Sécurité : 300 SMS maximum par campagne. Envoi à 1 SMS/seconde.</p>
             </div>
             <div>
               <label>Type de cible</label>
@@ -387,6 +388,7 @@
                 <option value="active_unsent">Clients actifs jamais contactés</option>
                 <option value="active_all">Clients actifs</option>
                 <option value="loyalty_card">Clients avec carte de fidélité</option>
+                <option value="no_loyalty_card">Clients sans carte de fidélité</option>
                 <option value="error_retry">Clients en erreur à réessayer</option>
               </select>
             </div>
@@ -400,6 +402,7 @@
             <button class="secondary" id="previewBtn">Calculer estimation</button>
             <button class="primary danger" id="sendCampaignBtn">Envoyer campagne</button>
           </div>
+          <div id="sendProgress" class="nice-result hidden"></div>
         </div>
 
         <div class="card estimate-card">
@@ -516,7 +519,7 @@
             <h2>Historique campagnes</h2>
             <button class="secondary" id="loadHistoryBtn">Actualiser</button>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Titre</th><th>Demandé</th><th>Envoyés</th><th>Échecs</th><th>Segments</th><th>Date</th></tr></thead><tbody id="historyTable"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Titre</th><th>Demandé</th><th>Envoyés réels</th><th>Échecs</th><th>Segments réels</th><th>Statut</th><th>Date</th></tr></thead><tbody id="historyTable"></tbody></table></div>
           <p class="hint">Clique sur une campagne pour voir le message et la liste des clients envoyés.</p>
         </div>
 

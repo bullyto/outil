@@ -7,7 +7,8 @@ const state = {
   clientsPage: 1,
   clientsPageSize: 300,
   clientsTotal: 0,
-  clientsSearch: ""
+  clientsSearch: "",
+  sendingCampaign: false
 };
 
 window.addEventListener("beforeinstallprompt", (e) => {
@@ -293,13 +294,20 @@ function humanCampaignResult(data) {
   }
 
   return {
-    title: "Campagne envoyée",
-    text: `Envoi réel effectué.\n${data.sent || 0} envoyé(s), ${data.failed || 0} échec(s), ${data.total || 0} destinataire(s).`,
+    title: "Campagne terminée",
+    text:
+      `Envoi réel terminé.\n` +
+      `${data.sent || 0} accepté(s) Twilio, ${data.failed || 0} échec(s), ${data.total || 0} destinataire(s).`,
     details: `
       Campagne n° ${data.campaignId}<br>
+      Demandé : <strong>${data.requested || 0}</strong><br>
+      Limite sécurité : <strong>${data.safetyLimit || 300}</strong>${data.cappedBySafety ? " — demande limitée" : ""}<br>
+      Clients éligibles : <strong>${data.eligible || 0}</strong><br>
+      Numéros valides envoyés : <strong>${data.validNumbers || data.total || 0}</strong><br>
+      Rythme : <strong>1 SMS / seconde</strong><br>
       Encodage : ${escapeHtml(data.encoding || "")}<br>
       Segments par SMS : ${data.segmentsPerSms || 0}<br>
-      Total segments : ${data.totalSegments || 0}
+      Segments réels : <strong>${data.realSegments || data.totalSegments || 0}</strong>
     `
   };
 }
@@ -353,15 +361,32 @@ async function refreshDashboard() {
 // CAMPAGNE
 // ======================================================
 
-async function previewCampaign() {
-  const body = {
+function getUiSmsLimit() {
+  return 300;
+}
+
+function readCampaignBody() {
+  const maxLimit = getUiSmsLimit();
+  const rawLimit = Number($("sendLimit")?.value || 0);
+  const safeLimit = rawLimit > 0 ? Math.min(rawLimit, maxLimit) : maxLimit;
+
+  if ($("sendLimit") && rawLimit > maxLimit) {
+    $("sendLimit").value = String(maxLimit);
+  }
+
+  return {
     title: $("campaignTitle")?.value || "Campagne ADN66",
     message: $("campaignMessage")?.value || "",
-    limit: Number($("sendLimit")?.value || 0),
+    limit: safeLimit,
+    requestedLimit: rawLimit,
     onlyActive: true,
     excludeAlreadySent: $("excludeAlreadySent")?.checked === true,
     targetMode: $("targetMode")?.value || "active_unsent"
   };
+}
+
+async function previewCampaign() {
+  const body = readCampaignBody();
 
   const data = await api("/campaign/preview", { method: "POST", body: JSON.stringify(body) });
   if (!data.success) {
@@ -376,7 +401,7 @@ async function previewCampaign() {
 
   const preview = data.preview || {};
   setText("estClients", preview.selectedClients ?? 0);
-  setText("estLimit", body.limit || preview.selectedClients || 0);
+  setText("estLimit", preview.effectiveLimit || body.limit || preview.selectedClients || 0);
   setText("estChars", preview.characters ?? 0);
   setText("estSegments", preview.segmentsPerSms ?? 0);
   setText("estTotalSegments", preview.totalSegments ?? 0);
@@ -386,8 +411,12 @@ async function previewCampaign() {
 
   const warning = $("estimateWarning");
   if (warning) {
-    if (preview.enoughBalance === false) {
-      warning.textContent = "Attention : solde Twilio insuffisant pour cette estimation.";
+    const messages = [];
+    if (preview.cappedBySafety) messages.push("Sécurité : maximum 300 SMS par campagne. Votre demande a été limitée à 300.");
+    if (preview.enoughBalance === false) messages.push("Attention : solde Twilio insuffisant pour cette estimation.");
+    if (preview.eligibleClients !== undefined) messages.push(`Clients éligibles trouvés : ${preview.eligibleClients}.`);
+    if (messages.length) {
+      warning.textContent = messages.join(" ");
       warning.classList.remove("hidden");
     } else warning.classList.add("hidden");
   }
@@ -395,26 +424,81 @@ async function previewCampaign() {
 }
 
 async function sendCampaign() {
-  if (!confirm("Confirmer l’envoi réel de la campagne SMS ?")) return;
+  if (state.sendingCampaign) {
+    toast("Une campagne est déjà en cours");
+    return;
+  }
 
-  const body = {
-    title: $("campaignTitle")?.value || "Campagne ADN66",
-    message: $("campaignMessage")?.value || "",
-    limit: Number($("sendLimit")?.value || 0),
-    onlyActive: true,
-    excludeAlreadySent: $("excludeAlreadySent")?.checked === true,
-    targetMode: $("targetMode")?.value || "active_unsent"
-  };
+  const body = readCampaignBody();
+  const estimatedCount = Number($("estClients")?.textContent || body.limit || 0);
 
-  const data = await api("/campaign/send", { method: "POST", body: JSON.stringify(body) });
-  const result = humanCampaignResult(data);
-  showModal(result.title, result.text, result.details);
+  const confirmText =
+    `Confirmer l’envoi réel ?\n\n` +
+    `Maximum sécurité : 300 SMS\n` +
+    `Rythme : 1 SMS par seconde\n` +
+    `Cible estimée : ${estimatedCount || body.limit} client(s)\n\n` +
+    `Ne fermez pas la page pendant l’envoi.`;
 
-  await refreshDashboard();
-  await loadHistory();
-  await loadProblems();
-  await loadClients();
-  await loadSentTracking();
+  if (!confirm(confirmText)) return;
+
+  const btn = $("sendCampaignBtn");
+  const previewBtn = $("previewBtn");
+  const oldText = btn ? btn.textContent : "";
+
+  state.sendingCampaign = true;
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add("is-loading");
+    btn.textContent = "Envoi en cours...";
+  }
+  if (previewBtn) previewBtn.disabled = true;
+
+  const progress = $("sendProgress");
+  if (progress) {
+    progress.classList.remove("hidden");
+    progress.innerHTML = `
+      <strong>Envoi en cours</strong><br>
+      1 SMS par seconde. Attendez la fin avant de quitter la page.<br>
+      Historique réel en préparation...
+    `;
+  }
+
+  try {
+    const data = await api("/campaign/send", { method: "POST", body: JSON.stringify({ ...body, delayMs: 1000 }) });
+    const result = humanCampaignResult(data);
+    showModal(result.title, result.text, result.details);
+
+    if (progress) {
+      progress.innerHTML = data.success
+        ? `
+          <strong>Campagne terminée</strong><br>
+          Demandé : <strong>${data.requested || 0}</strong><br>
+          Clients éligibles : <strong>${data.eligible || 0}</strong><br>
+          Numéros envoyés : <strong>${data.sent || 0}</strong><br>
+          Échecs : <strong>${data.failed || 0}</strong><br>
+          Segments réels : <strong>${data.realSegments || data.totalSegments || 0}</strong>
+        `
+        : `<strong>Erreur :</strong> ${escapeHtml(data.error || "Envoi impossible")}`;
+    }
+
+    await refreshDashboard();
+    await loadHistory();
+    await loadProblems();
+    await loadClients();
+    await loadSentTracking();
+  } catch (error) {
+    const msg = error?.message || "Erreur pendant l’envoi";
+    showModal("Erreur campagne", msg);
+    if (progress) progress.innerHTML = `<strong>Erreur :</strong> ${escapeHtml(msg)}`;
+  } finally {
+    state.sendingCampaign = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove("is-loading");
+      btn.textContent = oldText || "Envoyer campagne";
+    }
+    if (previewBtn) previewBtn.disabled = false;
+  }
 }
 
 // ======================================================
@@ -773,15 +857,21 @@ async function loadHistory() {
   tbody.innerHTML = "";
 
   (data.campaigns || []).forEach((campaign) => {
+    const sent = campaign.real_sent_count ?? campaign.sent_count ?? 0;
+    const failed = campaign.real_failed_count ?? campaign.failed_count ?? 0;
+    const requested = campaign.requested_clients || campaign.total_clients || 0;
+    const realSegments = campaign.real_segments || campaign.total_segments || 0;
+
     const tr = document.createElement("tr");
     tr.dataset.campaignId = campaign.id;
     tr.innerHTML = `
       <td>${campaign.id}</td>
       <td>${escapeHtml(campaign.title || "")}</td>
-      <td>${campaign.total_clients || 0}</td>
-      <td>${campaign.sent_count ?? (campaign.status === "sent" ? campaign.total_clients || 0 : 0)}</td>
-      <td>${campaign.failed_count ?? (campaign.status === "partial" ? "Voir" : 0)}</td>
-      <td>${campaign.total_segments || 0}</td>
+      <td>${requested}</td>
+      <td>${sent}</td>
+      <td>${failed}</td>
+      <td>${realSegments}</td>
+      <td>${escapeHtml(campaign.status || "")}</td>
       <td>${escapeHtml(campaign.created_at || "")}</td>
     `;
     tbody.appendChild(tr);
@@ -794,22 +884,39 @@ async function openCampaignDetails(id) {
 
   const campaign = data.campaign || {};
   const messages = data.messages || [];
+  const delivered = campaign.delivered_count || messages.filter(m => String(m.status || "").toLowerCase() === "delivered").length;
+  const queued = campaign.queued_count || messages.filter(m => ["queued","accepted","sending","sent"].includes(String(m.status || "").toLowerCase())).length;
+  const failed = campaign.failed_count || messages.filter(m => ["failed","undelivered"].includes(String(m.status || "").toLowerCase())).length;
+  const realSegments = campaign.real_segments || messages.reduce((sum, m) => sum + Number(m.segments || 0), 0);
+
   const rows = messages.map((m) => `
     <tr>
       <td>${escapeHtml(m.client_name || m.name || "—")}</td>
       <td>${escapeHtml(m.phone || "")}</td>
       <td>${escapeHtml(m.status || "")}</td>
+      <td>${Number(m.segments || 0)}</td>
+      <td>${escapeHtml(m.error_message || "")}</td>
     </tr>
   `).join("");
 
   showModal(
     `Campagne n° ${campaign.id || id}`,
-    `${campaign.title || "Campagne"} — ${messages.length} destinataire(s)`,
+    `${campaign.title || "Campagne"} — historique relié aux statuts Twilio enregistrés`,
     `
       <div class="msg-preview">${escapeHtml(campaign.message || "")}</div>
+      <div class="campaign-real-summary">
+        <div><span>Demandé</span><strong>${campaign.requested_clients || campaign.total_clients || 0}</strong></div>
+        <div><span>Éligibles</span><strong>${campaign.eligible_clients || "—"}</strong></div>
+        <div><span>Envoyés réels</span><strong>${campaign.real_sent_count || campaign.sent_count || 0}</strong></div>
+        <div><span>Delivered</span><strong>${delivered}</strong></div>
+        <div><span>En attente</span><strong>${queued}</strong></div>
+        <div><span>Échecs</span><strong>${failed}</strong></div>
+        <div><span>Segments réels</span><strong>${realSegments}</strong></div>
+        <div><span>Statut final</span><strong>${escapeHtml(campaign.status || "")}</strong></div>
+      </div>
       <table>
-        <thead><tr><th>Nom</th><th>Numéro</th><th>Statut</th></tr></thead>
-        <tbody>${rows || '<tr><td colspan="3">Aucun détail</td></tr>'}</tbody>
+        <thead><tr><th>Nom</th><th>Numéro</th><th>Statut Twilio</th><th>Segments</th><th>Erreur</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="5">Aucun détail</td></tr>'}</tbody>
       </table>
     `
   );
@@ -915,6 +1022,14 @@ function escapeHtml(value) {
 $("refreshAllBtn")?.addEventListener("click", refreshDashboard);
 $("previewBtn")?.addEventListener("click", previewCampaign);
 $("sendCampaignBtn")?.addEventListener("click", sendCampaign);
+$("sendLimit")?.addEventListener("input", () => {
+  const max = getUiSmsLimit();
+  const value = Number($("sendLimit")?.value || 0);
+  if (value > max) {
+    $("sendLimit").value = String(max);
+    toast("Sécurité : 300 SMS maximum par campagne");
+  }
+});
 $("addClientBtn")?.addEventListener("click", addSingleClient);
 $("importBtn")?.addEventListener("click", importContacts);
 $("importCsvFileBtn")?.addEventListener("click", importCsvFileContacts);

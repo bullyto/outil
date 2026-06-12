@@ -81,3 +81,43 @@
 .adn-result-details table{width:100%;min-width:0;background:#0f172a}
 .adn-result-details th,.adn-result-details td{font-size:13px;padding:8px}
 .adn-result-details .msg-preview{background:#111827;border:1px solid #283447;border-radius:14px;padding:10px;margin:8px 0 12px;color:#e5e7eb}
+
+
+/* V12 : sécurité campagne Twilio + historique réel */
+button:disabled,
+button.is-loading{
+  opacity:.62;
+  cursor:not-allowed;
+  filter:grayscale(.25);
+}
+.mini-hint{
+  margin:7px 0 0;
+  font-size:12px;
+}
+.campaign-real-summary{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:10px 0 14px;
+}
+.campaign-real-summary div{
+  background:#0f172a;
+  border:1px solid #283447;
+  border-radius:14px;
+  padding:10px;
+}
+.campaign-real-summary span{
+  display:block;
+  color:#94a3b8;
+  font-size:12px;
+  font-weight:700;
+}
+.campaign-real-summary strong{
+  display:block;
+  color:#f8fafc;
+  font-size:18px;
+  margin-top:4px;
+}
+@media(max-width:640px){
+  .campaign-real-summary{grid-template-columns:1fr 1fr}
+}
