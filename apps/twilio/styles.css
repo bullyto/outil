@@ -382,3 +382,12 @@ button.is-loading{
   #dashboard .stat-card strong{font-size:23px;}
   #dashboard .stat-card:nth-child(5){grid-column:1 / -1;}
 }
+
+/* V17 : arrêt immédiat du chargement dès réponse Worker */
+.send-finished-box{
+  border-color:rgba(22,163,74,.48);
+  background:rgba(22,163,74,.10);
+}
+.send-finished-box strong:first-child{
+  color:#86efac;
+}

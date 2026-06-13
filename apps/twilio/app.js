@@ -671,23 +671,46 @@ async function sendCampaign() {
     progressTimer = setInterval(renderSendingProgress, 1000);
   }
 
+  function stopSendingUiNow() {
+    if (progressTimer) {
+      clearInterval(progressTimer);
+      progressTimer = null;
+    }
+    state.sendingCampaign = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove("is-loading");
+      btn.textContent = oldText || "Envoyer campagne";
+    }
+    if (previewBtn) previewBtn.disabled = false;
+    releaseWakeLock().catch(() => {});
+  }
+
   try {
     const data = await api("/campaign/send", { method: "POST", body: JSON.stringify({ ...body, delayMs: 2000 }) });
+
+    // Dès que le Worker répond, on arrête immédiatement le faux chargement.
+    // La barre ne doit pas attendre les 250 secondes si le retour d'envoi est déjà reçu.
+    stopSendingUiNow();
+
     const result = humanCampaignResult(data);
-    showModal(result.title, result.text, result.details);
 
     if (progress) {
       progress.innerHTML = data.success
         ? `
-          <strong>Campagne terminée</strong><br>
-          Demandé : <strong>${data.requested || 0}</strong><br>
-          Clients éligibles : <strong>${data.eligible || 0}</strong><br>
-          Numéros envoyés : <strong>${data.sent || 0}</strong><br>
-          Échecs : <strong>${data.failed || 0}</strong><br>
-          Segments réels : <strong>${data.realSegments || data.totalSegments || 0}</strong>
+          <div class="send-lock-box send-finished-box">
+            <strong>Campagne terminée</strong><br>
+            Demandé : <strong>${data.requested || 0}</strong><br>
+            Clients éligibles : <strong>${data.eligible || 0}</strong><br>
+            Numéros envoyés : <strong>${data.sent || 0}</strong><br>
+            Échecs : <strong>${data.failed || 0}</strong><br>
+            Segments réels : <strong>${data.realSegments || data.totalSegments || 0}</strong>
+          </div>
         `
-        : `<strong>Erreur :</strong> ${escapeHtml(data.error || "Envoi impossible")}`;
+        : `<div class="send-lock-box"><strong>Erreur :</strong> ${escapeHtml(data.error || "Envoi impossible")}</div>`;
     }
+
+    showModal(result.title, result.text, result.details);
 
     await refreshDashboard();
     await loadHistory();
@@ -696,18 +719,11 @@ async function sendCampaign() {
     await loadSentTracking();
   } catch (error) {
     const msg = error?.message || "Erreur pendant l’envoi";
+    stopSendingUiNow();
     showModal("Erreur campagne", msg);
-    if (progress) progress.innerHTML = `<strong>Erreur :</strong> ${escapeHtml(msg)}`;
+    if (progress) progress.innerHTML = `<div class="send-lock-box"><strong>Erreur :</strong> ${escapeHtml(msg)}</div>`;
   } finally {
-    if (progressTimer) clearInterval(progressTimer);
-    await releaseWakeLock();
-    state.sendingCampaign = false;
-    if (btn) {
-      btn.disabled = false;
-      btn.classList.remove("is-loading");
-      btn.textContent = oldText || "Envoyer campagne";
-    }
-    if (previewBtn) previewBtn.disabled = false;
+    stopSendingUiNow();
   }
 }
 
