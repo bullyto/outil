@@ -307,10 +307,10 @@ function humanCampaignResult(data) {
     details: `
       Campagne n° ${data.campaignId}<br>
       Demandé : <strong>${data.requested || 0}</strong><br>
-      Limite sécurité : <strong>${data.safetyLimit || 300}</strong>${data.cappedBySafety ? " — demande limitée" : ""}<br>
+      Limite sécurité : <strong>${data.safetyLimit || 50}</strong>${data.cappedBySafety ? " — demande limitée" : ""}<br>
       Clients éligibles : <strong>${data.eligible || 0}</strong><br>
       Numéros valides envoyés : <strong>${data.validNumbers || data.total || 0}</strong><br>
-      Rythme : <strong>1 SMS / seconde</strong><br>
+      Rythme : <strong>1 SMS toutes les 2 secondes</strong><br>
       Encodage : ${escapeHtml(data.encoding || "")}<br>
       Segments par SMS : ${data.segmentsPerSms || 0}<br>
       Segments réels : <strong>${data.realSegments || data.totalSegments || 0}</strong>
@@ -368,7 +368,7 @@ const TWILIO_ERROR_HELP = {
   "30001": {
     title: "File d’attente dépassée",
     meaning: "Trop de SMS ont été mis en attente côté Twilio.",
-    action: "Ralentissez l’envoi. Le rythme 1 SMS/seconde est recommandé."
+    action: "Ralentissez l’envoi. Le rythme 1 SMS toutes les 2 secondes est recommandé."
   },
   "30002": {
     title: "Compte suspendu ou bloqué",
@@ -505,7 +505,7 @@ async function refreshDashboard() {
 // ======================================================
 
 function getUiSmsLimit() {
-  return 300;
+  return 50;
 }
 
 function readCampaignBody() {
@@ -515,6 +515,7 @@ function readCampaignBody() {
 
   if ($("sendLimit") && rawLimit > maxLimit) {
     $("sendLimit").value = String(maxLimit);
+    toast("Impossible : choisissez 50 SMS maximum par campagne.");
   }
 
   return {
@@ -555,7 +556,7 @@ async function previewCampaign() {
   const warning = $("estimateWarning");
   if (warning) {
     const messages = [];
-    if (preview.cappedBySafety) messages.push("Sécurité : maximum 300 SMS par campagne. Votre demande a été limitée à 300.");
+    if (preview.cappedBySafety) messages.push("Sécurité : maximum 50 SMS par campagne. Votre demande a été limitée à 50.");
     if (preview.enoughBalance === false) messages.push("Attention : solde Twilio insuffisant pour cette estimation.");
     if (preview.eligibleClients !== undefined) messages.push(`Clients éligibles trouvés : ${preview.eligibleClients}.`);
     if (messages.length) {
@@ -577,8 +578,8 @@ async function sendCampaign() {
 
   const confirmText =
     `Confirmer l’envoi réel ?\n\n` +
-    `Maximum sécurité : 300 SMS\n` +
-    `Rythme : 1 SMS par seconde\n` +
+    `Maximum sécurité : 50 SMS\n` +
+    `Rythme : 1 SMS toutes les 2 secondes\n` +
     `Cible estimée : ${estimatedCount || body.limit} client(s)\n\n` +
     `Ne fermez pas la page pendant l’envoi.`;
 
@@ -604,13 +605,13 @@ async function sendCampaign() {
   function renderSendingProgress() {
     if (!progress) return;
     const elapsed = Math.floor((Date.now() - startedAtMs) / 1000);
-    const estimatedDone = Math.min(estimatedTotal, Math.max(0, elapsed));
-    const remaining = Math.max(0, estimatedTotal - estimatedDone);
+    const estimatedDone = Math.min(estimatedTotal, Math.max(0, Math.floor(elapsed / 2)));
+    const remaining = Math.max(0, (estimatedTotal - estimatedDone) * 2);
     progress.classList.remove("hidden");
     progress.innerHTML = `
       <div class="send-lock-box">
         <strong>Envoi en cours — NE PAS QUITTER LA PAGE</strong>
-        <div class="send-lock-text">Le Worker envoie environ <strong>1 SMS par seconde</strong>. Gardez cet écran ouvert jusqu'au message de fin.</div>
+        <div class="send-lock-text">Le Worker envoie environ <strong>1 SMS toutes les 2 secondes</strong>. Gardez cet écran ouvert jusqu'au message de fin.</div>
         <div class="send-progress-line">Traitement estimé : <strong>${estimatedDone} / ${estimatedTotal}</strong></div>
         <div class="send-progress-bar"><span style="width:${Math.round((estimatedDone / estimatedTotal) * 100)}%"></span></div>
         <div class="send-lock-sub">Temps écoulé : ${elapsed}s — restant estimé : ${remaining}s</div>
@@ -624,7 +625,7 @@ async function sendCampaign() {
   }
 
   try {
-    const data = await api("/campaign/send", { method: "POST", body: JSON.stringify({ ...body, delayMs: 1000 }) });
+    const data = await api("/campaign/send", { method: "POST", body: JSON.stringify({ ...body, delayMs: 2000 }) });
     const result = humanCampaignResult(data);
     showModal(result.title, result.text, result.details);
 
@@ -1294,7 +1295,7 @@ $("sendLimit")?.addEventListener("input", () => {
   const value = Number($("sendLimit")?.value || 0);
   if (value > max) {
     $("sendLimit").value = String(max);
-    toast("Sécurité : 300 SMS maximum par campagne");
+    toast("Impossible : choisissez 50 SMS maximum par campagne.");
   }
 });
 $("addClientBtn")?.addEventListener("click", addSingleClient);
