@@ -136,3 +136,182 @@ button.is-loading{
 .send-progress-bar{height:12px;background:#0b1220;border:1px solid #283447;border-radius:999px;overflow:hidden;margin-top:8px}
 .send-progress-bar span{display:block;height:100%;background:#5db7ee;border-radius:999px;transition:width .25s ease}
 .problem-row td:nth-child(5){font-weight:900;color:#fecaca}
+
+
+/* V14 : Problèmes + Historique optimisés mobile */
+.mobile-record-list{
+  display:none;
+  gap:12px;
+  margin-top:14px;
+}
+.mobile-record{
+  background:linear-gradient(180deg, rgba(15,23,42,.98), rgba(17,24,39,.96));
+  border:1px solid #283447;
+  border-radius:20px;
+  padding:14px;
+  box-shadow:0 14px 34px rgba(0,0,0,.22);
+}
+.record-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+.record-head strong{
+  display:block;
+  color:#f8fafc;
+  font-size:16px;
+  line-height:1.2;
+  word-break:break-word;
+}
+.record-kicker{
+  display:block;
+  color:#5db7ee;
+  font-size:11px;
+  font-weight:1000;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-bottom:4px;
+}
+.record-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.record-grid div,
+.history-score div{
+  background:#0b1220;
+  border:1px solid #283447;
+  border-radius:14px;
+  padding:10px;
+  min-width:0;
+}
+.record-grid span,
+.history-score span,
+.twilio-help-card span{
+  display:block;
+  color:#94a3b8;
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  margin-bottom:5px;
+}
+.record-grid strong,
+.history-score strong,
+.twilio-help-card strong{
+  display:block;
+  color:#f8fafc;
+  font-size:15px;
+  line-height:1.35;
+  word-break:break-word;
+}
+.record-full{
+  grid-column:1 / -1;
+}
+.record-actions,
+.record-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.record-footer{
+  color:#94a3b8;
+  font-size:12px;
+}
+.history-score{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.history-card{
+  cursor:pointer;
+}
+.history-card:active{
+  transform:translateY(1px);
+}
+.code-btn{
+  border:1px solid rgba(93,183,238,.45);
+  background:rgba(93,183,238,.16);
+  color:#dbeafe;
+  border-radius:999px;
+  padding:7px 10px;
+  font-weight:1000;
+  cursor:pointer;
+  line-height:1;
+}
+.code-btn.code-missing{
+  border-color:rgba(148,163,184,.30);
+  background:rgba(148,163,184,.10);
+  color:#cbd5e1;
+}
+.code-btn:hover{
+  border-color:#5db7ee;
+  background:rgba(93,183,238,.24);
+}
+.twilio-help-card{
+  display:grid;
+  gap:10px;
+}
+.twilio-help-card div{
+  background:#0b1220;
+  border:1px solid #283447;
+  border-radius:14px;
+  padding:12px;
+}
+.detail-list{
+  display:grid;
+  gap:10px;
+  max-height:55vh;
+  overflow:auto;
+  padding-right:2px;
+}
+.detail-sms-card{
+  background:#0b1220;
+  border:1px solid #283447;
+  border-radius:16px;
+  padding:12px;
+}
+.empty-card{
+  background:#0f172a;
+  border:1px solid #283447;
+  border-radius:16px;
+  padding:14px;
+  color:#94a3b8;
+  text-align:center;
+}
+.pill.warn{
+  background:rgba(245,158,11,.18);
+  color:#fde68a;
+}
+
+@media(max-width:720px){
+  .mobile-record-list{display:grid}
+  .desktop-table{display:none}
+  .section-title{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .history-score{
+    grid-template-columns:1fr 1fr;
+  }
+  .record-grid{
+    grid-template-columns:1fr;
+  }
+  .record-actions .mini{
+    flex:1 1 auto;
+    min-height:42px;
+  }
+  .adn-result-card{
+    max-height:88vh;
+    overflow:auto;
+  }
+}
+
+@media(min-width:721px){
+  .desktop-table{display:block}
+}

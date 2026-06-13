@@ -346,6 +346,143 @@ function showModal(title, text, details = "") {
 $("adnResultClose")?.addEventListener("click", () => $("adnResultModal")?.classList.add("hidden"));
 
 // ======================================================
+// CODES ERREUR TWILIO — aide lisible ADN66
+// ======================================================
+
+const TWILIO_ERROR_HELP = {
+  "21211": {
+    title: "Numéro destinataire invalide",
+    meaning: "Le numéro envoyé à Twilio n’est pas un numéro valide.",
+    action: "Vérifiez le format du numéro. Pour la France, gardez un mobile en +336 ou +337."
+  },
+  "21408": {
+    title: "Permission d’envoi absente",
+    meaning: "Le compte Twilio n’est pas autorisé à envoyer vers ce pays ou ce type de destination.",
+    action: "Vérifiez les permissions géographiques dans Twilio."
+  },
+  "21610": {
+    title: "Client désinscrit / STOP",
+    meaning: "Le destinataire a répondu STOP ou est désinscrit des SMS Twilio.",
+    action: "Ne le recontactez pas par SMS marketing. Désactivez ce client dans la liste."
+  },
+  "30001": {
+    title: "File d’attente dépassée",
+    meaning: "Trop de SMS ont été mis en attente côté Twilio.",
+    action: "Ralentissez l’envoi. Le rythme 1 SMS/seconde est recommandé."
+  },
+  "30002": {
+    title: "Compte suspendu ou bloqué",
+    meaning: "Twilio indique un problème de compte ou de facturation.",
+    action: "Vérifiez le solde, la facturation et l’état du compte Twilio."
+  },
+  "30003": {
+    title: "Téléphone injoignable",
+    meaning: "L’opérateur n’a pas pu joindre le téléphone du client.",
+    action: "Le numéro peut être éteint, hors réseau ou temporairement indisponible. Vous pouvez retenter plus tard."
+  },
+  "30004": {
+    title: "Message bloqué",
+    meaning: "L’opérateur ou un filtre a bloqué le SMS.",
+    action: "Évitez les textes trop commerciaux, les liens raccourcis, les emojis et gardez STOP SMS."
+  },
+  "30005": {
+    title: "Numéro inconnu / inexistant",
+    meaning: "L’opérateur indique que le numéro n’existe pas ou n’est plus attribué.",
+    action: "Désactivez ce client dans la base."
+  },
+  "30006": {
+    title: "Numéro fixe ou incompatible SMS",
+    meaning: "Le numéro ne peut pas recevoir de SMS, souvent un fixe ou une ligne incompatible.",
+    action: "Désactivez ce numéro ou corrigez-le si le client a donné un mobile."
+  },
+  "30007": {
+    title: "Filtrage opérateur / contenu refusé",
+    meaning: "Le SMS a probablement été filtré par l’opérateur comme contenu commercial ou non conforme.",
+    action: "Simplifiez le message, évitez les mots trop promotionnels, gardez -18 interdit et STOP SMS."
+  },
+  "30008": {
+    title: "Erreur opérateur inconnue",
+    meaning: "Twilio ou l’opérateur n’a pas donné de raison précise.",
+    action: "Vous pouvez retenter plus tard. Si cela revient souvent, désactivez le numéro."
+  }
+};
+
+function normalizeTwilioCode(value) {
+  const found = String(value || "").match(/\b\d{5}\b/);
+  return found ? found[0] : "";
+}
+
+function getTwilioErrorCode(item) {
+  return normalizeTwilioCode(
+    item?.error_code ||
+    item?.twilio_code ||
+    item?.code ||
+    item?.errorCode ||
+    item?.error_message ||
+    item?.twilioMessage ||
+    ""
+  );
+}
+
+function twilioCodeButton(rawCode, context = {}) {
+  const code = normalizeTwilioCode(rawCode);
+  if (!code) {
+    return `<button class="code-btn code-missing" data-error-code="" data-error-status="${escapeHtml(context.status || "")}" data-error-message="${escapeHtml(context.message || "")}" type="button">Non transmis</button>`;
+  }
+  return `<button class="code-btn" data-error-code="${escapeHtml(code)}" data-error-status="${escapeHtml(context.status || "")}" data-error-message="${escapeHtml(context.message || "")}" type="button">${escapeHtml(code)}</button>`;
+}
+
+function explainTwilioCode(code, status = "", rawMessage = "") {
+  const cleanCode = normalizeTwilioCode(code);
+  const help = TWILIO_ERROR_HELP[cleanCode];
+
+  if (!cleanCode) {
+    showModal(
+      "Code Twilio non transmis",
+      "Le statut indique une erreur, mais aucun code Twilio exact n’est encore enregistré dans D1.",
+      `
+        <div class="msg-preview">
+          Statut connu : <strong>${escapeHtml(status || "inconnu")}</strong><br>
+          Erreur reçue : <strong>${escapeHtml(rawMessage || "aucune erreur détaillée")}</strong>
+        </div>
+        <p class="hint">Pour obtenir le code exact, le Worker doit enregistrer le champ <strong>error_code</strong> renvoyé par Twilio ou par le callback de statut.</p>
+      `
+    );
+    return;
+  }
+
+  showModal(
+    `Code Twilio ${cleanCode}`,
+    help ? help.title : "Code Twilio non référencé dans l’aide locale.",
+    `
+      <div class="twilio-help-card">
+        <div><span>Signification</span><strong>${escapeHtml(help?.meaning || "Twilio a retourné ce code, mais l’aide locale ne connaît pas encore son détail.")}</strong></div>
+        <div><span>Action conseillée</span><strong>${escapeHtml(help?.action || "Ouvrez le détail Twilio ou ajoutez ce code dans l’aide locale du module.")}</strong></div>
+        <div><span>Statut SMS</span><strong>${escapeHtml(status || "—")}</strong></div>
+        <div><span>Erreur exacte</span><strong>${escapeHtml(rawMessage || "—")}</strong></div>
+      </div>
+    `
+  );
+}
+
+function campaignStatusLabel(status) {
+  const s = String(status || "").toLowerCase();
+  if (s === "sent") return "Terminé";
+  if (s === "partial") return "Partiel";
+  if (s === "sending") return "En cours";
+  if (s === "failed") return "Échec";
+  return status || "—";
+}
+
+function statusClass(status) {
+  const s = String(status || "").toLowerCase();
+  if (["delivered", "sent", "accepted", "queued"].includes(s)) return "ok";
+  if (["failed", "undelivered"].includes(s)) return "bad";
+  if (["partial"].includes(s)) return "warn";
+  return "neutral";
+}
+
+// ======================================================
 // DASHBOARD
 // ======================================================
 
@@ -826,6 +963,26 @@ function statusPill(active) {
 }
 
 document.addEventListener("click", async (event) => {
+  const codeButton = event.target.closest("[data-error-code]");
+  if (codeButton) {
+    event.preventDefault();
+    event.stopPropagation();
+    explainTwilioCode(
+      codeButton.dataset.errorCode || "",
+      codeButton.dataset.errorStatus || "",
+      codeButton.dataset.errorMessage || ""
+    );
+    return;
+  }
+
+  const openButton = event.target.closest("[data-campaign-open]");
+  if (openButton) {
+    event.preventDefault();
+    event.stopPropagation();
+    await openCampaignDetails(openButton.dataset.campaignOpen);
+    return;
+  }
+
   const row = event.target.closest("[data-campaign-id]");
   if (row && !event.target.closest("button")) {
     await openCampaignDetails(row.dataset.campaignId);
@@ -853,30 +1010,60 @@ document.addEventListener("click", async (event) => {
 async function loadProblems() {
   const data = await api("/problems/list");
   const tbody = $("problemsTable");
-  if (!tbody) return;
-  tbody.innerHTML = "";
+  const cards = $("problemsCards");
+  if (tbody) tbody.innerHTML = "";
+  if (cards) cards.innerHTML = "";
 
   const problems = data.problems || [];
   if (problems.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8">Aucun SMS en erreur pour le moment.</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="8">Aucun SMS en erreur pour le moment.</td></tr>`;
+    if (cards) cards.innerHTML = `<div class="empty-card">Aucun SMS en erreur pour le moment.</div>`;
     return;
   }
 
   problems.forEach((problem) => {
     const client = { phone: problem.phone, is_active: problem.is_active ?? 1 };
-    const tr = document.createElement("tr");
-    tr.classList.add("problem-row");
-    tr.innerHTML = `
-      <td>${escapeHtml(problem.campaign_id || "")}</td>
-      <td>${escapeHtml(problem.campaign_title || "")}</td>
-      <td>${escapeHtml(problem.phone || "")}</td>
-      <td>${escapeHtml(problem.status || "")}</td>
-      <td>${escapeHtml(problem.error_code || "")}</td>
-      <td>${escapeHtml(problem.error_message || "")}</td>
-      <td>${escapeHtml(problem.created_at || "")}</td>
-      <td>${clientActions(client)}</td>
-    `;
-    tbody.appendChild(tr);
+    const code = getTwilioErrorCode(problem);
+    const errorMessage = problem.error_message || problem.twilio_message || "";
+    const status = problem.status || "erreur";
+
+    if (tbody) {
+      const tr = document.createElement("tr");
+      tr.classList.add("problem-row");
+      tr.innerHTML = `
+        <td>${escapeHtml(problem.campaign_id || "")}</td>
+        <td>${escapeHtml(problem.campaign_title || "")}</td>
+        <td>${escapeHtml(problem.phone || "")}</td>
+        <td><span class="pill ${statusClass(status)}">${escapeHtml(status)}</span></td>
+        <td>${twilioCodeButton(code, { status, message: errorMessage })}</td>
+        <td>${escapeHtml(errorMessage || "—")}</td>
+        <td>${escapeHtml(problem.created_at || "")}</td>
+        <td>${clientActions(client)}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    if (cards) {
+      const card = document.createElement("article");
+      card.className = "mobile-record problem-card";
+      card.innerHTML = `
+        <div class="record-head">
+          <div>
+            <span class="record-kicker">Campagne #${escapeHtml(problem.campaign_id || "—")}</span>
+            <strong>${escapeHtml(problem.campaign_title || "Campagne inconnue")}</strong>
+          </div>
+          <span class="pill ${statusClass(status)}">${escapeHtml(status)}</span>
+        </div>
+        <div class="record-grid">
+          <div><span>Numéro</span><strong>${escapeHtml(problem.phone || "—")}</strong></div>
+          <div><span>Code Twilio</span><strong>${twilioCodeButton(code, { status, message: errorMessage })}</strong></div>
+          <div class="record-full"><span>Erreur exacte</span><strong>${escapeHtml(errorMessage || "Aucune erreur exacte enregistrée")}</strong></div>
+          <div class="record-full"><span>Date</span><strong>${escapeHtml(problem.created_at || "—")}</strong></div>
+        </div>
+        <div class="record-actions">${clientActions(client)}</div>
+      `;
+      cards.appendChild(card);
+    }
   });
 }
 
@@ -887,28 +1074,65 @@ async function loadProblems() {
 async function loadHistory() {
   const data = await api("/campaigns/history");
   const tbody = $("historyTable");
-  if (!tbody) return;
-  tbody.innerHTML = "";
+  const cards = $("historyCards");
+  if (tbody) tbody.innerHTML = "";
+  if (cards) cards.innerHTML = "";
 
-  (data.campaigns || []).forEach((campaign) => {
+  const campaigns = data.campaigns || [];
+  if (campaigns.length === 0) {
+    if (tbody) tbody.innerHTML = `<tr><td colspan="8">Aucune campagne enregistrée.</td></tr>`;
+    if (cards) cards.innerHTML = `<div class="empty-card">Aucune campagne enregistrée.</div>`;
+    return;
+  }
+
+  campaigns.forEach((campaign) => {
     const sent = campaign.real_sent_count ?? campaign.sent_count ?? 0;
     const failed = campaign.real_failed_count ?? campaign.failed_count ?? 0;
     const requested = campaign.requested_clients || campaign.total_clients || 0;
     const realSegments = campaign.real_segments || campaign.total_segments || 0;
+    const status = campaignStatusLabel(campaign.status || "");
 
-    const tr = document.createElement("tr");
-    tr.dataset.campaignId = campaign.id;
-    tr.innerHTML = `
-      <td>${campaign.id}</td>
-      <td>${escapeHtml(campaign.title || "")}</td>
-      <td>${requested}</td>
-      <td>${sent}</td>
-      <td>${failed}</td>
-      <td>${realSegments}</td>
-      <td>${escapeHtml(campaign.status || "")}</td>
-      <td>${escapeHtml(campaign.created_at || "")}</td>
-    `;
-    tbody.appendChild(tr);
+    if (tbody) {
+      const tr = document.createElement("tr");
+      tr.dataset.campaignId = campaign.id;
+      tr.innerHTML = `
+        <td>${campaign.id}</td>
+        <td>${escapeHtml(campaign.title || "")}</td>
+        <td>${requested}</td>
+        <td>${sent}</td>
+        <td>${failed}</td>
+        <td>${realSegments}</td>
+        <td><span class="pill ${statusClass(campaign.status)}">${escapeHtml(status)}</span></td>
+        <td>${escapeHtml(campaign.created_at || "")}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    if (cards) {
+      const card = document.createElement("article");
+      card.className = "mobile-record history-card";
+      card.dataset.campaignId = campaign.id;
+      card.innerHTML = `
+        <div class="record-head">
+          <div>
+            <span class="record-kicker">Campagne #${escapeHtml(campaign.id || "—")}</span>
+            <strong>${escapeHtml(campaign.title || "Campagne SMS")}</strong>
+          </div>
+          <span class="pill ${statusClass(campaign.status)}">${escapeHtml(status)}</span>
+        </div>
+        <div class="history-score">
+          <div><span>Demandé</span><strong>${requested}</strong></div>
+          <div><span>Envoyés</span><strong>${sent}</strong></div>
+          <div><span>Échecs</span><strong>${failed}</strong></div>
+          <div><span>Segments</span><strong>${realSegments}</strong></div>
+        </div>
+        <div class="record-footer">
+          <span>${escapeHtml(campaign.created_at || "")}</span>
+          <button class="mini" type="button" data-campaign-open="${escapeHtml(campaign.id || "")}">Voir détail</button>
+        </div>
+      `;
+      cards.appendChild(card);
+    }
   });
 }
 
@@ -923,20 +1147,31 @@ async function openCampaignDetails(id) {
   const failed = campaign.failed_count || messages.filter(m => ["failed","undelivered"].includes(String(m.status || "").toLowerCase())).length;
   const realSegments = campaign.real_segments || messages.reduce((sum, m) => sum + Number(m.segments || 0), 0);
 
-  const rows = messages.map((m) => `
-    <tr>
-      <td>${escapeHtml(m.client_name || m.name || "—")}</td>
-      <td>${escapeHtml(m.phone || "")}</td>
-      <td>${escapeHtml(m.status || "")}</td>
-      <td>${Number(m.segments || 0)}</td>
-      <td>${escapeHtml(m.error_code || "")}</td>
-      <td>${escapeHtml(m.error_message || "")}</td>
-    </tr>
-  `).join("");
+  const messageCards = messages.map((m) => {
+    const code = getTwilioErrorCode(m);
+    const status = m.status || "";
+    const errorMessage = m.error_message || "";
+    return `
+      <article class="detail-sms-card">
+        <div class="record-head">
+          <div>
+            <span class="record-kicker">${escapeHtml(m.client_name || m.name || "Client")}</span>
+            <strong>${escapeHtml(m.phone || "")}</strong>
+          </div>
+          <span class="pill ${statusClass(status)}">${escapeHtml(status || "—")}</span>
+        </div>
+        <div class="record-grid">
+          <div><span>Segments</span><strong>${Number(m.segments || 0)}</strong></div>
+          <div><span>Code</span><strong>${twilioCodeButton(code, { status, message: errorMessage })}</strong></div>
+          <div class="record-full"><span>Erreur</span><strong>${escapeHtml(errorMessage || "—")}</strong></div>
+        </div>
+      </article>
+    `;
+  }).join("");
 
   showModal(
     `Campagne n° ${campaign.id || id}`,
-    `${campaign.title || "Campagne"} — historique relié aux statuts Twilio enregistrés`,
+    `${campaign.title || "Campagne"} — détail réel des SMS`,
     `
       <div class="msg-preview">${escapeHtml(campaign.message || "")}</div>
       <div class="campaign-real-summary">
@@ -947,12 +1182,9 @@ async function openCampaignDetails(id) {
         <div><span>En attente</span><strong>${queued}</strong></div>
         <div><span>Échecs</span><strong>${failed}</strong></div>
         <div><span>Segments réels</span><strong>${realSegments}</strong></div>
-        <div><span>Statut final</span><strong>${escapeHtml(campaign.status || "")}</strong></div>
+        <div><span>Statut final</span><strong>${escapeHtml(campaignStatusLabel(campaign.status || ""))}</strong></div>
       </div>
-      <table>
-        <thead><tr><th>Nom</th><th>Numéro</th><th>Statut Twilio</th><th>Segments</th><th>Code</th><th>Erreur exacte</th></tr></thead>
-        <tbody>${rows || '<tr><td colspan="6">Aucun détail</td></tr>'}</tbody>
-      </table>
+      <div class="detail-list">${messageCards || '<div class="empty-card">Aucun détail</div>'}</div>
     `
   );
 }
