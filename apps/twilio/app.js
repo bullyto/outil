@@ -8,7 +8,8 @@ const state = {
   clientsPageSize: 300,
   clientsTotal: 0,
   clientsSearch: "",
-  sendingCampaign: false
+  sendingCampaign: false,
+  wakeLock: null
 };
 
 window.addEventListener("beforeunload", (event) => {
@@ -61,6 +62,31 @@ function toast(message) {
 function apiBase() {
   return state.workerUrl.replace(/\/+$/, "");
 }
+
+async function requestWakeLock() {
+  try {
+    if (!("wakeLock" in navigator)) return;
+    state.wakeLock = await navigator.wakeLock.request("screen");
+  } catch (error) {
+    state.wakeLock = null;
+  }
+}
+
+async function releaseWakeLock() {
+  try {
+    if (state.wakeLock) await state.wakeLock.release();
+  } catch (error) {
+    // Rien à faire : certains navigateurs relâchent automatiquement le verrou.
+  } finally {
+    state.wakeLock = null;
+  }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && state.sendingCampaign && !state.wakeLock) {
+    requestWakeLock();
+  }
+});
 
 function getAdminToken() {
   const token =
@@ -310,7 +336,6 @@ function humanCampaignResult(data) {
       Limite sécurité : <strong>${data.safetyLimit || 50}</strong>${data.cappedBySafety ? " — demande limitée" : ""}<br>
       Clients éligibles : <strong>${data.eligible || 0}</strong><br>
       Numéros valides envoyés : <strong>${data.validNumbers || data.total || 0}</strong><br>
-      Rythme : <strong>1 SMS toutes les 2 secondes</strong><br>
       Encodage : ${escapeHtml(data.encoding || "")}<br>
       Segments par SMS : ${data.segmentsPerSms || 0}<br>
       Segments réels : <strong>${data.realSegments || data.totalSegments || 0}</strong>
@@ -492,11 +517,31 @@ async function refreshDashboard() {
     setText("activeClients", dashboard?.clients?.active ?? "--");
     setText("problemCount", dashboard?.messages?.failed ?? "--");
     setText("sentTotal", dashboard?.messages?.sent ?? "--");
+
+    const loyaltyFromStats =
+      dashboard?.clients?.loyalty_card ??
+      dashboard?.clients?.with_loyalty_card ??
+      dashboard?.clients?.active_loyalty ??
+      dashboard?.clients?.loyaltyActive;
+
+    if (loyaltyFromStats !== undefined && loyaltyFromStats !== null) {
+      setText("loyaltyActiveClients", loyaltyFromStats);
+    } else {
+      refreshLoyaltyActiveCount().catch(() => setText("loyaltyActiveClients", "--"));
+    }
+
     const balance = dashboard?.balance;
     setText("balanceValue", balance?.success ? fmtEuro(balance.balance) : "--");
     setText("balanceSub", balance?.success ? "Compte Twilio" : (balance?.error || "Erreur solde"));
   } catch (error) {
     toast("Impossible d’actualiser");
+  }
+}
+
+async function refreshLoyaltyActiveCount() {
+  const data = await api("/clients/list?filter=loyalty_card&limit=1&offset=0");
+  if (data?.success) {
+    setText("loyaltyActiveClients", Number(data.total ?? data.clients?.length ?? 0));
   }
 }
 
@@ -579,7 +624,6 @@ async function sendCampaign() {
   const confirmText =
     `Confirmer l’envoi réel ?\n\n` +
     `Maximum sécurité : 50 SMS\n` +
-    `Rythme : 1 SMS toutes les 2 secondes\n` +
     `Cible estimée : ${estimatedCount || body.limit} client(s)\n\n` +
     `Ne fermez pas la page pendant l’envoi.`;
 
@@ -590,6 +634,7 @@ async function sendCampaign() {
   const oldText = btn ? btn.textContent : "";
 
   state.sendingCampaign = true;
+  await requestWakeLock();
   if (btn) {
     btn.disabled = true;
     btn.classList.add("is-loading");
@@ -605,16 +650,18 @@ async function sendCampaign() {
   function renderSendingProgress() {
     if (!progress) return;
     const elapsed = Math.floor((Date.now() - startedAtMs) / 1000);
-    const estimatedDone = Math.min(estimatedTotal, Math.max(0, Math.floor(elapsed / 2)));
-    const remaining = Math.max(0, (estimatedTotal - estimatedDone) * 2);
+    const totalDuration = 250;
+    const percent = Math.min(100, Math.round((Math.min(elapsed, totalDuration) / totalDuration) * 100));
+    const waitingText = elapsed >= totalDuration
+      ? `<div class="send-lock-sub send-wait-more">Merci de patienter encore un peu.</div>`
+      : "";
+
     progress.classList.remove("hidden");
     progress.innerHTML = `
       <div class="send-lock-box">
         <strong>Envoi en cours — NE PAS QUITTER LA PAGE</strong>
-        <div class="send-lock-text">Le Worker envoie environ <strong>1 SMS toutes les 2 secondes</strong>. Gardez cet écran ouvert jusqu'au message de fin.</div>
-        <div class="send-progress-line">Traitement estimé : <strong>${estimatedDone} / ${estimatedTotal}</strong></div>
-        <div class="send-progress-bar"><span style="width:${Math.round((estimatedDone / estimatedTotal) * 100)}%"></span></div>
-        <div class="send-lock-sub">Temps écoulé : ${elapsed}s — restant estimé : ${remaining}s</div>
+        <div class="send-progress-bar"><span style="width:${percent}%"></span></div>
+        ${waitingText}
       </div>
     `;
   }
@@ -653,6 +700,7 @@ async function sendCampaign() {
     if (progress) progress.innerHTML = `<strong>Erreur :</strong> ${escapeHtml(msg)}`;
   } finally {
     if (progressTimer) clearInterval(progressTimer);
+    await releaseWakeLock();
     state.sendingCampaign = false;
     if (btn) {
       btn.disabled = false;
@@ -1017,13 +1065,14 @@ async function loadProblems() {
 
   const problems = data.problems || [];
   if (problems.length === 0) {
-    if (tbody) tbody.innerHTML = `<tr><td colspan="8">Aucun SMS en erreur pour le moment.</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="9">Aucun SMS en erreur pour le moment.</td></tr>`;
     if (cards) cards.innerHTML = `<div class="empty-card">Aucun SMS en erreur pour le moment.</div>`;
     return;
   }
 
   problems.forEach((problem) => {
-    const client = { phone: problem.phone, is_active: problem.is_active ?? 1 };
+    const clientName = problem.client_name || problem.name || problem.client || "";
+    const client = { phone: problem.phone, name: clientName, is_active: problem.is_active ?? 1 };
     const code = getTwilioErrorCode(problem);
     const errorMessage = problem.error_message || problem.twilio_message || "";
     const status = problem.status || "erreur";
@@ -1034,6 +1083,7 @@ async function loadProblems() {
       tr.innerHTML = `
         <td>${escapeHtml(problem.campaign_id || "")}</td>
         <td>${escapeHtml(problem.campaign_title || "")}</td>
+        <td>${escapeHtml(clientName || "—")}</td>
         <td>${escapeHtml(problem.phone || "")}</td>
         <td><span class="pill ${statusClass(status)}">${escapeHtml(status)}</span></td>
         <td>${twilioCodeButton(code, { status, message: errorMessage })}</td>
@@ -1056,6 +1106,7 @@ async function loadProblems() {
           <span class="pill ${statusClass(status)}">${escapeHtml(status)}</span>
         </div>
         <div class="record-grid">
+          <div><span>Client</span><strong>${escapeHtml(clientName || "—")}</strong></div>
           <div><span>Numéro</span><strong>${escapeHtml(problem.phone || "—")}</strong></div>
           <div><span>Code Twilio</span><strong>${twilioCodeButton(code, { status, message: errorMessage })}</strong></div>
           <div class="record-full"><span>Erreur exacte</span><strong>${escapeHtml(errorMessage || "Aucune erreur exacte enregistrée")}</strong></div>
@@ -1156,8 +1207,8 @@ async function openCampaignDetails(id) {
       <article class="detail-sms-card">
         <div class="record-head">
           <div>
-            <span class="record-kicker">${escapeHtml(m.client_name || m.name || "Client")}</span>
-            <strong>${escapeHtml(m.phone || "")}</strong>
+            <span class="record-kicker">Client</span>
+            <strong>${escapeHtml((m.client_name || m.name || "Client") + " — " + (m.phone || ""))}</strong>
           </div>
           <span class="pill ${statusClass(status)}">${escapeHtml(status || "—")}</span>
         </div>
@@ -1343,6 +1394,15 @@ $("nextClientsPageBtn")?.addEventListener("click", () => {
     loadClients();
   }
 });
+document.querySelectorAll("[data-history-tab]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const tab = button.dataset.historyTab;
+    document.querySelectorAll("[data-history-tab]").forEach((b) => b.classList.toggle("active", b === button));
+    $("historyCampaignsPane")?.classList.toggle("active", tab === "campaigns");
+    $("historySentPane")?.classList.toggle("active", tab === "sent");
+  });
+});
+
 $("loadProblemsBtn")?.addEventListener("click", loadProblems);
 $("loadHistoryBtn")?.addEventListener("click", loadHistory);
 $("loadSentTrackingBtn")?.addEventListener("click", loadSentTracking);

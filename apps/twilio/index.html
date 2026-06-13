@@ -352,6 +352,7 @@
         <div class="grid cards-grid">
           <article class="card stat-card"><span>Solde Twilio</span><strong id="balanceValue">--</strong><small id="balanceSub">Non chargé</small></article>
           <article class="card stat-card"><span>Clients actifs</span><strong id="activeClients">--</strong><small>D1</small></article>
+          <article class="card stat-card"><span>Actifs avec carte</span><strong id="loyaltyActiveClients">--</strong><small>Carte fidélité</small></article>
           <article class="card stat-card"><span>Problèmes</span><strong id="problemCount">--</strong><small>SMS échoués / numéros invalides</small></article>
           <article class="card stat-card"><span>Envoyés total</span><strong id="sentTotal">--</strong><small>Historique</small></article>
         </div>
@@ -380,7 +381,7 @@
             <div>
               <label>Nombre de SMS à envoyer maintenant</label>
               <input id="sendLimit" type="number" min="1" max="50" value="50" />
-              <p class="hint mini-hint">Sécurité : 50 SMS maximum par campagne. Envoi estimé à 1 SMS toutes les 2 secondes.</p>
+              <p class="hint mini-hint">Sécurité : 50 SMS maximum par campagne.</p>
             </div>
             <div>
               <label>Type de cible</label>
@@ -510,36 +511,45 @@
           </div>
           <p class="hint">Ici vous voyez tous les SMS non envoyés ou non livrés : campagne, numéro, statut Twilio, code exact et erreur exacte.</p>
           <div id="problemsCards" class="mobile-record-list"></div>
-          <div class="table-wrap desktop-table"><table><thead><tr><th>ID campagne</th><th>Campagne</th><th>Numéro</th><th>Statut</th><th>Code Twilio</th><th>Erreur exacte</th><th>Date</th><th>Action</th></tr></thead><tbody id="problemsTable"></tbody></table></div>
+          <div class="table-wrap desktop-table"><table><thead><tr><th>ID campagne</th><th>Campagne</th><th>Client</th><th>Numéro</th><th>Statut</th><th>Code Twilio</th><th>Erreur exacte</th><th>Date</th><th>Action</th></tr></thead><tbody id="problemsTable"></tbody></table></div>
         </div>
       </section>
 
       <section id="history" class="screen">
-        <div class="card">
-          <div class="section-title">
-            <h2>Historique campagnes</h2>
-            <button class="secondary" id="loadHistoryBtn">Actualiser</button>
-          </div>
-          <div id="historyCards" class="mobile-record-list"></div>
-          <div class="table-wrap desktop-table"><table><thead><tr><th>ID</th><th>Titre</th><th>Demandé</th><th>Envoyés réels</th><th>Échecs</th><th>Segments réels</th><th>Statut</th><th>Date</th></tr></thead><tbody id="historyTable"></tbody></table></div>
-          <p class="hint">Clique sur une campagne pour voir le message et la liste des clients envoyés.</p>
+        <div class="history-subtabs" role="tablist" aria-label="Historique SMS">
+          <button class="history-subtab active" type="button" data-history-tab="campaigns">Campagnes</button>
+          <button class="history-subtab" type="button" data-history-tab="sent">Déjà reçus</button>
         </div>
 
-        <div class="card">
-          <div class="section-title">
-            <h2>Déjà reçus</h2>
-            <button class="secondary" id="loadSentTrackingBtn">Actualiser</button>
+        <div id="historyCampaignsPane" class="history-pane active">
+          <div class="card">
+            <div class="section-title">
+              <h2>Historique campagnes</h2>
+              <button class="secondary" id="loadHistoryBtn">Actualiser</button>
+            </div>
+            <div id="historyCards" class="mobile-record-list"></div>
+            <div class="table-wrap desktop-table"><table><thead><tr><th>ID</th><th>Titre</th><th>Demandé</th><th>Envoyés réels</th><th>Échecs</th><th>Segments réels</th><th>Statut</th><th>Date</th></tr></thead><tbody id="historyTable"></tbody></table></div>
+            <p class="hint">Clique sur une campagne pour voir le message et la liste des clients envoyés.</p>
           </div>
-          <p class="hint">Liste des contacts qui ont déjà reçu au moins un SMS depuis le dernier reset.</p>
-          <div class="grid cards-grid sent-summary">
-            <article class="card stat-card mini-stat"><span>Déjà reçus</span><strong id="sentTrackedCount">--</strong><small>Contacts</small></article>
-            <article class="card stat-card mini-stat"><span>Restants</span><strong id="remainingUnsentCount">--</strong><small>Clients actifs</small></article>
+        </div>
+
+        <div id="historySentPane" class="history-pane">
+          <div class="card">
+            <div class="section-title">
+              <h2>Déjà reçus</h2>
+              <button class="secondary" id="loadSentTrackingBtn">Actualiser</button>
+            </div>
+            <p class="hint">Liste des contacts qui ont déjà reçu au moins un SMS depuis le dernier reset.</p>
+            <div class="grid cards-grid sent-summary">
+              <article class="card stat-card mini-stat"><span>Déjà reçus</span><strong id="sentTrackedCount">--</strong><small>Contacts</small></article>
+              <article class="card stat-card mini-stat"><span>Restants</span><strong id="remainingUnsentCount">--</strong><small>Clients actifs</small></article>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>Nom</th><th>Numéro</th><th>SMS reçus</th><th>Dernier SMS</th></tr></thead><tbody id="sentTrackingTable"></tbody></table></div>
+            <div class="quick-actions">
+              <button class="secondary danger" id="resetSentTrackingBtn">Remettre la liste à 0</button>
+            </div>
+            <div id="resetTrackingResult" class="nice-result hidden"></div>
           </div>
-          <div class="table-wrap"><table><thead><tr><th>Nom</th><th>Numéro</th><th>SMS reçus</th><th>Dernier SMS</th></tr></thead><tbody id="sentTrackingTable"></tbody></table></div>
-          <div class="quick-actions">
-            <button class="secondary danger" id="resetSentTrackingBtn">Remettre la liste à 0</button>
-          </div>
-          <div id="resetTrackingResult" class="nice-result hidden"></div>
         </div>
       </section>
 
@@ -591,7 +601,7 @@
     })();
   </script>
 
-  <script src="app.js?v=15"></script>
+  <script src="app.js?v=16"></script>
 <script src="./admin-gate.js"></script>
 </body>
 </html>
