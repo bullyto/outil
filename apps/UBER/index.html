@@ -27,6 +27,7 @@
     .day-title{font-size:18px;margin:20px 0 10px;font-weight:950;color:#fff}.record{display:grid;grid-template-columns:1fr;gap:12px;border:1px solid var(--line);background:rgba(15,23,42,.72);border-radius:18px;padding:14px;margin-bottom:10px}.record strong{font-size:17px}.record small{display:block;color:var(--soft);margin-top:4px}.record-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.mini{min-height:44px;padding:10px 8px;border-radius:13px;font-size:13px}
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow:auto}.modal-card{width:min(940px,100%);background:#0b1220;border:1px solid var(--line);border-radius:24px;padding:12px;box-shadow:0 30px 90px rgba(0,0,0,.5)}
     .public-frame{width:100%;height:70vh;border:1px solid var(--line);border-radius:18px;background:#050812}.modal-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111827;border:1px solid var(--line);padding:12px 14px;border-radius:14px;color:#fff;z-index:100;box-shadow:0 18px 45px rgba(0,0,0,.45)}
+    .gps-popup{position:fixed;inset:0;background:rgba(0,0,0,.76);z-index:120;display:flex;align-items:center;justify-content:center;padding:14px}.gps-card{width:min(430px,100%);background:linear-gradient(145deg,#101827,#0b1220);border:1px solid rgba(93,183,238,.35);border-radius:24px;padding:18px;box-shadow:0 30px 90px rgba(0,0,0,.55)}.gps-icon{width:54px;height:54px;border-radius:18px;background:rgba(93,183,238,.16);border:1px solid rgba(93,183,238,.38);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px}.gps-card h2{margin:0 0 8px;font-size:22px}.gps-card p{margin:0;color:var(--muted);line-height:1.45;font-weight:700}.gps-actions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:16px}.badge.bad{color:#fecaca;border-color:rgba(220,38,38,.55)}
     @media(max-width:720px){.app{padding-left:10px;padding-right:10px}.top{margin-left:-10px;margin-right:-10px}.row{grid-template-columns:1fr}.actions,.record-actions,.modal-actions{grid-template-columns:1fr}.btn{width:100%}.public-frame{height:66vh}.h1{font-size:20px}}
   </style>
 </head>
@@ -169,6 +170,19 @@
     <small>Le token reste enregistré uniquement sur cet appareil.</small>
   </aside>
 
+  <div id="gpsPopup" class="gps-popup hidden" role="dialog" aria-modal="true" aria-labelledby="gpsPopupTitle">
+    <div class="gps-card">
+      <div class="gps-icon">📍</div>
+      <h2 id="gpsPopupTitle">GPS obligatoire</h2>
+      <p>Pour lancer un enregistrement partenaire Uber, vous devez autoriser la localisation et activer le GPS du téléphone.</p>
+      <p style="margin-top:8px">Activez le GPS puis réessayez.</p>
+      <div class="gps-actions">
+        <button id="gpsRetryBtn" class="btn">Activer / Réessayer le GPS</button>
+        <button id="gpsCloseBtn" class="btn secondary">Fermer</button>
+      </div>
+    </div>
+  </div>
+
   <div id="modal" class="modal hidden"><div class="modal-card" id="modalContent"></div></div>
   <div id="toast" class="toast hidden"></div>
 
@@ -218,18 +232,75 @@ function switchTab(name){
   els.newPanel.classList.toggle('hidden', name!=='new'); els.historyPanel.classList.toggle('hidden', name!=='history');
 }
 
-function updateGpsBadge(){
-  if(lastGps){ els.gpsBadge.textContent = 'GPS OK ± '+Math.round(lastGps.accuracy||0)+' m'; els.gpsBadge.className='badge ok'; }
-  else { els.gpsBadge.textContent = 'GPS en attente'; els.gpsBadge.className='badge warn'; }
+function updateGpsBadge(state){
+  if(lastGps){
+    els.gpsBadge.textContent = 'GPS OK ± '+Math.round(lastGps.accuracy||0)+' m';
+    els.gpsBadge.className='badge ok';
+    return;
+  }
+  if(state === 'bad'){
+    els.gpsBadge.textContent = 'GPS requis';
+    els.gpsBadge.className='badge bad';
+    return;
+  }
+  els.gpsBadge.textContent = 'GPS requis';
+  els.gpsBadge.className='badge warn';
+}
+function setGpsFromPosition(pos){
+  lastGps={
+    lat:pos.coords.latitude,
+    lng:pos.coords.longitude,
+    accuracy:pos.coords.accuracy,
+    recordedAt:new Date(pos.timestamp).toISOString()
+  };
+  updateGpsBadge();
+}
+function requestGpsPosition(){
+  return new Promise((resolve, reject) => {
+    if(!navigator.geolocation) return reject(new Error('GPS indisponible sur cet appareil.'));
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy:true,
+      maximumAge:0,
+      timeout:15000
+    });
+  });
+}
+async function requireGpsBeforeRecording(){
+  try{
+    const pos = await requestGpsPosition();
+    setGpsFromPosition(pos);
+    closeGpsRequiredPopup();
+    return true;
+  } catch(e){
+    lastGps = null;
+    updateGpsBadge('bad');
+    showGpsRequiredPopup();
+    return false;
+  }
+}
+function showGpsRequiredPopup(){
+  els.gpsPopup.classList.remove('hidden');
+}
+function closeGpsRequiredPopup(){
+  els.gpsPopup.classList.add('hidden');
 }
 function initGps(){
-  if(!navigator.geolocation){ els.gpsBadge.textContent='GPS indisponible'; return; }
+  updateGpsBadge();
+  if(!navigator.geolocation){ updateGpsBadge('bad'); return; }
   navigator.geolocation.watchPosition(pos => {
-    lastGps={ lat:pos.coords.latitude, lng:pos.coords.longitude, accuracy:pos.coords.accuracy, recordedAt:new Date(pos.timestamp).toISOString() };
-    updateGpsBadge();
-  }, () => { els.gpsBadge.textContent='GPS refusé ou indisponible'; els.gpsBadge.className='badge warn'; }, { enableHighAccuracy:true, maximumAge:5000, timeout:15000 });
+    setGpsFromPosition(pos);
+  }, () => {
+    lastGps = null;
+    updateGpsBadge('bad');
+  }, { enableHighAccuracy:true, maximumAge:5000, timeout:15000 });
 }
 initGps();
+els.gpsCloseBtn.onclick = closeGpsRequiredPopup;
+els.gpsRetryBtn.onclick = async () => {
+  const ok = await requireGpsBeforeRecording();
+  if(ok) toast('GPS activé ✅ Vous pouvez lancer l’enregistrement.');
+  else toast('GPS toujours indisponible. Activez la localisation du téléphone.');
+};
 
 els.orderNumber.addEventListener('input', () => {
   const raw = els.orderNumber.value.trim();
@@ -247,6 +318,8 @@ els.startBtn.onclick = async () => {
   const order = cleanOrder(rawOrder);
   const noPreviewMode = !order;
   if(!adminToken) return toast('Ouvrez le menu puis Réglages admin');
+  const gpsOk = await requireGpsBeforeRecording();
+  if(!gpsOk) return;
   try{
     currentRecording = {
       orderNumber: order,
