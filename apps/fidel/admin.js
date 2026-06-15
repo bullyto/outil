@@ -236,7 +236,8 @@ function renderGoogleReviewDetails(it){
   return `
       <div class="hibair-detail-title">Avis Google</div>
       <div class="hibair-detail-row"><span>Statut</span><b>${escapeHtml(googleReviewStatusLabel(gr))}</b></div>
-      <div class="hibair-detail-row"><span>Éligible</span><b>${Number(it.points || 0) === 3 ? 'Oui · carte à 3 tampons' : 'Non'}</b></div>
+      <div class="hibair-detail-row"><span>Mode automatique</span><b>${Number(it.points || 0) === 3 ? 'Oui · carte à 3 tampons' : 'Non · réservé au 3/8'}</b></div>
+      <div class="hibair-detail-row"><span>Mode manuel admin</span><b>${Number(it.points || 0) < Number(it.goal || 8) && !(gr.stamp_given || gr.status === 'rewarded' || gr.status === 'manual_rewarded') ? 'Possible si avis déjà publié' : 'Bloqué / déjà donné'}</b></div>
       <div class="hibair-detail-row"><span>Tampon Google donné</span><b>${gr.stamp_given || gr.status === 'rewarded' || gr.status === 'manual_rewarded' ? 'Oui' : 'Non'}</b></div>
       <div class="hibair-detail-row"><span>Avis avant clic</span><b>${gr.review_count_before !== undefined && gr.review_count_before !== null ? Number(gr.review_count_before) : '—'}</b></div>
       <div class="hibair-detail-row"><span>Avis actuel</span><b>${gr.review_count_now !== undefined && gr.review_count_now !== null ? Number(gr.review_count_now) : '—'}</b></div>
@@ -253,6 +254,14 @@ async function postGoogleReviewRoute(path, payload){
   const body = JSON.stringify({admin_key:key, ...payload});
   return api(path, {method:'POST', headers:{'content-type':'text/plain;charset=utf-8','x-admin-key':key}, body});
 }
+function friendlyGoogleError(message){
+  const m = String(message || '');
+  if(m.includes('not_exactly_3_points')) return 'Le mode automatique est réservé aux cartes à 3/8. Utilisez le tampon manuel admin si le client avait déjà publié son avis avant.';
+  if(m.includes('google_review_already_rewarded')) return 'Le tampon Google a déjà été donné sur cette carte.';
+  if(m.includes('card_already_completed') || m.includes('already_completed')) return 'La carte est déjà complète, impossible d’ajouter un tampon Google.';
+  if(m.includes('client_not_found') || m.includes('not_found')) return 'Client introuvable.';
+  return m || 'Erreur inconnue.';
+}
 async function verifyGoogleReviewForClient(client){
   const cid = googleReviewClientId(client);
   if(!cid) return showError('Client introuvable pour la vérification Google.');
@@ -263,17 +272,17 @@ async function verifyGoogleReviewForClient(client){
     setMainStatus('Vérification Google terminée.');
     try{ await loadGoogleReviews(); }catch(_){}
     try{ await loadHistory(); }catch(_){}
-  }catch(e){ setApiState(false, 'Erreur Google'); showError('Erreur avis Google : ' + e.message); }
+  }catch(e){ setApiState(false, 'Erreur Google'); showError('Erreur avis Google : ' + friendlyGoogleError(e.message)); }
 }
 function confirmManualGoogleReward(client){
   const cid = googleReviewClientId(client);
   if(!cid) return showError('Client introuvable.');
   showSmart({
-    title:'Donner le tampon Google ?',
+    title:'Donner le tampon Google manuellement ?',
     sub:clientName(client),
-    body:`<p>Cette action ajoute le tampon Google manuellement et bloque normalement un deuxième tampon avis Google pour cette carte.</p><p><b>${escapeHtml(pointsLabel(client.points))}</b></p><p class="mono">${escapeHtml(cid)}</p>`,
+    body:`<p>Mode manuel admin : cette action ajoute +1 tampon Google même si la carte n’est pas exactement à 3/8.</p><p>À utiliser si le client avait déjà publié son avis Google avant la nouvelle règle.</p><p><b>${escapeHtml(pointsLabel(client.points))}</b></p><p class="mono">${escapeHtml(cid)}</p>`,
     actions:[
-      {label:'Confirmer tampon Google', onClick:()=>manualGoogleReward(client)},
+      {label:'Confirmer +1 tampon', onClick:()=>manualGoogleReward(client)},
       {label:'Annuler', secondary:true}
     ]
   });
@@ -289,7 +298,7 @@ async function manualGoogleReward(client){
     showPointResult(cid, {...client, points: points ?? client.points}, points ?? client.points, Number(points ?? client.points) >= 8, 'Tampon Google ajouté manuellement.');
     try{ await loadGoogleReviews(); }catch(_){}
     try{ await loadHistory(); }catch(_){}
-  }catch(e){ setApiState(false, 'Erreur Google'); showError('Erreur tampon Google : ' + e.message); }
+  }catch(e){ setApiState(false, 'Erreur Google'); showError('Erreur tampon Google : ' + friendlyGoogleError(e.message)); }
 }
 function confirmResetGoogleReview(client){
   const cid = googleReviewClientId(client);
@@ -313,7 +322,7 @@ async function resetGoogleReview(client){
     setMainStatus('Demande avis Google réinitialisée.');
     try{ await loadGoogleReviews(); }catch(_){}
     try{ await loadHistory(); }catch(_){}
-  }catch(e){ setApiState(false, 'Erreur Google'); showError('Erreur reset avis Google : ' + e.message); }
+  }catch(e){ setApiState(false, 'Erreur Google'); showError('Erreur reset avis Google : ' + friendlyGoogleError(e.message)); }
 }
 function showGoogleReviewClientPanel(client){
   const cid = googleReviewClientId(client);
