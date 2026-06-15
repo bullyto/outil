@@ -180,6 +180,240 @@ function wheelRewardShortLabel(w){
   if(id === 'WHEEL_REROLL') return 'Relance';
   return w && w.has_claim ? 'Gain roue' : 'Non';
 }
+
+function getGoogleReviewInfo(it){
+  const gr = it && it.google_review && typeof it.google_review === 'object' ? it.google_review : null;
+  if(gr) return gr;
+  return {
+    status: it && it.google_review_status ? it.google_review_status : 'none',
+    clicked_at: it && it.google_review_clicked_at,
+    review_count_before: it && it.google_review_count_before,
+    review_count_now: it && it.google_review_count_now,
+    checked_at: it && it.google_review_checked_at,
+    rewarded_at: it && it.google_review_rewarded_at,
+    rewarded_method: it && it.google_review_rewarded_method,
+    stamp_given: !!(it && it.google_review_stamp_given),
+    error_message: it && it.google_review_error
+  };
+}
+function googleReviewStatusLabel(gr){
+  const s = String(gr && gr.status || 'none');
+  if(s === 'pending_10min') return 'En attente 10 min';
+  if(s === 'waiting_1h') return 'En attente 1h';
+  if(s === 'rewarded') return 'Tampon donné';
+  if(s === 'manual_rewarded') return 'Tampon manuel';
+  if(s === 'expired') return 'Expiré';
+  if(s === 'error') return 'Erreur';
+  if(s === 'api_missing') return 'Google non configuré';
+  return 'Aucun';
+}
+function googleReviewStatusClass(gr){
+  const s = String(gr && gr.status || 'none');
+  if(s === 'rewarded' || s === 'manual_rewarded') return 'ok';
+  if(s === 'pending_10min' || s === 'waiting_1h') return 'warn';
+  if(s === 'expired' || s === 'error' || s === 'api_missing') return 'bad';
+  return 'off';
+}
+function googleReviewShortLine(it){
+  const gr = getGoogleReviewInfo(it);
+  const label = googleReviewStatusLabel(gr);
+  const s = String(gr.status || 'none');
+  if(s === 'pending_10min' && gr.clicked_at) return label + ' · clic ' + formatDateTime(gr.clicked_at);
+  if(s === 'waiting_1h' && gr.clicked_at) return label + ' · clic ' + formatDateTime(gr.clicked_at);
+  if((s === 'rewarded' || s === 'manual_rewarded') && gr.rewarded_at) return label + ' · ' + formatDateTime(gr.rewarded_at);
+  if(s === 'expired' && gr.checked_at) return label + ' · ' + formatDateTime(gr.checked_at);
+  if(s === 'error' && gr.error_message) return label + ' · ' + gr.error_message;
+  return label;
+}
+function googleReviewMessageForStatus(gr){
+  const s = String(gr && gr.status || 'none');
+  if(s === 'rewarded' || s === 'manual_rewarded') return 'Merci pour votre avis Google ⭐ Votre tampon fidélité a bien été ajouté à votre carte.';
+  if(s === 'expired') return 'Bonjour, nous n’avons pas encore pu détecter votre avis Google. Vous pourrez réessayer plus tard depuis votre carte fidélité.';
+  return 'Bonjour, votre avis Google est en cours de vérification. Patientez quelques minutes après publication, votre carte fidélité sera mise à jour automatiquement si l’avis est bien détecté.';
+}
+function renderGoogleReviewDetails(it){
+  const gr = getGoogleReviewInfo(it);
+  return `
+      <div class="hibair-detail-title">Avis Google</div>
+      <div class="hibair-detail-row"><span>Statut</span><b>${escapeHtml(googleReviewStatusLabel(gr))}</b></div>
+      <div class="hibair-detail-row"><span>Éligible</span><b>${Number(it.points || 0) === 3 ? 'Oui · carte à 3 tampons' : 'Non'}</b></div>
+      <div class="hibair-detail-row"><span>Tampon Google donné</span><b>${gr.stamp_given || gr.status === 'rewarded' || gr.status === 'manual_rewarded' ? 'Oui' : 'Non'}</b></div>
+      <div class="hibair-detail-row"><span>Avis avant clic</span><b>${gr.review_count_before !== undefined && gr.review_count_before !== null ? Number(gr.review_count_before) : '—'}</b></div>
+      <div class="hibair-detail-row"><span>Avis actuel</span><b>${gr.review_count_now !== undefined && gr.review_count_now !== null ? Number(gr.review_count_now) : '—'}</b></div>
+      <div class="hibair-detail-row"><span>Date du clic</span><b>${escapeHtml(formatDateTimeSeconds(gr.clicked_at))}</b></div>
+      <div class="hibair-detail-row"><span>Dernière vérification</span><b>${escapeHtml(formatDateTimeSeconds(gr.checked_at))}</b></div>
+      <div class="hibair-detail-row"><span>Récompense</span><b>${escapeHtml(formatDateTimeSeconds(gr.rewarded_at))}</b></div>
+      <div class="hibair-detail-row"><span>Méthode</span><b>${escapeHtml(gr.rewarded_method || '—')}</b></div>
+      ${gr.error_message ? `<div class="hibair-detail-row"><span>Erreur</span><b>${escapeHtml(gr.error_message)}</b></div>` : ''}`;
+}
+function googleReviewClientId(obj){ return obj && (obj.client_id || obj.id || obj.cid || currentClient.id || ''); }
+async function postGoogleReviewRoute(path, payload){
+  const key = await requireAdminAccess();
+  if(!key) return null;
+  const body = JSON.stringify({admin_key:key, ...payload});
+  return api(path, {method:'POST', headers:{'content-type':'text/plain;charset=utf-8','x-admin-key':key}, body});
+}
+async function verifyGoogleReviewForClient(client){
+  const cid = googleReviewClientId(client);
+  if(!cid) return showError('Client introuvable pour la vérification Google.');
+  try{
+    setMainStatus('Vérification avis Google en cours…');
+    await postGoogleReviewRoute('/admin/google-review/check', {client_id:cid});
+    setApiState(true, 'Avis vérifié ✅');
+    setMainStatus('Vérification Google terminée.');
+    try{ await loadGoogleReviews(); }catch(_){}
+    try{ await loadHistory(); }catch(_){}
+  }catch(e){ setApiState(false, 'Erreur Google'); showError('Erreur avis Google : ' + e.message); }
+}
+function confirmManualGoogleReward(client){
+  const cid = googleReviewClientId(client);
+  if(!cid) return showError('Client introuvable.');
+  showSmart({
+    title:'Donner le tampon Google ?',
+    sub:clientName(client),
+    body:`<p>Cette action ajoute le tampon Google manuellement et bloque normalement un deuxième tampon avis Google pour cette carte.</p><p><b>${escapeHtml(pointsLabel(client.points))}</b></p><p class="mono">${escapeHtml(cid)}</p>`,
+    actions:[
+      {label:'Confirmer tampon Google', onClick:()=>manualGoogleReward(client)},
+      {label:'Annuler', secondary:true}
+    ]
+  });
+}
+async function manualGoogleReward(client){
+  const cid = googleReviewClientId(client);
+  try{
+    setMainStatus('Ajout manuel du tampon Google…');
+    const r = await postGoogleReviewRoute('/admin/google-review/manual-reward', {client_id:cid});
+    const points = r && (r.points ?? r.total_points ?? r.current_points);
+    if(points !== undefined) setClient(cid, {...client, points});
+    setApiState(true, 'Tampon Google ✅');
+    showPointResult(cid, {...client, points: points ?? client.points}, points ?? client.points, Number(points ?? client.points) >= 8, 'Tampon Google ajouté manuellement.');
+    try{ await loadGoogleReviews(); }catch(_){}
+    try{ await loadHistory(); }catch(_){}
+  }catch(e){ setApiState(false, 'Erreur Google'); showError('Erreur tampon Google : ' + e.message); }
+}
+function confirmResetGoogleReview(client){
+  const cid = googleReviewClientId(client);
+  if(!cid) return showError('Client introuvable.');
+  showSmart({
+    title:'Réinitialiser la demande Google ?',
+    sub:clientName(client),
+    body:`<p>La demande d’avis Google sera remise à zéro. Le client pourra recommencer plus tard depuis sa carte si les règles le permettent.</p><p class="mono">${escapeHtml(cid)}</p>`,
+    actions:[
+      {label:'Réinitialiser', className:'danger', onClick:()=>resetGoogleReview(client)},
+      {label:'Annuler', secondary:true}
+    ]
+  });
+}
+async function resetGoogleReview(client){
+  const cid = googleReviewClientId(client);
+  try{
+    setMainStatus('Réinitialisation avis Google…');
+    await postGoogleReviewRoute('/admin/google-review/reset', {client_id:cid});
+    setApiState(true, 'Avis Google reset ✅');
+    setMainStatus('Demande avis Google réinitialisée.');
+    try{ await loadGoogleReviews(); }catch(_){}
+    try{ await loadHistory(); }catch(_){}
+  }catch(e){ setApiState(false, 'Erreur Google'); showError('Erreur reset avis Google : ' + e.message); }
+}
+function showGoogleReviewClientPanel(client){
+  const cid = googleReviewClientId(client);
+  const gr = getGoogleReviewInfo(client);
+  showSmart({
+    title:'Avis Google ⭐',
+    sub:clientName(client),
+    body:`<div class="hibair-detail-grid">
+      <div class="hibair-detail-row"><span>Client</span><b>${escapeHtml(clientName(client))}</b></div>
+      <div class="hibair-detail-row"><span>Téléphone</span><b>${escapeHtml(displayPhone(rawPhoneForClient(client), client.phone_last4))}</b></div>
+      <div class="hibair-detail-row"><span>Carte</span><b>${escapeHtml(pointsLabel(client.points))}</b></div>
+      ${renderGoogleReviewDetails(client)}
+      <div class="hibair-detail-title">Message client</div>
+      <div class="google-review-note">${escapeHtml(googleReviewMessageForStatus(gr))}</div>
+      <div class="hibair-detail-title">ID</div>
+      <div class="mono" style="font-size:11px;color:var(--soft);overflow-wrap:anywhere">${escapeHtml(cid)}</div>
+    </div>`,
+    actions:[
+      {label:'Vérifier', onClick:()=>verifyGoogleReviewForClient(client)},
+      {label:'Tampon manuel', onClick:()=>confirmManualGoogleReward(client)},
+      {label:'Reset', secondary:true, onClick:()=>confirmResetGoogleReview(client)},
+      {label:'Copier message', secondary:true, onClick:()=>copyText(googleReviewMessageForStatus(gr), 'Message avis Google copié.')},
+      {label:'Fermer', secondary:true}
+    ]
+  });
+}
+function renderGoogleReviewStats(data){
+  const host = $('googleReviewStats');
+  if(!host) return;
+  const stats = (data && data.stats) || data || {};
+  host.innerHTML = `
+    <div class="google-stat"><span>En attente</span><b>${Number(stats.pending || stats.waiting || 0)}</b></div>
+    <div class="google-stat"><span>Récompensés</span><b>${Number(stats.rewarded || 0)}</b></div>
+    <div class="google-stat"><span>Erreurs</span><b>${Number(stats.errors || stats.error || 0)}</b></div>`;
+}
+function normalizeGoogleReviewRequest(it){
+  const gr = getGoogleReviewInfo(it);
+  return {
+    ...it,
+    google_review: gr,
+    client_id: it.client_id || it.card_id || it.id || '',
+    name: it.name || it.client_name || 'Client',
+    phone: it.phone || it.phone_digits || '',
+    points: it.points ?? it.points_before ?? null
+  };
+}
+function renderGoogleReviewRequests(items){
+  const host = $('googleReviewList');
+  if(!host) return;
+  if(!items || !items.length){ host.innerHTML = '<div class="hint">Aucune demande d’avis Google à afficher.</div>'; return; }
+  host.innerHTML = '';
+  items.forEach(raw=>{
+    const it = normalizeGoogleReviewRequest(raw);
+    const gr = getGoogleReviewInfo(it);
+    const cid = googleReviewClientId(it);
+    const card = document.createElement('article');
+    card.className = 'google-review-card';
+    card.innerHTML = `
+      <div class="result-top">
+        <div>
+          <div class="result-name">${escapeHtml(it.name || 'Client')}</div>
+          <div class="result-meta mono">${escapeHtml(displayPhone(it.phone || it.phone_digits || '', it.phone_last4))}</div>
+          <div class="result-meta">Clic : ${escapeHtml(formatDateTime(gr.clicked_at))}</div>
+        </div>
+        <div class="result-meta"><span class="google-status ${googleReviewStatusClass(gr)}">⭐ ${escapeHtml(googleReviewStatusLabel(gr))}</span><br>${escapeHtml(pointsLabel(it.points))}</div>
+      </div>
+      <div class="google-review-note">Avis avant : <b>${gr.review_count_before ?? '—'}</b> · Avis actuel : <b>${gr.review_count_now ?? '—'}</b>${gr.error_message ? '<br>Erreur : '+escapeHtml(gr.error_message) : ''}</div>
+      <div class="result-actions">
+        <button class="small" data-action="check">Vérifier</button>
+        <button class="secondary small" data-action="details">Détails</button>
+        <button class="secondary small" data-action="manual">Tampon</button>
+        <button class="secondary small" data-action="copy">Message</button>
+      </div>`;
+    card.querySelector('[data-action="check"]').addEventListener('click', ()=>verifyGoogleReviewForClient({...it, client_id:cid}));
+    card.querySelector('[data-action="details"]').addEventListener('click', ()=>showGoogleReviewClientPanel({...it, client_id:cid}));
+    card.querySelector('[data-action="manual"]').addEventListener('click', ()=>confirmManualGoogleReward({...it, client_id:cid}));
+    card.querySelector('[data-action="copy"]').addEventListener('click', ()=>copyText(googleReviewMessageForStatus(gr), 'Message avis Google copié.'));
+    host.appendChild(card);
+  });
+}
+async function loadGoogleReviews(){
+  const key = await requireAdminAccess();
+  if(!key) return;
+  setMainStatus('Chargement avis Google…');
+  if(!API_BASE){ renderGoogleReviewStats({pending:0,rewarded:0,errors:0}); renderGoogleReviewRequests([]); setApiState(true, 'Démo locale'); return; }
+  try{
+    const r = await api('/admin/google-review/requests?limit=50', {method:'GET', headers:{'x-admin-key':key}});
+    renderGoogleReviewStats(r.stats ? r : {stats:r});
+    renderGoogleReviewRequests(r.items || r.requests || r.history || []);
+    setApiState(true, 'Avis Google OK');
+    setMainStatus('Avis Google actualisés.');
+  }catch(e){
+    renderGoogleReviewStats({pending:0,rewarded:0,errors:1});
+    const msg = String(e && e.message || e);
+    const host = $('googleReviewList');
+    if(host) host.innerHTML = `<div class="hint">Routes Avis Google pas encore disponibles ou erreur Worker : ${escapeHtml(msg)}</div>`;
+    setApiState(false, 'Avis Google indisponible');
+    setMainStatus('Avis Google indisponible pour le moment.');
+  }
+}
 function renderHibairMini(it){
   ensureHibairAdminStyles();
   const g = getGameInfo(it);
@@ -192,16 +426,20 @@ function renderHibairMini(it){
   const deliveryClaimAt = g.free_delivery_claimed_at || (it.rewards && it.rewards.GAME_35) || null;
   const fdActive = !!fd.active;
   const fdTxt = fdActive ? `Active · ${msLeftLabel(fd.expires_at)}` : (fd.expires_at ? `Expirée le ${formatDateTime(fd.expires_at)}` : 'Non');
+  const gr = getGoogleReviewInfo(it);
+  const grClass = googleReviewStatusClass(gr);
   return `
     <div class="hibair-mini">
       <div class="hibair-line"><span>🎮 Hib’air Drink</span><b class="${hasGame ? 'ok' : 'off'}">${hasGame ? 'Oui' : 'Non'}${hasGame && best !== null ? ' · Score max '+best : ''}</b></div>
       <div class="hibair-line"><span>🚚 Livraison offerte</span><b class="${fdActive ? 'ok' : 'off'}">${escapeHtml(fdTxt)}</b></div>
       <div class="hibair-line"><span>🎡 Roue de la chance</span><b class="${hasWheel ? 'ok' : 'off'}">${hasWheel ? escapeHtml(wheelRewardShortLabel(wheel)) : 'Non'}</b></div>
+      <div class="hibair-line"><span>⭐ Avis Google</span><b class="${grClass}">${escapeHtml(googleReviewShortLine(it))}</b></div>
       <div class="hibair-badges">
         ${stampAt ? '<span class="hibair-badge game">+1 jeu débloqué</span>' : '<span class="hibair-badge">+1 jeu non réclamé</span>'}
         ${deliveryClaimAt ? '<span class="hibair-badge game">Palier 35 réclamé</span>' : '<span class="hibair-badge">Palier 35 non réclamé</span>'}
         ${fdActive ? '<span class="hibair-badge active">Livraison active</span>' : ''}
         ${hasWheel ? '<span class="hibair-badge wheel">Roue : '+escapeHtml(wheelRewardShortLabel(wheel))+'</span>' : '<span class="hibair-badge">Roue non jouée</span>'}
+        ${gr.status && gr.status !== 'none' ? '<span class="hibair-badge '+(grClass === 'ok' ? 'active' : grClass === 'warn' ? 'wheel' : '')+'">Avis Google : '+escapeHtml(googleReviewStatusLabel(gr))+'</span>' : '<span class="hibair-badge">Avis Google aucun</span>'}
       </div>
     </div>`;
 }
@@ -242,6 +480,7 @@ function showClientDetails(it){
       <div class="hibair-detail-row"><span>Activée le</span><b>${escapeHtml(formatDateTime(fd.starts_at || fd.created_at))}</b></div>
       <div class="hibair-detail-row"><span>Expire le</span><b>${escapeHtml(formatDateTimeSeconds(fd.expires_at))}</b></div>
       <div class="hibair-detail-row"><span>Temps restant</span><b>${fd.active ? escapeHtml(msLeftLabel(fd.expires_at)) : '—'}</b></div>
+      ${renderGoogleReviewDetails(it)}
       <div class="hibair-detail-title">ID</div>
       <div class="mono" style="font-size:11px;color:var(--soft);overflow-wrap:anywhere">${escapeHtml(cid)}</div>
     </div>`;
@@ -251,6 +490,7 @@ function showClientDetails(it){
   }else{
     actions.push({label:'Sélectionner', onClick:()=>{ setClient(cid, {name:it.name, phone:rawPhoneForClient(it), points:it.points}); setMainStatus('Client sélectionné depuis les détails.'); }});
   }
+  actions.push({label:'Avis Google', secondary:true, onClick:()=>showGoogleReviewClientPanel({...it, client_id:cid})});
   actions.push({label:'QR', secondary:true, onClick:()=>showRecoveryQr(cid, it)});
   actions.push({label:'Fermer', secondary:true});
   showSmart({
@@ -724,6 +964,7 @@ $("btnStamp").addEventListener("click", stamp);
 $("btnSearch").addEventListener("click", search);
 $("btnClear").addEventListener("click", clearResults);
 if($("btnHistory")) $("btnHistory").addEventListener("click", loadHistory);
+if($("btnGoogleReviews")) $("btnGoogleReviews").addEventListener("click", loadGoogleReviews);
 $("btnCloseQr").addEventListener("click", ()=>closeModal(qrModal));
 $("btnCopy").addEventListener("click", ()=>copyText(($("clientId").value||"").trim(), "ID copié."));
 $("btnQrStamp").addEventListener("click", ()=>{
