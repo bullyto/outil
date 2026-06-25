@@ -193,6 +193,119 @@
       font-weight:750;
     }
 
+    /* ===== Popup alerte Agent IA Facebook ===== */
+    .adn-ai-alert-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:9999;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background:rgba(2,6,23,.72);
+      backdrop-filter:blur(8px);
+    }
+
+    .adn-ai-alert-backdrop.show{
+      display:flex;
+    }
+
+    .adn-ai-alert{
+      width:min(560px,100%);
+      border-radius:24px;
+      border:1px solid rgba(220,38,38,.55);
+      background:
+        radial-gradient(circle at top left, rgba(220,38,38,.22), transparent 34%),
+        linear-gradient(180deg, rgba(17,24,39,.98), rgba(11,18,32,.98));
+      box-shadow:0 24px 70px rgba(0,0,0,.55);
+      padding:20px;
+      color:var(--text);
+    }
+
+    .adn-ai-alert-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:12px;
+    }
+
+    .adn-ai-alert-title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:0;
+      font-size:20px;
+      line-height:1.15;
+      font-weight:950;
+      color:#fecaca;
+    }
+
+    .adn-ai-alert-close{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      border:1px solid rgba(248,250,252,.14);
+      background:rgba(15,23,42,.85);
+      color:#f8fafc;
+      font-size:22px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .adn-ai-alert p{
+      margin:0 0 12px;
+      color:var(--text-soft);
+      line-height:1.45;
+      font-size:14px;
+      font-weight:750;
+    }
+
+    .adn-ai-alert-list{
+      margin:12px 0;
+      padding:12px;
+      border-radius:16px;
+      background:rgba(15,23,42,.72);
+      border:1px solid rgba(220,38,38,.30);
+      color:#fecaca;
+      font-size:13px;
+      line-height:1.45;
+      font-weight:800;
+      white-space:pre-wrap;
+    }
+
+    .adn-ai-alert-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .adn-ai-alert-actions a,
+    .adn-ai-alert-actions button{
+      min-height:44px;
+      border-radius:14px;
+      border:0;
+      padding:12px 14px;
+      font-weight:950;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .adn-ai-alert-primary{
+      background:var(--primary);
+      color:white;
+    }
+
+    .adn-ai-alert-secondary{
+      background:#0f172a;
+      color:var(--text);
+      border:1px solid var(--border)!important;
+    }
+
     @media (max-width: 1060px){
       .shortcut-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
     }
@@ -206,6 +319,8 @@
       .shortcut-btn{min-height:auto;flex-direction:row;align-items:center;justify-content:flex-start}
       .shortcut-head{justify-content:flex-start}
       .shortcut-rank{display:none}
+      .adn-ai-alert-actions a,
+      .adn-ai-alert-actions button{width:100%}
     }
   </style>
 </head>
@@ -309,6 +424,34 @@
     </section>
   </main>
 
+  <div class="adn-ai-alert-backdrop" id="adnAiAlertBackdrop" role="dialog" aria-modal="true" aria-labelledby="adnAiAlertTitle">
+    <div class="adn-ai-alert">
+      <div class="adn-ai-alert-head">
+        <h2 class="adn-ai-alert-title" id="adnAiAlertTitle">⚠️ Problème Agent IA Facebook</h2>
+        <button class="adn-ai-alert-close" type="button" id="adnAiAlertClose" aria-label="Fermer">×</button>
+      </div>
+
+      <p>
+        La publication automatique Facebook semble avoir un problème. Vérifiez le token Meta/Facebook,
+        l’activation automatique ou la prochaine publication prévue.
+      </p>
+
+      <div class="adn-ai-alert-list" id="adnAiAlertDetails">Diagnostic indisponible.</div>
+
+      <div class="adn-ai-alert-actions">
+        <a class="adn-ai-alert-primary" href="https://agent-ia.apero-nuit-du-66.workers.dev/admin?key=test123" target="_blank" rel="noopener">
+          Ouvrir Agent IA
+        </a>
+        <a class="adn-ai-alert-secondary" href="https://agent-ia.apero-nuit-du-66.workers.dev/admin/auto-status?key=test123" target="_blank" rel="noopener">
+          Voir diagnostic
+        </a>
+        <button class="adn-ai-alert-secondary" type="button" id="adnAiAlertIgnore">
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
@@ -318,6 +461,115 @@
       });
     }
   </script>
+
+  <script>
+    (function () {
+      const AGENT_IA_STATUS_URL = "https://agent-ia.apero-nuit-du-66.workers.dev/admin/auto-status?key=test123";
+      const CHECK_TIMEOUT_MS = 8000;
+
+      const backdrop = document.getElementById("adnAiAlertBackdrop");
+      const detailsBox = document.getElementById("adnAiAlertDetails");
+      const closeBtn = document.getElementById("adnAiAlertClose");
+      const ignoreBtn = document.getElementById("adnAiAlertIgnore");
+
+      function showAiAlert(lines) {
+        if (!backdrop || !detailsBox) return;
+        detailsBox.textContent = lines.join("\n");
+        backdrop.classList.add("show");
+      }
+
+      function hideAiAlert() {
+        if (!backdrop) return;
+        backdrop.classList.remove("show");
+      }
+
+      if (closeBtn) closeBtn.addEventListener("click", hideAiAlert);
+      if (ignoreBtn) ignoreBtn.addEventListener("click", hideAiAlert);
+      if (backdrop) {
+        backdrop.addEventListener("click", function (event) {
+          if (event.target === backdrop) hideAiAlert();
+        });
+      }
+
+      async function checkAgentIaStatus() {
+        const controller = new AbortController();
+        const timeout = setTimeout(function () {
+          controller.abort();
+        }, CHECK_TIMEOUT_MS);
+
+        try {
+          const response = await fetch(AGENT_IA_STATUS_URL, {
+            method: "GET",
+            cache: "no-store",
+            signal: controller.signal
+          });
+
+          clearTimeout(timeout);
+
+          if (!response.ok) {
+            showAiAlert([
+              "Worker Agent IA inaccessible.",
+              "Erreur HTTP : " + response.status,
+              "Action : ouvrir l’admin Agent IA et vérifier le Worker Cloudflare."
+            ]);
+            return;
+          }
+
+          const data = await response.json();
+
+          const problems = [];
+
+          if (!data || data.ok !== true) {
+            problems.push("Le diagnostic Agent IA ne répond pas correctement.");
+          }
+
+          if (data.enabled !== true) {
+            problems.push("Auto-publication désactivée.");
+          }
+
+          if (!data.token_status || data.token_status.ok !== true) {
+            problems.push("Token Facebook invalide ou impossible à vérifier.");
+          }
+
+          if (!data.next_date || !data.next_time) {
+            problems.push("Aucune prochaine publication programmée.");
+          }
+
+          if (data.last_status && String(data.last_status).toLowerCase().includes("error")) {
+            problems.push("Dernier statut en erreur : " + (data.last_message || "Erreur inconnue."));
+          }
+
+          if (data.token_status && data.token_status.error) {
+            problems.push("Erreur token : " + data.token_status.error);
+          }
+
+          if (problems.length > 0) {
+            showAiAlert([
+              "Diagnostic Agent IA Facebook : problème détecté.",
+              "",
+              ...problems,
+              "",
+              "Dernier message : " + (data.last_message || "Aucun"),
+              "Prochaine publication : " + ((data.next_date && data.next_time) ? data.next_date + " à " + data.next_time : "non définie")
+            ]);
+          }
+        } catch (error) {
+          clearTimeout(timeout);
+
+          showAiAlert([
+            "Impossible de vérifier l’Agent IA Facebook.",
+            "Erreur : " + (error && error.message ? error.message : String(error)),
+            "Causes possibles : Worker inaccessible, réseau, CORS, clé admin invalide ou Cloudflare indisponible."
+          ]);
+        }
+      }
+
+      window.addEventListener("load", function () {
+        setTimeout(checkAgentIaStatus, 1200);
+      });
+    })();
+  </script>
+
   <script src="./admin-gate.js"></script>
 </body>
 </html>
