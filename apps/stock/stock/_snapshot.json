@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scope": "vehicule",
-  "updatedAt": "2026-06-08T20:50:50.342Z",
+  "updatedAt": "2026-06-26T02:37:12.240Z",
   "items": [
     {
       "id": "cacahuette",
@@ -33,11 +33,11 @@
     },
     {
       "id": "poliakov",
-      "qty": 5
+      "qty": 1
     },
     {
       "id": "absolut",
-      "qty": 2
+      "qty": 4
     },
     {
       "id": "ciroc_classic",
@@ -57,19 +57,19 @@
     },
     {
       "id": "label_5",
-      "qty": 2
+      "qty": 1
     },
     {
       "id": "ballantines",
-      "qty": 2
+      "qty": 5
     },
     {
       "id": "jack_old7",
-      "qty": 2
+      "qty": 4
     },
     {
       "id": "jack_honey",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "old_nick_darkwood",
@@ -77,11 +77,11 @@
     },
     {
       "id": "captain_morgan",
-      "qty": 1
+      "qty": 4
     },
     {
       "id": "havana_especial",
-      "qty": 1
+      "qty": 5
     },
     {
       "id": "saint_james_blanc",
@@ -97,23 +97,23 @@
     },
     {
       "id": "get_27",
-      "qty": 1
+      "qty": 2
     },
     {
       "id": "jagermeister",
-      "qty": 1
+      "qty": 3
     },
     {
       "id": "gibsons_gin",
-      "qty": 1
+      "qty": 3
     },
     {
       "id": "gordons_gin",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "tequila_sanjose",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "ricard",
@@ -121,19 +121,19 @@
     },
     {
       "id": "pastis_51",
-      "qty": 1
+      "qty": 0
     },
     {
       "id": "xv_catalan_rose",
-      "qty": 1
+      "qty": 3
     },
     {
       "id": "xv_catalan_blanc",
-      "qty": 1
+      "qty": 2
     },
     {
       "id": "xv_catalan_rouge",
-      "qty": 1
+      "qty": 5
     },
     {
       "id": "muscat",
