@@ -188,19 +188,68 @@ function wheelRewardShortLabel(w){
 
 function getGoogleReviewInfo(it){
   const gr = it && it.google_review && typeof it.google_review === 'object' ? it.google_review : null;
-  if(gr) return gr;
+  const src = gr || {};
+
+  // Compat Worker / GitHub :
+  // Le Worker ADN66 renvoie "review_count_after" pour le compteur actuel.
+  // L'ancienne interface admin affichait seulement "review_count_now", donc elle mettait "—".
+  const before =
+    src.review_count_before ??
+    src.google_review_count_before ??
+    (it && it.review_count_before) ??
+    (it && it.google_review_count_before) ??
+    null;
+
+  const after =
+    src.review_count_now ??
+    src.review_count_after ??
+    src.google_review_count_now ??
+    src.google_review_count_after ??
+    (it && it.review_count_now) ??
+    (it && it.review_count_after) ??
+    (it && it.google_review_count_now) ??
+    (it && it.google_review_count_after) ??
+    null;
+
+  const checkedAt =
+    src.checked_at ??
+    src.last_checked_at ??
+    src.checked_10min_at ??
+    src.checked_1h_at ??
+    (it && it.checked_at) ??
+    (it && it.last_checked_at) ??
+    (it && it.checked_10min_at) ??
+    (it && it.checked_1h_at) ??
+    (it && it.google_review_checked_at) ??
+    null;
+
+  const rewardedAt =
+    src.rewarded_at ??
+    (it && it.rewarded_at) ??
+    (it && it.google_review_rewarded_at) ??
+    null;
+
+  const status =
+    src.status ??
+    (it && it.status) ??
+    (it && it.google_review_status) ??
+    'none';
+
   return {
-    status: it && it.google_review_status ? it.google_review_status : 'none',
-    clicked_at: it && it.google_review_clicked_at,
-    review_count_before: it && it.google_review_count_before,
-    review_count_now: it && it.google_review_count_now,
-    checked_at: it && it.google_review_checked_at,
-    rewarded_at: it && it.google_review_rewarded_at,
-    rewarded_method: it && it.google_review_rewarded_method,
-    stamp_given: !!(it && it.google_review_stamp_given),
-    error_message: it && it.google_review_error
+    ...src,
+    status,
+    clicked_at: src.clicked_at ?? (it && it.clicked_at) ?? (it && it.google_review_clicked_at) ?? null,
+    review_count_before: before,
+    review_count_now: after,
+    review_count_after: after,
+    checked_at: checkedAt,
+    rewarded_at: rewardedAt,
+    rewarded_method: src.rewarded_method ?? (it && it.google_review_rewarded_method) ?? null,
+    stamp_given: !!(src.stamp_given || status === 'rewarded' || status === 'manual_rewarded' || (it && it.google_review_stamp_given)),
+    error_message: src.error_message ?? src.error ?? (it && it.google_review_error) ?? null
   };
 }
+
 function googleReviewStatusLabel(gr){
   const s = String(gr && gr.status || 'none');
   if(s === 'pending_10min') return 'En attente 10 min';
