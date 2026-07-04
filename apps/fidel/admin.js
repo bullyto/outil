@@ -66,40 +66,45 @@ function formatDateTime(iso){
 }
 function getWorkerAdminKey(){
   try{
+    // Version simplifiée : le champ visible sert directement de mot de passe serveur ADMIN_KEY.
+    // On lit d'abord ce que l'admin vient de taper, puis l'ancienne valeur mémorisée.
+    const typed = ($("adminKey") && $("adminKey").value || "").trim();
+    if(typed) return typed;
+
+    const saved = String(localStorage.getItem(WORKER_KEY_STORAGE) || "").trim();
+    if(saved) return saved;
+
+    // Compatibilité si un ancien admin-gate est encore présent sur une vieille page en cache.
     if(window.ADNAdminGate && typeof window.ADNAdminGate.getWorkerKey === "function"){
       const k = window.ADNAdminGate.getWorkerKey();
       if(k) return String(k).trim();
     }
-    return String(localStorage.getItem(WORKER_KEY_STORAGE) || "").trim();
+    return "";
   }catch(_){ return ""; }
 }
-function getSavedLocalPin(){
-  try{ return String(localStorage.getItem(ADMIN_LS) || "").trim(); }catch(_){ return ""; }
+function saveWorkerAdminKey(key){
+  try{ localStorage.setItem(WORKER_KEY_STORAGE, String(key || "").trim()); }catch(_){}
 }
-function saveLocalPin(pin){
-  try{ localStorage.setItem(ADMIN_LS, String(pin || "").trim()); }catch(_){}
+function clearWorkerAdminKey(){
+  try{
+    localStorage.removeItem(WORKER_KEY_STORAGE);
+    localStorage.removeItem(ADMIN_LS); // ancien code local, supprimé pour éviter les conflits après changement ADMIN_KEY
+  }catch(_){}
 }
-async function checkLocalPin(){
-  const input = $("adminKey");
-  const typed = (input && input.value || "").trim();
-  const saved = getSavedLocalPin();
-  const pin = typed || saved;
-  if(!pin){ showError("Code local obligatoire."); return false; }
-  let ok = false;
-  try{ ok = (await sha256Text(pin)) === LOCAL_MODULE_PIN_HASH; }catch(_){ ok = false; }
-  if(!ok){ showError("Code local incorrect."); return false; }
-  saveLocalPin(pin);
-  if(input && !typed) input.value = pin;
-  return true;
-}
+function getSavedLocalPin(){ return ""; }
+function saveLocalPin(_pin){}
+async function checkLocalPin(){ return true; }
 async function requireAdminAccess(){
-  if(!(await checkLocalPin())) return "";
   const key = getWorkerAdminKey();
   if(!key){
-    if(window.ADNAdminGate && typeof window.ADNAdminGate.lock === "function") window.ADNAdminGate.lock();
-    showError("Accès admin serveur manquant. Entrez le mot de passe d’accès au démarrage de la page.");
+    showError("Mot de passe admin serveur obligatoire. Mets ici la valeur actuelle de ADMIN_KEY Cloudflare.");
     return "";
   }
+  saveWorkerAdminKey(key);
+  const input = $("adminKey");
+  if(input && !input.value) input.value = key;
+  const who = $("who");
+  if(who) who.textContent = "Accès serveur prêt";
   return key;
 }
 function pointsLabel(points){ return points === null || points === undefined || points === "" ? "Points : ?" : `Points : ${Number(points||0)}/8`; }
@@ -531,7 +536,17 @@ async function api(path, opts={}){
   const res = await fetch(url, { headers:{"content-type":"application/json"}, ...opts });
   const ct = res.headers.get("content-type") || "";
   const data = ct.includes("application/json") ? await res.json() : await res.text();
-  if(!res.ok) throw new Error((data && data.error) ? data.error : ("HTTP "+res.status));
+  if(!res.ok){
+    if(res.status === 401){
+      clearWorkerAdminKey();
+      const input = $("adminKey");
+      if(input) input.value = "";
+      const who = $("who");
+      if(who) who.textContent = "Mot de passe refusé";
+      throw new Error("Mot de passe admin serveur incorrect. Remets la nouvelle ADMIN_KEY Cloudflare dans le champ puis recommence.");
+    }
+    throw new Error((data && data.error) ? data.error : ("HTTP "+res.status));
+  }
   return data;
 }
 
@@ -987,13 +1002,26 @@ $("btnCopyQrLink").addEventListener("click", ()=>copyText(currentQr.url, "Lien Q
 $("btnQrSelect").addEventListener("click", ()=>{ setClient(currentQr.id, currentQr.meta||{}); closeModal(qrModal); setMainStatus("Client sélectionné depuis le QR."); });
 
 $("searchPhone").addEventListener("keydown", (e)=>{ if(e.key === "Enter"){ e.preventDefault(); search(); } });
-$("adminKey").addEventListener("input", ()=>{ $("who").textContent = $("adminKey").value ? "Code local saisi" : "—"; });
-window.addEventListener("adn-admin-gate-unlocked", ()=>setMainStatus("Accès Age Gate validé. Vous pouvez charger l’historique."));
+$("adminKey").addEventListener("input", ()=>{
+  const v = $("adminKey").value.trim();
+  if(v) saveWorkerAdminKey(v);
+  $("who").textContent = v ? "ADMIN_KEY saisi" : "—";
+});
+$("adminKey").addEventListener("keydown", (e)=>{
+  if(e.key === "Enter"){
+    e.preventDefault();
+    loadHistory();
+  }
+});
+window.addEventListener("adn-admin-gate-unlocked", ()=>setMainStatus("Accès admin validé. Vous pouvez charger l’historique."));
 
-const saved = getSavedLocalPin();
+// Migration : l'ancienne version utilisait un code local séparé. On le retire pour éviter
+// qu'un ancien 0000 soit confondu avec la nouvelle ADMIN_KEY Cloudflare.
+try{ localStorage.removeItem(ADMIN_LS); }catch(_){}
+const saved = (()=>{ try{ return String(localStorage.getItem(WORKER_KEY_STORAGE) || "").trim(); }catch(_){ return ""; } })();
 if(saved && $("adminKey")) $("adminKey").value = saved;
-$("who").textContent = saved ? "Code local OK" : "—";
+$("who").textContent = saved ? "Accès serveur mémorisé" : "—";
 setEnvPill();
 setApiState(true, API_BASE ? "Serveur" : "Démo locale");
 setClient("", {});
-setMainStatus("Prêt.");
+setMainStatus("Prêt. Mets la nouvelle ADMIN_KEY Cloudflare dans le champ, puis actualise l’historique.");

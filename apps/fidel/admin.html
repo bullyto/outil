@@ -71,9 +71,9 @@
       <div class="card-h"><h1>Action rapide</h1><div class="mono hint" id="who">—</div></div>
       <div class="card-body">
         <div>
-          <label>Code module local</label>
-          <input id="adminKey" class="mono" type="password" inputmode="numeric" autocomplete="off" placeholder="Code local" />
-          <div class="hint">Double validation obligatoire : accès admin + code local du module. Aucun historique ne sera chargé sans validation serveur.</div>
+          <label>Mot de passe admin serveur</label>
+          <input id="adminKey" class="mono" type="password" autocomplete="off" placeholder="ADMIN_KEY Cloudflare" />
+          <div class="hint">Version simplifiée : ce champ utilise directement la valeur actuelle de <b>ADMIN_KEY</b> Cloudflare. Si tu changes ADMIN_KEY, remets simplement la nouvelle valeur ici.</div>
         </div>
 
         <input id="clientId" class="mono" placeholder="UUID..." />
@@ -166,7 +166,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/@zxing/browser@latest/umd/index.min.js"></script>
-  <script src="./admin-gate.js?v=20260608-mdp-fix"></script>
-  <script src="./admin.js?v=20260615-google-review-admin"></script>
+  <script src="./admin.js?v=20260704-admin-key-direct"></script>
 </body>
 </html>
