@@ -1,7 +1,7 @@
 {
-  "active": false,
-  "mode": "none",
-  "last_update": "2026-07-13T19:48:53.113+02:00",
+  "active": true,
+  "mode": "warning",
+  "last_update": "2026-07-14T00:57:15.129+02:00",
   "modes": {
     "info": {
       "title": "Ouverture exceptionnel",
@@ -13,9 +13,9 @@
       "image_catalan_disabled": true
     },
     "warning": {
-      "title": "EXCEPTIONNELLEMENT FERMER",
-      "message": "Merci pour vôtre compréhension.",
-      "image": "images/incident.png",
+      "title": "Panne",
+      "message": "Panne véhicule",
+      "image": "images/panne.png",
       "severity": "warning",
       "block_order": true,
       "block_schedule": {
@@ -28,7 +28,7 @@
         ]
       },
       "warning_click_message": "Ce n'est actuellement pas possible de commander.",
-      "image_catalan": "",
+      "image_catalan": "images/CATALAN_panne_1.png",
       "image_catalan_disabled": false
     }
   },
@@ -51,7 +51,7 @@
     },
     "panne": {
       "title": "Panne",
-      "message": "Il n’est pas possible de payer par carte ce soir. Nous acceptons uniquement les paiements en espèces. Merci de votre compréhension.\n\nVous pouvez commander directement par téléphone au 06 52 33 64 61.",
+      "message": "Panne véhicule",
       "image": "images/panne.png",
       "severity": "info",
       "image_catalan": "images/CATALAN_panne_1.png",
@@ -83,7 +83,7 @@
     }
   },
   "created_at": "2026-01-01T19:53:43.073+01:00",
-  "published_at": "2026-07-13T19:48:53.113+02:00",
+  "published_at": "2026-07-14T00:57:15.129+02:00",
   "ends_at": "",
   "starts_at": "2026-01-01T19:56:27.600+01:00"
 }
