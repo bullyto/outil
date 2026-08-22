@@ -1,7 +1,7 @@
 {
-  "active": false,
+  "active": true,
   "mode": "none",
-  "last_update": "2026-08-22T21:11:29.032+02:00",
+  "last_update": "2026-08-22T21:45:30.372+02:00",
   "modes": {
     "info": {
       "title": "Fermeture exeptionel",
@@ -83,7 +83,7 @@
     }
   },
   "created_at": "2026-01-01T19:53:43.073+01:00",
-  "published_at": "2026-08-22T21:11:29.032+02:00",
+  "published_at": "2026-08-22T21:45:30.372+02:00",
   "ends_at": "",
   "starts_at": "2026-01-01T19:56:27.600+01:00"
 }
