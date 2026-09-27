@@ -1,7 +1,7 @@
 {
-  "active": false,
-  "mode": "none",
-  "last_update": "2026-09-09T19:24:03.120+02:00",
+  "active": true,
+  "mode": "warning",
+  "last_update": "2026-09-27T15:05:42.469+02:00",
   "modes": {
     "info": {
       "title": "",
@@ -13,22 +13,23 @@
       "image_catalan_disabled": true
     },
     "warning": {
-      "title": "Panne",
-      "message": "Panne véhicule",
-      "image": "images/ADN66_panne_3.png",
+      "title": "Fermeture",
+      "message": "Stage annuel de sensibilisation à la sécurité routière.\n\nNous serons exceptionnellement fermés les nuits du :\n\nDimanche 27,\nLundi 28,\nmardi 29.",
+      "image": "images/ADN66_securite.png",
       "severity": "warning",
       "block_order": true,
       "block_schedule": {
-        "enabled": false,
+        "enabled": true,
         "start": "18:45",
-        "end": "18:48",
+        "end": "10:20",
         "days": [
-          3,
-          4
+          1,
+          2,
+          0
         ]
       },
       "warning_click_message": "Ce n'est actuellement pas possible de commander.",
-      "image_catalan": "images/CATALAN_panne_2.png",
+      "image_catalan": "images/CATALAN_fermeture_1.png",
       "image_catalan_disabled": false
     }
   },
@@ -58,11 +59,11 @@
       "image_catalan_disabled": false
     },
     "sécurité": {
-      "title": "Sécurité",
-      "message": "Mesure de sécurité en cours. Service temporairement indisponible.",
-      "image": "images/sécurité.png",
+      "title": "Fermeture",
+      "message": "Stage annuel de sensibilisation à la sécurité routière.\n\nNous serons exceptionnellement fermés les nuits du :\n\nDimanche 27,\nLundi 28,\nmardi 29.",
+      "image": "images/ADN66_securite.png",
       "severity": "info",
-      "image_catalan": "images/CATALAN_incident_1.png",
+      "image_catalan": "images/CATALAN_fermeture_1.png",
       "image_catalan_disabled": false
     },
     "libre": {
@@ -83,7 +84,7 @@
     }
   },
   "created_at": "2026-01-01T19:53:43.073+01:00",
-  "published_at": "2026-09-09T19:24:03.120+02:00",
+  "published_at": "2026-09-27T15:05:42.469+02:00",
   "ends_at": "",
   "starts_at": "2026-01-01T19:56:27.600+01:00"
 }
